@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.CoreFramework", "com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj", "{3AD30AB1-3984-47C7-8D1C-91A8FD7067AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AD30AB1-3984-47C7-8D1C-91A8FD7067AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AD30AB1-3984-47C7-8D1C-91A8FD7067AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AD30AB1-3984-47C7-8D1C-91A8FD7067AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AD30AB1-3984-47C7-8D1C-91A8FD7067AF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2428CC27-0744-4C10-B541-870D4771F127}
+	EndGlobalSection
+EndGlobal
