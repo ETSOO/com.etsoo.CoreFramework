@@ -1,169 +1,93 @@
-﻿using com.etsoo.CoreFramework.ActionResult;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Database
 {
     /// <summary>
-    /// Abstract Common Database
-    /// 通用数据库抽象类
+    /// Common database
+    /// 通用数据库
     /// </summary>
-    public abstract class CommonDatabase : ICommonDatabase
+    /// <typeparam name="C">Generic database connection type</typeparam>
+    public abstract class CommonDatabase<C> : IDatabase<C> where C : DbConnection
     {
         /// <summary>
-        /// Connection string
-        /// 链接字符串
+        /// Database connection string
+        /// 数据库链接字符串
         /// </summary>
-        public string ConnectionString { get; }
+        protected readonly string ConnectionString;
 
         /// <summary>
-        /// Data parameter parser
-        /// 数据参数解析器
+        /// Snake naming, like user_id
+        /// 蛇形命名，如 user_id
         /// </summary>
-        public IDataParameterParser? DataParameterParser { get; set; }
+        public bool SnakeNaming { get; }
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">Connection string</param>
-        public CommonDatabase(string connectionString)
+        /// <param name="snakeNaming">Is snake naming</param>
+        public CommonDatabase(string connectionString, bool snakeNaming = false)
         {
             ConnectionString = connectionString;
-        }
+            SnakeNaming = snakeNaming;
 
-        /// <summary>
-        /// Add data parameter
-        /// 添加数据列表参数
-        /// </summary>
-        /// <typeparam name="T">Type generic</typeparam>
-        /// <param name="items">Data list</param>
-        /// <param name="parameters">Operation parameters</param>
-        /// <param name="name">Parameter name</param>
-        /// <param name="hasRowIndex">Has row index</param>
-        public virtual void AddDataParameter<T>(IEnumerable<T> items, Dictionary<string, dynamic> parameters, string name, bool? hasRowIndex) where T : IComparable
-        {
-            // No further process when empty
-            if (items == null || !items.Any())
-            {
-                return;
-            }
+            // Default settings
+            Dapper.SqlMapper.Settings.UseSingleResultOptimization = true;
 
-            // When hasRowIndex not equal to null, need unique
-            if (hasRowIndex != null)
-                items = items.Distinct();
-
-            if (DataParameterParser == null)
+            // Database snake naming
+            if (snakeNaming)
             {
-                // Join the items with comma
-                parameters.Add(name, string.Join(',', items));
-            }
-            else
-            {
-                // Pass to the defined interface
-                DataParameterParser.AddDataParameter(items, parameters, name, hasRowIndex);
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
             }
         }
 
         /// <summary>
-        /// Create EF Database Context
-        /// 创建EF数据库上下文
+        /// New database connection
+        /// 新数据库链接对象
         /// </summary>
-        /// <typeparam name="M">Model class</typeparam>
-        /// <returns>Database Context</returns>
-        public abstract CommonDbContext<M> CreateContext<M>() where M : class, new();
+        /// <returns>Connection</returns>
+        public abstract C NewConnection();
 
         /// <summary>
-        /// Async Execute SQL Command
-        /// 异步执行SQL命令
+        /// New database context
+        /// 新数据库上下文
         /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Rows affacted</returns>
-        public async Task<int> ExecuteAsync(string sql, bool? isStoredProcedure = false)
+        /// <typeparam name="M">Generic context class</typeparam>
+        /// <returns>Context</returns>
+        public abstract CommonDbContext<M> NewDbContext<M>() where M : class;
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <param name="func">Callback function</param>
+        /// <returns>Task</returns>
+        public async Task WithConnection(Func<C, Task> func)
         {
-            return await ExecuteAsync(sql, null, isStoredProcedure);
+            using var connection = NewConnection();
+
+            await connection.OpenAsync();
+
+            await func(connection);
         }
 
         /// <summary>
-        /// Async Execute SQL Command
-        /// 异步执行SQL命令
+        /// With callback connection
+        /// 带回调的数据库链接
         /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="paras">Parameters</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Rows affacted</returns>
-        public abstract Task<int> ExecuteAsync(string sql, IDictionary<string, dynamic>? paras, bool? isStoredProcedure = false);
-
-        /// <summary>
-        /// Async Execute SQL Command to return first row first column value
-        /// 异步执行SQL命令，返回第一行第一列的值
-        /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>First row first column's value</returns>
-        public async Task<object?> ExecuteScalarAsync(string sql, bool? isStoredProcedure = false)
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="func">Callback function</param>
+        /// <returns>Result</returns>
+        public async Task<T> WithConnection<T>(Func<C, Task<T>> func)
         {
-            return await ExecuteScalarAsync(sql, null, isStoredProcedure);
+            using var connection = NewConnection();
+
+            await connection.OpenAsync();
+
+            return await func(connection);
         }
-
-        /// <summary>
-        /// Async Execute SQL Command to return first row first column value
-        /// 异步执行SQL命令，返回第一行第一列的值
-        /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="paras">Parameters</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>First row first column's value</returns>
-        public abstract Task<object?> ExecuteScalarAsync(string sql, IDictionary<string, dynamic>? paras, bool? isStoredProcedure = false);
-
-        /// <summary>
-        /// Async execute SQL Command to return operation result
-        /// 异步执行SQL命令，返回操作结果对象
-        /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Operation result</returns>
-        public async Task<ActionResult<T, F>?> ExecuteResultAsync<T, F>(string sql, bool? isStoredProcedure = false)
-        {
-            return await ExecuteResultAsync<T, F>(sql, null, isStoredProcedure);
-        }
-
-        /// <summary>
-        /// Async execute SQL Command to return operation result
-        /// 异步执行SQL命令，返回操作结果对象
-        /// </summary>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="paras">Parameters</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Operation result</returns>
-        public abstract Task<ActionResult<T, F>?> ExecuteResultAsync<T, F>(string sql, IDictionary<string, dynamic>? paras, bool? isStoredProcedure = false);
-
-        /// <summary>
-        /// Async Execute SQL Command, write to stream of the first row first column value, used to read huge text data like json/xml
-        /// 异步执行SQL命令，读取第一行第一列的数据到流，用于读取大文本字段，比如返回的JSON/XML数据
-        /// </summary>
-        /// <param name="stream">Stream to write</param>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Is content wrote</returns>
-        public async Task<bool> ExecuteToStreamAsync(Stream stream, string sql, bool? isStoredProcedure = false)
-        {
-            return await ExecuteToStreamAsync(stream, sql, null, isStoredProcedure);
-        }
-
-        /// <summary>
-        /// Async ESQL Command, write to stream of the first row first column value, used to read huge text data like json/xml
-        /// 异步执行SQL命令，读取第一行第一列的数据到流，用于读取大文本字段，比如返回的JSON/XML数据
-        /// </summary>
-        /// <param name="stream">Stream to write</param>
-        /// <param name="sql">SQL Command</param>
-        /// <param name="paras">Parameters</param>
-        /// <param name="isStoredProcedure">Is stored procedure</param>
-        /// <returns>Is content wrote</returns>
-        public abstract Task<bool> ExecuteToStreamAsync(Stream stream, string sql, IDictionary<string, dynamic>? paras, bool? isStoredProcedure = false);
     }
 }

@@ -1,11 +1,32 @@
-﻿using com.etsoo.CoreFramework.ActionResult;
+﻿using com.etsoo.Utils.Actions;
 using System;
 
 namespace com.etsoo.CoreFramework.Application
 {
     /// <summary>
-    /// Application constant errors
-    /// 程序错误常量
+    /// Application error
+    /// 程序错误对象
+    /// </summary>
+    public record ApplicationError(Uri Type, string Title)
+    {
+        /// <summary>
+        /// As AcionResult
+        /// 输出为操作结果
+        /// </summary>
+        /// <returns>Action result</returns>
+        public IActionResult AsResult()
+        {
+            return new ActionResult
+            {
+                Type = Type,
+                Title = Title
+            };
+        }
+    }
+
+    /// <summary>
+    /// Application errors
+    /// 程序错误
     /// </summary>
     public static class ApplicationErrors
     {
@@ -13,22 +34,6 @@ namespace com.etsoo.CoreFramework.Application
         /// No action result error
         /// 没有操作结果错误
         /// </summary>
-        public static ActionResultNoData NoActionResult => CreateError(Resources.Resource.NoActionResult, "NoActionResult");
-
-        /// <summary>
-        /// Create error
-        /// 创建错误
-        /// </summary>
-        /// <param name="title">Title</param>
-        /// <param name="type">Type</param>
-        /// <returns>Error</returns>
-        public static ActionResultNoData CreateError(string title, string type)
-        {
-            return new ActionResultNoData()
-            {
-                Type = new Uri("https://api.etsoo.com/SmartERPNext/errors/" + type),
-                Title = title
-            };
-        }
+        public static ApplicationError NoActionResult => new ApplicationError(new Uri("https://api.etsoo.com/SmartERPNext/errors/NoActionResult"), Resources.Resource.NoActionResult);
     }
 }

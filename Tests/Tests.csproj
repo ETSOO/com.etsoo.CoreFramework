@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
+
+    <IsPackable>false</IsPackable>
+
+    <Nullable>enable</Nullable>
+
+    <SignAssembly>true</SignAssembly>
+
+    <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
+    <ProjectReference Include="..\com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+    <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

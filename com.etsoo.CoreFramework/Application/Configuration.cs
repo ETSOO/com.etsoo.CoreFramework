@@ -13,11 +13,13 @@ namespace com.etsoo.CoreFramework.Application
         /// 构造函数
         /// </summary>
         /// <param name="privateKey">Private key for encryption/decryption</param>
+        /// <param name="appId">Application id, default is "e"</param>
         /// <param name="languages">Supported languages</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
         public Configuration(
             string privateKey,
+            string? appId = null,
             string[]? languages = null,
             bool modelValidated = false,
             string? symmetricKey = null
@@ -28,17 +30,25 @@ namespace com.etsoo.CoreFramework.Application
 
             // Update
             (
+                AppId,
                 Languages,
                 ModelValidated,
                 PrivateKey,
                 SymmetricKey
             ) = (
+                (appId ?? "e").AsMemory(),
                 languages,
                 modelValidated,
-                privateKey,
-                symmetricKey
+                privateKey.AsMemory(),
+                symmetricKey.AsMemory()
             );
         }
+
+        /// <summary>
+        /// Application id
+        /// 程序编号
+        /// </summary>
+        public ReadOnlyMemory<char> AppId { get; }
 
         /// <summary>
         /// Supported languages, like zh-CN, en
@@ -56,12 +66,12 @@ namespace com.etsoo.CoreFramework.Application
         /// Private key for encryption/decryption, required
         /// 加解密私匙，必填
         /// </summary>
-        public string PrivateKey { get; }
+        public ReadOnlyMemory<char> PrivateKey { get; }
 
         /// <summary>
         /// Symmetric security key, for data exchange, null means prevention exchange
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
-        public string? SymmetricKey { get; }
+        public ReadOnlyMemory<char>? SymmetricKey { get; }
     }
 }

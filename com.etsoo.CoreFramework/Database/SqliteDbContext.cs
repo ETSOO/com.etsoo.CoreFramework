@@ -8,16 +8,14 @@ namespace com.etsoo.CoreFramework.Database
     /// </summary>
     public class SqliteDbContext<M> : CommonDbContext<M> where M : class
     {
-        readonly private string connectionString;
-
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">Connection string</param>
-        public SqliteDbContext(string connectionString)
+        /// <param name="snakeNaming">Is snake naming</param>
+        public SqliteDbContext(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
         {
-            this.connectionString = connectionString;
         }
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace com.etsoo.CoreFramework.Database
         /// <param name="optionsBuilder">Options builder</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(this.connectionString);
+            optionsBuilder.UseSqlite(ConnectionString);
         }
     }
 }

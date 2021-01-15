@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.CoreFramework.Application
+﻿using System;
+
+namespace com.etsoo.CoreFramework.Application
 {
     /// <summary>
     /// Application configuration interface
@@ -6,6 +8,12 @@
     /// </summary>
     public interface IConfiguration
     {
+        /// <summary>
+        /// Application id
+        /// 程序编号
+        /// </summary>
+        ReadOnlyMemory<char> AppId { get; }
+
         /// <summary>
         /// Supported languages, like zh-CN, en
         /// 支持的语言，比如zh-CN, en
@@ -22,12 +30,12 @@
         /// Private key for encryption/decryption, required
         /// 加解密私匙，必填
         /// </summary>
-        string PrivateKey { get; }
+        ReadOnlyMemory<char> PrivateKey { get; }
 
         /// <summary>
         /// Symmetric security key, for data exchange, null means prevention exchange
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
-        string? SymmetricKey { get; }
+        ReadOnlyMemory<char>? SymmetricKey { get; }
     }
 }
