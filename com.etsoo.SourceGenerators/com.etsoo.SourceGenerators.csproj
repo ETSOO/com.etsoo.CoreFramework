@@ -4,6 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SourceGenerators</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Company>ETSOO</Company>
+    <Copyright>Copyright © ETSOO 2020</Copyright>
+    <Authors>SmartERP NextGen Team</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>ETSOO SmartERP NextGen shared source generators for Json, DataReader, Dictionary seriliazation and deserialization.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

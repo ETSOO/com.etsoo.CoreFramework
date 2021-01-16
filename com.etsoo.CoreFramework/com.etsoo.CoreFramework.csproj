@@ -4,10 +4,17 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <NeutralLanguage>en</NeutralLanguage>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.CoreFramework</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RepositoryType>GitHub</RepositoryType>
+    <Authors>SmartERP NextGen Team</Authors>
+    <Company>ETSOO</Company>
+    <Copyright>Copyright © ETSOO 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>ETSOO SmartERP NextGen shared core framework.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

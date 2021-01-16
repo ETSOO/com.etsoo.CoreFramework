@@ -5,6 +5,15 @@
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Utils</RepositoryUrl>
+    <Authors>SmartERP NextGen Team</Authors>
+    <Company>ETSOO</Company>
+    <Copyright>Copyright © ETSOO 2020</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>ETSOO SmartERP NextGen shared coding utilities.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
