@@ -2,11 +2,9 @@
 using com.etsoo.CoreFramework.MessageQueue;
 using com.etsoo.CoreFramework.Storage;
 using com.etsoo.Utils.Crypto;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
 using System.Data.Common;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
@@ -18,24 +16,11 @@ namespace com.etsoo.CoreFramework.Application
     /// <typeparam name="C">Generic database connection type</typeparam>
     public record CoreApplication<C> : ICoreApplication<C> where C : DbConnection
     {
-        // Create logger
-        private static ILogger CreateLogger()
-        {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", true)
-                .Build();
-
-            return new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
-        }
-
         /// <summary>
         /// Application configuration
         /// 程序配置
         /// </summary>
-        public virtual IConfiguration Configuration { get; init; }
+        public virtual IAppConfiguration Configuration { get; init; }
 
         /// <summary>
         /// Database
@@ -62,20 +47,17 @@ namespace com.etsoo.CoreFramework.Application
         public virtual IStorage Storage { get; init; }
 
         /// <summary>
-        /// Protected constructor to prevent direct initialization
-        /// 受保护的构造函数防止直接初始化
+        /// Constructor
+        /// 构造函数
         /// </summary>
         public CoreApplication(
-            IConfiguration configuration,
+            IAppConfiguration configuration,
             IDatabase<C> db,
-            ILogger? logger = null,
+            ILogger logger,
             IMessageQueue? messageQueue = null,
             IStorage? storage = null 
         )
         {
-            // Default logger
-            logger ??= CreateLogger();
-
             // Default storage
             storage ??= new LocalStorage();
 
@@ -93,6 +75,20 @@ namespace com.etsoo.CoreFramework.Application
                 messageQueue,
                 storage
             );
+        }
+
+        /// <summary>
+        /// Constructor with tuple
+        /// 元组的构造函数
+        /// </summary>
+        /// <param name="init">Init tuple</param>
+        public CoreApplication((IAppConfiguration configuration,
+            IDatabase<C> db,
+            ILogger logger,
+            IMessageQueue? messageQueue,
+            IStorage? storage) init) : this(init.configuration, init.db, init.logger, init.messageQueue, init.storage)
+        {
+
         }
 
         /// <summary>

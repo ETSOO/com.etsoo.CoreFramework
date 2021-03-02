@@ -32,7 +32,7 @@ namespace Tests.Utils
             using var connection = db.NewConnection();
 
             // Create table e_user when not exists
-            await connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS e_user (id int, name nvarchar(128), status int)");
+            await connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS User (Id int, Name nvarchar(128), Status int)");
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Tests.Utils
 
             // Act
             // Insert rows
-            var sql = "INSERT OR IGNORE INTO e_user (id, name) VALUES(@user1, @name1), (@user2, @name2)";
+            var sql = "INSERT OR IGNORE INTO User (Id, Name) VALUES(@user1, @name1), (@user2, @name2)";
 
             // Result
             await connection.ExecuteAsync(sql, paras);
@@ -107,10 +107,10 @@ namespace Tests.Utils
             using var connection = db.NewConnection();
 
             // Create table and add a record for test
-            await connection.ExecuteAsync("INSERT OR IGNORE INTO e_user (id, name) VALUES(1003, 'Admin 3')");
+            await connection.ExecuteAsync("INSERT OR IGNORE INTO User (Id, Name) VALUES(1003, 'Admin 3')");
 
             // Act
-            var result = await connection.ExecuteScalarAsync("SELECT name FROM e_user WHERE id = 1003");
+            var result = await connection.ExecuteScalarAsync("SELECT Name FROM User WHERE Id = 1003");
 
             // Assert
             Assert.AreEqual("Admin 3", result);
@@ -128,11 +128,11 @@ namespace Tests.Utils
             using var connection = db.NewConnection();
 
             // Create table and add a record for test
-            await connection.ExecuteAsync("INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1')");
+            await connection.ExecuteAsync("INSERT OR IGNORE INTO User (id, name) VALUES(1001, 'Admin 1')");
 
             // Act
             // "Admin 1"
-            await connection.QueryToStreamAsync(new("SELECT name FROM e_user WHERE id = 1001 LIMIT 1"), stream);
+            await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream);
 
             // Assert
             Assert.IsTrue(stream.Length == "Admin 1".Length);

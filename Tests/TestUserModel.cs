@@ -8,7 +8,7 @@ namespace Tests
     /// <summary>
     /// User module for test
     /// </summary>
-    [Table("e_user")]
+    [Table("User")]
     [AutoDataReaderGenerator]
     [AutoDictionaryGenerator]
     [AutoToParameters]

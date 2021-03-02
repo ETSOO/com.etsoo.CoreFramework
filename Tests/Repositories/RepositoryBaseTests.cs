@@ -33,7 +33,7 @@ namespace Tests.Repositories
         {
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
-            var config = new Configuration("test");
+            var config = new AppConfiguration("test");
             var app = new CoreApplication<SqliteConnection>(config, db);
 
             repo = new RepositoryBaseTest(app);

@@ -149,7 +149,7 @@ namespace com.etsoo.CoreFramework.Repositories
             var name = GetCommandName("delete");
 
             var parameters = new DynamicParameters();
-            parameters.Add("ids", StringUtil.IEnumerableToString(ids));
+            parameters.Add("ids", App.DB.AsListParameter(ids));
 
             return CreateCommand(name, parameters);
         }

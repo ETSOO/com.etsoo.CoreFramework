@@ -6,7 +6,7 @@ namespace com.etsoo.CoreFramework.Application
     /// Application configuration interface
     /// 程序配置接口
     /// </summary>
-    public interface IConfiguration
+    public interface IAppConfiguration
     {
         /// <summary>
         /// Application id

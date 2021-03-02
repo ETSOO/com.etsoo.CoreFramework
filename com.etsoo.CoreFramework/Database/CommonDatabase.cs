@@ -1,4 +1,6 @@
-﻿using System;
+﻿using com.etsoo.Utils.String;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 
@@ -58,6 +60,18 @@ namespace com.etsoo.CoreFramework.Database
         /// <typeparam name="M">Generic context class</typeparam>
         /// <returns>Context</returns>
         public abstract CommonDbContext<M> NewDbContext<M>() where M : class;
+
+        /// <summary>
+        /// Convert id list to parameter value
+        /// 转换编号列表为参数值
+        /// </summary>
+        /// <typeparam name="T">Id generic</typeparam>
+        /// <param name="ids">Id list</param>
+        /// <returns>Parameter value</returns>
+        public virtual object AsListParameter<T>(IEnumerable<T> ids) where T : struct, IComparable
+        {
+            return StringUtil.IEnumerableToString(ids);
+        }
 
         /// <summary>
         /// With callback connection

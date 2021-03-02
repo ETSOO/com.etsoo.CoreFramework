@@ -17,7 +17,7 @@ namespace Tests.Utils
         {
             // Arrange
             // Create the dabase
-            db = new SqlServerDatabase("Initial Catalog=ftp_server;Server=(local);User ID=ftp;Password=ftp;Enlist=false", true);
+            db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Tests.Utils
 
             // Act
             // Insert rows
-            var sql = "IF NOT EXISTS (SELECT * FROM e_user WHERE id = @user1) INSERT INTO e_user (id, name) VALUES(@user1, @name1); IF NOT EXISTS (SELECT * FROM e_user WHERE id = @user2) INSERT INTO e_user (id, name) VALUES(@user2, @name2)";
+            var sql = "IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user1) INSERT INTO [User] (Id, Name) VALUES(@user1, @name1); IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user2) INSERT INTO [User] (Id, Name) VALUES(@user2, @name2)";
 
             // Result
             await connection.ExecuteAsync(sql, paras);
@@ -120,7 +120,7 @@ namespace Tests.Utils
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.ExecuteScalarAsync("SELECT name FROM e_user WHERE id = 1001");
+            var result = await connection.ExecuteScalarAsync("SELECT Name FROM [User] WHERE Id = 1001");
 
             // Assert
             Assert.AreEqual("Admin 1", result);
@@ -139,10 +139,10 @@ namespace Tests.Utils
 
             // Act
             // {"name":"Admin 1"}
-            await connection.QueryToStreamAsync(new("SELECT TOP 1 name FROM e_user WHERE id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
+            await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
 
             // Assert
-            Assert.IsTrue(stream.Length == "{\"name\":\"Admin 1\"}".Length);
+            Assert.IsTrue(stream.Length == "{\"Name\":\"Admin 1\"}".Length);
         }
     }
 }

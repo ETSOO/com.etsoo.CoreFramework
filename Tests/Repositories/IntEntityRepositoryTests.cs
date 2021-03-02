@@ -39,8 +39,8 @@ namespace Tests.Repositories
 
         public IntEntityRepositoryTests()
         {
-            var db = new SqlServerDatabase("Initial Catalog=ftp_server;Server=(local);User ID=ftp;Password=ftp;Enlist=false", true);
-            var config = new Configuration("test");
+            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
+            var config = new AppConfiguration("test");
             var app = new CoreApplication<SqlConnection>(config, db);
             repo = new IntEntityRepository(app, "user");
         }

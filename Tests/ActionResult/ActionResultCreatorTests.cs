@@ -14,7 +14,7 @@ namespace Tests.ActionResult
         {
             // Arrange
             // Create the dabase
-            db = new SqlServerDatabase("Initial Catalog=ftp_server;Server=(local);User ID=ftp;Password=ftp;Enlist=false");
+            db = new SqlServerDatabase("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false");
         }
 
         /// <summary>

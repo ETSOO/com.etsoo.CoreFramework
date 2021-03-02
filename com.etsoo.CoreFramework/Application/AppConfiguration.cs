@@ -1,4 +1,7 @@
-﻿using System;
+﻿using com.etsoo.Utils.String;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Linq;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -6,7 +9,7 @@ namespace com.etsoo.CoreFramework.Application
     /// Application configuration
     /// 程序配置
     /// </summary>
-    public record Configuration : IConfiguration
+    public record AppConfiguration : IAppConfiguration
     {
         /// <summary>
         /// Constructor
@@ -17,7 +20,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="languages">Supported languages</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
-        public Configuration(
+        public AppConfiguration(
             string privateKey,
             string? appId = null,
             string[]? languages = null,
@@ -42,6 +45,20 @@ namespace com.etsoo.CoreFramework.Application
                 privateKey.AsMemory(),
                 symmetricKey.AsMemory()
             );
+        }
+
+        /// <summary>
+        /// Constructor with configuration
+        /// 使用配置的构造函数
+        /// </summary>
+        /// <param name="section">Configuration section</param>
+        /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
+        public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(section.GetValue<string>("PrivateKey"),
+            section.GetValue<string>("AppId"),
+            StringUtil.AsEnumerable(section.GetValue<string>("Languages")).ToArray(),
+            modelValidated,
+            section.GetValue<string>("SymmetricKey"))
+        {
         }
 
         /// <summary>
