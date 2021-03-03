@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.MessageQueue;
 using com.etsoo.CoreFramework.Storage;
-using Serilog;
 using System;
 using System.Threading.Tasks;
 
@@ -17,12 +16,6 @@ namespace com.etsoo.CoreFramework.Application
         /// 程序配置
         /// </summary>
         IAppConfiguration Configuration { get; init; }
-
-        /// <summary>
-        /// Logger
-        /// 日志记录器
-        /// </summary>
-        ILogger Logger { get; init; }
 
         /// <summary>
         /// Message queue

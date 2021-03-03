@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace com.etsoo.CoreFramework.MessageQueue
 {
@@ -42,7 +43,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
                 factory.VirtualHost = virtualHost;
 
             // Port
-            var port = section.GetValue<int?>("DispatchConsumersAsync");
+            var port = section.GetValue<int?>("Port");
             if (port.HasValue)
                 factory.Port = port.Value;
 
@@ -78,7 +79,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
         Tuple<string, string>? RPCClientProperties;
 
         // PRC client result queue
-        readonly ConcurrentDictionary<int, BlockingCollection<ReadOnlyMemory<byte>>> RPCClientQueue = new ();
+        readonly ConcurrentDictionary<int, BufferBlock<ReadOnlyMemory<byte>>> RPCClientQueue = new ();
 
         // New connection created
         readonly bool newConnection;
@@ -264,7 +265,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
 
             // Thread id based collection
             var id = Thread.CurrentThread.ManagedThreadId;
-            var collection = RPCClientQueue.GetOrAdd(id, new BlockingCollection<ReadOnlyMemory<byte>>());
+            var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
 
             var properties = Channel.CreateBasicProperties();
             properties.CorrelationId = RPCClientProperties.Item1;
@@ -277,7 +278,36 @@ namespace com.etsoo.CoreFramework.MessageQueue
                                  basicProperties: properties,
                                  body);
 
-            return collection.Take();
+            return collection.Receive();
+        }
+
+        /// <summary>
+        /// Async remote procedure call
+        /// 异步远程过程调用
+        /// </summary>
+        /// <param name="body">Message body</param>
+        /// <param name="queue">Queue name</param>
+        public async Task<ReadOnlyMemory<byte>> PRCCallAsync(ReadOnlyMemory<byte> body, string queue)
+        {
+            if (RPCClientProperties == null)
+                throw new NullReferenceException(nameof(RPCClientProperties));
+
+            // Thread id based collection
+            var id = Thread.CurrentThread.ManagedThreadId;
+            var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
+
+            var properties = Channel.CreateBasicProperties();
+            properties.CorrelationId = RPCClientProperties.Item1;
+            properties.ReplyTo = RPCClientProperties.Item2;
+            properties.AppId = id.ToString();
+
+            // Publish the message
+            Channel.BasicPublish(exchange: string.Empty,
+                                 routingKey: queue,
+                                 basicProperties: properties,
+                                 body);
+
+            return await collection.ReceiveAsync();
         }
 
         /// <summary>
@@ -384,10 +414,9 @@ namespace com.etsoo.CoreFramework.MessageQueue
                 {
                     // Thread id based collection through AppId
                     var id = StringUtil.TryParse<int>(ea.BasicProperties.AppId).GetValueOrDefault(0);
-                    var collection = RPCClientQueue.GetOrAdd(id, new BlockingCollection<ReadOnlyMemory<byte>>());
-                    collection.Add(ea.Body);
+                    var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
+                    await collection.SendAsync(ea.Body);
                 }
-                await Task.CompletedTask;
             };
 
             // Start the consumer

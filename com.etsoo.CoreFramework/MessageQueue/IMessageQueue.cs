@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.MessageQueue
 {
@@ -50,6 +51,14 @@ namespace com.etsoo.CoreFramework.MessageQueue
         /// <param name="body">Message body</param>
         /// <param name="queue">Queue name</param>
         ReadOnlyMemory<byte> PRCCall(ReadOnlyMemory<byte> body, string queue);
+
+        /// <summary>
+        /// Async remote procedure call
+        /// 异步远程过程调用
+        /// </summary>
+        /// <param name="body">Message body</param>
+        /// <param name="queue">Queue name</param>
+        Task<ReadOnlyMemory<byte>> PRCCallAsync(ReadOnlyMemory<byte> body, string queue);
 
         /// <summary>
         /// Produce confirm

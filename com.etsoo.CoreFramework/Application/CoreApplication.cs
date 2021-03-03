@@ -2,7 +2,6 @@
 using com.etsoo.CoreFramework.MessageQueue;
 using com.etsoo.CoreFramework.Storage;
 using com.etsoo.Utils.Crypto;
-using Serilog;
 using System;
 using System.Data.Common;
 using System.Threading.Tasks;
@@ -29,12 +28,6 @@ namespace com.etsoo.CoreFramework.Application
         public virtual IDatabase<C> DB { get; init; }
 
         /// <summary>
-        /// Logger
-        /// 日志记录器
-        /// </summary>
-        public ILogger Logger { get; init; }
-
-        /// <summary>
         /// Message queue
         /// 消息队列
         /// </summary>
@@ -53,7 +46,6 @@ namespace com.etsoo.CoreFramework.Application
         public CoreApplication(
             IAppConfiguration configuration,
             IDatabase<C> db,
-            ILogger logger,
             IMessageQueue? messageQueue = null,
             IStorage? storage = null 
         )
@@ -65,13 +57,11 @@ namespace com.etsoo.CoreFramework.Application
             (
                 Configuration,
                 DB,
-                Logger,
                 MessageQueue,
                 Storage
             ) = (
                 configuration,
                 db,
-                logger,
                 messageQueue,
                 storage
             );
@@ -84,9 +74,8 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="init">Init tuple</param>
         public CoreApplication((IAppConfiguration configuration,
             IDatabase<C> db,
-            ILogger logger,
             IMessageQueue? messageQueue,
-            IStorage? storage) init) : this(init.configuration, init.db, init.logger, init.messageQueue, init.storage)
+            IStorage? storage) init) : this(init.configuration, init.db, init.messageQueue, init.storage)
         {
 
         }

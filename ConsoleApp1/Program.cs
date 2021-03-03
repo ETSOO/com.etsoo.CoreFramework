@@ -15,12 +15,14 @@ namespace ConsoleApp1
     {
         static readonly string connectionString = "Server=(local);User ID=smarterp;Password=smarterp;";
 
-        static readonly ConnectionFactory factory = new ConnectionFactory { HostName = "hk.etsoo.com", UserName = "remote_user", Password = "Remote@User@2020", DispatchConsumersAsync = true, ConsumerDispatchConcurrency = 4 };
+        static readonly ConnectionFactory factory = new ConnectionFactory { HostName = "localhost", UserName = "guest", Password = "guest", DispatchConsumersAsync = true };
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            PRCParallelCalls();
-            // RPCCalls();
+            await Task.CompletedTask;
+
+            //PRCParallelCalls();
+            await RPCCallsAsync();
         }
 
         static void PRCParallelCalls()
@@ -41,21 +43,22 @@ namespace ConsoleApp1
 
             var inputs = new string[] { "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10" };
 
-            // PRC Client
-            using var client = new RabbitMQEx(server.Connection);
-            client.PreparePRCClient();
-
-            Parallel.ForEach(inputs, (input) =>
+            // Each thread a channel
+            Parallel.ForEach(inputs, async (input) =>
             {
+                // PRC Client
+                using var client = new RabbitMQEx(server.Connection);
+                client.PreparePRCClient();
+
                 Console.WriteLine($"Message sent at {DateTime.UtcNow:ss:fff}: {input}");
-                var result = client.PRCCall(Encoding.UTF8.GetBytes(input), queue);
+                var result = await client.PRCCallAsync(Encoding.UTF8.GetBytes(input), queue);
                 Console.WriteLine($"Client {Thread.CurrentThread.ManagedThreadId} received at {DateTime.UtcNow:ss:fff} for {input}: {Encoding.UTF8.GetString(result.Span)}");
             });
 
             Console.ReadKey();
         }
 
-        static void RPCCalls()
+        static async Task RPCCallsAsync()
         {
             // Queue
             var queue = "rpc_queue";
@@ -79,7 +82,7 @@ namespace ConsoleApp1
             foreach (var input in inputs)
             {
                 Console.WriteLine($"Message sent at {DateTime.UtcNow:ss:fff}: {input}");
-                var result = client.PRCCall(Encoding.UTF8.GetBytes(input), queue);
+                var result = await client.PRCCallAsync(Encoding.UTF8.GetBytes(input), queue);
                 Console.WriteLine($"Client received at {DateTime.UtcNow:ss:fff} for {input}: {Encoding.UTF8.GetString(result.Span)}");
             }
 
