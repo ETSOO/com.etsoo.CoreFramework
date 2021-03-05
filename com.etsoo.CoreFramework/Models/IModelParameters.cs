@@ -17,6 +17,6 @@ namespace com.etsoo.CoreFramework.Models
         /// <param name="app">Application</param>
         /// <param name="user">Current user</param>
         /// <returns>Parameters</returns>
-        DynamicParameters AsParameters(ICoreApplicationBase app, ICurrentUser user);
+        DynamicParameters AsParameters(ICoreApplicationBase app, ICurrentUser? user);
     }
 }
