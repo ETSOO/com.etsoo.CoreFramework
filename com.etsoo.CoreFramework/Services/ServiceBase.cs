@@ -24,7 +24,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Current user
         /// 当前用户
         /// </summary>
-        protected ICurrentUser User { get; init; }
+        protected ICurrentUser? User { get; init; }
 
         /// <summary>
         /// Logger
@@ -38,7 +38,15 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         protected R Repo { get; init; }
 
-        public ServiceBase(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger)
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="app">Application</param>
+        /// <param name="user">Current user</param>
+        /// <param name="repo">Repository</param>
+        /// <param name="logger">Logger</param>
+        public ServiceBase(ICoreApplication<C> app, ICurrentUser? user, R repo, ILogger logger)
         {
             this.App = app;
             this.User = user;

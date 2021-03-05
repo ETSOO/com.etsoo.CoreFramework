@@ -1,9 +1,50 @@
-name: publish to nuget
+name: Publish to nuget
 on:
   push:
     branches:
       - master # Default release branch
 jobs:
   publish:
-    name: build, pack & publish
-    runs-on: ubuntu-latest
+    name: Build, pack & publish
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Publish com.etsoo.Utils
+      - name: Publish com.etsoo.Utils on version change
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.Utils/com.etsoo.Utils.csproj
+          
+          # NuGet package id, used for version detection & defaults to project name
+          # PACKAGE_NAME: com.etsoo.Utils
+          
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.SourceGenerators
+      - name: Publish com.etsoo.SourceGenerators on version change
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.SourceGenerators/com.etsoo.SourceGenerators.csproj
+          
+          # NuGet package id, used for version detection & defaults to project name
+          # PACKAGE_NAME: com.etsoo.SourceGenerators
+          
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.CoreFramework
+      - name: Publish com.etsoo.CoreFramework on version change
+        uses: rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.CoreFramework/com.etsoo.CoreFramework.csproj
+          
+          # NuGet package id, used for version detection & defaults to project name
+          # PACKAGE_NAME: com.etsoo.CoreFramework
+          
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}

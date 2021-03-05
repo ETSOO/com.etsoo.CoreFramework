@@ -15,6 +15,12 @@ namespace com.etsoo.CoreFramework.User
         public string Id { get; init; }
 
         /// <summary>
+        /// Role
+        /// 角色
+        /// </summary>
+        public string Role { get; init; }
+
+        /// <summary>
         /// Client IP address
         /// 客户端IP地址
         /// </summary>
