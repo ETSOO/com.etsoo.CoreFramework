@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Utils</RepositoryUrl>
     <Authors>SmartERP NextGen Team</Authors>
@@ -17,6 +17,7 @@
     <Version>1.0.3</Version>
     <AssemblyVersion>1.0.3.0</AssemblyVersion>
     <FileVersion>1.0.3.0</FileVersion>
+    <PackageIcon>logo640.jpg</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,6 +32,13 @@
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.4.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="6.1.1" />
     <PackageReference Include="System.IO.Pipelines" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Company\logo640.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

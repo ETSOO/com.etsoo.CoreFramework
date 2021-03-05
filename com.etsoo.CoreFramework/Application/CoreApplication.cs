@@ -81,6 +81,17 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Hash password
+        /// 哈希密码
+        /// </summary>
+        /// <param name="password">Raw password</param>
+        /// <returns>Hashed bytes</returns>
+        public byte[] HashPassword(ReadOnlySpan<char> password)
+        {
+            return CryptographyUtil.HMACSHA512(password, Configuration.PrivateKey.Span);
+        }
+
+        /// <summary>
         /// Async hash password
         /// 异步哈希密码
         /// </summary>

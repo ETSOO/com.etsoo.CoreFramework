@@ -46,7 +46,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepository(ICoreApplication<C> app, ICurrentUser user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
+        public EntityRepository(ICoreApplication<C> app, ICurrentUser? user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
         {
             Flag = flag.AsMemory();
             ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();

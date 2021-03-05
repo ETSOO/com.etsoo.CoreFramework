@@ -70,6 +70,19 @@ namespace Tests.Utils
         }
 
         /// <summary>
+        /// SHA512 test
+        /// </summary>
+        [Test]
+        public void HMACSHA512_HelloWorldTest()
+        {
+            // Arrange & act
+            var result = CryptographyUtil.HMACSHA512(data.Span, password.Span);
+
+            // Assert
+            Assert.IsTrue(Convert.ToBase64String(result) == "DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==");
+        }
+
+        /// <summary>
         /// SHA512 to Base64 string test
         /// </summary>
         [Test]

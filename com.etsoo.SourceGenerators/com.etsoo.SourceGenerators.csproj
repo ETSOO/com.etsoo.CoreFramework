@@ -12,10 +12,19 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared source generators for Json, DataReader, Dictionary seriliazation and deserialization.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon>logo640.jpg</PackageIcon>
+    <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Company\logo640.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

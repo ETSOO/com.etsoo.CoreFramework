@@ -34,6 +34,14 @@ namespace com.etsoo.CoreFramework.Application
         /// 哈希密码
         /// </summary>
         /// <param name="password">Raw password</param>
+        /// <returns>Hashed bytes</returns>
+        byte[] HashPassword(ReadOnlySpan<char> password);
+
+        /// <summary>
+        /// Hash password
+        /// 哈希密码
+        /// </summary>
+        /// <param name="password">Raw password</param>
         /// <returns>Hashed password</returns>
         Task<ReadOnlyMemory<char>> HashPasswordAsync(ReadOnlyMemory<char> password);
     }

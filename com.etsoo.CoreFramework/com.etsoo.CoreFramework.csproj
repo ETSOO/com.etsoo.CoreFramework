@@ -15,9 +15,11 @@
     <Copyright>Copyright © ETSOO 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <AssemblyVersion>1.0.3.0</AssemblyVersion>
     <FileVersion>1.0.3.0</FileVersion>
+    <PackageIcon>logo640.jpg</PackageIcon>
+    <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,6 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\..\..\Company\logo640.jpg">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 

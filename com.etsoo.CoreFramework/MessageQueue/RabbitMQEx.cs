@@ -261,7 +261,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
         public ReadOnlyMemory<byte> PRCCall(ReadOnlyMemory<byte> body, string queue)
         {
             if (RPCClientProperties == null)
-                throw new NullReferenceException(nameof(RPCClientProperties));
+                throw new ArgumentNullException(nameof(RPCClientProperties));
 
             // Thread id based collection
             var id = Thread.CurrentThread.ManagedThreadId;
@@ -290,7 +290,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
         public async Task<ReadOnlyMemory<byte>> PRCCallAsync(ReadOnlyMemory<byte> body, string queue)
         {
             if (RPCClientProperties == null)
-                throw new NullReferenceException(nameof(RPCClientProperties));
+                throw new ArgumentNullException(nameof(RPCClientProperties));
 
             // Thread id based collection
             var id = Thread.CurrentThread.ManagedThreadId;

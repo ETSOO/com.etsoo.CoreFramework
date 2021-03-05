@@ -208,6 +208,26 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="privateKey">Private key</param>
         /// <returns>Hashed bytes</returns>
         /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
+        public static byte[] HMACSHA512(ReadOnlySpan<char> message, ReadOnlySpan<char> privateKey)
+        {
+            // HMAC
+            using var alg = new HMACSHA512(privateKey.ToEncodingBytes().ToArray());
+
+            alg.Initialize();
+
+            var manager = new RecyclableMemoryStreamManager();
+
+            return alg.ComputeHash(manager.GetStream(message.ToEncodingBytes().ToArray()));
+        }
+
+        /// <summary>
+        /// Hash-based Message Authentication Code (HMAC), SHA512
+        /// 基于哈希的消息认证码（HMAC）, SHA512
+        /// </summary>
+        /// <param name="message">Raw message</param>
+        /// <param name="privateKey">Private key</param>
+        /// <returns>Hashed bytes</returns>
+        /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
         public static async Task<ReadOnlyMemory<byte>> HMACSHA512Async(ReadOnlyMemory<char> message, ReadOnlyMemory<char> privateKey)
         {
             // HMAC

@@ -32,14 +32,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        protected ICurrentUser User { get; init; }
+        protected ICurrentUser? User { get; init; }
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        public RepositoryBase(ICoreApplication<C> app, ICurrentUser user) => (App, User) = (app, user);
+        public RepositoryBase(ICoreApplication<C> app, ICurrentUser? user) => (App, User) = (app, user);
 
         /// <summary>
         /// Add default parameters
