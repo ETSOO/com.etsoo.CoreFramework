@@ -9,6 +9,12 @@ namespace com.etsoo.CoreFramework.User
     public interface ICurrentUser
     {
         /// <summary>
+        /// Unique connection id
+        /// 唯一连接编号
+        /// </summary>
+        public string ConnectionId { get; init; }
+
+        /// <summary>
         /// Id
         /// 编号
         /// </summary>
@@ -24,7 +30,7 @@ namespace com.etsoo.CoreFramework.User
         /// Client IP address
         /// 客户端IP地址
         /// </summary>
-        IPAddress ClientIp { get; init; }
+        IPAddress? ClientIp { get; init; }
 
         /// <summary>
         /// Language
