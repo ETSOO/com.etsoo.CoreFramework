@@ -7,7 +7,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.CoreFramework</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryType>GitHub</RepositoryType>
     <Authors>SmartERP NextGen Team</Authors>

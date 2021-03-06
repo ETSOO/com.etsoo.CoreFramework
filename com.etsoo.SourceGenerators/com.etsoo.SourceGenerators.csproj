@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SourceGenerators</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Company>ETSOO</Company>

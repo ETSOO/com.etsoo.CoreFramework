@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <RepositoryType>GitHub</RepositoryType>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Utils</RepositoryUrl>
