@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.MessageQueue;
 using com.etsoo.CoreFramework.Storage;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
@@ -16,6 +17,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 程序配置
         /// </summary>
         IAppConfiguration Configuration { get; init; }
+
+        /// <summary>
+        /// Default Json serializer options
+        /// 默认的Json序列化器选项
+        /// </summary>
+        JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
 
         /// <summary>
         /// Message queue

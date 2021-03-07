@@ -8,7 +8,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <Company>ETSOO</Company>
     <Copyright>Copyright © ETSOO 2020</Copyright>
-    <Authors>SmartERP NextGen Team</Authors>
+    <Authors>ETSOO SmartERP NextGen Team</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared source generators for Json, DataReader, Dictionary seriliazation and deserialization.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

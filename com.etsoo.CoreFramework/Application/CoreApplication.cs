@@ -4,6 +4,7 @@ using com.etsoo.CoreFramework.Storage;
 using com.etsoo.Utils.Crypto;
 using System;
 using System.Data.Common;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
@@ -20,6 +21,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 程序配置
         /// </summary>
         public virtual IAppConfiguration Configuration { get; init; }
+
+        /// <summary>
+        /// Default Json serializer options
+        /// 默认的Json序列化器选项
+        /// </summary>
+        public JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
 
         /// <summary>
         /// Database
@@ -52,6 +59,9 @@ namespace com.etsoo.CoreFramework.Application
         {
             // Default storage
             storage ??= new LocalStorage();
+
+            // Json options
+            DefaultJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { IgnoreNullValues = true };
 
             // Update
             (
