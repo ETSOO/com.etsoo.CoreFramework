@@ -61,11 +61,47 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No action result.
+        ///   Looks up a localized string similar to No Action Result.
         /// </summary>
         internal static string NoActionResult {
             get {
                 return ResourceManager.GetString("NoActionResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No User Agent.
+        /// </summary>
+        internal static string NoUserAgent {
+            get {
+                return ResourceManager.GetString("NoUserAgent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No User Found.
+        /// </summary>
+        internal static string NoUserFound {
+            get {
+                return ResourceManager.GetString("NoUserFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User name and password do not match.
+        /// </summary>
+        internal static string NoUserMatch {
+            get {
+                return ResourceManager.GetString("NoUserMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your token has expired.
+        /// </summary>
+        internal static string TokenExpired {
+            get {
+                return ResourceManager.GetString("TokenExpired", resourceCulture);
             }
         }
     }

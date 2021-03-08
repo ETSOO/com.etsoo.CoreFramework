@@ -118,6 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="NoActionResult" xml:space="preserve">
-    <value>No action result</value>
+    <value>No Action Result</value>
+  </data>
+  <data name="NoUserAgent" xml:space="preserve">
+    <value>No User Agent</value>
+  </data>
+  <data name="NoUserFound" xml:space="preserve">
+    <value>No User Found</value>
+  </data>
+  <data name="NoUserMatch" xml:space="preserve">
+    <value>User name and password do not match</value>
+  </data>
+  <data name="TokenExpired" xml:space="preserve">
+    <value>Your token has expired</value>
   </data>
 </root>

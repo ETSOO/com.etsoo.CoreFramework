@@ -13,13 +13,16 @@ namespace com.etsoo.CoreFramework.Application
         /// As AcionResult
         /// 输出为操作结果
         /// </summary>
+        /// <param name="title">Title</param>
+        /// <param name="field">Field</param>
         /// <returns>Action result</returns>
-        public IActionResult AsResult()
+        public IActionResult AsResult(string? title = null, string? field = null)
         {
             return new ActionResult
             {
                 Type = Type,
-                Title = Title
+                Title = title ?? Title,
+                Field = field
             };
         }
     }
@@ -31,9 +34,58 @@ namespace com.etsoo.CoreFramework.Application
     public static class ApplicationErrors
     {
         /// <summary>
+        /// No action result type url
+        /// </summary>
+        public const string NoActionResultUrl = "https://api.etsoo.com/SmartERP/errors/NoActionResult";
+
+        /// <summary>
+        /// No user agent type url
+        /// </summary>
+        public const string NoUserAgentUrl = "https://api.etsoo.com/SmartERP/errors/NoUserAgent";
+
+        /// <summary>
+        /// No user id found url
+        /// </summary>
+        public const string NoUserFoundUrl = "https://api.etsoo.com/SmartERP/errors/NoUserId";
+
+        /// <summary>
+        /// No user id and password match url
+        /// </summary>
+        public const string NoUserMatchUrl = "https://api.etsoo.com/SmartERP/errors/NoUserMatch";
+
+        /// <summary>
+        /// Your token has expired url
+        /// </summary>
+        public const string TokenExpiredUrl = "https://api.etsoo.com/SmartERP/errors/TokenExpired";
+
+        /// <summary>
         /// No action result error
         /// 没有操作结果错误
         /// </summary>
-        public static ApplicationError NoActionResult => new ApplicationError(new Uri("https://api.etsoo.com/SmartERPNext/errors/NoActionResult"), Resources.Resource.NoActionResult);
+        public static ApplicationError NoActionResult => new ApplicationError(new Uri(NoActionResultUrl), Resources.Resource.NoActionResult);
+
+        /// <summary>
+        /// No user agent result error
+        /// 没有用户代理错误
+        /// </summary>
+        public static ApplicationError NoUserAgent => new ApplicationError(new Uri(NoUserAgentUrl), Resources.Resource.NoUserAgent);
+
+        /// <summary>
+        /// No user found error
+        /// 找不到用户错误
+        /// </summary>
+        public static ApplicationError NoUserFound => new ApplicationError(new Uri(NoUserFoundUrl), Resources.Resource.NoUserFound);
+
+        /// <summary>
+        /// User name and password do not match error
+        /// 用户名和密码不匹配错误
+        /// </summary>
+        public static ApplicationError NoUserMatch => new ApplicationError(new Uri(NoUserMatchUrl), Resources.Resource.NoUserMatch);
+
+        /// <summary>
+        /// User name and password do not match error
+        /// 您的令牌已过期错误
+        /// </summary>
+        public static ApplicationError TokenExpired => new ApplicationError(new Uri(TokenExpiredUrl), Resources.Resource.TokenExpired);
     }
 }

@@ -18,25 +18,25 @@ namespace com.etsoo.CoreFramework.Services
         /// Application
         /// 程序对象
         /// </summary>
-        protected ICoreApplication<C> App { get; init; }
+        protected ICoreApplication<C> App { get; }
 
         /// <summary>
         /// Current user
         /// 当前用户
         /// </summary>
-        protected ICurrentUser? User { get; init; }
+        protected ICurrentUser? User { get; }
 
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
-        protected ILogger Logger { get; init; }
+        protected ILogger Logger { get; }
 
         /// <summary>
         /// Database repository
         /// 数据库仓库
         /// </summary>
-        protected R Repo { get; init; }
+        protected R Repo { get; }
 
         /// <summary>
         /// Constructor

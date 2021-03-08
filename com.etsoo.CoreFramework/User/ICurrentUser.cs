@@ -12,30 +12,30 @@ namespace com.etsoo.CoreFramework.User
         /// Unique connection id
         /// 唯一连接编号
         /// </summary>
-        public string ConnectionId { get; init; }
+        public string ConnectionId { get; }
 
         /// <summary>
         /// Id
         /// 编号
         /// </summary>
-        public string Id { get; init; }
+        public string Id { get; }
 
         /// <summary>
         /// Role
         /// 角色
         /// </summary>
-        public string Role { get; init; }
+        public string Role { get; }
 
         /// <summary>
         /// Client IP address
         /// 客户端IP地址
         /// </summary>
-        IPAddress? ClientIp { get; init; }
+        IPAddress? ClientIp { get; }
 
         /// <summary>
         /// Language
         /// 语言
         /// </summary>
-        string Language { get; init; }
+        string Language { get; }
     }
 }

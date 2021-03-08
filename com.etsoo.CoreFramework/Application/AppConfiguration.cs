@@ -65,30 +65,30 @@ namespace com.etsoo.CoreFramework.Application
         /// Application id
         /// 程序编号
         /// </summary>
-        public ReadOnlyMemory<char> AppId { get; init; }
+        public ReadOnlyMemory<char> AppId { get; }
 
         /// <summary>
         /// Supported languages, like zh-CN, en
         /// 支持的语言，比如zh-CN, en
         /// </summary>
-        public string[] Languages { get; init; }
+        public string[] Languages { get; }
         
         /// <summary>
         /// Model DataAnnotations are validated, true under Web API to avoid double validation
         /// 模块数据标记已验证，在Web API下可以设置为true以避免重复验证
         /// </summary>
-        public bool ModelValidated { get; init; }
+        public bool ModelValidated { get; }
 
         /// <summary>
         /// Private key for encryption/decryption, required
         /// 加解密私匙，必填
         /// </summary>
-        public ReadOnlyMemory<char> PrivateKey { get; init; }
+        public ReadOnlyMemory<char> PrivateKey { get; }
 
         /// <summary>
         /// Symmetric security key, for data exchange, null means prevention exchange
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
-        public ReadOnlyMemory<char>? SymmetricKey { get; init; }
+        public ReadOnlyMemory<char>? SymmetricKey { get; }
     }
 }

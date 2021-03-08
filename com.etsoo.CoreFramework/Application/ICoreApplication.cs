@@ -14,6 +14,6 @@ namespace com.etsoo.CoreFramework.Application
         /// Database
         /// 数据库
         /// </summary>
-        IDatabase<C> DB { get; init; }
+        IDatabase<C> DB { get; }
     }
 }

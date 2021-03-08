@@ -120,4 +120,16 @@
   <data name="NoActionResult" xml:space="preserve">
     <value>没有返回操作结果</value>
   </data>
+  <data name="NoUserAgent" xml:space="preserve">
+    <value>没有用户代理</value>
+  </data>
+  <data name="NoUserFound" xml:space="preserve">
+    <value>找不到用户</value>
+  </data>
+  <data name="NoUserMatch" xml:space="preserve">
+    <value>用户名和密码不匹配</value>
+  </data>
+  <data name="TokenExpired" xml:space="preserve">
+    <value>您的令牌已过期</value>
+  </data>
 </root>

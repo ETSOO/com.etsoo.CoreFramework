@@ -20,31 +20,31 @@ namespace com.etsoo.CoreFramework.Application
         /// Application configuration
         /// 程序配置
         /// </summary>
-        public virtual IAppConfiguration Configuration { get; init; }
+        public virtual IAppConfiguration Configuration { get; }
 
         /// <summary>
         /// Default Json serializer options
         /// 默认的Json序列化器选项
         /// </summary>
-        public JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
+        public JsonSerializerOptions DefaultJsonSerializerOptions { get; }
 
         /// <summary>
         /// Database
         /// 数据库
         /// </summary>
-        public virtual IDatabase<C> DB { get; init; }
+        public virtual IDatabase<C> DB { get; }
 
         /// <summary>
         /// Message queue
         /// 消息队列
         /// </summary>
-        public virtual IMessageQueue? MessageQueue { get; init; }
+        public virtual IMessageQueue? MessageQueue { get; }
 
         /// <summary>
         /// Storage
         /// 存储
         /// </summary>
-        public virtual IStorage Storage { get; init; }
+        public virtual IStorage Storage { get; }
 
         /// <summary>
         /// Constructor
