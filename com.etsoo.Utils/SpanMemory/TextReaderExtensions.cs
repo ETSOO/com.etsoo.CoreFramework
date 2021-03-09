@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.IO.Pipelines;
 using System.Text;
@@ -84,12 +85,12 @@ namespace com.etsoo.Utils.SpanMemory
         /// <param name="reader">Reader</param>
         /// <param name="maxLength">Max length</param>
         /// <returns>Task</returns>
-        public static async Task<ReadOnlyMemory<char>> ReadAllCharsAsyn(this TextReader reader, int maxLength)
+        public static async Task<ReadOnlyMemory<char>> ReadAllCharsAsyn(this TextReader reader, int? maxLength = null)
         {
-            var writer = new StreamBufferWriter<char>(maxLength);
+            var writer = maxLength.HasValue ? new ArrayBufferWriter<char>(maxLength.Value) : new ArrayBufferWriter<char>();
 
             // Memory for read
-            var memory = writer.GetMemory(Math.Min(maxLength, BytesToRead));
+            var memory = writer.GetMemory(BytesToRead);
 
             int read;
             while ((read = await reader.ReadBlockAsync(memory)) > 0)
@@ -97,7 +98,7 @@ namespace com.etsoo.Utils.SpanMemory
                 writer.Advance(read);
             }
 
-            return writer.AsMemory();
+            return writer.WrittenMemory;
         }
     }
 }

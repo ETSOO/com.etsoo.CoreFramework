@@ -51,7 +51,7 @@ namespace com.etsoo.Utils.Crypto
             using var decryptor = aesAlg.CreateDecryptor();
             using var csDecrypt = new CryptoStream(cipherTextBytes.AsStream(), decryptor, CryptoStreamMode.Read, true);
             using var srDecrypt = new StreamReader(csDecrypt, Encoding.UTF8);
-            return await srDecrypt.ReadAllCharsAsyn(2 * cipherTextBytes.Length);
+            return await srDecrypt.ReadAllCharsAsyn();
         }
 
         /// <summary>

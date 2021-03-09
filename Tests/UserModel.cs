@@ -58,7 +58,7 @@ namespace Tests
         [ArrayProperty(';')]
         public List<int> List;
 
-        public bool? Valid;
+        public bool? Valid { get; set; }
 
         public short? ShortValue { get; init; }
 

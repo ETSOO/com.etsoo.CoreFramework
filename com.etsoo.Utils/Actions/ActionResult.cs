@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -273,10 +274,10 @@ namespace com.etsoo.Utils.Actions
         /// </summary>
         /// <param name="writer">Writer</param>
         /// <param name="options">Options</param>
-        public async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options)
+        public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
         {
             // Utf8JsonWriter
-            using var w = new Utf8JsonWriter(writer, new JsonWriterOptions { Indented = options.WriteIndented });
+            using var w = new Utf8JsonWriter(writer, new JsonWriterOptions { Encoder = options.Encoder, Indented = options.WriteIndented });
 
             // Object start {
             w.WriteStartObject();

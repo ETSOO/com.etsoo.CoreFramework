@@ -2,6 +2,7 @@
 using com.etsoo.Utils.Database;
 using com.etsoo.Utils.SpanMemory;
 using NUnit.Framework;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -27,10 +28,10 @@ namespace Tests.ActionResult
             };
 
             // Act
-            var writer = new StreamBufferWriter<byte>(2048);
+            var writer = new ArrayBufferWriter<byte>();
             await modal.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web) { IgnoreNullValues = true });
 
-            var json = Encoding.UTF8.GetString(writer.AsMemory().ToArray());
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
             // Assert
             Assert.IsTrue(json.Contains("keys"));
