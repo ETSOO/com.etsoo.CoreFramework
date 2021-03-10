@@ -26,7 +26,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Default Json serializer options
         /// 默认的Json序列化器选项
         /// </summary>
-        public JsonSerializerOptions DefaultJsonSerializerOptions { get; }
+        public JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
 
         /// <summary>
         /// Database
