@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Buffers;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.Utils.Serialization
@@ -9,6 +10,18 @@ namespace com.etsoo.Utils.Serialization
     /// </summary>
     public static class SerializationExtensions
     {
+        /// <summary>
+        /// Create Utf8 Json writer
+        /// Utf8 Json创建器
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <returns></returns>
+        public static Utf8JsonWriter CreateJsonWriter(this JsonSerializerOptions options, IBufferWriter<byte> writer)
+        {
+            return new Utf8JsonWriter(writer, new JsonWriterOptions { Encoder = options.Encoder, Indented = options.WriteIndented });
+        }
+
         /// <summary>
         /// Convert name
         /// 转化名称

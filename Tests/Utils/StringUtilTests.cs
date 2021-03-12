@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.String;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -204,6 +205,19 @@ namespace Tests.Utils
             // Assert
             Assert.IsTrue(items.Count() == 3);
             Assert.IsTrue(items.Contains("3"));
+        }
+
+        [Test]
+        public void ToPascalWord_Test()
+        {
+            // Arrange
+            var input = "HELLO";
+
+            // Act
+            var result = input.AsSpan().ToPascalWord();
+
+            // Assert
+            Assert.IsTrue(result.ToString() == "Hello");
         }
     }
 }

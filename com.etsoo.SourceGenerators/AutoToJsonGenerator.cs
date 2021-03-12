@@ -171,7 +171,7 @@ namespace com.etsoo.CoreFramework.SourceGenerators
                         public async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options)
                         {{
                             // Utf8JsonWriter
-                            using var w = new Utf8JsonWriter(writer, new JsonWriterOptions {{ Indented = options.WriteIndented }});
+                            using var w = options.CreateJsonWriter(writer);
 
                             // Object start
                             w.WriteStartObject();

@@ -277,7 +277,7 @@ namespace com.etsoo.Utils.Actions
         public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
         {
             // Utf8JsonWriter
-            using var w = new Utf8JsonWriter(writer, new JsonWriterOptions { Encoder = options.Encoder, Indented = options.WriteIndented });
+            using var w = options.CreateJsonWriter(writer);
 
             // Object start {
             w.WriteStartObject();

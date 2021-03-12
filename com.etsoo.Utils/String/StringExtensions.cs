@@ -38,6 +38,25 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// To Pascal word
+        /// 转换为首字母大写单词
+        /// </summary>
+        /// <param name="input">Input word</param>
+        /// <returns>Pascal word</returns>
+        public static ReadOnlySpan<char> ToPascalWord(this ReadOnlySpan<char> input)
+        {
+            Span<char> span = new char[input.Length];
+
+            // Change the first letter to upper case
+            span[0] = char.ToUpper(input[0]);
+
+            // Left letters to lower case
+            input.Slice(1).ToLowerInvariant(span.Slice(1));
+
+            return span;
+        }
+
+        /// <summary>
         /// To Dapper DbString
         /// 转化为 Dapper DbString
         /// </summary>

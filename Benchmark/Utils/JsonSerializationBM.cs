@@ -92,7 +92,7 @@ namespace Benchmark.Utils
         {
             public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
             {
-                using var w = new Utf8JsonWriter(writer, new JsonWriterOptions { Indented = options.WriteIndented });
+                using var w = options.CreateJsonWriter(writer);
 
                 w.WriteStartObject();
 
