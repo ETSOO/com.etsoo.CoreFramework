@@ -50,7 +50,14 @@ namespace com.etsoo.SourceGenerators
             try
             {
                 // Business logic to decide what we're interested in goes here
-                if (syntaxNode is StructDeclarationSyntax sds
+                if (syntaxNode is RecordDeclarationSyntax rds
+                    && (!KeywordKind.HasValue || rds.HasToken(KeywordKind.Value))
+                    && rds.AttributeLists.HasAttribute(AttributeType))
+                {
+                    // Partial Record
+                    RecordCandidates.Add(rds);
+                }
+                else if (syntaxNode is StructDeclarationSyntax sds
                     && (!KeywordKind.HasValue || sds.HasToken(KeywordKind.Value))
                     && sds.AttributeLists.HasAttribute(AttributeType))
                 {
@@ -63,13 +70,6 @@ namespace com.etsoo.SourceGenerators
                 {
                     // Partial Class
                     ClassCandidates.Add(cds);
-                }
-                else if (syntaxNode is RecordDeclarationSyntax rds
-                    && (!KeywordKind.HasValue || rds.HasToken(KeywordKind.Value))
-                    && rds.AttributeLists.HasAttribute(AttributeType))
-                {
-                    // Partial Record
-                    RecordCandidates.Add(rds);
                 }
             }
             catch

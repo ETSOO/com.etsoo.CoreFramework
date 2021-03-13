@@ -160,6 +160,12 @@ namespace com.etsoo.SourceGenerators
                 return;
             }
 
+            // Records
+            foreach (var rds in syntaxReceiver.RecordCandidates)
+            {
+                GenerateCode(context, rds, syntaxReceiver.AttributeType);
+            }
+
             // Structs
             foreach (var sds in syntaxReceiver.StructCandidates)
             {
@@ -170,12 +176,6 @@ namespace com.etsoo.SourceGenerators
             foreach (var cds in syntaxReceiver.ClassCandidates)
             {
                 GenerateCode(context, cds, syntaxReceiver.AttributeType);
-            }
-
-            // Records
-            foreach (var rds in syntaxReceiver.RecordCandidates)
-            {
-                GenerateCode(context, rds, syntaxReceiver.AttributeType);
             }
         }
 

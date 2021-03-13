@@ -42,10 +42,9 @@ namespace com.etsoo.SourceGenerators
                 if (name.Equals(className) || (name + "Attribute").Equals(className))
                 {
                     // Namespace match
-                    var usingDirective = a.GetUsingDirectiveSyntax();
-                    if (usingDirective != null)
+                    if (a.GetUsingDirectiveSyntax(ns) != null)
                     {
-                        return usingDirective.Name.ToString().Equals(ns);
+                        return true;
                     }
                 }
 
@@ -80,10 +79,11 @@ namespace com.etsoo.SourceGenerators
         /// 获取 SyntaxNode 类型的引用
         /// </summary>
         /// <param name="sn">SyntaxNode</param>
+        /// <param name="ns">Name space</param>
         /// <returns>UsingDirectiveSyntax</returns>
-        public static UsingDirectiveSyntax GetUsingDirectiveSyntax(this SyntaxNode sn)
+        public static UsingDirectiveSyntax GetUsingDirectiveSyntax(this SyntaxNode sn, string ns)
         {
-            return sn.SyntaxTree.GetReference(sn).SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>().FirstOrDefault();
+            return sn.SyntaxTree.GetReference(sn).SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>().FirstOrDefault((s) => s.Name.ToString().Equals(ns));
         }
 
         /// <summary>

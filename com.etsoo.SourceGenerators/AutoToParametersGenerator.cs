@@ -247,6 +247,12 @@ namespace com.etsoo.SourceGenerators
                 return;
             }
 
+            // Records
+            foreach (var rds in syntaxReceiver.RecordCandidates)
+            {
+                GenerateCode(context, rds, syntaxReceiver.AttributeType);
+            }
+
             // Structs
             foreach (var sds in syntaxReceiver.StructCandidates)
             {
@@ -258,20 +264,16 @@ namespace com.etsoo.SourceGenerators
             {
                 GenerateCode(context, cds, syntaxReceiver.AttributeType);
             }
-
-            // Records
-            foreach (var rds in syntaxReceiver.RecordCandidates)
-            {
-                GenerateCode(context, rds, syntaxReceiver.AttributeType);
-            }
         }
 
         public void Initialize(GeneratorInitializationContext context)
         {
-/*            if (!Debugger.IsAttached)
+            /*
+            if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
-            }*/
+            }
+            */
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToParametersAttribute), SyntaxKind.PartialKeyword));
