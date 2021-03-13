@@ -8,14 +8,14 @@
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SourceGenerators</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Company>ETSOO</Company>
-    <Copyright>Copyright © ETSOO 2020</Copyright>
+    <Copyright>Copyright © ETSOO 2004 - 2021</Copyright>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared source generators for Json, DataReader, Dictionary seriliazation and deserialization.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.12</Version>
+    <Version>1.0.13</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -23,6 +23,7 @@
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
 	<DevelopmentDependency>true</DevelopmentDependency>
+	<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,12 +35,16 @@
   </ItemGroup>
 
   <ItemGroup>
-	<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-	<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="..\logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
+
+  <Target Name="_AddAnalyzersToOutput">
+	<ItemGroup>
+	  <TfmSpecificPackageFile Include="$(OutputPath)\com.etsoo.SourceGenerators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup>
+  </Target>
 
 </Project>
