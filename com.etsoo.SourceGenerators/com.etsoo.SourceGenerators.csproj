@@ -14,7 +14,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.10</Version>
+	<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+    <Version>1.0.11</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -31,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
+	<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
     <None Include="..\logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -40,7 +41,7 @@
 	
   <Target Name="_AddAnalyzersToOutput">
 	<ItemGroup>
-	  <TfmSpecificPackageFile Include="$(OutputPath)\com.etsoo.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
+	  <TfmSpecificPackageFile Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 	</ItemGroup>
   </Target>
 
