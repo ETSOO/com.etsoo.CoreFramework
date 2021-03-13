@@ -109,14 +109,14 @@ namespace com.etsoo.SourceGenerators
         {
             // Field symbol
             var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
-            if (context.CancellationToken.IsCancellationRequested)
+            if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
             // Attribute data
             var attributeData = symbol.GetAttributeData(attributeType.FullName);
 
             // Snake case
-            var snakeCase = attributeData.GetValue<bool>(nameof(AutoToParametersAttribute.SnakeCase));
+            var snakeCase = attributeData?.GetValue<bool>(nameof(AutoToParametersAttribute.SnakeCase));
 
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
@@ -141,7 +141,7 @@ namespace com.etsoo.SourceGenerators
                         public static {name} Create(StringKeyDictionaryObject dic)
                         {{
                             return new {name} {{
-                                {GenerateBody(context, tds, snakeCase)}
+                                {GenerateBody(context, tds, snakeCase.GetValueOrDefault())}
                             }};
                         }}
                     }}

@@ -18,13 +18,13 @@ namespace com.etsoo.SourceGenerators.Attributes
         /// Parameter name
         /// 参数名称
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Type name
         /// 类型名称，如 Int
         /// </summary>
-        public string TypeName { get; set; }
+        public string? TypeName { get; set; }
 
         /// <summary>
         /// Constructor

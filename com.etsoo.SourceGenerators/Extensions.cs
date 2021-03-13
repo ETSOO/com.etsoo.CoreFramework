@@ -105,7 +105,7 @@ namespace com.etsoo.SourceGenerators
         /// <param name="compilation">Compilation</param>
         /// <param name="sn">SyntaxNode</param>
         /// <returns>Symbol</returns>
-        public static T GetParentSyntaxNode<T>(this SyntaxNode sn)
+        public static T? GetParentSyntaxNode<T>(this SyntaxNode sn)
         {
             while (sn != null)
             {
@@ -113,6 +113,9 @@ namespace com.etsoo.SourceGenerators
                 {
                     return nds;
                 }
+
+                if (sn.Parent == null)
+                    break;
 
                 sn = sn.Parent;
             }
@@ -127,7 +130,7 @@ namespace com.etsoo.SourceGenerators
         /// <param name="symbol">Symbol</param>
         /// <param name="type">Type full name</param>
         /// <returns>Attribute data</returns>
-        public static AttributeData GetAttributeData(this ISymbol symbol, string type)
+        public static AttributeData? GetAttributeData(this ISymbol symbol, string type)
         {
             return symbol.GetAttributes().SingleOrDefault(a => {
                 if (a.AttributeClass != null)
@@ -147,12 +150,12 @@ namespace com.etsoo.SourceGenerators
         /// <param name="data">Attribute data</param>
         /// <param name="name">Field name</param>
         /// <returns>Field value</returns>
-        public static T GetValue<T>(this AttributeData data, string name)
+        public static T? GetValue<T>(this AttributeData data, string name)
         {
             var kv = data.NamedArguments.FirstOrDefault(a => a.Key.Equals(name));
             var value = kv.Value.Value;
             // kv == default(KeyValuePair<string, TypedConstant>)
-            if (kv.Key == null)
+            if (kv.Key == null && data.AttributeConstructor != null)
             {
                 var parameters = data.AttributeConstructor.Parameters;
                 for (var p = 0; p < parameters.Length; p++)
@@ -170,7 +173,7 @@ namespace com.etsoo.SourceGenerators
                 return default;
             }
 
-            return (T)value;
+            return (T?)value;
         }
 
         /// <summary>
@@ -180,10 +183,10 @@ namespace com.etsoo.SourceGenerators
         /// <param name="context">Context</param>
         /// <param name="sn">SyntaxNode</param>
         /// <returns>Symbol</returns>
-        public static T ParseSyntaxNode<T>(this GeneratorExecutionContext context, SyntaxNode sn) where T : ISymbol
+        public static T? ParseSyntaxNode<T>(this GeneratorExecutionContext context, SyntaxNode sn) where T : ISymbol
         {
             var model = context.Compilation.GetSemanticModel(sn.SyntaxTree);
-            return (T)model.GetDeclaredSymbol(sn);
+            return (T?)model.GetDeclaredSymbol(sn);
         }
 
         /// <summary>
@@ -211,7 +214,7 @@ namespace com.etsoo.SourceGenerators
         /// <returns>Name space and class name</returns>
         public static (string nameSpace, string className) ParseSyntaxNodeNames(this GeneratorExecutionContext context, SyntaxNode sn)
         {
-            var symbol = context.ParseSyntaxNode<ISymbol>(sn);
+            var symbol = context.ParseSyntaxNode<ISymbol>(sn)!;
             return (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
@@ -239,10 +242,12 @@ namespace com.etsoo.SourceGenerators
                     // Property
                     // Symbol
                     var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
+                    if(pSymbol != null)
+                    {
+                        var (pNullable, type) = p.Type.IsNullable();
 
-                    var (pNullable, type) = p.Type.IsNullable();
-
-                    items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
+                        items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
+                    }
                 }
                 else if (member is FieldDeclarationSyntax f)
                 {
@@ -251,10 +256,12 @@ namespace com.etsoo.SourceGenerators
                     {
                         // Symbol
                         var fSymbol = context.ParseSyntaxNode<IFieldSymbol>(variable);
+                        if (fSymbol != null)
+                        {
+                            var (fNullable, fType) = f.Declaration.Type.IsNullable();
 
-                        var (fNullable, fType) = f.Declaration.Type.IsNullable();
-
-                        items.Add(new ParsedMember(fSymbol, fType, fSymbol.Type, fNullable));
+                            items.Add(new ParsedMember(fSymbol, fType, fSymbol.Type, fNullable));
+                        }
                     }
                 }
                 else
@@ -283,7 +290,7 @@ namespace com.etsoo.SourceGenerators
         /// </summary>
         /// <param name="type">Type</param>
         /// <returns>Enum type</returns>
-        public static ITypeSymbol GetEnumType(this ITypeSymbol type)
+        public static ITypeSymbol? GetEnumType(this ITypeSymbol type)
         {
             if(type.TypeKind == TypeKind.Enum)
             {
@@ -300,7 +307,7 @@ namespace com.etsoo.SourceGenerators
                 return nts.TypeArguments[0];
             }
 
-            return null;
+            return default;
         }
 
         /// <summary>

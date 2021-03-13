@@ -73,7 +73,7 @@ namespace Benchmark.Utils
         {
             var type = typeof(T);
             var obj = Activator.CreateInstance(type, dic);
-            return (T)obj;
+            return (T?)obj;
         }
 
         [Benchmark]

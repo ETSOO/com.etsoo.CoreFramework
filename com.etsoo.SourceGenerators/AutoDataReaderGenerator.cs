@@ -106,7 +106,7 @@ namespace com.etsoo.SourceGenerators
         {
             // Field symbol
             var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
-            if (context.CancellationToken.IsCancellationRequested)
+            if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
             // Name space and class name

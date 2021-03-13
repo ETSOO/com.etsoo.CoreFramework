@@ -57,7 +57,7 @@ namespace com.etsoo.SourceGenerators
                     if (typeSymbol.IsSimpleType())
                     {
                         // Default type name from member's type
-                        if (string.IsNullOrEmpty(typeName))
+                        if (typeName == null || typeName == string.Empty)
                         {
                             typeName = typeSymbol.Name;
                         }
@@ -76,7 +76,7 @@ namespace com.etsoo.SourceGenerators
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
                     {
                         // Enum item type
-                        if (string.IsNullOrEmpty(typeName))
+                        if (typeName == null || typeName == string.Empty)
                         {
                             var enumSymbol = (INamedTypeSymbol)typeSymbol;
                             typeName = enumSymbol.EnumUnderlyingType?.Name;
@@ -184,17 +184,17 @@ namespace com.etsoo.SourceGenerators
         {
             // Field symbol
             var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
-            if (context.CancellationToken.IsCancellationRequested)
+            if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
             // Attribute data
             var attributeData = symbol.GetAttributeData(attributeType.FullName);
 
             // Ignore null
-            var ignoreNull = attributeData.GetValue<bool>(nameof(AutoToParametersAttribute.IgnoreNull));
+            var ignoreNull = attributeData?.GetValue<bool>(nameof(AutoToParametersAttribute.IgnoreNull));
 
             // Snake case
-            var snakeCase = attributeData.GetValue<bool>(nameof(AutoToParametersAttribute.SnakeCase));
+            var snakeCase = attributeData?.GetValue<bool>(nameof(AutoToParametersAttribute.SnakeCase));
 
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
@@ -203,7 +203,7 @@ namespace com.etsoo.SourceGenerators
             var keyword = tds.Keyword.ToString();
 
             // Body
-            var body = GenerateBody(context, tds, ignoreNull, snakeCase);
+            var body = GenerateBody(context, tds, ignoreNull.GetValueOrDefault(), snakeCase.GetValueOrDefault());
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
