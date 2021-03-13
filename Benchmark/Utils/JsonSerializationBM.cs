@@ -168,12 +168,12 @@ namespace Benchmark.Utils
 
             if(person is IJsonSerialization jl)
             {
-                var writer = new StreamBufferWriter<byte>(1024);
+                var writer = new ArrayBufferWriter<byte>();
                 await jl.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web)
                 {
                     IgnoreNullValues = true
                 });
-                var json = Encoding.UTF8.GetString(writer.AsMemory().ToArray());
+                var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
                 Console.WriteLine(json);
             }

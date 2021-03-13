@@ -14,7 +14,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.6</Version>
+    <Version>1.0.10</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -22,28 +22,26 @@
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="bin\**" />
-    <EmbeddedResource Remove="bin\**" />
-    <None Remove="bin\**" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget></PlatformTarget>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" />
-	<PackageReference Include="NETStandard.Library" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-	<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="tools" />
-	<None Remove="bin\Debug\netstandard2.0\\com.etsoo.SourceGenerators.dll" />
-	<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<None Update="tools\*.ps1" CopyToOutputDirectory="Always" Pack="true" PackagePath="" />
     <None Include="..\logo.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>
+	
+  <Target Name="_AddAnalyzersToOutput">
+	<ItemGroup>
+	  <TfmSpecificPackageFile Include="$(OutputPath)\com.etsoo.SourceGenerators.dll" PackagePath="analyzers/dotnet/cs" />
+	</ItemGroup>
+  </Target>
 
 </Project>

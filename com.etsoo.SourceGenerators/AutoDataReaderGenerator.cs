@@ -1,5 +1,4 @@
-﻿using com.etsoo.SourceGenerators;
-using com.etsoo.SourceGenerators.Attributes;
+﻿using com.etsoo.SourceGenerators.Attributes;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace com.etsoo.CoreFramework.SourceGenerators
+namespace com.etsoo.SourceGenerators
 {
     /// <summary>
     /// Auto DbDataReader initialization generator

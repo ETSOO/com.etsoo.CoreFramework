@@ -1,11 +1,10 @@
-﻿using com.etsoo.SourceGenerators;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 
-namespace com.etsoo.CoreFramework.SourceGenerators
+namespace com.etsoo.SourceGenerators
 {
     /// <summary>
     /// Syntax receiver

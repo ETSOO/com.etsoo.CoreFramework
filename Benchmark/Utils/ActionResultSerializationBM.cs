@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using com.etsoo.Utils.Actions;
-using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using System;
+using System.Buffers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -47,12 +47,12 @@ namespace Benchmark.Utils
         [Benchmark]
         public async Task JsonLocal()
         {
-            var writer = new StreamBufferWriter<byte>(40960);
+            var writer = new ArrayBufferWriter<byte>();
             await result.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 IgnoreNullValues = true
             });
-            var json = Encoding.UTF8.GetString(writer.AsMemory().ToArray());
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
             Console.WriteLine(json);
         }
