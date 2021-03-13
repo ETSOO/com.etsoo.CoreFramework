@@ -15,14 +15,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.14</Version>
+    <Version>1.0.15</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <AnalysisLevel>latest</AnalysisLevel>
     <EnableNETAnalyzers>false</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
-	<DevelopmentDependency>true</DevelopmentDependency>
 	<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
@@ -32,7 +31,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis" Version="3.9.0" />
-	<PackageReference Update="NETStandard.Library" Version="2.0.3" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
