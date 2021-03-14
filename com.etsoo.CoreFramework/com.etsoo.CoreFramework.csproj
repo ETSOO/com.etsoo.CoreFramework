@@ -15,7 +15,7 @@
     <Copyright>Copyright © ETSOO 2004 - 2021</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.0.12</Version>
+    <Version>1.0.13</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper.StrongName" Version="2.0.78" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />

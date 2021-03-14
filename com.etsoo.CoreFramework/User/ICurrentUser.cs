@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Security.Claims;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -12,7 +14,13 @@ namespace com.etsoo.CoreFramework.User
         /// Unique connection id
         /// 唯一连接编号
         /// </summary>
-        public string ConnectionId { get; }
+        public string? ConnectionId { get; }
+
+        /// <summary>
+        /// Name
+        /// 姓名
+        /// </summary>
+        public string Name { get; }
 
         /// <summary>
         /// Id
@@ -37,5 +45,19 @@ namespace com.etsoo.CoreFramework.User
         /// 语言
         /// </summary>
         string Language { get; }
+
+        /// <summary>
+        /// Create claims
+        /// 创建声明
+        /// </summary>
+        /// <returns>Claims</returns>
+        IEnumerable<Claim> CreateClaims();
+
+        /// <summary>
+        /// Create identity
+        /// 创建身份
+        /// </summary>
+        /// <returns>Identity</returns>
+        ClaimsIdentity CreateIdentity();
     }
 }
