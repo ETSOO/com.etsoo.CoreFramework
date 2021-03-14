@@ -52,7 +52,7 @@ namespace com.etsoo.SourceGenerators
                     var typeName = attributeData?.GetValue<string>(typeNameField);
 
                     // Line parts
-                    string valuePart, typePart = "null";
+                    string valuePart;
 
                     if (typeSymbol.IsSimpleType())
                     {
@@ -70,7 +70,6 @@ namespace com.etsoo.SourceGenerators
                         else
                         {
                             valuePart = fieldName;
-                            typePart = $"DatabaseUtil.TypeToDbType(\"{typeName}\")";
                         }
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
@@ -85,7 +84,6 @@ namespace com.etsoo.SourceGenerators
                         }
 
                         valuePart = $"({typeName.ToLower()}){fieldName}";
-                        typePart = $"DatabaseUtil.TypeToDbType(\"{typeName}\")";
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Array)
                     {
@@ -108,7 +106,7 @@ namespace com.etsoo.SourceGenerators
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, DatabaseUtil.TypeToDbType(\"{itemTypeSymbol.Name}\").Value).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if (typeSymbol.IsList())
@@ -132,7 +130,7 @@ namespace com.etsoo.SourceGenerators
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, DatabaseUtil.TypeToDbType(\"{itemTypeSymbol.Name}\").Value).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if(typeSymbol.IsDictionary())
@@ -156,7 +154,7 @@ namespace com.etsoo.SourceGenerators
                             var itemType = dicSymbol.TypeArguments[1];
 
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.DictionaryToRecords({fieldName}, DatabaseUtil.TypeToDbType(\"{keyType.Name}\").Value, DatabaseUtil.TypeToDbType(\"{itemType.Name}\").Value).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtil.DictionaryToRecords({fieldName}, {keyType.Name.ToDbType()}, {itemType.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else
@@ -171,7 +169,7 @@ namespace com.etsoo.SourceGenerators
                         // Ignore null field
                         itemCode.AppendLine($"if({fieldName} != null)");
                     }
-                    itemCode.Append($"parameters.Add(\"{name}\", {valuePart}, {typePart})");
+                    itemCode.Append($"parameters.Add(\"{name}\", {valuePart}, {typeName.ToDbType()})");
 
                     body.Add(itemCode.ToString());
                 }
@@ -213,6 +211,7 @@ namespace com.etsoo.SourceGenerators
                 using com.etsoo.Utils.Database;
                 using com.etsoo.Utils.String;
                 using System;
+                using System.Data;
 
                 namespace {ns}
                 {{

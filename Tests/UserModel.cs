@@ -1,4 +1,5 @@
 ﻿using com.etsoo.SourceGenerators.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -67,6 +68,8 @@ namespace Tests
         public decimal? DecimalValue { get; init; }
 
         public ushort UShortValue { get; init; }
+
+        public DateTime? Date { get; init; }
 
         /// <summary>
         /// List

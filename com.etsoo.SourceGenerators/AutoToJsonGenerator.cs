@@ -18,15 +18,10 @@ namespace com.etsoo.SourceGenerators
         // Get method name by type name
         private string GetMethod(string typeName)
         {
-            typeName = typeName.ToLower();
-
-            if (typeName == "boolean")
+            if (typeName == "bool" || typeName == "boolean")
                 return "WriteBoolean";
 
-            if (typeName.StartsWith("int") || typeName.StartsWith("uint") || typeName == "long" || typeName == "decimal" || typeName == "float")
-                return "WriteNumber";
-
-            return "WriteString";
+            return typeName.IsNumericType() ? "WriteNumber" : "WriteString";
         }
 
         private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds)
@@ -71,8 +66,10 @@ namespace com.etsoo.SourceGenerators
 
                     if (typeSymbol.IsSimpleType())
                     {
-                        var method = GetMethod(typeName);
-                        item.AppendLine($@"w.{method}({pName}, {fieldName});");
+                        // Value field
+                        var valueField = nullable && typeSymbol.IsValueType ? $"{fieldName}.Value" : fieldName;
+                        var method = GetMethod(type.ToString());
+                        item.AppendLine($@"w.{method}({pName}, {valueField});");
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
                     {
@@ -92,7 +89,7 @@ namespace com.etsoo.SourceGenerators
                         }
                         else
                         {
-                            var method = GetMethod(itemTypeSymbol.Name) + "Value";
+                            var method = GetMethod(itemTypeSymbol.ToString()) + "Value";
                             var itemName = "item" + fieldName;
                             item.AppendLine($@"w.WritePropertyName({pName});
                                 w.WriteStartArray();
@@ -220,10 +217,12 @@ namespace com.etsoo.SourceGenerators
 
         public void Initialize(GeneratorInitializationContext context)
         {
-/*            if (!Debugger.IsAttached)
+            /*
+            if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
-            }*/
+            }
+            */
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToJsonAttribute), SyntaxKind.PartialKeyword));

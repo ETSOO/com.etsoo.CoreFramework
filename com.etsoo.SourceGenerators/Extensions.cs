@@ -245,7 +245,6 @@ namespace com.etsoo.SourceGenerators
                     if(pSymbol != null)
                     {
                         var (pNullable, type) = p.Type.IsNullable();
-
                         items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
                     }
                 }

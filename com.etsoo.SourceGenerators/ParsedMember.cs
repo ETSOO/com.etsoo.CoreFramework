@@ -46,10 +46,18 @@ namespace com.etsoo.SourceGenerators
                     // Enum
                     typeSymbol = enumType;
                 }
-                else if (typeSymbol is INamedTypeSymbol nts && !nts.IsGenericType)
+                else if (typeSymbol is INamedTypeSymbol nts)
                 {
-                    // Get the original non-generic definition, like string? => string, int[]? => int[]
-                    typeSymbol = typeSymbol.OriginalDefinition;
+                    if(!nts.IsGenericType)
+                    {
+                        // Get the original non-generic definition, like string? => string, int[]? => int[]
+                        typeSymbol = typeSymbol.OriginalDefinition;
+                    }
+                    else if(nts.TypeKind == TypeKind.Struct && nts.TypeArguments.Length == 1)
+                    {
+                        // bool? => bool
+                        typeSymbol = nts.TypeArguments[0];
+                    }
                 }
             }
 
