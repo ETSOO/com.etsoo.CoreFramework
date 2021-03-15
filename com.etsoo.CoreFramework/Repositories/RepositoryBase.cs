@@ -26,13 +26,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Application
         /// 程序对象
         /// </summary>
-        protected ICoreApplication<C> App { get; }
+        virtual protected ICoreApplication<C> App { get; }
 
         /// <summary>
         /// Current user
         /// 当前用户
         /// </summary>
-        protected ICurrentUser? User { get; }
+        virtual protected ICurrentUser? User { get; }
 
         /// <summary>
         /// Constructor
