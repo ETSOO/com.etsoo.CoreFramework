@@ -14,25 +14,25 @@ namespace com.etsoo.CoreFramework.User
         /// Unique connection id
         /// 唯一连接编号
         /// </summary>
-        public string? ConnectionId { get; }
+        string? ConnectionId { get; }
 
         /// <summary>
         /// Name
         /// 姓名
         /// </summary>
-        public string Name { get; }
+        string Name { get; }
 
         /// <summary>
         /// Id
         /// 编号
         /// </summary>
-        public string Id { get; }
+        string Id { get; }
 
         /// <summary>
         /// Role
         /// 角色
         /// </summary>
-        public string Role { get; }
+        IEnumerable<string> Roles { get; }
 
         /// <summary>
         /// Client IP address
