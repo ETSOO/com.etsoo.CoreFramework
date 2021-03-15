@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DataProcessingFailed" xml:space="preserve">
+    <value>Data Processing Failed</value>
+  </data>
+  <data name="DbConnectionFailed" xml:space="preserve">
+    <value>Database Connection Failed</value>
+  </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>No Action Result</value>
   </data>
@@ -128,6 +134,9 @@
   </data>
   <data name="NoUserMatch" xml:space="preserve">
     <value>User name and password do not match</value>
+  </data>
+  <data name="OutOfMemory" xml:space="preserve">
+    <value>Out Of Memory</value>
   </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>Your token has expired</value>

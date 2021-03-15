@@ -61,6 +61,24 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Data Processing Failed.
+        /// </summary>
+        internal static string DataProcessingFailed {
+            get {
+                return ResourceManager.GetString("DataProcessingFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database Connection Failed.
+        /// </summary>
+        internal static string DbConnectionFailed {
+            get {
+                return ResourceManager.GetString("DbConnectionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Action Result.
         /// </summary>
         internal static string NoActionResult {
@@ -93,6 +111,15 @@ namespace com.etsoo.CoreFramework.Resources {
         internal static string NoUserMatch {
             get {
                 return ResourceManager.GetString("NoUserMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Out Of Memory.
+        /// </summary>
+        internal static string OutOfMemory {
+            get {
+                return ResourceManager.GetString("OutOfMemory", resourceCulture);
             }
         }
         

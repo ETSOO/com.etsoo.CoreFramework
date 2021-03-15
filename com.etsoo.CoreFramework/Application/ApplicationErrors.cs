@@ -1,5 +1,7 @@
 ﻿using com.etsoo.Utils.Actions;
 using System;
+using System.Configuration;
+using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -34,6 +36,11 @@ namespace com.etsoo.CoreFramework.Application
     public static class ApplicationErrors
     {
         /// <summary>
+        /// Out Of Memory
+        /// </summary>
+        public const string OutOfMemoryUrl = "https://api.etsoo.com/SmartERP/errors/OutOfMemory";
+
+        /// <summary>
         /// No action result type url
         /// </summary>
         public const string NoActionResultUrl = "https://api.etsoo.com/SmartERP/errors/NoActionResult";
@@ -57,6 +64,22 @@ namespace com.etsoo.CoreFramework.Application
         /// Your token has expired url
         /// </summary>
         public const string TokenExpiredUrl = "https://api.etsoo.com/SmartERP/errors/TokenExpired";
+
+        /// <summary>
+        /// Database Connection Failed url
+        /// </summary>
+        public const string DbConnectionFailedUrl = "https://api.etsoo.com/SmartERP/errors/DbConnectionFailed";
+
+        /// <summary>
+        /// Data Processing Failed
+        /// </summary>
+        public const string DataProcessingFailedUrl = "https://api.etsoo.com/SmartERP/errors/DataProcessingFailed";
+
+        /// <summary>
+        /// Out Of Memory
+        /// 内存不足
+        /// </summary>
+        public static ApplicationError OutOfMemory => new ApplicationError(new Uri(OutOfMemoryUrl), Resources.Resource.OutOfMemory);
 
         /// <summary>
         /// No action result error
@@ -87,5 +110,39 @@ namespace com.etsoo.CoreFramework.Application
         /// 您的令牌已过期错误
         /// </summary>
         public static ApplicationError TokenExpired => new ApplicationError(new Uri(TokenExpiredUrl), Resources.Resource.TokenExpired);
+
+        /// <summary>
+        /// Database Connection Failed
+        /// 数据库连接失败
+        /// </summary>
+        public static ApplicationError DbConnectionFailed => new ApplicationError(new Uri(DbConnectionFailedUrl), Resources.Resource.DbConnectionFailed);
+
+        /// <summary>
+        /// Data Processing Failed
+        /// 数据处理失败
+        /// </summary>
+        public static ApplicationError DataProcessingFailed => new ApplicationError(new Uri(DataProcessingFailedUrl), Resources.Resource.DataProcessingFailed);
+
+        /// <summary>
+        /// Get Db exception result
+        /// 获取数据库异常结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        public static IActionResult GetDbException(Exception ex)
+        {
+            var result = ex switch
+            {
+                OutOfMemoryException => OutOfMemory.AsResult(),
+
+                InvalidOperationException
+                or DbException
+                or ConfigurationErrorsException => DbConnectionFailed.AsResult(),
+
+                _ => DataProcessingFailed.AsResult()
+            };
+
+            return result;
+        }
     }
 }
