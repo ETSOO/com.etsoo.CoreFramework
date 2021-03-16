@@ -11,10 +11,10 @@ namespace com.etsoo.Utils.Localization
         /// </summary>
         /// <param name="language">Language</param>
         /// <returns>Changed or not</returns>
-        public static bool SetCulture(string language)
+        public static CultureInfo SetCulture(string language)
         {
             if (CultureInfo.CurrentCulture.Name == language)
-                return false;
+                return CultureInfo.CurrentCulture;
 
             // Set related cultures
             var ci = new CultureInfo(language);
@@ -23,7 +23,7 @@ namespace com.etsoo.Utils.Localization
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
 
-            return true;
+            return ci;
         }
     }
 }
