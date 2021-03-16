@@ -39,9 +39,6 @@ namespace com.etsoo.SourceGenerators
                     // Field name
                     var fieldName = symbol.Name;
 
-                    // Field type name
-                    var typeName = typeSymbol.Name;
-
                     // Is field or property
                     var isField = (symbol.Kind == SymbolKind.Field).ToCode();
 

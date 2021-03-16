@@ -25,6 +25,7 @@ namespace com.etsoo.SourceGenerators
             {
                 var propertyType = typeof(PropertyAttribute);
                 var arrayPropertyType = typeof(ArrayPropertyAttribute);
+                var ignoreName = nameof(PropertyAttribute.Ignore);
                 var isAnsiName = nameof(PropertyAttribute.IsAnsi);
                 var nameField = nameof(PropertyAttribute.Name);
                 var typeNameField = nameof(PropertyAttribute.TypeName);
@@ -33,13 +34,19 @@ namespace com.etsoo.SourceGenerators
                 {
                     var (symbol, _, typeSymbol, nullable) = member;
 
+                    // Attribute data
+                    var attributeData = symbol.GetAttributeData(propertyType.FullName);
+                    
+                    // Ignore it?
+                    var ignore = attributeData?.GetValue<bool?>(ignoreName) ?? false;
+                    if (ignore)
+                        continue;
+
+                    // Is ansi, not unicode
+                    var isAnsi = attributeData?.GetValue<bool?>(isAnsiName) ?? false;
+
                     // Object field name
                     var fieldName = symbol.Name;
-
-                    var attributeData = symbol.GetAttributeData(propertyType.FullName);
-                    var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
-
-                    var isAnsi = attributeData?.GetValue<bool?>(isAnsiName) ?? false;
 
                     // Parameter name
                     var name = attributeData?.GetValue<string>(nameField);
@@ -50,6 +57,9 @@ namespace com.etsoo.SourceGenerators
 
                     // Data type name
                     var typeName = attributeData?.GetValue<string>(typeNameField);
+
+                    // Array data
+                    var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
 
                     // Line parts
                     string valuePart;

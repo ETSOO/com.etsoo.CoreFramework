@@ -15,6 +15,12 @@ namespace com.etsoo.SourceGenerators.Attributes
         public bool IsAnsi { get; set; }
 
         /// <summary>
+        /// Ignore the property
+        /// 是否忽略该属性
+        /// </summary>
+        public bool Ignore { get; set; }
+
+        /// <summary>
         /// Parameter name
         /// 参数名称
         /// </summary>
