@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Security.Claims;
 
@@ -44,7 +45,7 @@ namespace com.etsoo.CoreFramework.User
         /// Language
         /// 语言
         /// </summary>
-        string Language { get; }
+        CultureInfo Language { get; }
 
         /// <summary>
         /// Create claims

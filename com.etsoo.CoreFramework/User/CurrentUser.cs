@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.String;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Security.Claims;
 
@@ -10,7 +11,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser(string Id, string Name, IEnumerable<string> Roles, IPAddress ClientIp, string Language, string? ConnectionId) : ICurrentUser
+    public record CurrentUser(string Id, string Name, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
     {
         /// <summary>
         /// Create user
@@ -40,7 +41,7 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, roles, ipAddress, language, connectionId);
+            return new CurrentUser(id, name, roles, ipAddress, new CultureInfo(language), connectionId);
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, string language)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language)
         {
             // Get data
             var id = data.Get("Id");
@@ -85,7 +86,7 @@ namespace com.etsoo.CoreFramework.User
             return new Claim[] {
                 new (ClaimTypes.Name, Name),
                 new (ClaimTypes.NameIdentifier, Id),
-                new (ClaimTypes.Locality, Language),
+                new (ClaimTypes.Locality, Language.Name),
                 new (ClaimTypes.Role, string.Join(',', Roles)),
                 new (IPAddressClaim, ClientIp.ToString())
             };
