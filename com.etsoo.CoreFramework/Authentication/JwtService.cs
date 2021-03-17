@@ -156,7 +156,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Token</returns>
         public string CreateRefreshToken()
         {
-            Span<byte> randomNumber = new byte[64];
+            Span<byte> randomNumber = new byte[32];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);

@@ -128,6 +128,20 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Async query command as data reader
+        /// 异步执行命令返回数据读取器
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <returns>Action result</returns>
+        public async Task<DbDataReader> QueryAsDataReaderAsync(CommandDefinition command)
+        {
+            return await App.DB.WithConnection((connection) =>
+            {
+                return connection.ExecuteReaderAsync(command);
+            });
+        }
+
+        /// <summary>
         /// Async query command as action result
         /// 异步执行命令返回操作结果
         /// </summary>
