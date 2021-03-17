@@ -1,7 +1,10 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Database;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.CoreFramework.User;
+using com.etsoo.Utils.Actions;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Services
@@ -52,6 +55,35 @@ namespace com.etsoo.CoreFramework.Services
             this.User = user;
             this.Repo = repo;
             this.Logger = logger;
+        }
+
+        /// <summary>
+        /// Get db exception result
+        /// 获取数据库异常结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        protected IActionResult GetDbExceptionResult(Exception ex)
+        {
+            // Get the Db connection failure result
+            var exResult = App.DB.GetExceptionResult(ex);
+
+            // Transform
+            var result = exResult.Type switch
+            {
+                DbExceptionType.OutOfMemory       => ApplicationErrors.OutOfMemory.AsResult(),
+                DbExceptionType.ConnectionFailed  => ApplicationErrors.DbConnectionFailed.AsResult(),
+                _                                 => ApplicationErrors.DataProcessingFailed.AsResult()
+            };
+
+            // Log the exception
+            if (exResult.Critical)
+                Logger.LogCritical(ex, result.Title);
+            else
+                Logger.LogError(ex, result.Title);
+
+            // Return
+            return result;
         }
     }
 }
