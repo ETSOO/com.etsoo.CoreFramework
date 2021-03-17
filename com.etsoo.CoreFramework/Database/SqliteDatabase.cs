@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
+using System;
 
 namespace com.etsoo.CoreFramework.Database
 {
@@ -16,6 +17,28 @@ namespace com.etsoo.CoreFramework.Database
         /// <param name="snakeNaming">Is snake naming</param>
         public SqliteDatabase(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
         {
+        }
+
+        /// <summary>
+        /// Get exception result
+        /// https://www.sqlite.org/rescode.html
+        /// 获取数据库异常结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        public override IDbExceptionResult GetExceptionResult(Exception ex)
+        {
+            if (ex is OutOfMemoryException)
+            {
+                return new DbExceptionResult(DbExceptionType.OutOfMemory, true);
+            }
+
+            if (ex is SqliteException)
+            {
+                return new DbExceptionResult(DbExceptionType.ConnectionFailed, true);
+            }
+
+            return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
         }
 
         /// <summary>

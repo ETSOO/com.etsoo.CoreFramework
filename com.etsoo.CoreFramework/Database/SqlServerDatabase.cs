@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
 
 namespace com.etsoo.CoreFramework.Database
@@ -19,6 +20,28 @@ namespace com.etsoo.CoreFramework.Database
         /// <param name="snakeNaming">Is snake naming</param>
         public SqlServerDatabase(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
         {
+        }
+
+        /// <summary>
+        /// Get exception result
+        /// https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors?view=sql-server-ver15
+        /// 获取数据库异常结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        public override IDbExceptionResult GetExceptionResult(Exception ex)
+        {
+            if (ex is OutOfMemoryException)
+            {
+                return new DbExceptionResult(DbExceptionType.OutOfMemory, true);
+            }
+
+            if (ex is SqlException se && se.Number < 100)
+            {
+                return new DbExceptionResult(DbExceptionType.ConnectionFailed, true);
+            }
+
+            return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
         }
 
         /// <summary>

@@ -1,7 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
 using System;
-using System.Configuration;
-using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -122,27 +120,5 @@ namespace com.etsoo.CoreFramework.Application
         /// 数据处理失败
         /// </summary>
         public static ApplicationError DataProcessingFailed => new ApplicationError(new Uri(DataProcessingFailedUrl), Resources.Resource.DataProcessingFailed);
-
-        /// <summary>
-        /// Get Db exception result
-        /// 获取数据库异常结果
-        /// </summary>
-        /// <param name="ex">Exception</param>
-        /// <returns>Result</returns>
-        public static IActionResult GetDbException(Exception ex)
-        {
-            var result = ex switch
-            {
-                OutOfMemoryException => OutOfMemory.AsResult(),
-
-                InvalidOperationException
-                or DbException
-                or ConfigurationErrorsException => DbConnectionFailed.AsResult(),
-
-                _ => DataProcessingFailed.AsResult()
-            };
-
-            return result;
-        }
     }
 }

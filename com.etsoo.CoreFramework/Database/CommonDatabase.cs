@@ -47,6 +47,14 @@ namespace com.etsoo.CoreFramework.Database
         }
 
         /// <summary>
+        /// Get exception result
+        /// 获取数据库异常结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        public abstract IDbExceptionResult GetExceptionResult(Exception ex);
+
+        /// <summary>
         /// New database connection
         /// 新数据库链接对象
         /// </summary>
