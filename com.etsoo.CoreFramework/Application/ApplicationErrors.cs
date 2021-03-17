@@ -44,6 +44,11 @@ namespace com.etsoo.CoreFramework.Application
         public const string NoActionResultUrl = "https://api.etsoo.com/SmartERP/errors/NoActionResult";
 
         /// <summary>
+        /// No data returned url
+        /// </summary>
+        public const string NoDataReturnedUrl = "https://api.etsoo.com/SmartERP/errors/NoDataReturned";
+
+        /// <summary>
         /// No user agent type url
         /// </summary>
         public const string NoUserAgentUrl = "https://api.etsoo.com/SmartERP/errors/NoUserAgent";
@@ -84,6 +89,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 没有操作结果错误
         /// </summary>
         public static ApplicationError NoActionResult => new ApplicationError(new Uri(NoActionResultUrl), Resources.Resource.NoActionResult);
+
+        /// <summary>
+        /// No action result error
+        /// 没有操作结果错误
+        /// </summary>
+        public static ApplicationError NoDataReturned => new ApplicationError(new Uri(NoDataReturnedUrl), Resources.Resource.NoDataReturned);
 
         /// <summary>
         /// No user agent result error

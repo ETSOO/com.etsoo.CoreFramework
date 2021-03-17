@@ -88,6 +88,15 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Data Returned.
+        /// </summary>
+        internal static string NoDataReturned {
+            get {
+                return ResourceManager.GetString("NoDataReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No User Agent.
         /// </summary>
         internal static string NoUserAgent {

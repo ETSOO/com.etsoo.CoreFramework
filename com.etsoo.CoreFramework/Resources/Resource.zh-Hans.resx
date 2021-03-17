@@ -126,6 +126,9 @@
   <data name="NoActionResult" xml:space="preserve">
     <value>没有返回操作结果</value>
   </data>
+  <data name="NoDataReturned" xml:space="preserve">
+    <value>没有返回任何数据</value>
+  </data>
   <data name="NoUserAgent" xml:space="preserve">
     <value>没有用户代理</value>
   </data>

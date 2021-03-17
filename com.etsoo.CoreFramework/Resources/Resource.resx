@@ -126,6 +126,9 @@
   <data name="NoActionResult" xml:space="preserve">
     <value>No Action Result</value>
   </data>
+  <data name="NoDataReturned" xml:space="preserve">
+    <value>No Data Returned</value>
+  </data>
   <data name="NoUserAgent" xml:space="preserve">
     <value>No User Agent</value>
   </data>
