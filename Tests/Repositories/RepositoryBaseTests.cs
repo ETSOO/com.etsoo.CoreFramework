@@ -67,8 +67,7 @@ namespace Tests.Repositories
             });
 
             // Assert
-            Assert.IsTrue(result.AsList().Count == 1);
-            Assert.IsTrue(result.AsList().FirstOrDefault()?.Name == "Admin 1");
+            Assert.IsTrue(result?.Name == "Admin 1");
         }
 
         [Test]

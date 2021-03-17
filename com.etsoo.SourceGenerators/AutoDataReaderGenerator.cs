@@ -135,7 +135,8 @@ namespace com.etsoo.SourceGenerators
                         public static async Task<IEnumerable<{name}>> CreateAsync(Task<DbDataReader> readerTask)
                         {{
                             using var reader = await readerTask;
-                            return CreateAsync(reader);
+                            var list = await CreateAsync(reader);
+                            return list;
                         }}
 
                         public static async Task<IEnumerable<{name}>> CreateAsync(DbDataReader reader)
