@@ -7,6 +7,7 @@ using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
@@ -128,16 +129,17 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Async query command as data reader
-        /// 异步执行命令返回数据读取器
+        /// Async query command as object
+        /// 异步执行命令返回对象
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async Task<DbDataReader> QueryAsDataReaderAsync(CommandDefinition command)
+        public async Task<IEnumerable<T>> QueryAsAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                return connection.ExecuteReaderAsync(command);
+                var reader = connection.ExecuteReaderAsync(command);
+                return callback(reader);
             });
         }
 
