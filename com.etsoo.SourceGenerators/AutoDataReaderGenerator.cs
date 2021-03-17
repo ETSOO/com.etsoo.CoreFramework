@@ -132,6 +132,12 @@ namespace com.etsoo.SourceGenerators
                 {{
                     public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDataReaderParser
                     {{
+                        public static async Task<IEnumerable<{name}>> CreateAsync(Task<DbDataReader> readerTask)
+                        {{
+                            using var reader = await readerTask;
+                            return CreateAsync(reader);
+                        }}
+
                         public static async Task<IEnumerable<{name}>> CreateAsync(DbDataReader reader)
                         {{
                             // Object list

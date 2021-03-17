@@ -12,6 +12,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.IO.Pipelines;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Repositories
@@ -134,12 +135,24 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async Task<IEnumerable<T>> QueryAsAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
+        public async Task<T?> QueryAsAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
+        {
+            var list = await QueryAsListAsync<T>(command, callback);
+            return list.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <returns>Action result</returns>
+        public async Task<IEnumerable<T>> QueryAsListAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                var reader = connection.ExecuteReaderAsync(command);
-                return callback(reader);
+                var readerTask = connection.ExecuteReaderAsync(command);
+                return callback(readerTask);
             });
         }
 

@@ -6,7 +6,9 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using System;
+using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +51,24 @@ namespace Tests.Repositories
             await db.WithConnection((connection) => {
                 return connection.ExecuteScalarAsync("INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1')");
             });
+        }
+
+        [Test]
+        public async Task QueryAs_Test()
+        {
+            // Arrange
+            var sql = "SELECT * FROM e_user WHERE id = 1001";
+            var command = new CommandDefinition(sql);
+
+            // Act
+            var result = await repo.QueryAsAsync(command, (Task<DbDataReader> readerTask) =>
+            {
+                return TestUserModule.CreateAsync(readerTask);
+            });
+
+            // Assert
+            Assert.IsTrue(result.AsList().Count == 1);
+            Assert.IsTrue(result.AsList().FirstOrDefault()?.Name == "Admin 1");
         }
 
         [Test]
