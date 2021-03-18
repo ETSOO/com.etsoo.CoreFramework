@@ -44,16 +44,6 @@ namespace com.etsoo.CoreFramework.Repositories
         public RepositoryBase(ICoreApplication<C> app, ICurrentUser? user) => (App, User) = (app, user);
 
         /// <summary>
-        /// Add default parameters
-        /// 添加默认参数
-        /// </summary>
-        /// <param name="parameters">Parameters collection</param>
-        protected virtual void AddDefaultParameters(DynamicParameters parameters)
-        {
-
-        }
-
-        /// <summary>
         /// Create command, default parameters added
         /// 创建命令，附加默认参数
         /// </summary>
@@ -61,13 +51,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType type = CommandType.StoredProcedure)
+        protected CommandDefinition CreateCommand(string name, object? parameters = null, CommandType type = CommandType.StoredProcedure)
         {
-            if(parameters != null)
-            {
-                AddDefaultParameters(parameters);
-            }
-
             return new CommandDefinition(name, parameters, commandType: type);
         }
 
