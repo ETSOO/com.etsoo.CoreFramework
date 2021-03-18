@@ -140,5 +140,14 @@ namespace com.etsoo.CoreFramework.Resources {
                 return ResourceManager.GetString("TokenExpired", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your account has been temporarily blocked.
+        /// </summary>
+        internal static string UserFrozen {
+            get {
+                return ResourceManager.GetString("UserFrozen", resourceCulture);
+            }
+        }
     }
 }

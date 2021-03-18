@@ -64,6 +64,11 @@ namespace com.etsoo.CoreFramework.Application
         public const string NoUserMatchUrl = "https://api.etsoo.com/SmartERP/errors/NoUserMatch";
 
         /// <summary>
+        /// User frozen url
+        /// </summary>
+        public const string UserFrozenUrl = "https://api.etsoo.com/SmartERP/errors/UserFrozen";
+
+        /// <summary>
         /// Your token has expired url
         /// </summary>
         public const string TokenExpiredUrl = "https://api.etsoo.com/SmartERP/errors/TokenExpired";
@@ -113,6 +118,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 用户名和密码不匹配错误
         /// </summary>
         public static ApplicationError NoUserMatch => new ApplicationError(new Uri(NoUserMatchUrl), Resources.Resource.NoUserMatch);
+
+        /// <summary>
+        /// Your account has been temporarily blocked
+        /// 您的帐户已被暂时禁止使用
+        /// </summary>
+        public static ApplicationError UserFrozen => new ApplicationError(new Uri(UserFrozenUrl), Resources.Resource.UserFrozen);
 
         /// <summary>
         /// User name and password do not match error

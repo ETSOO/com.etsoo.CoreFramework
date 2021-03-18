@@ -144,4 +144,7 @@
   <data name="TokenExpired" xml:space="preserve">
     <value>您的令牌已过期</value>
   </data>
+  <data name="UserFrozen" xml:space="preserve">
+    <value>您的帐户已被暂时禁止使用</value>
+  </data>
 </root>
