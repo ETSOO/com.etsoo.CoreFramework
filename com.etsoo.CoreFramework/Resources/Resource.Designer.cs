@@ -61,6 +61,15 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your account has been disabled.
+        /// </summary>
+        internal static string AccountDisabled {
+            get {
+                return ResourceManager.GetString("AccountDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         internal static string DataProcessingFailed {

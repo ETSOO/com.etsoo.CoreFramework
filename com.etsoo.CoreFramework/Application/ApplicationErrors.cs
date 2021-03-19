@@ -34,6 +34,11 @@ namespace com.etsoo.CoreFramework.Application
     public static class ApplicationErrors
     {
         /// <summary>
+        /// Your account has been disabled
+        /// </summary>
+        public const string AccountDisabledUrl = "https://api.etsoo.com/SmartERP/errors/AccountDisabled";
+
+        /// <summary>
         /// Out Of Memory
         /// </summary>
         public const string OutOfMemoryUrl = "https://api.etsoo.com/SmartERP/errors/OutOfMemory";
@@ -82,6 +87,12 @@ namespace com.etsoo.CoreFramework.Application
         /// Data Processing Failed
         /// </summary>
         public const string DataProcessingFailedUrl = "https://api.etsoo.com/SmartERP/errors/DataProcessingFailed";
+
+        /// <summary>
+        /// Your account has been disabled
+        /// 您的帐户已被禁用
+        /// </summary>
+        public static ApplicationError AccountDisabled => new ApplicationError(new Uri(AccountDisabledUrl), Resources.Resource.AccountDisabled);
 
         /// <summary>
         /// Out Of Memory
