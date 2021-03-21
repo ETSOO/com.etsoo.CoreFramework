@@ -70,6 +70,15 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account has expired.
+        /// </summary>
+        internal static string AccountExpired {
+            get {
+                return ResourceManager.GetString("AccountExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         internal static string DataProcessingFailed {
@@ -88,6 +97,24 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Device Disabled.
+        /// </summary>
+        internal static string DeviceDisabled {
+            get {
+                return ResourceManager.GetString("DeviceDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join Organization Required.
+        /// </summary>
+        internal static string JoinOrgRequired {
+            get {
+                return ResourceManager.GetString("JoinOrgRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Action Result.
         /// </summary>
         internal static string NoActionResult {
@@ -102,6 +129,24 @@ namespace com.etsoo.CoreFramework.Resources {
         internal static string NoDataReturned {
             get {
                 return ResourceManager.GetString("NoDataReturned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The passed ID does not exist.
+        /// </summary>
+        internal static string NoId {
+            get {
+                return ResourceManager.GetString("NoId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Organization Joined.
+        /// </summary>
+        internal static string NoOrgJoined {
+            get {
+                return ResourceManager.GetString("NoOrgJoined", resourceCulture);
             }
         }
         
@@ -129,6 +174,24 @@ namespace com.etsoo.CoreFramework.Resources {
         internal static string NoUserMatch {
             get {
                 return ResourceManager.GetString("NoUserMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The organization has been disabled.
+        /// </summary>
+        internal static string OrgDisabled {
+            get {
+                return ResourceManager.GetString("OrgDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Organization service has expired.
+        /// </summary>
+        internal static string OrgExpired {
+            get {
+                return ResourceManager.GetString("OrgExpired", resourceCulture);
             }
         }
         

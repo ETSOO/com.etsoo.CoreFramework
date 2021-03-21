@@ -34,9 +34,7 @@ namespace com.etsoo.Utils.Actions
                 string? title = null;
                 Uri? type = null;
                 string? detail = null;
-                Uri? instance = null;
                 int? status = null;
-                string? field = null;
                 string? traceId = null;
 
                 for (var f = 0; f < reader.FieldCount; f++)
@@ -58,7 +56,7 @@ namespace com.etsoo.Utils.Actions
                     if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
                     {
                         var typeUrlString = await reader.GetFieldValueAsync<string>(f);
-                        if (Uri.TryCreate(typeUrlString, UriKind.Absolute, out var typeUri))
+                        if (Uri.TryCreate(typeUrlString, UriKind.RelativeOrAbsolute, out var typeUri))
                         {
                             type = typeUri;
                         }
@@ -77,25 +75,9 @@ namespace com.etsoo.Utils.Actions
                         continue;
                     }
 
-                    if (name.Equals("instance", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var instanceUrlString = await reader.GetFieldValueAsync<string>(f);
-                        if (Uri.TryCreate(instanceUrlString, UriKind.RelativeOrAbsolute, out var instanceUri))
-                        {
-                            instance = instanceUri;
-                        }
-                        continue;
-                    }
-
                     if (name.Equals("status", StringComparison.OrdinalIgnoreCase))
                     {
                         status = await reader.GetFieldValueAsync<int>(f);
-                        continue;
-                    }
-
-                    if (name.Equals("field", StringComparison.OrdinalIgnoreCase))
-                    {
-                        field = await reader.GetFieldValueAsync<string>(f);
                         continue;
                     }
 
@@ -114,9 +96,7 @@ namespace com.etsoo.Utils.Actions
                     Success = success,
                     Title = title,
                     Detail = detail,
-                    Instance = instance,
                     Status = status,
-                    Field = field,
                     TraceId = traceId
                 };
             }
@@ -140,19 +120,13 @@ namespace com.etsoo.Utils.Actions
         /// Title
         /// 标题
         /// </summary>
-        public string? Title { get; init; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Detail
         /// 细节
         /// </summary>
-        public string? Detail { get; init; }
-
-        /// <summary>
-        /// Instance, API call URI
-        /// 实例，一般为接口调用地址
-        /// </summary>
-        public Uri? Instance { get; init; }
+        public string? Detail { get; set; }
 
         /// <summary>
         /// The HTTP status code
@@ -161,16 +135,10 @@ namespace com.etsoo.Utils.Actions
         public int? Status { get; init; }
 
         /// <summary>
-        /// Problem field
-        /// 问题字段
-        /// </summary>
-        public string? Field { get; init; }
-
-        /// <summary>
         /// Log trace id
         /// 日志跟踪编号
         /// </summary>
-        public string? TraceId { get; init; }
+        public string? TraceId { get; set; }
 
         /// <summary>
         /// Additional data
@@ -312,15 +280,6 @@ namespace com.etsoo.Utils.Actions
                     w.WriteString(detailName, Detail);
             }
 
-            if (options.IsWritable(Instance == null))
-            {
-                var instanceName = options.ConvertName("Instance");
-                if (Instance == null)
-                    w.WriteNull(instanceName);
-                else
-                    w.WriteString(instanceName, Instance.ToString());
-            }
-
             if (options.IsWritable(Status == null))
             {
                 var statusName = options.ConvertName("Status");
@@ -328,15 +287,6 @@ namespace com.etsoo.Utils.Actions
                     w.WriteNull(statusName);
                 else
                     w.WriteNumber(statusName, Status.Value);
-            }
-
-            if (options.IsWritable(Field == null))
-            {
-                var fieldName = options.ConvertName("Field");
-                if (Field == null)
-                    w.WriteNull(fieldName);
-                else
-                    w.WriteString(fieldName, Field);
             }
 
             if (options.IsWritable(TraceId == null))

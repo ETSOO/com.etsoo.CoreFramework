@@ -78,10 +78,6 @@ namespace Tests.Repositories
             {
                 Assert.IsTrue(result.DataAsIdModal().Id == 1021);
             }
-            else
-            {
-                Assert.IsTrue(result.Field == "id");
-            }
         }
 
         [Test]

@@ -47,11 +47,10 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync(new("SELECT 1 AS success, 'test' AS field"));
+            var result = await connection.QueryAsResultAsync(new("SELECT 1 AS success, 'test/user' AS [type]"));
 
             // Assert
             Assert.IsTrue(result!.Success);
-            Assert.IsTrue(result.Field == "test");
         }
 
         [Test]

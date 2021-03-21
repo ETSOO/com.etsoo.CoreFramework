@@ -149,10 +149,22 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Action result</returns>
         public async Task<IActionResult> QueryAsResultAsync(CommandDefinition command)
         {
-            return await App.DB.WithConnection((connection) =>
+            var result = await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryAsResultAsync(command);
-            }) ?? ApplicationErrors.NoActionResult.AsResult();
+            });
+
+            if (result != null && !result.Success && result.Title == null)
+            {
+                var name = result.Type.ToString().Split('/')[0];
+                var error = ApplicationErrors.Get(name);
+                if (error != null)
+                {
+                    result.Title = error.Title;
+                }
+            }
+
+            return result ?? ApplicationErrors.NoActionResult.AsResult();
         }
 
         /// <summary>

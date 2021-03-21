@@ -14,15 +14,15 @@ namespace com.etsoo.CoreFramework.Application
         /// 输出为操作结果
         /// </summary>
         /// <param name="title">Title</param>
-        /// <param name="field">Field</param>
+        /// <param name="traceId">Trace id</param>
         /// <returns>Action result</returns>
-        public IActionResult AsResult(string? title = null, string? field = null)
+        public IActionResult AsResult(string? title = null, string? traceId = null)
         {
             return new ActionResult
             {
                 Type = Type,
                 Title = title ?? Title,
-                Field = field
+                TraceId = traceId
             };
         }
     }
@@ -35,123 +35,168 @@ namespace com.etsoo.CoreFramework.Application
     {
         /// <summary>
         /// Your account has been disabled
-        /// </summary>
-        public const string AccountDisabledUrl = "https://api.etsoo.com/SmartERP/errors/AccountDisabled";
-
-        /// <summary>
-        /// Out Of Memory
-        /// </summary>
-        public const string OutOfMemoryUrl = "https://api.etsoo.com/SmartERP/errors/OutOfMemory";
-
-        /// <summary>
-        /// No action result type url
-        /// </summary>
-        public const string NoActionResultUrl = "https://api.etsoo.com/SmartERP/errors/NoActionResult";
-
-        /// <summary>
-        /// No data returned url
-        /// </summary>
-        public const string NoDataReturnedUrl = "https://api.etsoo.com/SmartERP/errors/NoDataReturned";
-
-        /// <summary>
-        /// No user agent type url
-        /// </summary>
-        public const string NoUserAgentUrl = "https://api.etsoo.com/SmartERP/errors/NoUserAgent";
-
-        /// <summary>
-        /// No user id found url
-        /// </summary>
-        public const string NoUserFoundUrl = "https://api.etsoo.com/SmartERP/errors/NoUserId";
-
-        /// <summary>
-        /// No user id and password match url
-        /// </summary>
-        public const string NoUserMatchUrl = "https://api.etsoo.com/SmartERP/errors/NoUserMatch";
-
-        /// <summary>
-        /// User frozen url
-        /// </summary>
-        public const string UserFrozenUrl = "https://api.etsoo.com/SmartERP/errors/UserFrozen";
-
-        /// <summary>
-        /// Your token has expired url
-        /// </summary>
-        public const string TokenExpiredUrl = "https://api.etsoo.com/SmartERP/errors/TokenExpired";
-
-        /// <summary>
-        /// Database Connection Failed url
-        /// </summary>
-        public const string DbConnectionFailedUrl = "https://api.etsoo.com/SmartERP/errors/DbConnectionFailed";
-
-        /// <summary>
-        /// Data Processing Failed
-        /// </summary>
-        public const string DataProcessingFailedUrl = "https://api.etsoo.com/SmartERP/errors/DataProcessingFailed";
-
-        /// <summary>
-        /// Your account has been disabled
         /// 您的帐户已被禁用
         /// </summary>
-        public static ApplicationError AccountDisabled => new ApplicationError(new Uri(AccountDisabledUrl), Resources.Resource.AccountDisabled);
+        public static ApplicationError AccountDisabled { get; }
 
         /// <summary>
-        /// Out Of Memory
-        /// 内存不足
+        /// Account has expired
+        /// 账户已到期
         /// </summary>
-        public static ApplicationError OutOfMemory => new ApplicationError(new Uri(OutOfMemoryUrl), Resources.Resource.OutOfMemory);
-
-        /// <summary>
-        /// No action result error
-        /// 没有操作结果错误
-        /// </summary>
-        public static ApplicationError NoActionResult => new ApplicationError(new Uri(NoActionResultUrl), Resources.Resource.NoActionResult);
-
-        /// <summary>
-        /// No action result error
-        /// 没有操作结果错误
-        /// </summary>
-        public static ApplicationError NoDataReturned => new ApplicationError(new Uri(NoDataReturnedUrl), Resources.Resource.NoDataReturned);
-
-        /// <summary>
-        /// No user agent result error
-        /// 没有用户代理错误
-        /// </summary>
-        public static ApplicationError NoUserAgent => new ApplicationError(new Uri(NoUserAgentUrl), Resources.Resource.NoUserAgent);
-
-        /// <summary>
-        /// No user found error
-        /// 找不到用户错误
-        /// </summary>
-        public static ApplicationError NoUserFound => new ApplicationError(new Uri(NoUserFoundUrl), Resources.Resource.NoUserFound);
-
-        /// <summary>
-        /// User name and password do not match error
-        /// 用户名和密码不匹配错误
-        /// </summary>
-        public static ApplicationError NoUserMatch => new ApplicationError(new Uri(NoUserMatchUrl), Resources.Resource.NoUserMatch);
-
-        /// <summary>
-        /// Your account has been temporarily blocked
-        /// 您的帐户已被暂时禁止使用
-        /// </summary>
-        public static ApplicationError UserFrozen => new ApplicationError(new Uri(UserFrozenUrl), Resources.Resource.UserFrozen);
-
-        /// <summary>
-        /// User name and password do not match error
-        /// 您的令牌已过期错误
-        /// </summary>
-        public static ApplicationError TokenExpired => new ApplicationError(new Uri(TokenExpiredUrl), Resources.Resource.TokenExpired);
-
-        /// <summary>
-        /// Database Connection Failed
-        /// 数据库连接失败
-        /// </summary>
-        public static ApplicationError DbConnectionFailed => new ApplicationError(new Uri(DbConnectionFailedUrl), Resources.Resource.DbConnectionFailed);
+        public static ApplicationError AccountExpired { get; }
 
         /// <summary>
         /// Data Processing Failed
         /// 数据处理失败
         /// </summary>
-        public static ApplicationError DataProcessingFailed => new ApplicationError(new Uri(DataProcessingFailedUrl), Resources.Resource.DataProcessingFailed);
+        public static ApplicationError DataProcessingFailed { get; }
+
+        /// <summary>
+        /// Database Connection Failed
+        /// 数据库连接失败
+        /// </summary>
+        public static ApplicationError DbConnectionFailed { get; }
+
+        /// <summary>
+        /// Device Disabled
+        /// 设备已禁用
+        /// </summary>
+        public static ApplicationError DeviceDisabled { get; }
+
+        /// <summary>
+        /// Join Organization Required
+        /// 需要加入组织
+        /// </summary>
+        public static ApplicationError JoinOrgRequired { get; }
+
+        /// <summary>
+        /// No action result error
+        /// 没有操作结果错误
+        /// </summary>
+        public static ApplicationError NoActionResult { get; }
+
+        /// <summary>
+        /// No action result error
+        /// 没有操作结果错误
+        /// </summary>
+        public static ApplicationError NoDataReturned { get; }
+
+        /// <summary>
+        /// The passed ID does not exist
+        /// 传递的编号不存在
+        /// </summary>
+        public static ApplicationError NoId { get; }
+
+        /// <summary>
+        /// No Organization Joined
+        /// 未加入任何组织
+        /// </summary>
+        public static ApplicationError NoOrgJoined { get; }
+
+        /// <summary>
+        /// No user agent result error
+        /// 没有用户代理错误
+        /// </summary>
+        public static ApplicationError NoUserAgent { get; }
+
+        /// <summary>
+        /// No user found error
+        /// 找不到用户错误
+        /// </summary>
+        public static ApplicationError NoUserFound { get; }
+
+        /// <summary>
+        /// User name and password do not match error
+        /// 用户名和密码不匹配错误
+        /// </summary>
+        public static ApplicationError NoUserMatch { get; }
+
+        /// <summary>
+        /// The organization has been disabled
+        /// 机构已被禁用
+        /// </summary>
+        public static ApplicationError OrgDisabled { get; }
+
+        /// <summary>
+        /// Organization service has expired
+        /// 机构服务已到期
+        /// </summary>
+        public static ApplicationError OrgExpired { get; }
+
+        /// <summary>
+        /// Out Of Memory
+        /// 内存不足
+        /// </summary>
+        public static ApplicationError OutOfMemory { get; }
+
+        /// <summary>
+        /// User name and password do not match error
+        /// 您的令牌已过期错误
+        /// </summary>
+        public static ApplicationError TokenExpired { get; }
+
+        /// <summary>
+        /// Your account has been temporarily blocked
+        /// 您的帐户已被暂时禁止使用
+        /// </summary>
+        public static ApplicationError UserFrozen { get; }
+
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        static ApplicationErrors()
+        {
+            AccountDisabled = new ApplicationError(new Uri(nameof(AccountDisabled), UriKind.Relative), Resources.Resource.AccountDisabled);
+            AccountExpired = new ApplicationError(new Uri(nameof(AccountExpired), UriKind.Relative), Resources.Resource.AccountExpired);
+            DataProcessingFailed = new ApplicationError(new Uri(nameof(DataProcessingFailed), UriKind.Relative), Resources.Resource.DataProcessingFailed);
+            DbConnectionFailed = new ApplicationError(new Uri(nameof(DbConnectionFailed), UriKind.Relative), Resources.Resource.DbConnectionFailed);
+            DeviceDisabled = new ApplicationError(new Uri(nameof(DeviceDisabled), UriKind.Relative), Resources.Resource.DeviceDisabled);
+            JoinOrgRequired = new ApplicationError(new Uri(nameof(JoinOrgRequired), UriKind.Relative), Resources.Resource.JoinOrgRequired);
+            NoActionResult = new ApplicationError(new Uri(nameof(NoActionResult), UriKind.Relative), Resources.Resource.NoActionResult);
+            NoDataReturned = new ApplicationError(new Uri(nameof(NoDataReturned), UriKind.Relative), Resources.Resource.NoDataReturned);
+            NoId = new ApplicationError(new Uri(nameof(NoId), UriKind.Relative), Resources.Resource.NoId);
+            NoOrgJoined = new ApplicationError(new Uri(nameof(NoOrgJoined), UriKind.Relative), Resources.Resource.NoOrgJoined);
+            NoUserAgent = new ApplicationError(new Uri(nameof(NoUserAgent), UriKind.Relative), Resources.Resource.NoUserAgent);
+            NoUserFound = new ApplicationError(new Uri(nameof(NoUserFound), UriKind.Relative), Resources.Resource.NoUserFound);
+            NoUserMatch = new ApplicationError(new Uri(nameof(NoUserMatch), UriKind.Relative), Resources.Resource.NoUserMatch);
+            OrgDisabled = new ApplicationError(new Uri(nameof(OrgDisabled), UriKind.Relative), Resources.Resource.OrgDisabled);
+            OrgExpired = new ApplicationError(new Uri(nameof(OrgExpired), UriKind.Relative), Resources.Resource.OrgExpired);
+            OutOfMemory = new ApplicationError(new Uri(nameof(OutOfMemory), UriKind.Relative), Resources.Resource.OutOfMemory);
+            TokenExpired = new ApplicationError(new Uri(nameof(TokenExpired), UriKind.Relative), Resources.Resource.TokenExpired);
+            UserFrozen = new ApplicationError(new Uri(nameof(UserFrozen), UriKind.Relative), Resources.Resource.UserFrozen);
+        }
+
+        /// <summary>
+        /// Get error with name
+        /// 从名称获取错误
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <returns>Error</returns>
+        public static ApplicationError? Get(string name)
+        {
+            return name switch
+            {
+                nameof(AccountDisabled) => AccountDisabled,
+                nameof(AccountExpired) => AccountExpired,
+                nameof(DataProcessingFailed) => DataProcessingFailed,
+                nameof(DbConnectionFailed) => DbConnectionFailed,
+                nameof(DeviceDisabled) => DeviceDisabled,
+                nameof(JoinOrgRequired) => JoinOrgRequired,
+                nameof(NoActionResult) => NoActionResult,
+                nameof(NoDataReturned) => NoDataReturned,
+                nameof(NoId) => NoId,
+                nameof(NoOrgJoined) => NoOrgJoined,
+                nameof(NoUserAgent) => NoUserAgent,
+                nameof(NoUserFound) => NoUserFound,
+                nameof(NoUserMatch) => NoUserMatch,
+                nameof(OrgDisabled) => OrgDisabled,
+                nameof(OrgExpired) => OrgExpired,
+                nameof(OutOfMemory) => OutOfMemory,
+                nameof(TokenExpired) => TokenExpired,
+                nameof(UserFrozen) => UserFrozen,
+                _ => null
+            };
+        }
     }
 }

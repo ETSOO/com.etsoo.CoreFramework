@@ -16,49 +16,37 @@ namespace com.etsoo.Utils.Actions
         /// Successful or not result
         /// 是否为成功结果
         /// </summary>
-        bool Success { get; init; }
+        bool Success { get; }
 
         /// <summary>
         /// Type
         /// 类型
         /// </summary>
-        Uri Type { get; init; }
+        Uri Type { get; }
 
         /// <summary>
         /// Title
         /// 标题
         /// </summary>
-        string? Title { get; init; }
+        string? Title { get; set; }
 
         /// <summary>
         /// Detail
         /// 细节
         /// </summary>
-        string? Detail { get; init; }
-
-        /// <summary>
-        /// Instance, API URI
-        /// 实例，一般为接口地址
-        /// </summary>
-        Uri? Instance { get; init; }
+        string? Detail { get; set; }
 
         /// <summary>
         /// The HTTP status code
         /// HTTP状态码
         /// </summary>
-        int? Status { get; init; }
-
-        /// <summary>
-        /// Problem field
-        /// 问题字段
-        /// </summary>
-        string? Field { get; init; }
+        int? Status { get; }
 
         /// <summary>
         /// Log trace id
         /// 日志跟踪编号
         /// </summary>
-        string? TraceId { get; init; }
+        string? TraceId { get; set; }
 
         /// <summary>
         /// Errors, grouped by field name
@@ -70,7 +58,7 @@ namespace com.etsoo.Utils.Actions
         /// Additional data
         /// 更多数据
         /// </summary>
-        StringKeyDictionaryObject Data { get; init; }
+        StringKeyDictionaryObject Data { get; }
 
         /// <summary>
         /// Add error
