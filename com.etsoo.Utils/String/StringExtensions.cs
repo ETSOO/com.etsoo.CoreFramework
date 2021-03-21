@@ -57,6 +57,17 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// To Json true or false, avoid True/False
+        /// 转换为Json的true或者false，避免出现True/False
+        /// </summary>
+        /// <param name="input">Input</param>
+        /// <returns>true or false</returns>
+        public static string ToJson(this bool input)
+        {
+            return input ? "true" : "false";
+        }
+
+        /// <summary>
         /// To Dapper DbString
         /// 转化为 Dapper DbString
         /// </summary>
