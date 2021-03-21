@@ -20,7 +20,6 @@ namespace Benchmark.Utils
             {
                 Success = false,
                 Title = "Action result test",
-                Field = "id",
                 TraceId = "SP1543",
                 Data = new StringKeyDictionaryObject
                 {

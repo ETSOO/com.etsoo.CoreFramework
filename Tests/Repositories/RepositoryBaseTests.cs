@@ -1,14 +1,11 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Database;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.CoreFramework.User;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
-using System;
 using System.Data.Common;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
