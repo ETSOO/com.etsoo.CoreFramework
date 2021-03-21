@@ -64,6 +64,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError DeviceDisabled { get; }
 
         /// <summary>
+        /// The device has been temporarily blocked
+        /// 该设备已被暂时禁止使用
+        /// </summary>
+        public static ApplicationError DeviceFrozen { get; }
+
+        /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>

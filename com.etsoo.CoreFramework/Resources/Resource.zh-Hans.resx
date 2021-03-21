@@ -132,6 +132,9 @@
   <data name="DeviceDisabled" xml:space="preserve">
     <value>设备已禁用</value>
   </data>
+  <data name="DeviceFrozen" xml:space="preserve">
+    <value>该设备已被暂时禁止使用</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入组织</value>
   </data>

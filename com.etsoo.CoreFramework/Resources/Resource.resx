@@ -132,6 +132,9 @@
   <data name="DeviceDisabled" xml:space="preserve">
     <value>Device Disabled</value>
   </data>
+  <data name="DeviceFrozen" xml:space="preserve">
+    <value>The device has been temporarily blocked</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
   </data>

@@ -106,6 +106,15 @@ namespace com.etsoo.CoreFramework.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The device has been temporarily blocked.
+        /// </summary>
+        internal static string DeviceFrozen {
+            get {
+                return ResourceManager.GetString("DeviceFrozen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Join Organization Required.
         /// </summary>
         internal static string JoinOrgRequired {
