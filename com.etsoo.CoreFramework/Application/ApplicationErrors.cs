@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Actions;
+﻿using com.etsoo.CoreFramework.Properties;
+using com.etsoo.Utils.Actions;
 using System;
 
 namespace com.etsoo.CoreFramework.Application
@@ -153,24 +154,25 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         static ApplicationErrors()
         {
-            AccountDisabled = new ApplicationError(new Uri(nameof(AccountDisabled), UriKind.Relative), Resources.Resource.AccountDisabled);
-            AccountExpired = new ApplicationError(new Uri(nameof(AccountExpired), UriKind.Relative), Resources.Resource.AccountExpired);
-            DataProcessingFailed = new ApplicationError(new Uri(nameof(DataProcessingFailed), UriKind.Relative), Resources.Resource.DataProcessingFailed);
-            DbConnectionFailed = new ApplicationError(new Uri(nameof(DbConnectionFailed), UriKind.Relative), Resources.Resource.DbConnectionFailed);
-            DeviceDisabled = new ApplicationError(new Uri(nameof(DeviceDisabled), UriKind.Relative), Resources.Resource.DeviceDisabled);
-            JoinOrgRequired = new ApplicationError(new Uri(nameof(JoinOrgRequired), UriKind.Relative), Resources.Resource.JoinOrgRequired);
-            NoActionResult = new ApplicationError(new Uri(nameof(NoActionResult), UriKind.Relative), Resources.Resource.NoActionResult);
-            NoDataReturned = new ApplicationError(new Uri(nameof(NoDataReturned), UriKind.Relative), Resources.Resource.NoDataReturned);
-            NoId = new ApplicationError(new Uri(nameof(NoId), UriKind.Relative), Resources.Resource.NoId);
-            NoOrgJoined = new ApplicationError(new Uri(nameof(NoOrgJoined), UriKind.Relative), Resources.Resource.NoOrgJoined);
-            NoUserAgent = new ApplicationError(new Uri(nameof(NoUserAgent), UriKind.Relative), Resources.Resource.NoUserAgent);
-            NoUserFound = new ApplicationError(new Uri(nameof(NoUserFound), UriKind.Relative), Resources.Resource.NoUserFound);
-            NoUserMatch = new ApplicationError(new Uri(nameof(NoUserMatch), UriKind.Relative), Resources.Resource.NoUserMatch);
-            OrgDisabled = new ApplicationError(new Uri(nameof(OrgDisabled), UriKind.Relative), Resources.Resource.OrgDisabled);
-            OrgExpired = new ApplicationError(new Uri(nameof(OrgExpired), UriKind.Relative), Resources.Resource.OrgExpired);
-            OutOfMemory = new ApplicationError(new Uri(nameof(OutOfMemory), UriKind.Relative), Resources.Resource.OutOfMemory);
-            TokenExpired = new ApplicationError(new Uri(nameof(TokenExpired), UriKind.Relative), Resources.Resource.TokenExpired);
-            UserFrozen = new ApplicationError(new Uri(nameof(UserFrozen), UriKind.Relative), Resources.Resource.UserFrozen);
+            AccountDisabled = new ApplicationError(new Uri(nameof(AccountDisabled), UriKind.Relative), Resources.AccountDisabled);
+            AccountExpired = new ApplicationError(new Uri(nameof(AccountExpired), UriKind.Relative), Resources.AccountExpired);
+            DataProcessingFailed = new ApplicationError(new Uri(nameof(DataProcessingFailed), UriKind.Relative), Resources.DataProcessingFailed);
+            DbConnectionFailed = new ApplicationError(new Uri(nameof(DbConnectionFailed), UriKind.Relative), Resources.DbConnectionFailed);
+            DeviceDisabled = new ApplicationError(new Uri(nameof(DeviceDisabled), UriKind.Relative), Resources.DeviceDisabled);
+            DeviceFrozen = new ApplicationError(new Uri(nameof(DeviceFrozen), UriKind.Relative), Resources.DeviceFrozen);
+            JoinOrgRequired = new ApplicationError(new Uri(nameof(JoinOrgRequired), UriKind.Relative), Resources.JoinOrgRequired);
+            NoActionResult = new ApplicationError(new Uri(nameof(NoActionResult), UriKind.Relative), Resources.NoActionResult);
+            NoDataReturned = new ApplicationError(new Uri(nameof(NoDataReturned), UriKind.Relative), Resources.NoDataReturned);
+            NoId = new ApplicationError(new Uri(nameof(NoId), UriKind.Relative), Resources.NoId);
+            NoOrgJoined = new ApplicationError(new Uri(nameof(NoOrgJoined), UriKind.Relative), Resources.NoOrgJoined);
+            NoUserAgent = new ApplicationError(new Uri(nameof(NoUserAgent), UriKind.Relative), Resources.NoUserAgent);
+            NoUserFound = new ApplicationError(new Uri(nameof(NoUserFound), UriKind.Relative), Resources.NoUserFound);
+            NoUserMatch = new ApplicationError(new Uri(nameof(NoUserMatch), UriKind.Relative), Resources.NoUserMatch);
+            OrgDisabled = new ApplicationError(new Uri(nameof(OrgDisabled), UriKind.Relative), Resources.OrgDisabled);
+            OrgExpired = new ApplicationError(new Uri(nameof(OrgExpired), UriKind.Relative), Resources.OrgExpired);
+            OutOfMemory = new ApplicationError(new Uri(nameof(OutOfMemory), UriKind.Relative), Resources.OutOfMemory);
+            TokenExpired = new ApplicationError(new Uri(nameof(TokenExpired), UriKind.Relative), Resources.TokenExpired);
+            UserFrozen = new ApplicationError(new Uri(nameof(UserFrozen), UriKind.Relative), Resources.UserFrozen);
         }
 
         /// <summary>
@@ -188,6 +190,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(DataProcessingFailed) => DataProcessingFailed,
                 nameof(DbConnectionFailed) => DbConnectionFailed,
                 nameof(DeviceDisabled) => DeviceDisabled,
+                nameof(DeviceFrozen) => DeviceFrozen,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,

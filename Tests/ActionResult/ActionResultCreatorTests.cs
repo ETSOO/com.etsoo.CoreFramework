@@ -64,6 +64,7 @@ namespace Tests.ActionResult
             var result = await connection.QueryAsResultAsync(new("SELECT 1 AS success, 'test' AS field, 1234 AS id, 44.3 AS amount"));
 
             // Assert
+            Assert.IsTrue(result?.Type.ToString() == "about:blank");
             Assert.IsTrue(result!.Success);
             Assert.IsTrue(result.Data.GetExact<int>("id") == 1234);
             Assert.IsTrue(result.Data.GetExact<decimal>("amount") == 44.3M);
