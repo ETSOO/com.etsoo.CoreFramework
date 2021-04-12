@@ -15,10 +15,10 @@ namespace com.etsoo.CoreFramework.Application
         ReadOnlyMemory<char> AppId { get; }
 
         /// <summary>
-        /// Supported languages, like zh-CN, en
-        /// 支持的语言，比如zh-CN, en
+        /// Supported cultures, like zh-CN, en
+        /// 支持的文化，比如zh-CN, en
         /// </summary>
-        string[] Languages { get; }
+        string[] Cultures { get; }
 
         /// <summary>
         /// Model DataAnnotations are validated, true under Web API to avoid double validation

@@ -1,6 +1,6 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using Microsoft.IO;
-using Microsoft.Toolkit.HighPerformance.Extensions;
+using Microsoft.Toolkit.HighPerformance;
 using System;
 using System.IO;
 using System.Security.Cryptography;

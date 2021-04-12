@@ -1,6 +1,6 @@
-﻿using com.etsoo.Utils.String;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace com.etsoo.CoreFramework.Application
@@ -17,30 +17,30 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="privateKey">Private key for encryption/decryption</param>
         /// <param name="appId">Application id, default is "e"</param>
-        /// <param name="languages">Supported languages</param>
+        /// <param name="cultures">Supported cultures</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
         public AppConfiguration(
             string privateKey,
             string? appId = null,
-            string[]? languages = null,
+            string[]? cultures = null,
             bool modelValidated = false,
             string? symmetricKey = null
         )
         {
             // Default languages
-            languages ??= Array.Empty<string>();
+            cultures ??= Array.Empty<string>();
 
             // Update
             (
                 AppId,
-                Languages,
+                Cultures,
                 ModelValidated,
                 PrivateKey,
                 SymmetricKey
             ) = (
                 (appId ?? "e").AsMemory(),
-                languages,
+                cultures,
                 modelValidated,
                 privateKey.AsMemory(),
                 symmetricKey.AsMemory()
@@ -55,7 +55,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(section.GetValue<string>("PrivateKey"),
             section.GetValue<string>("AppId"),
-            StringUtil.AsEnumerable(section.GetValue<string>("Languages")).ToArray(),
+            section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
             modelValidated,
             section.GetValue<string>("SymmetricKey"))
         {
@@ -68,10 +68,10 @@ namespace com.etsoo.CoreFramework.Application
         public ReadOnlyMemory<char> AppId { get; }
 
         /// <summary>
-        /// Supported languages, like zh-CN, en
-        /// 支持的语言，比如zh-CN, en
+        /// Supported cultures, like zh-CN, en
+        /// 支持的文化，比如zh-CN, en
         /// </summary>
-        public string[] Languages { get; }
+        public string[] Cultures { get; }
         
         /// <summary>
         /// Model DataAnnotations are validated, true under Web API to avoid double validation
