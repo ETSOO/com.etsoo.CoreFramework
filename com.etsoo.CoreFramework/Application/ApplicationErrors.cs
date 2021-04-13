@@ -32,7 +32,7 @@ namespace com.etsoo.CoreFramework.Application
     /// Application errors, static constructor will be failed with multiple cultures
     /// 程序错误，静态构造函数初始化会导致多文化无法切换
     /// </summary>
-    public static class ApplicationErrors
+    public class ApplicationErrors
     {
         /// <summary>
         /// Your account has been disabled
