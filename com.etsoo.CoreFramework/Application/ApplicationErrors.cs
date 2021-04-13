@@ -29,8 +29,8 @@ namespace com.etsoo.CoreFramework.Application
     }
 
     /// <summary>
-    /// Application errors
-    /// 程序错误
+    /// Application errors, static constructor will be failed with multiple cultures
+    /// 程序错误，静态构造函数初始化会导致多文化无法切换
     /// </summary>
     public static class ApplicationErrors
     {
@@ -38,142 +38,115 @@ namespace com.etsoo.CoreFramework.Application
         /// Your account has been disabled
         /// 您的帐户已被禁用
         /// </summary>
-        public static ApplicationError AccountDisabled { get; }
+        public static ApplicationError AccountDisabled => new(new Uri(nameof(AccountDisabled), UriKind.Relative), Resources.AccountDisabled);
 
         /// <summary>
         /// Account has expired
         /// 账户已到期
         /// </summary>
-        public static ApplicationError AccountExpired { get; }
+        public static ApplicationError AccountExpired => new(new Uri(nameof(AccountExpired), UriKind.Relative), Resources.AccountExpired);
 
         /// <summary>
         /// Data Processing Failed
         /// 数据处理失败
         /// </summary>
-        public static ApplicationError DataProcessingFailed { get; }
+        public static ApplicationError DataProcessingFailed => new(new Uri(nameof(DataProcessingFailed), UriKind.Relative), Resources.DataProcessingFailed);
 
         /// <summary>
         /// Database Connection Failed
         /// 数据库连接失败
         /// </summary>
-        public static ApplicationError DbConnectionFailed { get; }
+        public static ApplicationError DbConnectionFailed => new(new Uri(nameof(DbConnectionFailed), UriKind.Relative), Resources.DbConnectionFailed);
 
         /// <summary>
         /// Device Disabled
         /// 设备已禁用
         /// </summary>
-        public static ApplicationError DeviceDisabled { get; }
+        public static ApplicationError DeviceDisabled => new(new Uri(nameof(DeviceDisabled), UriKind.Relative), Resources.DeviceDisabled);
 
         /// <summary>
         /// The device has been temporarily blocked
         /// 该设备已被暂时禁止使用
         /// </summary>
-        public static ApplicationError DeviceFrozen { get; }
+        public static ApplicationError DeviceFrozen => new(new Uri(nameof(DeviceFrozen), UriKind.Relative), Resources.DeviceFrozen);
 
         /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>
-        public static ApplicationError JoinOrgRequired { get; }
+        public static ApplicationError JoinOrgRequired => new(new Uri(nameof(JoinOrgRequired), UriKind.Relative), Resources.JoinOrgRequired);
 
         /// <summary>
         /// No action result error
         /// 没有操作结果错误
         /// </summary>
-        public static ApplicationError NoActionResult { get; }
+        public static ApplicationError NoActionResult => new(new Uri(nameof(NoActionResult), UriKind.Relative), Resources.NoActionResult);
 
         /// <summary>
         /// No action result error
         /// 没有操作结果错误
         /// </summary>
-        public static ApplicationError NoDataReturned { get; }
+        public static ApplicationError NoDataReturned => new(new Uri(nameof(NoDataReturned), UriKind.Relative), Resources.NoDataReturned);
 
         /// <summary>
         /// The passed ID does not exist
         /// 传递的编号不存在
         /// </summary>
-        public static ApplicationError NoId { get; }
+        public static ApplicationError NoId => new(new Uri(nameof(NoId), UriKind.Relative), Resources.NoId);
 
         /// <summary>
         /// No Organization Joined
         /// 未加入任何组织
         /// </summary>
-        public static ApplicationError NoOrgJoined { get; }
+        public static ApplicationError NoOrgJoined => new(new Uri(nameof(NoOrgJoined), UriKind.Relative), Resources.NoOrgJoined);
 
         /// <summary>
         /// No user agent result error
         /// 没有用户代理错误
         /// </summary>
-        public static ApplicationError NoUserAgent { get; }
+        public static ApplicationError NoUserAgent => new(new Uri(nameof(NoUserAgent), UriKind.Relative), Resources.NoUserAgent);
 
         /// <summary>
         /// No user found error
         /// 找不到用户错误
         /// </summary>
-        public static ApplicationError NoUserFound { get; }
+        public static ApplicationError NoUserFound => new(new Uri(nameof(NoUserFound), UriKind.Relative), Resources.NoUserFound);
 
         /// <summary>
         /// User name and password do not match error
         /// 用户名和密码不匹配错误
         /// </summary>
-        public static ApplicationError NoUserMatch { get; }
+        public static ApplicationError NoUserMatch => new(new Uri(nameof(NoUserMatch), UriKind.Relative), Resources.NoUserMatch);
 
         /// <summary>
         /// The organization has been disabled
         /// 机构已被禁用
         /// </summary>
-        public static ApplicationError OrgDisabled { get; }
+        public static ApplicationError OrgDisabled => new(new Uri(nameof(OrgDisabled), UriKind.Relative), Resources.OrgDisabled);
 
         /// <summary>
         /// Organization service has expired
         /// 机构服务已到期
         /// </summary>
-        public static ApplicationError OrgExpired { get; }
+        public static ApplicationError OrgExpired => new(new Uri(nameof(OrgExpired), UriKind.Relative), Resources.OrgExpired);
 
         /// <summary>
         /// Out Of Memory
         /// 内存不足
         /// </summary>
-        public static ApplicationError OutOfMemory { get; }
+        public static ApplicationError OutOfMemory => new(new Uri(nameof(OutOfMemory), UriKind.Relative), Resources.OutOfMemory);
 
         /// <summary>
         /// User name and password do not match error
         /// 您的令牌已过期错误
         /// </summary>
-        public static ApplicationError TokenExpired { get; }
+        public static ApplicationError TokenExpired => new(new Uri(nameof(TokenExpired), UriKind.Relative), Resources.TokenExpired);
 
         /// <summary>
         /// Your account has been temporarily blocked
         /// 您的帐户已被暂时禁止使用
         /// </summary>
-        public static ApplicationError UserFrozen { get; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        static ApplicationErrors()
-        {
-            AccountDisabled = new ApplicationError(new Uri(nameof(AccountDisabled), UriKind.Relative), Resources.AccountDisabled);
-            AccountExpired = new ApplicationError(new Uri(nameof(AccountExpired), UriKind.Relative), Resources.AccountExpired);
-            DataProcessingFailed = new ApplicationError(new Uri(nameof(DataProcessingFailed), UriKind.Relative), Resources.DataProcessingFailed);
-            DbConnectionFailed = new ApplicationError(new Uri(nameof(DbConnectionFailed), UriKind.Relative), Resources.DbConnectionFailed);
-            DeviceDisabled = new ApplicationError(new Uri(nameof(DeviceDisabled), UriKind.Relative), Resources.DeviceDisabled);
-            DeviceFrozen = new ApplicationError(new Uri(nameof(DeviceFrozen), UriKind.Relative), Resources.DeviceFrozen);
-            JoinOrgRequired = new ApplicationError(new Uri(nameof(JoinOrgRequired), UriKind.Relative), Resources.JoinOrgRequired);
-            NoActionResult = new ApplicationError(new Uri(nameof(NoActionResult), UriKind.Relative), Resources.NoActionResult);
-            NoDataReturned = new ApplicationError(new Uri(nameof(NoDataReturned), UriKind.Relative), Resources.NoDataReturned);
-            NoId = new ApplicationError(new Uri(nameof(NoId), UriKind.Relative), Resources.NoId);
-            NoOrgJoined = new ApplicationError(new Uri(nameof(NoOrgJoined), UriKind.Relative), Resources.NoOrgJoined);
-            NoUserAgent = new ApplicationError(new Uri(nameof(NoUserAgent), UriKind.Relative), Resources.NoUserAgent);
-            NoUserFound = new ApplicationError(new Uri(nameof(NoUserFound), UriKind.Relative), Resources.NoUserFound);
-            NoUserMatch = new ApplicationError(new Uri(nameof(NoUserMatch), UriKind.Relative), Resources.NoUserMatch);
-            OrgDisabled = new ApplicationError(new Uri(nameof(OrgDisabled), UriKind.Relative), Resources.OrgDisabled);
-            OrgExpired = new ApplicationError(new Uri(nameof(OrgExpired), UriKind.Relative), Resources.OrgExpired);
-            OutOfMemory = new ApplicationError(new Uri(nameof(OutOfMemory), UriKind.Relative), Resources.OutOfMemory);
-            TokenExpired = new ApplicationError(new Uri(nameof(TokenExpired), UriKind.Relative), Resources.TokenExpired);
-            UserFrozen = new ApplicationError(new Uri(nameof(UserFrozen), UriKind.Relative), Resources.UserFrozen);
-        }
+        public static ApplicationError UserFrozen => new(new Uri(nameof(UserFrozen), UriKind.Relative), Resources.UserFrozen);
 
         /// <summary>
         /// Get error with name
