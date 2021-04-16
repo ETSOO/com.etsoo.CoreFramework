@@ -121,7 +121,7 @@
     <value>Your account has been disabled</value>
   </data>
   <data name="AccountExpired" xml:space="preserve">
-    <value>Account has expired</value>
+    <value>Account expired on {0}</value>
   </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>Data Processing Failed</value>
@@ -133,7 +133,7 @@
     <value>Device Disabled</value>
   </data>
   <data name="DeviceFrozen" xml:space="preserve">
-    <value>The device has been temporarily blocked</value>
+    <value>The device has been temporarily blocked until {0}</value>
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
@@ -163,7 +163,7 @@
     <value>The organization has been disabled</value>
   </data>
   <data name="OrgExpired" xml:space="preserve">
-    <value>Organization service has expired</value>
+    <value>Organization service expired on {0}</value>
   </data>
   <data name="OutOfMemory" xml:space="preserve">
     <value>Out Of Memory</value>
@@ -172,6 +172,6 @@
     <value>Your token has expired</value>
   </data>
   <data name="UserFrozen" xml:space="preserve">
-    <value>Your account has been temporarily blocked</value>
+    <value>Your account has been temporarily blocked until {0}</value>
   </data>
 </root>

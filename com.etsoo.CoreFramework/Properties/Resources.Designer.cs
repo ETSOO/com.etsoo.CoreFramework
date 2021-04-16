@@ -70,7 +70,7 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Account has expired.
+        ///   Looks up a localized string similar to Account expired on {0}.
         /// </summary>
         public static string AccountExpired {
             get {
@@ -106,7 +106,7 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The device has been temporarily blocked.
+        ///   Looks up a localized string similar to The device has been temporarily blocked until {0}.
         /// </summary>
         public static string DeviceFrozen {
             get {
@@ -196,7 +196,7 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Organization service has expired.
+        ///   Looks up a localized string similar to Organization service expired on {0}.
         /// </summary>
         public static string OrgExpired {
             get {
@@ -223,7 +223,7 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your account has been temporarily blocked.
+        ///   Looks up a localized string similar to Your account has been temporarily blocked until {0}.
         /// </summary>
         public static string UserFrozen {
             get {

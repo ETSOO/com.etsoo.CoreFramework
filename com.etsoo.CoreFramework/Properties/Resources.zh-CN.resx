@@ -121,7 +121,7 @@
     <value>您的帐户已被禁用</value>
   </data>
   <data name="AccountExpired" xml:space="preserve">
-    <value>账户已到期</value>
+    <value>账户已于 {0} 到期</value>
   </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>数据处理失败</value>
@@ -133,7 +133,7 @@
     <value>设备已禁用</value>
   </data>
   <data name="DeviceFrozen" xml:space="preserve">
-    <value>该设备已被暂时禁止使用</value>
+    <value>该设备已被暂时禁止使用至 {0}</value>
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入组织</value>
@@ -163,7 +163,7 @@
     <value>机构已被禁用</value>
   </data>
   <data name="OrgExpired" xml:space="preserve">
-    <value>机构服务已到期</value>
+    <value>机构服务已于 {0} 到期</value>
   </data>
   <data name="OutOfMemory" xml:space="preserve">
     <value>内存不足</value>
@@ -172,6 +172,6 @@
     <value>您的令牌已过期</value>
   </data>
   <data name="UserFrozen" xml:space="preserve">
-    <value>您的帐户已被暂时禁止使用</value>
+    <value>您的帐户已被暂时禁止使用至 {0}</value>
   </data>
 </root>
