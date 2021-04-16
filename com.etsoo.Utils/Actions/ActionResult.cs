@@ -195,6 +195,21 @@ namespace com.etsoo.Utils.Actions
         }
 
         /// <summary>
+        /// Format title
+        /// 格式化标题
+        /// </summary>
+        /// <param name="data">Format data</param>
+        /// <returns>Self</returns>
+        public IActionResult FormatTitle(params object[] data)
+        {
+            if(this.Title != null)
+            {
+                this.Title = string.Format(this.Title, data);
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Has any error
         /// 是否有任何错误
         /// </summary>

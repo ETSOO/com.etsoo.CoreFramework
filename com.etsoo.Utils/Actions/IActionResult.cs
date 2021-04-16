@@ -75,6 +75,14 @@ namespace com.etsoo.Utils.Actions
         void AddErrors(IEnumerable<ActionResultError> errors);
 
         /// <summary>
+        /// Format title
+        /// 格式化标题
+        /// </summary>
+        /// <param name="data">Format data</param>
+        /// <returns>Self</returns>
+        IActionResult FormatTitle(params object[] data);
+
+        /// <summary>
         /// Has any error
         /// 是否有任何错误
         /// </summary>
