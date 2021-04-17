@@ -8,7 +8,7 @@ namespace Tests
     /// <summary>
     /// User model
     /// </summary>
-    [AutoDataReaderGenerator]
+    [AutoDataReaderGenerator(UtcDateTime = true)]
     [AutoDictionaryGenerator]
     [AutoToJson]
     [AutoToParameters(true, SnakeCase = false)]

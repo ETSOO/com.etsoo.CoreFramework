@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Threading;
 
 namespace com.etsoo.Utils.Localization
@@ -24,6 +25,30 @@ namespace com.etsoo.Utils.Localization
             Thread.CurrentThread.CurrentUICulture = ci;
 
             return ci;
+        }
+
+        /// <summary>
+        /// Set datatime's Utc kind
+        /// 设置日期时间的类型为Utc
+        /// </summary>
+        /// <param name="input">Input datetime</param>
+        /// <returns>Utc datetime</returns>
+        public static DateTime? SetUtcKind(DateTime? input)
+        {
+            if (input == null)
+                return input;
+            return SetUtcKind(input.Value);
+        }
+
+        /// <summary>
+        /// Set datatime's Utc kind
+        /// 设置日期时间的类型为Utc
+        /// </summary>
+        /// <param name="input">Input datetime</param>
+        /// <returns>Utc datetime</returns>
+        public static DateTime SetUtcKind(DateTime input)
+        {
+            return input.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(input, DateTimeKind.Utc) : input;
         }
     }
 }

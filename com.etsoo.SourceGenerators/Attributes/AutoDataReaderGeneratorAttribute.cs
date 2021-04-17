@@ -9,5 +9,10 @@ namespace com.etsoo.SourceGenerators.Attributes
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
     public class AutoDataReaderGeneratorAttribute : Attribute
     {
+        /// <summary>
+        /// Is auto set datetime to Utc kind
+        /// 是否设置日期时间为Utc类型
+        /// </summary>
+        public bool UtcDateTime { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class AutoDataReaderGenerator : ISourceGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds)
+        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime)
         {
             var body = new List<string>();
 
@@ -44,6 +44,11 @@ namespace com.etsoo.SourceGenerators
                     if (typeSymbol.IsSimpleType())
                     {
                         valuePart = $@"(await reader.GetValueAsync<{typeName}>(""{fieldName}"", names))";
+
+                        if (utcDateTime && typeSymbol.Name == "DateTime")
+                        {
+                            valuePart = $"LocalizationUtil.SetUtcKind{valuePart}";
+                        }
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
                     {
@@ -102,12 +107,18 @@ namespace com.etsoo.SourceGenerators
             return string.Join(",\n", body);
         }
 
-        private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type _)
+        private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
         {
             // Field symbol
             var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
             if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
+
+            // Attribute data
+            var attributeData = symbol.GetAttributeData(attributeType.FullName);
+
+            // Auto Utc datetime
+            var utcDateTime = attributeData?.GetValue<bool>(nameof(AutoDataReaderGeneratorAttribute.UtcDateTime));
 
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
@@ -127,6 +138,7 @@ namespace com.etsoo.SourceGenerators
                 using System.Threading.Tasks;
                 using com.etsoo.Utils.Database;
                 using com.etsoo.Utils.String;
+                using com.etsoo.Utils.Localization;
 
                 namespace {ns}
                 {{
@@ -150,7 +162,7 @@ namespace com.etsoo.SourceGenerators
                             while(await reader.ReadAsync())
                             {{
                                 list.Add(new {name} {{
-                                    {GenerateBody(context, tds)}
+                                    {GenerateBody(context, tds, utcDateTime.GetValueOrDefault())}
                                 }});
                             }}
 

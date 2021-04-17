@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Serialization;
+﻿using com.etsoo.Utils.Localization;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System;
 using System.Buffers;
@@ -17,6 +18,12 @@ namespace com.etsoo.Utils.Actions
     /// </summary>
     public record ActionResult : IActionResult
     {
+        /// <summary>
+        /// Is auto set datetime to Utc kind
+        /// 是否设置日期时间为Utc类型
+        /// </summary>
+        public static bool UtcDateTime { get; set; }
+
         /// <summary>
         /// Create action result
         /// 创建操作结果
@@ -88,7 +95,13 @@ namespace com.etsoo.Utils.Actions
                     }
 
                     // Additional data
-                    data.Add(name, await reader.GetFieldValueAsync<object>(f));
+                    var addValue = await reader.GetFieldValueAsync<object>(f);
+                    if(UtcDateTime && addValue is DateTime dt)
+                    {
+                        addValue = LocalizationUtil.SetUtcKind(dt);
+                    }
+
+                    data.Add(name, addValue);
                 }
 
                 return new ActionResult(type, data)
