@@ -3,8 +3,10 @@ using com.etsoo.CoreFramework.Database;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.CoreFramework.User;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
+using System.Configuration;
 using System.Threading.Tasks;
 
 namespace Tests.Repositories
@@ -40,8 +42,10 @@ namespace Tests.Repositories
         public IntEntityRepositoryTests()
         {
             var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
-            var config = new AppConfiguration("test");
+
+            var config = new AppConfiguration(new ConfigurationBuilder().Build().GetSection("test"), "test");
             var app = new CoreApplication<SqlConnection>(config, db);
+
             repo = new IntEntityRepository(app, "user");
         }
 

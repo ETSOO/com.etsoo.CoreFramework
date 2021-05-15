@@ -25,13 +25,15 @@ namespace com.etsoo.Web
         /// <param name="model">Data model</param>
         /// <param name="isMainPage">Is main page</param>
         /// <returns>Result</returns>
-        public static async Task<string> RenderViewAsync<TModel>(this ControllerBase controller, string? viewName, TModel model, bool isMainPage = true)
+        public static async Task<string> RenderViewAsync<TModel>(this Controller controller, string? viewName, TModel model, bool isMainPage = true)
         {
             if (string.IsNullOrEmpty(viewName))
             {
                 // Action name as view name
                 viewName = controller.ControllerContext.ActionDescriptor.ActionName;
             }
+
+            controller.ViewData.Model = model;
 
             using var writer = new StringWriter();
 
@@ -48,16 +50,11 @@ namespace com.etsoo.Web
                 throw new ArgumentNullException(viewName);
             }
 
-            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-            {
-                Model = model
-            };
-
             var viewContext = new ViewContext(
                 controller.ControllerContext,
                 viewResult.View,
-                viewData,
-                null,
+                controller.ViewData,
+                controller.TempData,
                 writer,
                 new HtmlHelperOptions()
             );

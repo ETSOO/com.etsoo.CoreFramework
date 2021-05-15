@@ -30,6 +30,7 @@
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
     <ProjectReference Include="..\com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
     <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
+    <ProjectReference Include="..\com.etsoo.Web\com.etsoo.Web.csproj" />
   </ItemGroup>
 
 </Project>

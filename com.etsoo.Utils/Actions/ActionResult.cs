@@ -18,6 +18,19 @@ namespace com.etsoo.Utils.Actions
     /// </summary>
     public record ActionResult : IActionResult
     {
+        private static Uri? ParseType(string? type)
+        {
+            if (string.IsNullOrEmpty(type))
+                return null;
+
+            if (Uri.TryCreate(type, UriKind.RelativeOrAbsolute, out var typeUri))
+            {
+                return typeUri;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Is auto set datetime to Utc kind
         /// 是否设置日期时间为Utc类型
@@ -39,7 +52,7 @@ namespace com.etsoo.Utils.Actions
                 var data = new StringKeyDictionaryObject();
 
                 string? title = null;
-                Uri? type = null;
+                string? type = null;
                 string? detail = null;
                 int? status = null;
                 string? traceId = null;
@@ -62,11 +75,7 @@ namespace com.etsoo.Utils.Actions
 
                     if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
                     {
-                        var typeUrlString = await reader.GetFieldValueAsync<string>(f);
-                        if (Uri.TryCreate(typeUrlString, UriKind.RelativeOrAbsolute, out var typeUri))
-                        {
-                            type = typeUri;
-                        }
+                        type = await reader.GetFieldValueAsync<string>(f);
                         continue;
                     }
 
@@ -158,6 +167,14 @@ namespace com.etsoo.Utils.Actions
         /// 更多数据
         /// </summary>
         public StringKeyDictionaryObject Data { get; init; }
+
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        public ActionResult(string type, StringKeyDictionaryObject? data = null) : this(ParseType(type), data)
+        {
+        }
 
         /// <summary>
         /// Constructor

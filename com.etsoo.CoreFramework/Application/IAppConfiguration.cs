@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using System;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -8,6 +9,12 @@ namespace com.etsoo.CoreFramework.Application
     /// </summary>
     public interface IAppConfiguration
     {
+        /// <summary>
+        /// Configuration section
+        /// 配置部分
+        /// </summary>
+        IConfigurationSection Section { get; }
+
         /// <summary>
         /// Application id
         /// 程序编号

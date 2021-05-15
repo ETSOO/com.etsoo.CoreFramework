@@ -15,12 +15,14 @@ namespace com.etsoo.CoreFramework.Application
         /// Constructor
         /// 构造函数
         /// </summary>
+        /// <param name="section">Configuration section</param>
         /// <param name="privateKey">Private key for encryption/decryption</param>
         /// <param name="appId">Application id, default is "e"</param>
         /// <param name="cultures">Supported cultures</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
         public AppConfiguration(
+            IConfigurationSection section,
             string privateKey,
             string? appId = null,
             string[]? cultures = null,
@@ -33,12 +35,14 @@ namespace com.etsoo.CoreFramework.Application
 
             // Update
             (
+                Section,
                 AppId,
                 Cultures,
                 ModelValidated,
                 PrivateKey,
                 SymmetricKey
             ) = (
+                section,
                 (appId ?? "e").AsMemory(),
                 cultures,
                 modelValidated,
@@ -53,13 +57,20 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(section.GetValue<string>("PrivateKey"),
+        public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(section,
+            section.GetValue<string>("PrivateKey"),
             section.GetValue<string>("AppId"),
             section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
             modelValidated,
             section.GetValue<string>("SymmetricKey"))
         {
         }
+
+        /// <summary>
+        /// Configuration section
+        /// 配置部分
+        /// </summary>
+        public IConfigurationSection Section { get; }
 
         /// <summary>
         /// Application id
