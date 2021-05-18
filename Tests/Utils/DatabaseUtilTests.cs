@@ -34,7 +34,7 @@ namespace Tests.Utils
         public void TypeToDbType_All_Test(Type type, DbType? dbType)
         {
             // Arrange & act
-            var result = DatabaseUtil.TypeToDbType(type);
+            var result = DatabaseUtils.TypeToDbType(type);
 
             // Assert
             Assert.IsTrue(result == dbType, $"{type.Name} is not converted with {dbType}");

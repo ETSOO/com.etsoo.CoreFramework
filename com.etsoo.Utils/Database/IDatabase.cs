@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace com.etsoo.CoreFramework.Database
+namespace com.etsoo.Utils.Database
 {
     /// <summary>
     /// Database interface

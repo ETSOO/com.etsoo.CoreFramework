@@ -1,7 +1,6 @@
 ﻿using com.etsoo.Utils.Localization;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 
 namespace Tests.Utils
 {
@@ -15,7 +14,7 @@ namespace Tests.Utils
             var dt = new DateTime(DateTime.Now.Ticks, DateTimeKind.Unspecified);
 
             // Act
-            var result = LocalizationUtil.SetUtcKind(dt);
+            var result = LocalizationUtils.SetUtcKind(dt);
 
             // Assert
             Assert.IsTrue(result.Kind == DateTimeKind.Utc);
@@ -28,7 +27,7 @@ namespace Tests.Utils
             var dt = DateTime.Now;
 
             // Act
-            var result = LocalizationUtil.SetUtcKind(dt);
+            var result = LocalizationUtils.SetUtcKind(dt);
 
             // Assert
             Assert.IsTrue(result.Kind == DateTimeKind.Local);

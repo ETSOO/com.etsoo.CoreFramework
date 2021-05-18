@@ -28,10 +28,10 @@ namespace Tests.Utils
         public async Task AESBase64_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var result = await CryptographyUtil.AESEncryptToBase64Async(data, password);
+            var result = await CryptographyUtils.AESEncryptToBase64Async(data, password);
 
             // Act
-            var decryptedData = await CryptographyUtil.AESDecryptFromBase64Async(result, password);
+            var decryptedData = await CryptographyUtils.AESDecryptFromBase64Async(result, password);
             var decriptedString = decryptedData.Span.ToString();
 
             // Assert
@@ -46,10 +46,10 @@ namespace Tests.Utils
         public async Task AESHex_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var result = await CryptographyUtil.AESEncryptToHexAsync(data, password);
+            var result = await CryptographyUtils.AESEncryptToHexAsync(data, password);
 
             // Act
-            var decryptedData = await CryptographyUtil.AESDecryptFromHexAsync(result, password);
+            var decryptedData = await CryptographyUtils.AESDecryptFromHexAsync(result, password);
             var decriptedString = decryptedData.Span.ToString();
 
             // Assert
@@ -63,7 +63,7 @@ namespace Tests.Utils
         public void CreateRandString_Digit_Test()
         {
             // Arrange & act
-            var result = CryptographyUtil.CreateRandString(RandStringKind.Digit, 6);
+            var result = CryptographyUtils.CreateRandString(RandStringKind.Digit, 6);
 
             // Assert
             Assert.IsTrue(result.Length == 6);
@@ -76,7 +76,7 @@ namespace Tests.Utils
         public void HMACSHA512_HelloWorldTest()
         {
             // Arrange & act
-            var result = CryptographyUtil.HMACSHA512(data.Span, password.Span);
+            var result = CryptographyUtils.HMACSHA512(data.Span, password.Span);
 
             // Assert
             Assert.IsTrue(Convert.ToBase64String(result) == "DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==");
@@ -89,7 +89,7 @@ namespace Tests.Utils
         public async Task HMACSHA512ToBase64_HelloWorldTest()
         {
             // Arrange & act
-            var result = await CryptographyUtil.HMACSHA512ToBase64Async(data, password);
+            var result = await CryptographyUtils.HMACSHA512ToBase64Async(data, password);
 
             // Assert
             Assert.IsTrue(result.ToString() == "DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==");
@@ -102,7 +102,7 @@ namespace Tests.Utils
         public async Task HMACSHA512ToHex_HelloWorldTest()
         {
             // Arrange & act
-            var result = await CryptographyUtil.HMACSHA512ToHexAsync(data, password);
+            var result = await CryptographyUtils.HMACSHA512ToHexAsync(data, password);
 
             // Assert
             Assert.IsTrue(result.ToString().Equals("0c08206a9e3c0fed6c7f828ff92ae06d6971e267cff7378017ffe7b69aad18834079de96285ab829a548f0ac92185d0447852f2fa415f7bb994112c9e606bbc7", StringComparison.OrdinalIgnoreCase));

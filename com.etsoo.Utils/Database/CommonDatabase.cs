@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 
-namespace com.etsoo.CoreFramework.Database
+namespace com.etsoo.Utils.Database
 {
     /// <summary>
     /// Common database
@@ -78,7 +78,7 @@ namespace com.etsoo.CoreFramework.Database
         /// <returns>Parameter value</returns>
         public virtual object AsListParameter<T>(IEnumerable<T> ids) where T : struct, IComparable
         {
-            return StringUtil.IEnumerableToString(ids);
+            return StringUtils.IEnumerableToString(ids);
         }
 
         /// <summary>

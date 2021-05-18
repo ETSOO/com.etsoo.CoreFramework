@@ -13,7 +13,7 @@ namespace com.etsoo.Utils.Crypto
     /// Cryptography Tools
     /// 密码工具
     /// </summary>
-    public static class CryptographyUtil
+    public static class CryptographyUtils
     {
         private static AesManaged AESManagedCreate(ReadOnlySpan<char> passPhrase)
         {

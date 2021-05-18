@@ -1,6 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.CoreFramework.Database;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;

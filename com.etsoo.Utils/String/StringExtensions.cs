@@ -20,7 +20,7 @@ namespace com.etsoo.Utils.String
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            return StringUtil.PascalCaseToLinuxStyle(input);
+            return StringUtils.PascalCaseToLinuxStyle(input);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace com.etsoo.Utils.String
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            return StringUtil.LinuxStyleToPascalCase(input);
+            return StringUtils.LinuxStyleToPascalCase(input);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace com.etsoo.CoreFramework.MessageQueue
+namespace com.etsoo.Utils.MessageQueue
 {
     /// <summary>
     /// Message queue interface

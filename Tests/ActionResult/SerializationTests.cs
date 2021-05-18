@@ -1,7 +1,4 @@
-﻿using com.etsoo.CoreFramework.Database;
-using com.etsoo.Utils.Database;
-using com.etsoo.Utils.SpanMemory;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Text;

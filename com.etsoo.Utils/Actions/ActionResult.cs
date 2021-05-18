@@ -18,17 +18,14 @@ namespace com.etsoo.Utils.Actions
     /// </summary>
     public record ActionResult : IActionResult
     {
-        private static Uri? ParseType(string? type)
+        private static Uri ParseType(string? type)
         {
-            if (string.IsNullOrEmpty(type))
-                return null;
-
-            if (Uri.TryCreate(type, UriKind.RelativeOrAbsolute, out var typeUri))
+            if (!string.IsNullOrEmpty(type) && Uri.TryCreate(type, UriKind.RelativeOrAbsolute, out var typeUri))
             {
                 return typeUri;
             }
 
-            return null;
+            return new Uri("about:blank");
         }
 
         /// <summary>
@@ -69,7 +66,7 @@ namespace com.etsoo.Utils.Actions
                     if (name.Equals("success", StringComparison.OrdinalIgnoreCase))
                     {
                         // true/false, 1/0
-                        success = StringUtil.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
+                        success = StringUtils.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
                         continue;
                     }
 
@@ -107,7 +104,7 @@ namespace com.etsoo.Utils.Actions
                     var addValue = await reader.GetFieldValueAsync<object>(f);
                     if(UtcDateTime && addValue is DateTime dt)
                     {
-                        addValue = LocalizationUtil.SetUtcKind(dt);
+                        addValue = LocalizationUtils.SetUtcKind(dt);
                     }
 
                     data.Add(name, addValue);
@@ -172,7 +169,7 @@ namespace com.etsoo.Utils.Actions
         /// Constructor
         /// 构造函数
         /// </summary>
-        public ActionResult(string type, StringKeyDictionaryObject? data = null) : this(ParseType(type), data)
+        public ActionResult(string? type = null, StringKeyDictionaryObject? data = null) : this(ParseType(type), data)
         {
         }
 
@@ -180,10 +177,10 @@ namespace com.etsoo.Utils.Actions
         /// Constructor
         /// 构造函数
         /// </summary>
-        public ActionResult(Uri? type = null, StringKeyDictionaryObject ? data = null)
+        public ActionResult(Uri type, StringKeyDictionaryObject ? data = null)
         {
             Success = false;
-            Type = type ?? new Uri("about:blank");
+            Type = type;
             Data = data ?? new StringKeyDictionaryObject();
         }
 

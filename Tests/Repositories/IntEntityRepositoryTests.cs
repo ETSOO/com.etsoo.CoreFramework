@@ -1,12 +1,10 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.CoreFramework.Database;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.CoreFramework.User;
+using com.etsoo.Utils.Database;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
-using System.Configuration;
 using System.Threading.Tasks;
 
 namespace Tests.Repositories

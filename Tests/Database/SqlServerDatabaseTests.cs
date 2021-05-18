@@ -1,5 +1,4 @@
-﻿using com.etsoo.CoreFramework.Database;
-using com.etsoo.Utils.Database;
+﻿using com.etsoo.Utils.Database;
 using Dapper;
 using NUnit.Framework;
 using System.Collections.Generic;

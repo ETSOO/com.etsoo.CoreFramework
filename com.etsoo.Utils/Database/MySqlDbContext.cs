@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace com.etsoo.CoreFramework.Database
+namespace com.etsoo.Utils.Database
 {
     /// <summary>
-    /// SQL Server EF Database Context
-    /// SQL Server EF 数据库上下文
+    /// MySQL EF Database Context
+    /// MySQL EF 数据库上下文
     /// </summary>
-    public class SqlServerDbContext<M> : CommonDbContext<M> where M : class
+    public class MySqlDbContext<M> : CommonDbContext<M> where M : class
     {
         /// <summary>
         /// Constructor
@@ -14,7 +14,7 @@ namespace com.etsoo.CoreFramework.Database
         /// </summary>
         /// <param name="connectionString">Connection string</param>
         /// <param name="snakeNaming">Is snake naming</param>
-        public SqlServerDbContext(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
+        public MySqlDbContext(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
         {
         }
 
@@ -25,7 +25,7 @@ namespace com.etsoo.CoreFramework.Database
         /// <param name="optionsBuilder">Options builder</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder.UseMySQL(ConnectionString);
         }
     }
 }

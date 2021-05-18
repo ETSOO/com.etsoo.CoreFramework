@@ -1,10 +1,8 @@
-﻿using com.etsoo.Utils.Net.SMS;
-using com.etsoo.Utils.Net.SMTP;
+﻿using com.etsoo.Utils.Net.SMTP;
 using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
 using NUnit.Framework;
-using Tea;
 
 namespace Tests.Utils
 {
@@ -33,23 +31,6 @@ namespace Tests.Utils
 
             // Assert
             Assert.IsTrue(result?.Message.StartsWith("535:"));
-        }
-
-        [Test]
-        public void AliyunSMSClient_Test()
-        {
-            // Arrange
-            var client = new AliyunSMSClient("id", "password");
-            client.AddResource(new SMSResource(Template: "SMS_153055065", Signature: "亿速思维"));
-
-            // Act
-            var result = Assert.ThrowsAsync<TeaException>(async () =>
-            {
-                await client.SendCodeAsync("138***", "123456");
-            });
-
-            // Assert
-            Assert.AreEqual("InvalidAccessKeyId.NotFound", result?.Code);
         }
     }
 }

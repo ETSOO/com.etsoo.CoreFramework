@@ -1,7 +1,7 @@
-﻿using com.etsoo.CoreFramework.MessageQueue;
-using com.etsoo.CoreFramework.Models;
+﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Properties;
 using com.etsoo.Utils.Localization;
+using com.etsoo.Utils.MessageQueue;
 using RabbitMQ.Client;
 using System;
 using System.Text;
@@ -22,10 +22,10 @@ namespace ConsoleApp1
         static async Task Main(string[] args)
         {
             //await Task.CompletedTask;
-            Resources.Culture = LocalizationUtil.SetCulture("zh-CN");
+            Resources.Culture = LocalizationUtils.SetCulture("zh-CN");
             Console.WriteLine(Resources.ResourceManager.GetString("NoUserFound"));
 
-            Resources.Culture = LocalizationUtil.SetCulture("en-US");
+            Resources.Culture = LocalizationUtils.SetCulture("en-US");
             Console.WriteLine(Resources.NoUserFound);
 
             //PRCParallelCalls();

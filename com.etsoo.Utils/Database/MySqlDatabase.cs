@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 
-namespace com.etsoo.CoreFramework.Database
+namespace com.etsoo.Utils.Database
 {
     /// <summary>
     /// MySQL database

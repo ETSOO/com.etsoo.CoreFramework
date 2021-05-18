@@ -9,7 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-namespace com.etsoo.CoreFramework.MessageQueue
+namespace com.etsoo.Utils.MessageQueue
 {
     /// <summary>
     /// RabbitMQ implementation
@@ -198,10 +198,10 @@ namespace com.etsoo.CoreFramework.MessageQueue
                         p.MessageId = item.Value.ToString();
                         break;
                     case "Persistent":
-                        p.Persistent = StringUtil.TryParseObject<bool>(item.Value).GetValueOrDefault();
+                        p.Persistent = StringUtils.TryParseObject<bool>(item.Value).GetValueOrDefault();
                         break;
                     case "Priority":
-                        p.Priority = StringUtil.TryParseObject<byte>(item.Value).GetValueOrDefault();
+                        p.Priority = StringUtils.TryParseObject<byte>(item.Value).GetValueOrDefault();
                         break;
                 }
             }
@@ -413,7 +413,7 @@ namespace com.etsoo.CoreFramework.MessageQueue
                 if (ea.BasicProperties.CorrelationId == correlationId)
                 {
                     // Thread id based collection through AppId
-                    var id = StringUtil.TryParse<int>(ea.BasicProperties.AppId).GetValueOrDefault(0);
+                    var id = StringUtils.TryParse<int>(ea.BasicProperties.AppId).GetValueOrDefault(0);
                     var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
                     await collection.SendAsync(ea.Body);
                 }

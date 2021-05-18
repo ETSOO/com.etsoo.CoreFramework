@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.SourceGenerators", "com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj", "{2752EAD1-532A-4842-A800-42275B843076}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.Web", "com.etsoo.Web\com.etsoo.Web.csproj", "{2BD66200-4BFD-41CA-B061-CDFB8B7374A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Web", "com.etsoo.Web\com.etsoo.Web.csproj", "{2BD66200-4BFD-41CA-B061-CDFB8B7374A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

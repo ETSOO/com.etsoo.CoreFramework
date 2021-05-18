@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace com.etsoo.Utils.Localization
 {
-    public static class LocalizationUtil
+    public static class LocalizationUtils
     {
         /// <summary>
         /// Set culture

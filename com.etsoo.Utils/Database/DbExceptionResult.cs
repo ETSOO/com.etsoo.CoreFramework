@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.CoreFramework.Database
+﻿namespace com.etsoo.Utils.Database
 {
     /// <summary>
     /// Db exception type

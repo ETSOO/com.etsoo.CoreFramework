@@ -36,7 +36,7 @@ namespace com.etsoo.Utils.String
         public T? Get<T>(string key) where T : struct
         {
             var item = GetItem(key);
-            return StringUtil.TryParse<T>(item);
+            return StringUtils.TryParse<T>(item);
         }
 
         /// <summary>

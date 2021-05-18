@@ -70,9 +70,9 @@ namespace com.etsoo.SourceGenerators
 
                         var arrayType = itemTypeSymbol.Name;
                         if(arrayType.Equals("String"))
-                            valuePart = $@"StringUtil.AsEnumerable(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToArray()";
+                            valuePart = $@"StringUtils.AsEnumerable(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToArray()";
                         else
-                            valuePart = $@"StringUtil.AsEnumerable<{arrayType}>(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToArray()";
+                            valuePart = $@"StringUtils.AsEnumerable<{arrayType}>(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToArray()";
                     }
                     else if (typeSymbol.IsList())
                     {
@@ -89,9 +89,9 @@ namespace com.etsoo.SourceGenerators
 
                         var listType = itemTypeSymbol.Name;
                         if(listType.Equals("String"))
-                            valuePart = $@"StringUtil.AsEnumerable(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToList()";
+                            valuePart = $@"StringUtils.AsEnumerable(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToList()";
                         else
-                            valuePart = $@"StringUtil.AsEnumerable<{listType}>(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToList()";
+                            valuePart = $@"StringUtils.AsEnumerable<{listType}>(dic.GetExact<string?>(""{dataFieldName}""), '{splitter}').ToList()";
                     }
                     else
                     {

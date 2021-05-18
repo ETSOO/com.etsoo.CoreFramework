@@ -14,13 +14,13 @@ namespace Tests.CoreFramework
         public void Errors_MultipleCultures()
         {
             // Arrange
-            LocalizationUtil.SetCulture("zh-CN");
+            LocalizationUtils.SetCulture("zh-CN");
 
             // Action & assert
             Assert.AreEqual("找不到用户", ApplicationErrors.NoUserFound.Title);
 
             // Arrange
-            LocalizationUtil.SetCulture("en-US");
+            LocalizationUtils.SetCulture("en-US");
 
             // Action & assert
             Assert.AreEqual("No User Found", ApplicationErrors.NoUserFound.Title);

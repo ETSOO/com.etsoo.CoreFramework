@@ -10,7 +10,7 @@ namespace com.etsoo.Utils.Database
     /// SQL Server utilities
     /// SQL Server 工具
     /// </summary>
-    public static class SqlServerUtil
+    public static class SqlServerUtils
     {
         /// <summary>
         /// Convert DbType to SqlDbType

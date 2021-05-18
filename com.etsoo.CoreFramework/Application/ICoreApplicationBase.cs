@@ -1,6 +1,4 @@
-﻿using com.etsoo.CoreFramework.MessageQueue;
-using com.etsoo.CoreFramework.Storage;
-using System;
+﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -23,18 +21,6 @@ namespace com.etsoo.CoreFramework.Application
         /// 默认的Json序列化器选项
         /// </summary>
         JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
-
-        /// <summary>
-        /// Message queue
-        /// 消息队列
-        /// </summary>
-        IMessageQueue? MessageQueue { get; }
-
-        /// <summary>
-        /// Storage
-        /// 存储
-        /// </summary>
-        IStorage Storage { get; }
 
         /// <summary>
         /// Hash password

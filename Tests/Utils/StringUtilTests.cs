@@ -53,7 +53,7 @@ namespace Tests.Utils
             // Arange
 
             // Act
-            var result = StringUtil.TryParseObject<bool>(input);
+            var result = StringUtils.TryParseObject<bool>(input);
 
             // Assert
             Assert.AreEqual(expectedResult, result);
@@ -66,7 +66,7 @@ namespace Tests.Utils
             var items = new int?[] { 1, 2, null, 3 };
 
             // Act
-            var result = StringUtil.IEnumerableToString(items);
+            var result = StringUtils.IEnumerableToString(items);
 
             // Assert
             Assert.IsTrue(result == "1,2,3");
@@ -80,8 +80,8 @@ namespace Tests.Utils
         {
             // Arrange
             // Act
-            var result1 = StringUtil.TryParse<TestEnum>("Friday");
-            var result2 = StringUtil.TryParse<TestEnum>("4");
+            var result1 = StringUtils.TryParse<TestEnum>("Friday");
+            var result2 = StringUtils.TryParse<TestEnum>("4");
 
             // Assert
             Assert.IsTrue(result1 == TestEnum.Friday);
@@ -112,7 +112,7 @@ namespace Tests.Utils
 
             for (var i = 0; i < 10000; i++)
             {
-                StringUtil.TryParseObject<bool>(input);
+                StringUtils.TryParseObject<bool>(input);
             }
 
             sw.Stop();
@@ -137,7 +137,7 @@ namespace Tests.Utils
         public void PascalCaseToLinuxStyle_All_Test(string pascal, string camel)
         {
             // Arrange & act
-            var result = StringUtil.PascalCaseToLinuxStyle(pascal).ToString();
+            var result = StringUtils.PascalCaseToLinuxStyle(pascal).ToString();
             
             // Assert
             Assert.IsTrue(result == camel, $"{result} is not equal with {camel}");
@@ -147,7 +147,7 @@ namespace Tests.Utils
         public void LinuxStyleToPascalCase_All_Test(string pascal, string camel)
         {
             // Arrange & act
-            var result = StringUtil.LinuxStyleToPascalCase(camel).ToString();
+            var result = StringUtils.LinuxStyleToPascalCase(camel).ToString();
 
             // Assert
             Assert.IsTrue(result == pascal, $"{result} is not equal with {pascal}");
@@ -160,7 +160,7 @@ namespace Tests.Utils
             var items = new int?[] { 1, null, 2 };
 
             // Act
-            var result = StringUtil.IEnumerableToString(items);
+            var result = StringUtils.IEnumerableToString(items);
 
             // Assert
             Assert.IsTrue(result == "1,2");
@@ -173,7 +173,7 @@ namespace Tests.Utils
             var items = new Dictionary<int, bool> { { 1001, true }, { 1002, false } };
 
             // Act
-            var result = StringUtil.DictionaryToString(items);
+            var result = StringUtils.DictionaryToString(items);
 
             // Assert
             Assert.IsTrue(result == "1001=True&1002=False");
@@ -186,7 +186,7 @@ namespace Tests.Utils
             var input = "1, a,3";
 
             // Act
-            var items = StringUtil.AsEnumerable<int>(input);
+            var items = StringUtils.AsEnumerable<int>(input);
 
             // Assert
             Assert.IsTrue(items.Count() == 2);
@@ -200,7 +200,7 @@ namespace Tests.Utils
             var input = "1, a,3";
 
             // Act
-            var items = StringUtil.AsEnumerable(input);
+            var items = StringUtils.AsEnumerable(input);
 
             // Assert
             Assert.IsTrue(items.Count() == 3);

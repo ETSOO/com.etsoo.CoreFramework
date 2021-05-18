@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.CoreFramework.Storage
+﻿namespace com.etsoo.Utils.Storage
 {
     /// <summary>
     /// Storage Interface, inherit for Local Storage, Network Storage and so on

@@ -10,7 +10,7 @@ namespace com.etsoo.Utils.String
     /// String utils
     /// 字符串工具类
     /// </summary>
-    public static class StringUtil
+    public static class StringUtils
     {
         /// <summary>
         /// IEnumerable to string

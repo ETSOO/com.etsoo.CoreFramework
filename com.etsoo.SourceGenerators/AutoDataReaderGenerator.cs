@@ -47,7 +47,7 @@ namespace com.etsoo.SourceGenerators
 
                         if (utcDateTime && typeSymbol.Name == "DateTime")
                         {
-                            valuePart = $"LocalizationUtil.SetUtcKind{valuePart}";
+                            valuePart = $"LocalizationUtils.SetUtcKind{valuePart}";
                         }
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
@@ -72,9 +72,9 @@ namespace com.etsoo.SourceGenerators
 
                         var arrayType = itemTypeSymbol.Name;
                         if(arrayType.Equals("String"))
-                            valuePart = $@"StringUtil.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
+                            valuePart = $@"StringUtils.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
                         else
-                            valuePart = $@"StringUtil.AsEnumerable<{arrayType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
+                            valuePart = $@"StringUtils.AsEnumerable<{arrayType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
                     }
                     else if (typeSymbol.IsList())
                     {
@@ -91,9 +91,9 @@ namespace com.etsoo.SourceGenerators
 
                         var listType = itemTypeSymbol.Name;
                         if(listType.Equals("String"))
-                            valuePart = $@"StringUtil.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
+                            valuePart = $@"StringUtils.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
                         else
-                            valuePart = $@"StringUtil.AsEnumerable<{listType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
+                            valuePart = $@"StringUtils.AsEnumerable<{listType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
                     }
                     else
                     {

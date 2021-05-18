@@ -7,7 +7,7 @@ namespace com.etsoo.Utils.Database
     /// Database util
     /// 数据库工具
     /// </summary>
-    public static class DatabaseUtil
+    public static class DatabaseUtils
     {
         /// <summary>
         /// Convert Type to DbType

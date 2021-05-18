@@ -1,7 +1,5 @@
-﻿using com.etsoo.CoreFramework.Database;
-using com.etsoo.CoreFramework.MessageQueue;
-using com.etsoo.CoreFramework.Storage;
-using com.etsoo.Utils.Crypto;
+﻿using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.Database;
 using System;
 using System.Data.Common;
 using System.Text.Json;
@@ -35,45 +33,24 @@ namespace com.etsoo.CoreFramework.Application
         public virtual IDatabase<C> DB { get; }
 
         /// <summary>
-        /// Message queue
-        /// 消息队列
-        /// </summary>
-        public virtual IMessageQueue? MessageQueue { get; }
-
-        /// <summary>
-        /// Storage
-        /// 存储
-        /// </summary>
-        public virtual IStorage Storage { get; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         public CoreApplication(
             IAppConfiguration configuration,
-            IDatabase<C> db,
-            IMessageQueue? messageQueue = null,
-            IStorage? storage = null 
+            IDatabase<C> db
         )
         {
-            // Default storage
-            storage ??= new LocalStorage();
-
             // Json options
             DefaultJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { IgnoreNullValues = true };
 
             // Update
             (
                 Configuration,
-                DB,
-                MessageQueue,
-                Storage
+                DB
             ) = (
                 configuration,
-                db,
-                messageQueue,
-                storage
+                db
             );
         }
 
@@ -83,9 +60,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="init">Init tuple</param>
         public CoreApplication((IAppConfiguration configuration,
-            IDatabase<C> db,
-            IMessageQueue? messageQueue,
-            IStorage? storage) init) : this(init.configuration, init.db, init.messageQueue, init.storage)
+            IDatabase<C> db) init) : this(init.configuration, init.db)
         {
 
         }
@@ -98,7 +73,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Hashed bytes</returns>
         public byte[] HashPassword(ReadOnlySpan<char> password)
         {
-            return CryptographyUtil.HMACSHA512(password, Configuration.PrivateKey.Span);
+            return CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey.Span);
         }
 
         /// <summary>
@@ -109,7 +84,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Hashed password</returns>
         public async Task<ReadOnlyMemory<char>> HashPasswordAsync(ReadOnlyMemory<char> password)
         {
-            return await CryptographyUtil.HMACSHA512ToBase64Async(password, Configuration.PrivateKey);
+            return await CryptographyUtils.HMACSHA512ToBase64Async(password, Configuration.PrivateKey);
         }
     }
 }

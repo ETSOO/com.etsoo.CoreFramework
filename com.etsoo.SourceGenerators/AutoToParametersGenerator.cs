@@ -111,12 +111,12 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtil.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
                         }
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if (typeSymbol.IsList())
@@ -135,12 +135,12 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtil.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
                         }
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if(typeSymbol.IsDictionary())
@@ -151,7 +151,7 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? '&');
 
                             // String
-                            valuePart = $"StringUtil.DictionaryToString({fieldName}, '{splitter}', '=').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.DictionaryToString({fieldName}, '{splitter}', '=').ToDbString({isAnsi.ToCode()})";
                         }
                         else
                         {
@@ -164,7 +164,7 @@ namespace com.etsoo.SourceGenerators
                             var itemType = dicSymbol.TypeArguments[1];
 
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtil.DictionaryToRecords({fieldName}, {keyType.Name.ToDbType()}, {itemType.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.DictionaryToRecords({fieldName}, {keyType.Name.ToDbType()}, {itemType.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else

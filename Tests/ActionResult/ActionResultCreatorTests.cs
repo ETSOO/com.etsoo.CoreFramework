@@ -1,5 +1,4 @@
-﻿using com.etsoo.CoreFramework.Database;
-using com.etsoo.Utils.Database;
+﻿using com.etsoo.Utils.Database;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
