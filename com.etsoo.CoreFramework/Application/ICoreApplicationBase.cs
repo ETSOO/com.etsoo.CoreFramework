@@ -28,7 +28,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="password">Raw password</param>
         /// <returns>Hashed bytes</returns>
-        byte[] HashPassword(ReadOnlySpan<char> password);
+        string HashPassword(ReadOnlySpan<char> password);
 
         /// <summary>
         /// Hash password
@@ -36,6 +36,6 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="password">Raw password</param>
         /// <returns>Hashed password</returns>
-        Task<byte[]> HashPasswordAsync(string password);
+        Task<string> HashPasswordAsync(string password);
     }
 }
