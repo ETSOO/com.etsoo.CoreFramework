@@ -5,6 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Tests
 {
+    [AutoDataReaderGenerator]
+    [AutoDictionaryGenerator]
+    [AutoToJson]
+    [AutoToParameters]
+    public partial record DirectUser (int? Id, string Name);
+
     /// <summary>
     /// User module for test
     /// </summary>

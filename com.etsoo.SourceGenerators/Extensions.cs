@@ -223,49 +223,73 @@ namespace com.etsoo.SourceGenerators
         /// 解析 SyntaxNode 为命名空间和类名
         /// </summary>
         /// <param name="context">Context</param>
+        /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="td">TypeDeclarationSyntax</param>
         /// <returns>Public properties and fields</returns>
-        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds)
+        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, out bool isPositionalRecord)
         {
             var items = new List<ParsedMember>();
 
-            foreach (var member in tds.Members)
+            if (tds is RecordDeclarationSyntax rds && rds.ParameterList != null)
             {
-                // Only public
-                if (!member.HasToken(SyntaxKind.PublicKeyword))
-                {
-                    continue;
-                }
+                // Positional Record
+                // public partial record DirectUser (int? Id, string Name);
+                isPositionalRecord = true;
 
-                if (member is PropertyDeclarationSyntax p)
+                foreach (var p in rds.ParameterList.Parameters)
                 {
-                    // Property
-                    // Symbol
-                    var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
-                    if(pSymbol != null)
+                    if (p.Type == null)
+                        continue;
+
+                    var pSymbol = context.ParseSyntaxNode<IParameterSymbol>(p);
+                    if (pSymbol != null)
                     {
                         var (pNullable, type) = p.Type.IsNullable();
                         items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
                     }
                 }
-                else if (member is FieldDeclarationSyntax f)
+            }
+            else
+            {
+                isPositionalRecord = false;
+                foreach (var member in tds.Members)
                 {
-                    // Field
-                    foreach (var variable in f.Declaration.Variables)
+                    // Only public
+                    if (!member.HasToken(SyntaxKind.PublicKeyword))
                     {
-                        // Symbol
-                        var fSymbol = context.ParseSyntaxNode<IFieldSymbol>(variable);
-                        if (fSymbol != null)
-                        {
-                            var (fNullable, fType) = f.Declaration.Type.IsNullable();
+                        continue;
+                    }
 
-                            items.Add(new ParsedMember(fSymbol, fType, fSymbol.Type, fNullable));
+                    if (member is PropertyDeclarationSyntax p)
+                    {
+                        // Property
+                        // Symbol
+                        var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
+                        if (pSymbol != null)
+                        {
+                            var (pNullable, type) = p.Type.IsNullable();
+                            items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
                         }
                     }
-                }
-                else
-                {
-                    continue;
+                    else if (member is FieldDeclarationSyntax f)
+                    {
+                        // Field
+                        foreach (var variable in f.Declaration.Variables)
+                        {
+                            // Symbol
+                            var fSymbol = context.ParseSyntaxNode<IFieldSymbol>(variable);
+                            if (fSymbol != null)
+                            {
+                                var (fNullable, fType) = f.Declaration.Type.IsNullable();
+
+                                items.Add(new ParsedMember(fSymbol, fType, fSymbol.Type, fNullable));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
             }
 

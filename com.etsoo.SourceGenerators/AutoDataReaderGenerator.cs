@@ -19,7 +19,7 @@ namespace com.etsoo.SourceGenerators
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds);
+            var members = context.ParseMembers(tds, out bool isPositionalRecord);
 
             if (!context.CancellationToken.IsCancellationRequested)
             {
@@ -49,6 +49,10 @@ namespace com.etsoo.SourceGenerators
                         {
                             valuePart = $"LocalizationUtils.SetUtcKind{valuePart}";
                         }
+                        else if (typeSymbol.Name == "String" && !nullable)
+                        {
+                            valuePart += "!";
+                        }
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
                     {
@@ -71,7 +75,7 @@ namespace com.etsoo.SourceGenerators
                         var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                         var arrayType = itemTypeSymbol.Name;
-                        if(arrayType.Equals("String"))
+                        if (arrayType.Equals("String"))
                             valuePart = $@"StringUtils.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
                         else
                             valuePart = $@"StringUtils.AsEnumerable<{arrayType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToArray()";
@@ -90,7 +94,7 @@ namespace com.etsoo.SourceGenerators
                         var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                         var listType = itemTypeSymbol.Name;
-                        if(listType.Equals("String"))
+                        if (listType.Equals("String"))
                             valuePart = $@"StringUtils.AsEnumerable(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
                         else
                             valuePart = $@"StringUtils.AsEnumerable<{listType}>(await reader.GetValueAsync<string>(""{fieldName}"", names), '{splitter}').ToList()";
@@ -100,11 +104,17 @@ namespace com.etsoo.SourceGenerators
                         continue;
                     }
 
-                    body.Add($@"{fieldName} = {valuePart}");
+                    if (isPositionalRecord)
+                        body.Add($@"{fieldName}: {valuePart}");
+                    else
+                        body.Add($@"{fieldName} = {valuePart}");
                 }
             }
 
-            return string.Join(",\n", body);
+            if(isPositionalRecord)
+                return "(" + string.Join(",\n", body) + ")";
+
+            return "{\n" + string.Join(",\n", body) + "\n}";
         }
 
         private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
@@ -161,9 +171,7 @@ namespace com.etsoo.SourceGenerators
 
                             while(await reader.ReadAsync())
                             {{
-                                list.Add(new {name} {{
-                                    {GenerateBody(context, tds, utcDateTime.GetValueOrDefault())}
-                                }});
+                                list.Add(new {name} {GenerateBody(context, tds, utcDateTime.GetValueOrDefault())});
                             }}
 
                             return list;
@@ -205,10 +213,12 @@ namespace com.etsoo.SourceGenerators
 
         public void Initialize(GeneratorInitializationContext context)
         {
-/*            if (!Debugger.IsAttached)
+            /*
+            if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
-            }*/
+            }
+            */
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoDataReaderGeneratorAttribute), SyntaxKind.PartialKeyword));

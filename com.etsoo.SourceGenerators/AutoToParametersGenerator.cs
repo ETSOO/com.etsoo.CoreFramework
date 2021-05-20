@@ -19,7 +19,7 @@ namespace com.etsoo.SourceGenerators
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds);
+            var members = context.ParseMembers(tds, out _);
 
             if(!context.CancellationToken.IsCancellationRequested)
             {
