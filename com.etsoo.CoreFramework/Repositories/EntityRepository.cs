@@ -53,7 +53,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var p = procedureInitals.AsSpan();
             var builder = new MemoryBuilder<char>(App.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
-            builder.Append(App.Configuration.AppId.Span);
+            builder.Append(App.Configuration.AppId);
             builder.Append(p);
             builder.Append(ProcedureJoinChar.Span);
             builder.Append(Flag.Span);

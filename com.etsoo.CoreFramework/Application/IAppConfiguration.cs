@@ -19,7 +19,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Application id
         /// 程序编号
         /// </summary>
-        ReadOnlyMemory<char> AppId { get; }
+        string AppId { get; }
 
         /// <summary>
         /// Supported cultures, like zh-CN, en
@@ -37,12 +37,12 @@ namespace com.etsoo.CoreFramework.Application
         /// Private key for encryption/decryption, required
         /// 加解密私匙，必填
         /// </summary>
-        ReadOnlyMemory<char> PrivateKey { get; }
+        string PrivateKey { get; }
 
         /// <summary>
         /// Symmetric security key, for data exchange, null means prevention exchange
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
-        ReadOnlyMemory<char>? SymmetricKey { get; }
+        string? SymmetricKey { get; }
     }
 }

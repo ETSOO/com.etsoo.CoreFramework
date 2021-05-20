@@ -15,7 +15,7 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public static class CryptographyUtils
     {
-        private static AesManaged AESManagedCreate(ReadOnlySpan<char> passPhrase)
+        private static AesManaged AESManagedCreate(string passPhrase)
         {
             // Random byte
             // 随机字节
@@ -24,7 +24,7 @@ namespace com.etsoo.Utils.Crypto
             // Hash the user password along with the salt
             // 由密匙创建加密的键，而不要直接使用密匙
             // https://stackoverflow.com/questions/2659214/why-do-i-need-to-use-the-rfc2898derivebytes-class-in-net-instead-of-directly
-            using var password = new Rfc2898DeriveBytes(passPhrase.ToEncodingBytes().ToArray(), new byte[] { 0, 1, 2, randByte, 4, 5, 6, 7 }, 10000);
+            using var password = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(passPhrase), new byte[] { 0, 1, 2, randByte, 4, 5, 6, 7 }, 10000);
 
             // 32 x 8 = 256 bits
             // 16 x 8 = 128 bits
@@ -45,37 +45,15 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="cipherTextBytes">Cipher text bytes</param>
         /// <param name="passPhrase">Password phrase</param>
         /// <returns>Encrypted bytes</returns>
-        public static async Task<ReadOnlyMemory<char>> AESDecryptAsync(ReadOnlyMemory<byte> cipherTextBytes, ReadOnlyMemory<char> passPhrase)
+        public static async Task<byte[]> AESDecryptAsync(byte[] cipherTextBytes, string passPhrase)
         {
-            using var aesAlg = AESManagedCreate(passPhrase.Span);
+            using var aesAlg = AESManagedCreate(passPhrase);
             using var decryptor = aesAlg.CreateDecryptor();
-            using var csDecrypt = new CryptoStream(cipherTextBytes.AsStream(), decryptor, CryptoStreamMode.Read, true);
-            using var srDecrypt = new StreamReader(csDecrypt, Encoding.UTF8);
-            return await srDecrypt.ReadAllCharsAsyn();
-        }
-
-        /// <summary>
-        /// AES 256-bit symmetric decryption from base64 string
-        /// AES 256位对称解密，从Base64字符串
-        /// </summary>
-        /// <param name="cipherText">Cipher text</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted bytes</returns>
-        public static async Task<ReadOnlyMemory<char>> AESDecryptFromBase64Async(ReadOnlyMemory<char> cipherText, ReadOnlyMemory<char> passPhrase)
-        {
-            return await AESDecryptAsync(Convert.FromBase64String(cipherText.ToString()).AsMemory(), passPhrase);
-        }
-
-        /// <summary>
-        /// AES 256-bit symmetric decryption from hexadecimal string
-        /// AES 256位对称解密，从16进制字符串
-        /// </summary>
-        /// <param name="cipherText">Cipher text</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted bytes</returns>
-        public static async Task<ReadOnlyMemory<char>> AESDecryptFromHexAsync(ReadOnlyMemory<char> cipherText, ReadOnlyMemory<char> passPhrase)
-        {
-            return await AESDecryptAsync(Convert.FromHexString(cipherText.Span), passPhrase);
+            var manager = new RecyclableMemoryStreamManager();
+            using var csDecrypt = new CryptoStream(manager.GetStream(cipherTextBytes), decryptor, CryptoStreamMode.Read, true);
+            using var ms = new MemoryStream();
+            await csDecrypt.CopyToAsync(ms);
+            return ms.ToArray();
         }
 
         /// <summary>
@@ -85,9 +63,9 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="plainText">Plain text</param>
         /// <param name="passPhrase">Password phrase</param>
         /// <returns>Encrypted bytes</returns>
-        public static async Task<ReadOnlyMemory<byte>> AESEncryptAsync(ReadOnlyMemory<char> plainText, ReadOnlyMemory<char> passPhrase)
+        public static async Task<byte[]> AESEncryptAsync(string plainText, string passPhrase)
         {
-            using var aesAlg = AESManagedCreate(passPhrase.Span);
+            using var aesAlg = AESManagedCreate(passPhrase);
             using var encryptor = aesAlg.CreateEncryptor();
 
             var manager = new RecyclableMemoryStreamManager();
@@ -95,7 +73,8 @@ namespace com.etsoo.Utils.Crypto
 
             // leaveOpen = true is critical
             using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write, true);
-            using var swEncrypt = new StreamWriter(csEncrypt, Encoding.UTF8);
+
+            using var swEncrypt = new StreamWriter(csEncrypt);
 
             // Write the plain text for encryption
             await swEncrypt.WriteAsync(plainText);
@@ -103,30 +82,6 @@ namespace com.etsoo.Utils.Crypto
 
             // Return byte array
             return msEncrypt.ToArray();
-        }
-
-        /// <summary>
-        /// AES 256-bit symmetric encryption, to base64 string
-        /// AES 256位对称加密，到Base64字符串
-        /// </summary>
-        /// <param name="plainText">Plain text</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted base64 string</returns>
-        public static async Task<ReadOnlyMemory<char>> AESEncryptToBase64Async(ReadOnlyMemory<char> plainText, ReadOnlyMemory<char> passPhrase)
-        {
-            return Convert.ToBase64String((await AESEncryptAsync(plainText, passPhrase)).ToArray()).AsMemory();
-        }
-
-        /// <summary>
-        /// AES 256-bit symmetric encryption, to Hexadecimal string
-        /// AES 256位对称加密，到16进制字符串
-        /// </summary>
-        /// <param name="plainText">Plain text</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted hexadecimal string</returns>
-        public static async Task<ReadOnlyMemory<char>> AESEncryptToHexAsync(ReadOnlyMemory<char> plainText, ReadOnlyMemory<char> passPhrase)
-        {
-            return Convert.ToHexString((await AESEncryptAsync(plainText, passPhrase)).Span).AsMemory();
         }
 
         /// <summary>
@@ -201,6 +156,26 @@ namespace com.etsoo.Utils.Crypto
         }
 
         /// <summary>
+        /// Hash-based Message Authentication Code (HMAC), SHA256
+        /// 基于哈希的消息认证码（HMAC）, SHA256
+        /// </summary>
+        /// <param name="message">Raw message</param>
+        /// <param name="privateKey">Private key</param>
+        /// <returns>Hashed bytes</returns>
+        /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
+        public static byte[] HMACSHA256(ReadOnlySpan<char> message, ReadOnlySpan<char> privateKey)
+        {
+            // HMAC
+            using var alg = new HMACSHA256(privateKey.ToEncodingBytes().ToArray());
+
+            alg.Initialize();
+
+            var manager = new RecyclableMemoryStreamManager();
+
+            return alg.ComputeHash(manager.GetStream(message.ToEncodingBytes().ToArray()));
+        }
+
+        /// <summary>
         /// Hash-based Message Authentication Code (HMAC), SHA512
         /// 基于哈希的消息认证码（HMAC）, SHA512
         /// </summary>
@@ -221,6 +196,26 @@ namespace com.etsoo.Utils.Crypto
         }
 
         /// <summary>
+        /// Hash-based Message Authentication Code (HMAC), SHA256
+        /// 基于哈希的消息认证码（HMAC）, SHA256
+        /// </summary>
+        /// <param name="message">Raw message</param>
+        /// <param name="privateKey">Private key</param>
+        /// <returns>Hashed bytes</returns>
+        /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
+        public static async Task<byte[]> HMACSHA256Async(string message, string privateKey)
+        {
+            // HMAC
+            using var alg = new HMACSHA256(Encoding.UTF8.GetBytes(privateKey));
+
+            alg.Initialize();
+
+            var manager = new RecyclableMemoryStreamManager();
+
+            return await alg.ComputeHashAsync(manager.GetStream(Encoding.UTF8.GetBytes(message)));
+        }
+
+        /// <summary>
         /// Hash-based Message Authentication Code (HMAC), SHA512
         /// 基于哈希的消息认证码（HMAC）, SHA512
         /// </summary>
@@ -228,42 +223,16 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="privateKey">Private key</param>
         /// <returns>Hashed bytes</returns>
         /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
-        public static async Task<ReadOnlyMemory<byte>> HMACSHA512Async(ReadOnlyMemory<char> message, ReadOnlyMemory<char> privateKey)
+        public static async Task<byte[]> HMACSHA512Async(string message, string privateKey)
         {
             // HMAC
-            using var alg = new HMACSHA512(privateKey.Span.ToEncodingBytes().ToArray());
+            using var alg = new HMACSHA512(Encoding.UTF8.GetBytes(privateKey));
 
             alg.Initialize();
 
             var manager = new RecyclableMemoryStreamManager();
 
-            return await alg.ComputeHashAsync(manager.GetStream(message.ToEncodingBytes()));
-        }
-
-        /// <summary>
-        /// Hash-based Message Authentication Code (HMAC), SHA512 to Base64 string
-        /// 基于哈希的消息身份验证代码（HMAC）, SHA512到Base64字符串
-        /// </summary>
-        /// <param name="message">Raw message</param>
-        /// <param name="privateKey">Private key</param>
-        /// <returns>Hashed message</returns>
-        /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
-        public static async Task<ReadOnlyMemory<char>> HMACSHA512ToBase64Async(ReadOnlyMemory<char> message, ReadOnlyMemory<char> privateKey)
-        {
-            return Convert.ToBase64String((await HMACSHA512Async(message, privateKey)).Span).AsMemory();
-        }
-
-        /// <summary>
-        /// Hash-based Message Authentication Code (HMAC), SHA512 to Hexadecimal string
-        /// 基于哈希的消息身份验证代码（HMAC）, SHA512到16进制字符串
-        /// </summary>
-        /// <param name="message">Raw message</param>
-        /// <param name="privateKey">Private key</param>
-        /// <returns>Hashed message</returns>
-        /// <seealso href="http://www.baike.com/wiki/HMAC/">HMAC</seealso>
-        public static async Task<ReadOnlyMemory<char>> HMACSHA512ToHexAsync(ReadOnlyMemory<char> message, ReadOnlyMemory<char> privateKey)
-        {
-            return Convert.ToHexString((await HMACSHA512Async(message, privateKey)).Span).AsMemory();
+            return await alg.ComputeHashAsync(manager.GetStream(Encoding.UTF8.GetBytes(message)));
         }
     }
 }

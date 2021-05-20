@@ -73,7 +73,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Hashed bytes</returns>
         public byte[] HashPassword(ReadOnlySpan<char> password)
         {
-            return CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey.Span);
+            return CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey);
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="password">Raw password</param>
         /// <returns>Hashed password</returns>
-        public async Task<ReadOnlyMemory<char>> HashPasswordAsync(ReadOnlyMemory<char> password)
+        public async Task<byte[]> HashPasswordAsync(string password)
         {
-            return await CryptographyUtils.HMACSHA512ToBase64Async(password, Configuration.PrivateKey);
+            return await CryptographyUtils.HMACSHA512Async(password, Configuration.PrivateKey);
         }
     }
 }

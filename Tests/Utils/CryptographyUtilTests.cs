@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Crypto;
 using NUnit.Framework;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Tests.Utils
@@ -11,13 +12,13 @@ namespace Tests.Utils
     [TestFixture]
     public class CryptographyUtilTests
     {
-        private readonly ReadOnlyMemory<char> data;
-        private readonly ReadOnlyMemory<char> password;
+        private readonly string data;
+        private readonly string password;
 
         public CryptographyUtilTests()
         {
-            data = "Hello, world!".AsMemory();
-            password = "test".AsMemory();
+            data = "Hello, world!";
+            password = "test";
         }
 
         /// <summary>
@@ -28,14 +29,15 @@ namespace Tests.Utils
         public async Task AESBase64_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var result = await CryptographyUtils.AESEncryptToBase64Async(data, password);
+            var bytes = await CryptographyUtils.AESEncryptAsync(data, password);
+            var result = Convert.ToBase64String(bytes);
 
             // Act
-            var decryptedData = await CryptographyUtils.AESDecryptFromBase64Async(result, password);
-            var decriptedString = decryptedData.Span.ToString();
+            var decryptedData = await CryptographyUtils.AESDecryptAsync(Convert.FromBase64String(result), password);
+            var decriptedString = Encoding.UTF8.GetString(decryptedData);
 
             // Assert
-            Assert.IsTrue(decriptedString.Equals(data.Span.ToString()));
+            Assert.AreEqual(data, decriptedString);
         }
 
         /// <summary>
@@ -46,14 +48,14 @@ namespace Tests.Utils
         public async Task AESHex_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var result = await CryptographyUtils.AESEncryptToHexAsync(data, password);
+            var result = Convert.ToHexString(await CryptographyUtils.AESEncryptAsync(data, password));
 
             // Act
-            var decryptedData = await CryptographyUtils.AESDecryptFromHexAsync(result, password);
-            var decriptedString = decryptedData.Span.ToString();
+            var decryptedData = await CryptographyUtils.AESDecryptAsync(Convert.FromHexString(result), password);
+            var decriptedString = Encoding.UTF8.GetString(decryptedData);
 
             // Assert
-            Assert.IsTrue(decriptedString.Equals(data.Span.ToString()));
+            Assert.AreEqual(data, decriptedString);
         }
 
         /// <summary>
@@ -70,29 +72,16 @@ namespace Tests.Utils
         }
 
         /// <summary>
-        /// SHA512 test
-        /// </summary>
-        [Test]
-        public void HMACSHA512_HelloWorldTest()
-        {
-            // Arrange & act
-            var result = CryptographyUtils.HMACSHA512(data.Span, password.Span);
-
-            // Assert
-            Assert.IsTrue(Convert.ToBase64String(result) == "DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==");
-        }
-
-        /// <summary>
         /// SHA512 to Base64 string test
         /// </summary>
         [Test]
         public async Task HMACSHA512ToBase64_HelloWorldTest()
         {
             // Arrange & act
-            var result = await CryptographyUtils.HMACSHA512ToBase64Async(data, password);
+            var result = await CryptographyUtils.HMACSHA512Async(data, password);
 
             // Assert
-            Assert.IsTrue(result.ToString() == "DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==");
+            Assert.AreEqual("DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==", Convert.ToBase64String(result));
         }
 
         /// <summary>
@@ -102,10 +91,10 @@ namespace Tests.Utils
         public async Task HMACSHA512ToHex_HelloWorldTest()
         {
             // Arrange & act
-            var result = await CryptographyUtils.HMACSHA512ToHexAsync(data, password);
+            var result = await CryptographyUtils.HMACSHA512Async(data, password);
 
             // Assert
-            Assert.IsTrue(result.ToString().Equals("0c08206a9e3c0fed6c7f828ff92ae06d6971e267cff7378017ffe7b69aad18834079de96285ab829a548f0ac92185d0447852f2fa415f7bb994112c9e606bbc7", StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual("0c08206a9e3c0fed6c7f828ff92ae06d6971e267cff7378017ffe7b69aad18834079de96285ab829a548f0ac92185d0447852f2fa415f7bb994112c9e606bbc7".ToUpper(), Convert.ToHexString(result));
         }
     }
 }

@@ -43,11 +43,11 @@ namespace com.etsoo.CoreFramework.Application
                 SymmetricKey
             ) = (
                 section,
-                (appId ?? "e").AsMemory(),
+                appId ?? "e",
                 cultures,
                 modelValidated,
-                privateKey.AsMemory(),
-                symmetricKey.AsMemory()
+                privateKey,
+                symmetricKey
             );
         }
 
@@ -76,7 +76,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Application id
         /// 程序编号
         /// </summary>
-        public ReadOnlyMemory<char> AppId { get; }
+        public string AppId { get; }
 
         /// <summary>
         /// Supported cultures, like zh-CN, en
@@ -94,12 +94,12 @@ namespace com.etsoo.CoreFramework.Application
         /// Private key for encryption/decryption, required
         /// 加解密私匙，必填
         /// </summary>
-        public ReadOnlyMemory<char> PrivateKey { get; }
+        public string PrivateKey { get; }
 
         /// <summary>
         /// Symmetric security key, for data exchange, null means prevention exchange
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
-        public ReadOnlyMemory<char>? SymmetricKey { get; }
+        public string? SymmetricKey { get; }
     }
 }
