@@ -121,7 +121,7 @@ namespace com.etsoo.CoreFramework.Repositories
         protected virtual CommandDefinition NewCreateCommand<M>(M model) where M : class
         {
             var name = GetCommandName("create");
-            return CreateModelCommand(model, name);
+            return CreateCommand(name, model);
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var key = "read".AsSpan();
             var name = format.HasValue ? GetCommandName(key, range, format.Value.ToString().ToLower()) : GetCommandName(key, range);
-            return CreateModelCommand(model, name);
+            return CreateCommand(name, model);
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace com.etsoo.CoreFramework.Repositories
         protected virtual CommandDefinition NewUpdateCommand<M>(M model) where M : class
         {
             var name = GetCommandName("update");
-            return CreateModelCommand(model, name);
+            return CreateCommand(name, model);
         }
 
         /// <summary>
