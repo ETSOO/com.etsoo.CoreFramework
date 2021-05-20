@@ -81,8 +81,8 @@ namespace Tests.Repositories
             // Assert
             var error = ApplicationErrors.NoActionResult;
             Assert.IsFalse(result.Success);
-            Assert.IsTrue(result.Type == error.Type);
-            Assert.IsTrue(result.Title == error.Title);
+            Assert.AreEqual(error.Type, result.Type.ToString());
+            Assert.AreEqual(error.Title, result.Title);
         }
 
         [Test]

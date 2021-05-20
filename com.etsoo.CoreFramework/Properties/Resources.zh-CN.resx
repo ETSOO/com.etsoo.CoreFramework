@@ -123,6 +123,15 @@
   <data name="AccountExpired" xml:space="preserve">
     <value>账户已于 {0} 到期</value>
   </data>
+  <data name="CodeExpired" xml:space="preserve">
+    <value>验证码已过期</value>
+  </data>
+  <data name="CodeFrozen" xml:space="preserve">
+    <value>验证码功能已被禁止</value>
+  </data>
+  <data name="CodesNoMatch" xml:space="preserve">
+    <value>验证码不匹配</value>
+  </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>数据处理失败</value>
   </data>

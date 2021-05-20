@@ -123,6 +123,15 @@
   <data name="AccountExpired" xml:space="preserve">
     <value>Account expired on {0}</value>
   </data>
+  <data name="CodeExpired" xml:space="preserve">
+    <value>Code Expired</value>
+  </data>
+  <data name="CodeFrozen" xml:space="preserve">
+    <value>Code function has been disabled</value>
+  </data>
+  <data name="CodesNoMatch" xml:space="preserve">
+    <value>Codes do not match</value>
+  </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>Data Processing Failed</value>
   </data>

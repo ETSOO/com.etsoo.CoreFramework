@@ -79,6 +79,33 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Code Expired.
+        /// </summary>
+        public static string CodeExpired {
+            get {
+                return ResourceManager.GetString("CodeExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code function has been disabled.
+        /// </summary>
+        public static string CodeFrozen {
+            get {
+                return ResourceManager.GetString("CodeFrozen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Codes do not match.
+        /// </summary>
+        public static string CodesNoMatch {
+            get {
+                return ResourceManager.GetString("CodesNoMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         public static string DataProcessingFailed {
