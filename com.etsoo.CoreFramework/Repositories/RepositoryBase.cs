@@ -53,21 +53,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Command</returns>
         protected CommandDefinition CreateCommand(string name, object? parameters = null, CommandType type = CommandType.StoredProcedure)
         {
-            return new CommandDefinition(name, parameters, commandType: type);
-        }
-
-        /// <summary>
-        /// Create model parameters command
-        /// 创建模块参数命令
-        /// </summary>
-        /// <typeparam name="M">Generic model type</typeparam>
-        /// <param name="model">Model</param>
-        /// <param name="name">Command text</param>
-        /// <param name="type">Command type</param>
-        /// <returns>Command</returns>
-        protected CommandDefinition CreateModelCommand<M>(M? model, string name, CommandType type = CommandType.StoredProcedure) where M : class
-        {
-            return CreateCommand(name, ModelToParameters(model), type);
+            return new CommandDefinition(name, FormatParameters(parameters), commandType: type);
         }
 
         /// <summary>
@@ -90,28 +76,32 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Model to parameters
-        /// 模块转化为参数
+        /// Format parameters
+        /// 格式化参数
         /// </summary>
-        /// <typeparam name="M">Generic model type</typeparam>
-        /// <param name="model">Model</param>
-        /// <returns>Parameters</returns>
-        protected DynamicParameters? ModelToParameters<M>(M? model) where M : class
+        /// <param name="parameters">Parameters</param>
+        /// <returns>Result</returns>
+        protected object? FormatParameters(object? parameters)
         {
-            if (model == null)
+            if (parameters == null)
                 return null;
 
-            if (model is IAutoParameters ap)
+            if (parameters is DynamicParameters dp)
+            {
+                return dp;
+            }
+
+            if (parameters is IAutoParameters ap)
             {
                 return ap.AsParameters();
             }
 
-            if (model is IModelParameters p)
+            if (parameters is IModelParameters p)
             {
                 return p.AsParameters(App, User);
             }
 
-            return null;
+            return parameters;
         }
 
         /// <summary>
