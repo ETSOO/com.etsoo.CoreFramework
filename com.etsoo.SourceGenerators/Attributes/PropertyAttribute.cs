@@ -15,6 +15,18 @@ namespace com.etsoo.SourceGenerators.Attributes
         public bool IsAnsi { get; set; }
 
         /// <summary>
+        /// Is fixed length (char or varchar)
+        /// 是否为固定长度
+        /// </summary>
+        public bool FixedLength { get; set; }
+
+        /// <summary>
+        /// Length
+        /// 字符串长度
+        /// </summary>
+        public int? Length { get; set; }
+
+        /// <summary>
         /// Ignore the property
         /// 是否忽略该属性
         /// </summary>

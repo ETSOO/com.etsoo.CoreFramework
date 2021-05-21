@@ -27,6 +27,8 @@ namespace com.etsoo.SourceGenerators
                 var arrayPropertyType = typeof(ArrayPropertyAttribute);
                 var ignoreName = nameof(PropertyAttribute.Ignore);
                 var isAnsiName = nameof(PropertyAttribute.IsAnsi);
+                var fixedLengthName = nameof(PropertyAttribute.FixedLength);
+                var lengthName = nameof(PropertyAttribute.Length);
                 var nameField = nameof(PropertyAttribute.Name);
                 var typeNameField = nameof(PropertyAttribute.TypeName);
 
@@ -44,6 +46,8 @@ namespace com.etsoo.SourceGenerators
 
                     // Is ansi, not unicode
                     var isAnsi = attributeData?.GetValue<bool?>(isAnsiName);
+                    var fixedLength = attributeData?.GetValue<bool?>(fixedLengthName);
+                    var length = attributeData?.GetValue<int?>(lengthName);
 
                     // Object field name
                     var fieldName = symbol.Name;
@@ -64,6 +68,9 @@ namespace com.etsoo.SourceGenerators
                     // Line parts
                     string valuePart;
 
+                    // Is dbstring
+                    bool isDbString = false;
+
                     if (typeSymbol.IsSimpleType())
                     {
                         // Default type name from member's type
@@ -75,7 +82,8 @@ namespace com.etsoo.SourceGenerators
                         // String case
                         if (typeName.Equals("String"))
                         {
-                            valuePart = $"{fieldName}.ToDbString({isAnsi.ToCode()})";
+                            isDbString = true;
+                            valuePart = $"{fieldName}.ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
                         }
                         else
                         {
@@ -107,11 +115,13 @@ namespace com.etsoo.SourceGenerators
 
                         if (string.IsNullOrEmpty(typeName))
                         {
+                            isDbString = true;
+
                             // Splitter
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
                         }
                         else
                         {
@@ -131,11 +141,13 @@ namespace com.etsoo.SourceGenerators
 
                         if (string.IsNullOrEmpty(typeName))
                         {
+                            isDbString = true;
+
                             // Splitter
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
                         }
                         else
                         {
@@ -147,11 +159,13 @@ namespace com.etsoo.SourceGenerators
                     {
                         if (string.IsNullOrEmpty(typeName))
                         {
+                            isDbString = true;
+
                             // Splitter
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? '&');
 
                             // String
-                            valuePart = $"StringUtils.DictionaryToString({fieldName}, '{splitter}', '=').ToDbString({isAnsi.ToCode()})";
+                            valuePart = $"StringUtils.DictionaryToString({fieldName}, '{splitter}', '=').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
                         }
                         else
                         {
@@ -179,7 +193,11 @@ namespace com.etsoo.SourceGenerators
                         // Ignore null field
                         itemCode.AppendLine($"if({fieldName} != null)");
                     }
-                    itemCode.Append($"parameters.Add(\"{name}\", {valuePart}, {typeName.ToDbType()})");
+
+                    if (isDbString)
+                        itemCode.Append($"parameters.Add(\"{name}\", {valuePart})");
+                    else
+                        itemCode.Append($"parameters.Add(\"{name}\", {valuePart}, {typeName.ToDbType()})");
 
                     body.Add(itemCode.ToString());
                 }

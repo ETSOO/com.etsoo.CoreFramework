@@ -99,10 +99,12 @@ namespace com.etsoo.Utils.String
         /// </summary>
         /// <param name="input">Input string</param>
         /// <param name="isAnsi">Is non-unicode</param>
+        /// <param name="length">Length</param>
+        /// <param name="fixedLength">Fixed length</param>
         /// <returns>DbString</returns>
-        public static DbString ToDbString(this string input, bool? isAnsi = null)
+        public static DbString ToDbString(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
         {
-            return new DbString { IsAnsi = isAnsi ?? input.IsAnsi(), IsFixedLength = false, Value = input, Length = input.Length };
+            return new DbString { IsAnsi = isAnsi ?? input.IsAnsi(), IsFixedLength = fixedLength.GetValueOrDefault(), Value = input, Length = length ?? input.Length };
         }
     }
 }
