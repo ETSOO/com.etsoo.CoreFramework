@@ -129,6 +129,9 @@
   <data name="CodeFrozen" xml:space="preserve">
     <value>验证码功能已被禁止</value>
   </data>
+  <data name="CodeSendingFailed" xml:space="preserve">
+    <value>验证码发送失败</value>
+  </data>
   <data name="CodesNoMatch" xml:space="preserve">
     <value>验证码不匹配</value>
   </data>

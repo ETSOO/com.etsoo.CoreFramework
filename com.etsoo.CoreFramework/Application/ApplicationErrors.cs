@@ -63,6 +63,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError CodesNoMatch => new(nameof(CodesNoMatch), Resources.CodesNoMatch);
 
         /// <summary>
+        /// Failed to send the code
+        /// 验证码发送失败
+        /// </summary>
+        public static ApplicationError CodeSendingFailed => new(nameof(CodeSendingFailed), Resources.CodeSendingFailed);
+
+        /// <summary>
         /// Data Processing Failed
         /// 数据处理失败
         /// </summary>
@@ -179,6 +185,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(CodeExpired) => CodeExpired,
                 nameof(CodeFrozen) => CodeFrozen,
                 nameof(CodesNoMatch) => CodesNoMatch,
+                nameof(CodeSendingFailed) => CodeSendingFailed,
                 nameof(DataProcessingFailed) => DataProcessingFailed,
                 nameof(DbConnectionFailed) => DbConnectionFailed,
                 nameof(DeviceDisabled) => DeviceDisabled,

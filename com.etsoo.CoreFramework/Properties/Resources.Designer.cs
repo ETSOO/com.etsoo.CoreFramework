@@ -97,6 +97,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to send the code.
+        /// </summary>
+        public static string CodeSendingFailed {
+            get {
+                return ResourceManager.GetString("CodeSendingFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Codes do not match.
         /// </summary>
         public static string CodesNoMatch {

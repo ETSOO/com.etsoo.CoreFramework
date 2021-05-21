@@ -129,6 +129,9 @@
   <data name="CodeFrozen" xml:space="preserve">
     <value>Code function has been disabled</value>
   </data>
+  <data name="CodeSendingFailed" xml:space="preserve">
+    <value>Failed to send the code</value>
+  </data>
   <data name="CodesNoMatch" xml:space="preserve">
     <value>Codes do not match</value>
   </data>
