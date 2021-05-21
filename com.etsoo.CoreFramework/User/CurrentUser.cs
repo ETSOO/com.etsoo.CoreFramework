@@ -14,6 +14,18 @@ namespace com.etsoo.CoreFramework.User
     public record CurrentUser(string Id, string Name, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
     {
         /// <summary>
+        /// Int type id
+        /// 整形编号
+        /// </summary>
+        public int IntId => int.Parse(Id);
+
+        /// <summary>
+        /// Guid type id
+        /// Guid类型编号
+        /// </summary>
+        public Guid GuidId => Guid.Parse(Id);
+
+        /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>

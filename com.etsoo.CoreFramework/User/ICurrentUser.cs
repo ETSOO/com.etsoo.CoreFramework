@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -28,6 +29,18 @@ namespace com.etsoo.CoreFramework.User
         /// 编号
         /// </summary>
         string Id { get; }
+
+        /// <summary>
+        /// Int type id
+        /// 整形编号
+        /// </summary>
+        int IntId { get; }
+
+        /// <summary>
+        /// Guid type id
+        /// Guid类型编号
+        /// </summary>
+        Guid GuidId { get; }
 
         /// <summary>
         /// Role
