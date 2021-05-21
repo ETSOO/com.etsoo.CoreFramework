@@ -24,7 +24,7 @@ namespace com.etsoo.SourceGenerators.Attributes
         /// Length
         /// 字符串长度
         /// </summary>
-        public int? Length { get; set; }
+        public int Length { get; set; }
 
         /// <summary>
         /// Ignore the property
