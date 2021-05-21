@@ -66,7 +66,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetBool_Test()
         {
-            Assert.IsTrue(dic.Get<bool>("bool") == true);
+            Assert.AreEqual(true, dic.Get<bool>("bool"));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetDecimal_Test()
         {
-            Assert.IsTrue(dic.Get<decimal>("money") == 12.8M);
+            Assert.AreEqual(12.8M, dic.Get<decimal>("money"));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetDecimalFromString_Test()
         {
-            Assert.IsTrue(dic.Get<decimal>("string") == 12.8M);
+            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Tests.Utils
 
             Assert.IsNull(dic.GetItem("null"));
             Assert.IsNull(dic.Get<bool>("null"));
-            Assert.IsTrue(dic.Get<decimal>("string") == 12.8M);
+            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
         }
     }
 }

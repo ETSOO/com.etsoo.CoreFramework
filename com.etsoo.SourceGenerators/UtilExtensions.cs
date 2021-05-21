@@ -47,6 +47,19 @@ namespace com.etsoo.SourceGenerators
         }
 
         /// <summary>
+        /// Convert bool? to lowercase "null", "true" or "false"
+        /// </summary>
+        /// <param name="input">Input bool</param>
+        /// <returns>Result</returns>
+        public static string ToCode(this bool? input)
+        {
+            if (!input.HasValue)
+                return "null";
+
+            return input.Value.ToCode();
+        }
+
+        /// <summary>
         /// Is numeric type
         /// </summary>
         /// <param name="type">Type name</param>

@@ -69,7 +69,7 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.IsTrue(result == "1,2,3");
+            Assert.AreEqual("1,2,3", result);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace Tests.Utils
             var result2 = StringUtils.TryParse<TestEnum>("4");
 
             // Assert
-            Assert.IsTrue(result1 == TestEnum.Friday);
-            Assert.IsTrue(result2 == TestEnum.Friday);
+            Assert.AreEqual(TestEnum.Friday, result1);
+            Assert.AreEqual(TestEnum.Friday, result2);
         }
 
         private static IEnumerable<TestCaseData> TryParsePerformanceBulkTestData
@@ -138,9 +138,9 @@ namespace Tests.Utils
         {
             // Arrange & act
             var result = StringUtils.PascalCaseToLinuxStyle(pascal).ToString();
-            
+
             // Assert
-            Assert.IsTrue(result == camel, $"{result} is not equal with {camel}");
+            Assert.AreEqual(camel, result);
         }
 
         [Test, TestCaseSource(nameof(PascalLinuxBulkTestData))]
@@ -150,7 +150,7 @@ namespace Tests.Utils
             var result = StringUtils.LinuxStyleToPascalCase(camel).ToString();
 
             // Assert
-            Assert.IsTrue(result == pascal, $"{result} is not equal with {pascal}");
+            Assert.AreEqual(pascal, result);
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.IsTrue(result == "1,2");
+            Assert.AreEqual("1,2", result);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace Tests.Utils
             var result = StringUtils.DictionaryToString(items);
 
             // Assert
-            Assert.IsTrue(result == "1001=True&1002=False");
+            Assert.AreEqual("1001=True&1002=False", result);
         }
 
         [Test]
@@ -189,7 +189,7 @@ namespace Tests.Utils
             var items = StringUtils.AsEnumerable<int>(input);
 
             // Assert
-            Assert.IsTrue(items.Count() == 2);
+            Assert.AreEqual(2, items.Count());
             Assert.IsTrue(items.Contains(3));
         }
 
@@ -203,7 +203,7 @@ namespace Tests.Utils
             var items = StringUtils.AsEnumerable(input);
 
             // Assert
-            Assert.IsTrue(items.Count() == 3);
+            Assert.AreEqual(3, items.Count());
             Assert.IsTrue(items.Contains("3"));
         }
 
@@ -217,7 +217,23 @@ namespace Tests.Utils
             var result = input.AsSpan().ToPascalWord();
 
             // Assert
-            Assert.IsTrue(result.ToString() == "Hello");
+            Assert.AreEqual("Hello", result.ToString());
+        }
+
+        private static IEnumerable<TestCaseData> IsAnsiBulkTestData
+        {
+            get
+            {
+                yield return new TestCaseData("abc123", true);
+                yield return new TestCaseData("abc,;-$%", true);
+                yield return new TestCaseData("亿速ab", false);
+            }
+        }
+
+        [Test, TestCaseSource(nameof(IsAnsiBulkTestData))]
+        public void IsAnsi_Test(string input, bool isAnsi)
+        {
+            Assert.AreEqual(isAnsi, input.IsAnsi());
         }
     }
 }

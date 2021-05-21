@@ -43,7 +43,7 @@ namespace com.etsoo.SourceGenerators
                         continue;
 
                     // Is ansi, not unicode
-                    var isAnsi = attributeData?.GetValue<bool?>(isAnsiName) ?? false;
+                    var isAnsi = attributeData?.GetValue<bool?>(isAnsiName);
 
                     // Object field name
                     var fieldName = symbol.Name;

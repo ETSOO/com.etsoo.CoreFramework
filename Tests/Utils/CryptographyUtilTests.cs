@@ -68,7 +68,7 @@ namespace Tests.Utils
             var result = CryptographyUtils.CreateRandString(RandStringKind.Digit, 6);
 
             // Assert
-            Assert.IsTrue(result.Length == 6);
+            Assert.AreEqual(6, result.Length);
         }
 
         /// <summary>

@@ -37,7 +37,7 @@ namespace Tests.Utils
             var result = DatabaseUtils.TypeToDbType(type);
 
             // Assert
-            Assert.IsTrue(result == dbType, $"{type.Name} is not converted with {dbType}");
+            Assert.AreEqual(dbType, result, $"{type.Name} is not converted with {dbType}");
         }
     }
 }

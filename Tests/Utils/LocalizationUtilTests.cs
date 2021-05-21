@@ -17,7 +17,7 @@ namespace Tests.Utils
             var result = LocalizationUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.IsTrue(result.Kind == DateTimeKind.Utc);
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Tests.Utils
             var result = LocalizationUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.IsTrue(result.Kind == DateTimeKind.Local);
+            Assert.AreEqual(DateTimeKind.Local, result.Kind);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Tests.Utils
             var result = SqlServerUtils.DbTypeToSql(type);
 
             // Assert
-            Assert.IsTrue(result == sqlType, $"{type} is not converted with {sqlType}");
+            Assert.AreEqual(sqlType, result, $"{type} is not converted with {sqlType}");
         }
     }
 }
