@@ -3,7 +3,6 @@ using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System.Data.Common;
 using System.IO;
@@ -33,7 +32,7 @@ namespace Tests.Repositories
         {
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
-            var config = new AppConfiguration(new ConfigurationBuilder().Build().GetSection("test"), "test");
+            var config = new AppConfiguration("test");
             var app = new CoreApplication<SqliteConnection>(config, db);
 
             repo = new RepositoryBaseTest(app);

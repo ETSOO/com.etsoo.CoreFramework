@@ -2,7 +2,6 @@
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Database;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
@@ -41,7 +40,7 @@ namespace Tests.Repositories
         {
             var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
 
-            var config = new AppConfiguration(new ConfigurationBuilder().Build().GetSection("test"), "test");
+            var config = new AppConfiguration("test");
             var app = new CoreApplication<SqlConnection>(config, db);
 
             repo = new IntEntityRepository(app, "user");
