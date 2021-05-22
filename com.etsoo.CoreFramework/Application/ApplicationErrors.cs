@@ -107,6 +107,24 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError DeviceFrozen => new(nameof(DeviceFrozen), Resources.DeviceFrozen);
 
         /// <summary>
+        /// Invalid Action
+        /// 无效的操作
+        /// </summary>
+        public static ApplicationError InvalidAction => new(nameof(InvalidAction), Resources.InvalidAction);
+
+        /// <summary>
+        /// It is not a valid Email address
+        /// 不是有效的Email地址
+        /// </summary>
+        public static ApplicationError InvalidEmail => new(nameof(InvalidEmail), Resources.InvalidEmail);
+
+        /// <summary>
+        /// It is not a valid mobile phone number
+        /// 不是有效的手机号码
+        /// </summary>
+        public static ApplicationError InvalidMobile => new(nameof(InvalidMobile), Resources.InvalidMobile);
+
+        /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>
@@ -153,6 +171,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 用户名和密码不匹配错误
         /// </summary>
         public static ApplicationError NoUserMatch => new(nameof(NoUserMatch), Resources.NoUserMatch);
+
+        /// <summary>
+        /// No valid data is passed
+        /// 没有传递有效的数据
+        /// </summary>
+        public static ApplicationError NoValidData => new(nameof(NoValidData), Resources.NoValidData);
 
         /// <summary>
         /// The organization has been disabled
@@ -204,6 +228,9 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(DbConnectionFailed) => DbConnectionFailed,
                 nameof(DeviceDisabled) => DeviceDisabled,
                 nameof(DeviceFrozen) => DeviceFrozen,
+                nameof(InvalidAction) => InvalidAction,
+                nameof(InvalidEmail) => InvalidEmail,
+                nameof(InvalidMobile) => InvalidMobile,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,
@@ -212,6 +239,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(NoUserAgent) => NoUserAgent,
                 nameof(NoUserFound) => NoUserFound,
                 nameof(NoUserMatch) => NoUserMatch,
+                nameof(NoValidData) => NoValidData,
                 nameof(OrgDisabled) => OrgDisabled,
                 nameof(OrgExpired) => OrgExpired,
                 nameof(OutOfMemory) => OutOfMemory,

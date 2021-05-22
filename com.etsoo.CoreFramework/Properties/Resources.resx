@@ -147,6 +147,15 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>The device has been temporarily blocked until {0}</value>
   </data>
+  <data name="InvalidAction" xml:space="preserve">
+    <value>Invalid Action</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>It is not a valid Email address</value>
+  </data>
+  <data name="InvalidMobile" xml:space="preserve">
+    <value>It is not a valid mobile phone number</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
   </data>
@@ -170,6 +179,9 @@
   </data>
   <data name="NoUserMatch" xml:space="preserve">
     <value>User name and password do not match</value>
+  </data>
+  <data name="NoValidData" xml:space="preserve">
+    <value>No valid data is passed</value>
   </data>
   <data name="OrgDisabled" xml:space="preserve">
     <value>The organization has been disabled</value>

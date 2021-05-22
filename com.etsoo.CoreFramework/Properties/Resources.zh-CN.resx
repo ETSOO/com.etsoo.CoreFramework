@@ -147,6 +147,15 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>该设备已被暂时禁止使用至 {0}</value>
   </data>
+  <data name="InvalidAction" xml:space="preserve">
+    <value>无效的操作</value>
+  </data>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>不是有效的Email地址</value>
+  </data>
+  <data name="InvalidMobile" xml:space="preserve">
+    <value>不是有效的手机号码</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入组织</value>
   </data>
@@ -170,6 +179,9 @@
   </data>
   <data name="NoUserMatch" xml:space="preserve">
     <value>用户名和密码不匹配</value>
+  </data>
+  <data name="NoValidData" xml:space="preserve">
+    <value>没有传递有效的数据</value>
   </data>
   <data name="OrgDisabled" xml:space="preserve">
     <value>机构已被禁用</value>

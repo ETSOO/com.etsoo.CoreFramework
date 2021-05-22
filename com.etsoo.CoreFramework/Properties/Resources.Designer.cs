@@ -151,6 +151,33 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid Action.
+        /// </summary>
+        public static string InvalidAction {
+            get {
+                return ResourceManager.GetString("InvalidAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is not a valid Email address.
+        /// </summary>
+        public static string InvalidEmail {
+            get {
+                return ResourceManager.GetString("InvalidEmail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is not a valid mobile phone number.
+        /// </summary>
+        public static string InvalidMobile {
+            get {
+                return ResourceManager.GetString("InvalidMobile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Join Organization Required.
         /// </summary>
         public static string JoinOrgRequired {
@@ -219,6 +246,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string NoUserMatch {
             get {
                 return ResourceManager.GetString("NoUserMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No valid data is passed.
+        /// </summary>
+        public static string NoValidData {
+            get {
+                return ResourceManager.GetString("NoValidData", resourceCulture);
             }
         }
         
