@@ -57,10 +57,10 @@ namespace com.etsoo.Utils.Net.SMTP
         /// <param name="message">Message</param>
         protected virtual void FormatMessage(MimeMessage message)
         {
-            if (message.From.Count == 0 && message.Sender == null)
+            if (message.From.Count == 0)
             {
-                // Specify the sender
-                message.Sender = MailboxAddress.Parse(Settings.Sender ?? Settings.UserName);
+                // Should specify the from
+                message.From.Add(MailboxAddress.Parse(Settings.Sender ?? Settings.UserName));
             }
         }
 
