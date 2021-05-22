@@ -24,6 +24,20 @@ namespace com.etsoo.CoreFramework.Application
                 TraceId = traceId
             };
         }
+
+        /// <summary>
+        /// As AcionResult
+        /// 输出为操作结果
+        /// </summary>
+        /// <param name="traceId">Trace id</param>
+        /// <returns>Action result</returns>
+        public IActionResult AsResult(string traceId)
+        {
+            return new ActionResult(Type)
+            {
+                TraceId = traceId
+            };
+        }
     }
 
     /// <summary>

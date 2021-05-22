@@ -124,6 +124,16 @@ namespace com.etsoo.Utils.Actions
         }
 
         /// <summary>
+        /// Create a successful result
+        /// 创建一个成功的操作结果
+        /// </summary>
+        /// <returns></returns>
+        public static IActionResult OK => new ActionResult
+        {
+            Success = true
+        };
+
+        /// <summary>
         /// Successful or not result
         /// 是否为成功结果
         /// </summary>
