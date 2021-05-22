@@ -18,6 +18,12 @@ namespace com.etsoo.Utils.Actions
     /// </summary>
     public record ActionResult : IActionResult
     {
+        /// <summary>
+        /// Default type
+        /// 默认类型
+        /// </summary>
+        public const string DefaultType = "about:blank";
+
         private static Uri ParseType(string? type)
         {
             if (!string.IsNullOrEmpty(type) && Uri.TryCreate(type, UriKind.RelativeOrAbsolute, out var typeUri))
@@ -25,7 +31,7 @@ namespace com.etsoo.Utils.Actions
                 return typeUri;
             }
 
-            return new Uri("about:blank");
+            return new Uri(DefaultType);
         }
 
         /// <summary>
@@ -310,8 +316,12 @@ namespace com.etsoo.Utils.Actions
 
             if (options.IsWritable(false))
             {
-                var typeName = options.ConvertName("Type");
-                w.WriteString(typeName, Type.ToString());
+                var typeValue = Type.ToString();
+                if(typeValue != DefaultType)
+                {
+                    var typeName = options.ConvertName("Type");
+                    w.WriteString(typeName, typeValue);
+                }
             }
 
             if (options.IsWritable(Title == null))
