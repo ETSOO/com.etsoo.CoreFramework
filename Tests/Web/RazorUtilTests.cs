@@ -40,7 +40,7 @@ namespace Tests.Web
             };
 
             // Act
-            var result = (await RazorUtil.RenderAsync("test", template, model)).Trim();
+            var result = (await RazorUtils.RenderAsync("test", template, model)).Trim();
 
             // Assert
             Assert.IsTrue(result.Equals("<p>Hello, ETSOO</p><h1>Item 1</h1><h1>Item 2</h1>"), result);

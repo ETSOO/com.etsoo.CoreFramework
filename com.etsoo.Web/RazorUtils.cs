@@ -10,7 +10,7 @@ namespace com.etsoo.Web
     /// https://github.com/adoconnection/RazorEngineCore
     /// Razor工具类
     /// </summary>
-    public static class RazorUtil
+    public static class RazorUtils
     {
         private static readonly ConcurrentDictionary<string, IRazorEngineCompiledTemplate> templateCache = new();
 
@@ -21,7 +21,7 @@ namespace com.etsoo.Web
         /// <param name="templateFile">Template file</param>
         /// <param name="model">Data model</param>
         /// <returns>Result</returns>
-        public static async Task<string> RenderAsync(string templateFile, object? model = null)
+        public static async Task<string> RenderAsync<M>(string templateFile, M model)
         {
             var template = await File.ReadAllTextAsync(templateFile);
             return await RenderAsync(templateFile, template, model);
