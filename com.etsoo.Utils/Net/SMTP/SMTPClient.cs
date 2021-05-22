@@ -12,6 +12,17 @@ namespace com.etsoo.Utils.Net.SMTP
     /// </summary>
     public class SMTPClient : ISMTPClient
     {
+        private static SMTPClientSettings Parse(IConfigurationSection section)
+        {
+            return new SMTPClientSettings(
+                section.GetValue<string>("Host"),
+                section.GetValue("Port", 0),
+                section.GetValue("UseSsl", false),
+                section.GetValue<string?>("UserName"),
+                section.GetValue<string?>("Password")
+            );
+        }
+
         /// <summary>
         /// Settings
         /// 配置
@@ -33,8 +44,9 @@ namespace com.etsoo.Utils.Net.SMTP
         /// 构造函数
         /// </summary>
         /// <param name="section">Configuration section</param>
-        public SMTPClient(IConfigurationSection section) : this(section.Get<SMTPClientSettings>())
+        public SMTPClient(IConfigurationSection section) : this(Parse(section))
         {
+
         }
 
         /// <summary>

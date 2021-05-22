@@ -4,5 +4,5 @@
     /// SMTP client settings
     /// SMTP客户端配置
     /// </summary>
-    public record SMTPClientSettings(string Host, int Port, bool UseSsl, string? UserName, string? Password);
+    public record SMTPClientSettings(string Host, int Port, bool UseSsl, string? UserName = null, string? Password = null);
 }

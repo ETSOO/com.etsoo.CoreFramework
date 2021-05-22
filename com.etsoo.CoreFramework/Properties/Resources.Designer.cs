@@ -88,7 +88,7 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Code function has been disabled.
+        ///   Looks up a localized string similar to Code function has been temporarily disabled.
         /// </summary>
         public static string CodeFrozen {
             get {

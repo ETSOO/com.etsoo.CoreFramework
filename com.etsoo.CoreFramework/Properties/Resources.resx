@@ -127,7 +127,7 @@
     <value>Code Expired</value>
   </data>
   <data name="CodeFrozen" xml:space="preserve">
-    <value>Code function has been disabled</value>
+    <value>Code function has been temporarily disabled</value>
   </data>
   <data name="CodeSendingFailed" xml:space="preserve">
     <value>Failed to send the code</value>
