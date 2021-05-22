@@ -21,7 +21,6 @@ namespace Tests.Utils
                 Subject = "Hello from ETSOO",
                 Body = new TextPart(TextFormat.Html) { Text = "<h1>Hello, world!</h1>" }
             };
-            message.From.Add(MailboxAddress.Parse("info@etsoo.com"));
             message.To.Add(MailboxAddress.Parse("xz@etsoo.com"));
         }
 
@@ -29,7 +28,7 @@ namespace Tests.Utils
         public void EmailUtilSend_Test()
         {
             // Arrange
-            var client = new SMTPClient(new SMTPClientSettings("smtp.exmail.qq.com", 465, true, "info@etsoo.com", "***"));
+            var client = new SMTPClient(new SMTPClientSettings("smtp.exmail.qq.com", 465, true, "ETSOO <info@etsoo.com>", "info@etsoo.com", "***"));
 
             // Act
             var result = Assert.ThrowsAsync<AuthenticationException>(async () =>

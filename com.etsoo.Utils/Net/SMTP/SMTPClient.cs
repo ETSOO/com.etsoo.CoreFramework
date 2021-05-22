@@ -18,6 +18,7 @@ namespace com.etsoo.Utils.Net.SMTP
                 section.GetValue<string>("Host"),
                 section.GetValue("Port", 0),
                 section.GetValue("UseSsl", false),
+                section.GetValue<string?>("Sender"),
                 section.GetValue<string?>("UserName"),
                 section.GetValue<string?>("Password")
             );
@@ -50,6 +51,20 @@ namespace com.etsoo.Utils.Net.SMTP
         }
 
         /// <summary>
+        /// Format message
+        /// 格式化信息
+        /// </summary>
+        /// <param name="message">Message</param>
+        protected virtual void FormatMessage(MimeMessage message)
+        {
+            if (message.From.Count == 0 && message.Sender == null)
+            {
+                // Specify the sender
+                message.Sender = MailboxAddress.Parse(Settings.Sender ?? Settings.UserName);
+            }
+        }
+
+        /// <summary>
         /// Send email
         /// 发送电子邮件
         /// </summary>
@@ -58,6 +73,9 @@ namespace com.etsoo.Utils.Net.SMTP
         /// <returns>Task</returns>
         public virtual async Task SendAsync(MimeMessage message, CancellationToken token = default)
         {
+            // Format the message
+            FormatMessage(message);
+
             // Client
             using var client = new SmtpClient();
 
