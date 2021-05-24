@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.Database;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -39,6 +40,33 @@ namespace Tests.Utils
 
             // Assert
             Assert.AreEqual(sqlType, result, $"{type} is not converted with {sqlType}");
+        }
+
+        private static IEnumerable<TestCaseData> ToSqlDateTimeBulkTestData
+        {
+            get
+            {
+                yield return new TestCaseData("2009-04-03 15:41:27.370", 370);
+                yield return new TestCaseData("2009-04-03 15:41:27.371", 370);
+                yield return new TestCaseData("2009-04-03 15:41:27.372", 373);
+                yield return new TestCaseData("2009-04-03 15:41:27.373", 373);
+                yield return new TestCaseData("2009-04-03 15:41:27.374", 373);
+                yield return new TestCaseData("2009-04-03 15:41:27.375", 377);
+                yield return new TestCaseData("2009-04-03 15:41:27.376", 377);
+                yield return new TestCaseData("2009-04-03 15:41:27.377", 377);
+                yield return new TestCaseData("2009-04-03 15:41:27.378", 377);
+                yield return new TestCaseData("2009-04-03 15:41:27.379", 380);
+            }
+        }
+
+        [Test, TestCaseSource(nameof(ToSqlDateTimeBulkTestData))]
+        public void ToSqlDateTime_All_Test(string input, int milliseconds)
+        {
+            // Arrange & act
+            var date = DateTime.Parse(input).ToSqlDateTime();
+
+            // Assert
+            Assert.AreEqual(date.Millisecond, milliseconds, "No match for milliseconds");
         }
     }
 }

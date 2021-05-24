@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -116,6 +117,31 @@ namespace com.etsoo.Utils.Database
                 // Memory saving
                 yield return sdr;
             }
+        }
+
+        /// <summary>
+        /// Convert to SQL Server DateTime same accuracy
+        /// https://stackoverflow.com/questions/715432/why-is-sql-server-losing-a-millisecond
+        /// 转换为SQL Server DateTime 一样的精度
+        /// </summary>
+        /// <param name="input">Datetime</param>
+        /// <returns>Result</returns>
+        public static DateTime ToSqlDateTime(this DateTime input)
+        {
+            // First to 0.001 second
+            input = input.AddMilliseconds(-input.Millisecond / 10000);
+
+            // To 0.000, 0.003, 0.007
+            var m = input.Millisecond % 10;
+            if (m == 1 || m == 4 || m == 8)
+                input = input.AddMilliseconds(-1);
+            else if (m == 2 || m == 6 || m == 9)
+                input = input.AddMilliseconds(1);
+            else if (m == 5)
+                input = input.AddMilliseconds(2);
+
+            // Return
+            return input;
         }
     }
 }
