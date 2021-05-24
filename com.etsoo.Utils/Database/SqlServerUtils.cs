@@ -129,7 +129,7 @@ namespace com.etsoo.Utils.Database
         public static DateTime ToSqlDateTime(this DateTime input)
         {
             // First to 0.001 second
-            input = input.AddMilliseconds(-input.Millisecond / 10000);
+            input = input.AddTicks(-input.Ticks % 10000);
 
             // To 0.000, 0.003, 0.007
             var m = input.Millisecond % 10;
