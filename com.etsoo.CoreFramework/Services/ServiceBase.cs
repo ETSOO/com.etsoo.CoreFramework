@@ -58,12 +58,12 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
-        /// Get db exception result
-        /// 获取数据库异常结果
+        /// Log exception and return simple user result
+        /// 登记异常结果日志，并返回简介的用户结果
         /// </summary>
         /// <param name="ex">Exception</param>
         /// <returns>Result</returns>
-        protected IActionResult GetDbExceptionResult(Exception ex)
+        protected IActionResult LogException(Exception ex)
         {
             // Get the Db connection failure result
             var exResult = App.DB.GetExceptionResult(ex);
