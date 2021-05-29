@@ -71,19 +71,31 @@ namespace com.etsoo.CoreFramework.Services
             // Transform
             var result = exResult.Type switch
             {
-                DbExceptionType.OutOfMemory       => ApplicationErrors.OutOfMemory.AsResult(),
-                DbExceptionType.ConnectionFailed  => ApplicationErrors.DbConnectionFailed.AsResult(),
-                _                                 => ApplicationErrors.DataProcessingFailed.AsResult()
+                DbExceptionType.OutOfMemory => ApplicationErrors.OutOfMemory.AsResult(),
+                DbExceptionType.ConnectionFailed => ApplicationErrors.DbConnectionFailed.AsResult(),
+                _ => ApplicationErrors.DataProcessingFailed.AsResult()
             };
 
             // Log the exception
-            if (exResult.Critical)
-                Logger.LogCritical(ex, result.Title);
-            else
-                Logger.LogError(ex, result.Title);
+            LogException(ex, result.Title!, exResult.Critical);
 
             // Return
             return result;
+        }
+
+        /// <summary>
+        /// Log exception
+        /// 登记异常日志
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <param name="title">Title</param>
+        /// <param name="critical">Is critical</param>
+        protected void LogException(Exception ex, string title, bool critical = false)
+        {
+            if (critical)
+                Logger.LogCritical(ex, title);
+            else
+                Logger.LogError(ex, title);
         }
     }
 }
