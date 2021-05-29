@@ -302,5 +302,14 @@ namespace com.etsoo.CoreFramework.Properties {
                 return ResourceManager.GetString("UserFrozen", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Username is already registered.
+        /// </summary>
+        public static string UserRegistered {
+            get {
+                return ResourceManager.GetString("UserRegistered", resourceCulture);
+            }
+        }
     }
 }

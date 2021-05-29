@@ -198,4 +198,7 @@
   <data name="UserFrozen" xml:space="preserve">
     <value>您的帐户已被暂时禁止使用至 {0}</value>
   </data>
+  <data name="UserRegistered" xml:space="preserve">
+    <value>用户名已注册</value>
+  </data>
 </root>

@@ -209,6 +209,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError UserFrozen => new(nameof(UserFrozen), Resources.UserFrozen);
 
         /// <summary>
+        /// Username is already registered
+        /// 用户名已注册
+        /// </summary>
+        public static ApplicationError UserRegistered => new(nameof(UserRegistered), Resources.UserRegistered);
+
+        /// <summary>
         /// Get error with name
         /// 从名称获取错误
         /// </summary>
@@ -245,6 +251,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(OutOfMemory) => OutOfMemory,
                 nameof(TokenExpired) => TokenExpired,
                 nameof(UserFrozen) => UserFrozen,
+                nameof(UserRegistered) => UserRegistered,
                 _ => null
             };
         }

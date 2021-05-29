@@ -198,4 +198,7 @@
   <data name="UserFrozen" xml:space="preserve">
     <value>Your account has been temporarily blocked until {0}</value>
   </data>
+  <data name="UserRegistered" xml:space="preserve">
+    <value>Username is already registered</value>
+  </data>
 </root>
