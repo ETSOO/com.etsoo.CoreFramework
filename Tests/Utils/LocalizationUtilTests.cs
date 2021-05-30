@@ -32,5 +32,17 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual(DateTimeKind.Local, result.Kind);
         }
+
+        [Test]
+        public void GetTimeZone_Test()
+        {
+            // Correct
+            var tz = LocalizationUtils.GetTimeZone("New Zealand Standard Time");
+            Assert.AreEqual("新西兰标准时间", tz.StandardName);
+
+            // Wrong
+            tz = LocalizationUtils.GetTimeZone("China Time");
+            Assert.AreEqual(TimeZoneInfo.Local, tz);
+        }
     }
 }
