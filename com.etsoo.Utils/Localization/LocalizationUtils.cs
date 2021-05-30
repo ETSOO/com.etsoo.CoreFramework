@@ -77,15 +77,24 @@ namespace com.etsoo.Utils.Localization
         /// <returns>Local datetime</returns>
         public static DateTime UtcToLocal(this DateTime input, string? timeZone)
         {
+            return input.UtcToLocal(GetTimeZone(timeZone));
+        }
+
+        /// <summary>
+        /// Utc datetime to local
+        /// UTC时间转换为本地时间
+        /// </summary>
+        /// <param name="input">Input Utc datetime</param>
+        /// <param name="timeZone">Target local time zone</param>
+        /// <returns>Local datetime</returns>
+        public static DateTime UtcToLocal(this DateTime input, TimeZoneInfo timeZone)
+        {
             // Ignore local
             if (input.Kind == DateTimeKind.Local)
                 return input;
 
-            // Time zone
-            var tz = GetTimeZone(timeZone);
-
             // Convert
-            return TimeZoneInfo.ConvertTimeFromUtc(input, tz);
+            return TimeZoneInfo.ConvertTimeFromUtc(input, timeZone);
         }
     }
 }
