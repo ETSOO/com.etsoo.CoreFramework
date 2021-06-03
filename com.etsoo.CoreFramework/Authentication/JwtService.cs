@@ -54,27 +54,24 @@ namespace com.etsoo.CoreFramework.Authentication
 
         private byte[] MakeRefreshTokenKey()
         {
-            // Length bytes
+            // Length
             var sLen = securityKeyBytes.Length;
-            var intBytes = BitConverter.GetBytes(sLen);
-            var intLen = intBytes.Length;
 
             // New bytes
-            var bLen = intLen + sLen;
-            var bytes = new byte[bLen];
+            var bytes = new byte[sLen + 1];
+            bytes[0] = BitConverter.GetBytes(sLen)[0];
 
             // Copy
-            intBytes.CopyTo(bytes, 0);
-            securityKeyBytes.CopyTo(bytes, intLen);
+            securityKeyBytes.CopyTo(bytes, 1);
 
             // Change 8, 16, 32, 64, 128 position bytes
             var posItems = new byte[] { 8, 16, 32, 64, 128 };
-            foreach(var pos in posItems)
+            foreach (var pos in posItems)
             {
-                if (pos >= bLen)
+                if (pos > sLen)
                     break;
 
-                bytes[pos] &= 2;
+                bytes[pos] &= pos;
             }
 
             return bytes;
