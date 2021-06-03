@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
+using System.Security.Claims;
 using System.Text;
 
 namespace com.etsoo.CoreFramework.Authentication
@@ -19,9 +19,13 @@ namespace com.etsoo.CoreFramework.Authentication
     {
         readonly string securityAlgorithms;
         readonly byte[] securityKeyBytes;
+        readonly byte[] securityKeyBytesFK;
 
         readonly string issuer;
         readonly string audience;
+
+        private const string refreshTokenAudience = "RefreshToken";
+        readonly TokenValidationParameters refreshTokenParameters;
 
         /// <summary>
         /// Access token expiration minutes
@@ -30,10 +34,10 @@ namespace com.etsoo.CoreFramework.Authentication
         public int AccessTokenMinutes { get; }
 
         /// <summary>
-        /// Refresh token expiration hours
-        /// 刷新令牌到期时间（小时）
+        /// Refresh token expiration days
+        /// 刷新令牌到期时间（天）
         /// </summary>
-        public int RefreshTokenHours { get; }
+        public int RefreshTokenDays { get; }
 
         /// <summary>
         /// Constructor
@@ -46,6 +50,34 @@ namespace com.etsoo.CoreFramework.Authentication
         public JwtService(IServiceCollection services, bool sslOnly, IConfigurationSection section, string securityKey)
             : this(services, sslOnly, section, Encoding.UTF8.GetBytes(securityKey))
         {
+        }
+
+        private byte[] MakeRefreshTokenKey()
+        {
+            // Length bytes
+            var sLen = securityKeyBytes.Length;
+            var intBytes = BitConverter.GetBytes(sLen);
+            var intLen = intBytes.Length;
+
+            // New bytes
+            var bLen = intLen + sLen;
+            var bytes = new byte[bLen];
+
+            // Copy
+            intBytes.CopyTo(bytes, 0);
+            securityKeyBytes.CopyTo(bytes, intLen);
+
+            // Change 8, 16, 32, 64, 128 position bytes
+            var posItems = new byte[] { 8, 16, 32, 64, 128 };
+            foreach(var pos in posItems)
+            {
+                if (pos >= bLen)
+                    break;
+
+                bytes[pos] &= 2;
+            }
+
+            return bytes;
         }
 
         /// <summary>
@@ -63,12 +95,68 @@ namespace com.etsoo.CoreFramework.Authentication
                 throw new ArgumentNullException(nameof(section));
 
             securityKeyBytes = keyBytes;
+
+            // Calculate a different security key bytes
+            securityKeyBytesFK = MakeRefreshTokenKey();
+
             securityAlgorithms = section.GetValue("SecurityAlgorithms", SecurityAlgorithms.HmacSha512);
+
             issuer = section.GetValue("Issuer", "SmartERP");
-            audience = section.GetValue("Audience", "all");
+            audience = section.GetValue("Audience", "access");
+
+            var validIssuer = section.GetValue<string>("ValidIssuer");
+            var validIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>>();
+            if (string.IsNullOrEmpty(validIssuer) && validIssuers == null)
+            {
+                validIssuer = issuer;
+            }
+
+            var validAudience = section.GetValue<string>("ValidAudience");
+            var validAudiences = section.GetSection("ValidAudiences").Get<IEnumerable<string>>();
+            if (string.IsNullOrEmpty(validAudience) && validAudiences == null)
+            {
+                validAudience = audience;
+            }
 
             AccessTokenMinutes = section.GetValue("AccessTokenMinutes", 15);
-            RefreshTokenHours = section.GetValue("RefreshTokenHours", 360); // 15 days x 24 = 360
+            RefreshTokenDays = section.GetValue("RefreshTokenDays", 90);
+
+            var parameters = new TokenValidationParameters
+            {
+                RequireSignedTokens = true,
+                RequireExpirationTime = true,
+                RequireAudience = true,
+
+                IssuerSigningKey = new SymmetricSecurityKey(securityKeyBytes),
+
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidAudience = validAudience,
+                ValidAudiences = validAudiences,
+                ValidIssuer = validIssuer,
+                ValidIssuers = validIssuers
+            };
+
+            refreshTokenParameters = new TokenValidationParameters
+            {
+                RequireSignedTokens = true,
+                RequireExpirationTime = true,
+                RequireAudience = true,
+
+                IssuerSigningKey = new SymmetricSecurityKey(securityKeyBytesFK),
+
+                ValidateLifetime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidAudience = refreshTokenAudience,
+                ValidIssuer = validIssuer,
+                ValidIssuers = validIssuers
+            };
 
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -81,24 +169,7 @@ namespace com.etsoo.CoreFramework.Authentication
                 options.SaveToken = true;
 
                 // Token validation parameters
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    RequireSignedTokens = true,
-                    RequireExpirationTime = true,
-                    RequireAudience = true,
-
-                    IssuerSigningKey = new SymmetricSecurityKey(securityKeyBytes),
-
-                    ValidateLifetime = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-
-                    ValidAudience = section.GetValue<string>("ValidAudience"),
-                    ValidAudiences = section.GetSection("ValidAudiences").Get<IEnumerable<string>>(),
-                    ValidIssuer = section.GetValue<string>("ValidIssuer"),
-                    ValidIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>>()
-                };
+                options.TokenValidationParameters = parameters;
             });
         }
 
@@ -106,10 +177,9 @@ namespace com.etsoo.CoreFramework.Authentication
         /// Create token
         /// 创建令牌
         /// </summary>
-        /// <param name="user">User</param>
-        /// <param name="liveSpan">Live time span</param>
+        /// <param name="action">Action</param>
         /// <returns>Token</returns>
-        public string CreateToken(ICurrentUser user, TimeSpan liveSpan)
+        public string CreateToken(AuthAction action)
         {
             // Token handler
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -118,20 +188,20 @@ namespace com.etsoo.CoreFramework.Authentication
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 // User identity
-                Subject = user.CreateIdentity(),
+                Subject = action.User.CreateIdentity(),
 
                 // TimeSpan.FromMinutes or TimeSpan.FromDays
-                Expires = DateTime.UtcNow.AddTicks(liveSpan.Ticks),
+                Expires = DateTime.UtcNow.AddTicks(action.LiveSpan.Ticks),
 
                 // Issuer
                 Issuer = issuer,
 
                 // Audience
-                Audience = audience,
+                Audience = action.Audience,
 
                 // JWE vs JWS
                 // https://stackoverflow.com/questions/33589353/what-are-the-pros-cons-of-using-jwe-or-jws
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(securityKeyBytes), securityAlgorithms)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(action.SecurityKeyBytes), securityAlgorithms)
             };
 
             // Create the token
@@ -146,20 +216,45 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Token</returns>
         public string CreateAccessToken(ICurrentUser user)
         {
-            return CreateToken(user, TimeSpan.FromMinutes(AccessTokenMinutes));
+            return CreateToken(new AuthAction(user, audience, TimeSpan.FromMinutes(AccessTokenMinutes), securityKeyBytes));
         }
 
         /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
+        /// <param name="user">User</param>
         /// <returns>Token</returns>
-        public string CreateRefreshToken()
+        public string CreateRefreshToken(ICurrentUser user)
         {
+            /*
+            /* This method just like a random password
             Span<byte> randomNumber = new byte[32];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+            */
+
+            return CreateToken(new AuthAction(user, refreshTokenAudience, TimeSpan.FromDays(RefreshTokenDays), securityKeyBytesFK));
+        }
+
+        /// <summary>
+        /// Validate refresh token
+        /// 验证刷新令牌
+        /// </summary>
+        /// <param name="token">Token</param>
+        /// <returns>Claims</returns>
+        public ClaimsPrincipal? ValidateRefreshToken(string token)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                return handler.ValidateToken(token, refreshTokenParameters, out _);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

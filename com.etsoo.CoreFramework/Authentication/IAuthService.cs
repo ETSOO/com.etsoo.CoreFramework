@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.User;
-using System;
-using System.Net;
+using System.Security.Claims;
 
 namespace com.etsoo.CoreFramework.Authentication
 {
@@ -17,19 +16,18 @@ namespace com.etsoo.CoreFramework.Authentication
         int AccessTokenMinutes { get; }
 
         /// <summary>
-        /// Refresh token expiration hours
-        /// 刷新令牌到期时间（小时）
+        /// Refresh token expiration days
+        /// 刷新令牌到期时间（天）
         /// </summary>
-        int RefreshTokenHours { get; }
+        int RefreshTokenDays { get; }
 
         /// <summary>
         /// Create token
         /// 创建令牌
         /// </summary>
-        /// <param name="user">User</param>
-        /// <param name="liveSpan">Live time span</param>
+        /// <param name="action">Action</param>
         /// <returns>Token</returns>
-        string CreateToken(ICurrentUser user, TimeSpan liveSpan);
+        public string CreateToken(AuthAction action);
 
         /// <summary>
         /// Create access token
@@ -43,7 +41,16 @@ namespace com.etsoo.CoreFramework.Authentication
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
+        /// <param name="user">User</param>
         /// <returns>Token</returns>
-        string CreateRefreshToken();
+        string CreateRefreshToken(ICurrentUser user);
+
+        /// <summary>
+        /// Validate refresh token
+        /// 验证刷新令牌
+        /// </summary>
+        /// <param name="token">Token</param>
+        /// <returns>Claims</returns>
+        ClaimsPrincipal? ValidateRefreshToken(string token);
     }
 }
