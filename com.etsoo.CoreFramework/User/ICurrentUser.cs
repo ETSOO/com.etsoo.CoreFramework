@@ -52,7 +52,7 @@ namespace com.etsoo.CoreFramework.User
         /// Client IP address
         /// 客户端IP地址
         /// </summary>
-        IPAddress? ClientIp { get; }
+        IPAddress ClientIp { get; }
 
         /// <summary>
         /// Language
