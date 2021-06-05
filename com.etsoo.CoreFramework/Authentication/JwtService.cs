@@ -145,7 +145,9 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 IssuerSigningKey = new SymmetricSecurityKey(securityKeyBytesFK),
 
-                ValidateLifetime = true,
+                // In order to valid additional data
+                ValidateLifetime = false,
+
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
@@ -231,7 +233,6 @@ namespace com.etsoo.CoreFramework.Authentication
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
             */
-
             return CreateToken(new AuthAction(user, refreshTokenAudience, TimeSpan.FromDays(RefreshTokenDays), securityKeyBytesFK));
         }
 
@@ -240,16 +241,22 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 验证刷新令牌
         /// </summary>
         /// <param name="token">Token</param>
+        /// <param name="expired">Expired or not</param>
         /// <returns>Claims</returns>
-        public ClaimsPrincipal? ValidateRefreshToken(string token)
+        public ClaimsPrincipal? ValidateRefreshToken(string token, out bool expired)
         {
             try
             {
                 var handler = new JwtSecurityTokenHandler();
-                return handler.ValidateToken(token, refreshTokenParameters, out _);
+                var claims = handler.ValidateToken(token, refreshTokenParameters, out var validatedToken);
+
+                expired = (validatedToken.ValidTo < DateTime.UtcNow);
+
+                return claims;
             }
             catch
             {
+                expired = true;
                 return null;
             }
         }

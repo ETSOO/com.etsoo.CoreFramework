@@ -50,7 +50,8 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 验证刷新令牌
         /// </summary>
         /// <param name="token">Token</param>
+        /// <param name="expired">Expired or not</param>
         /// <returns>Claims</returns>
-        ClaimsPrincipal? ValidateRefreshToken(string token);
+        ClaimsPrincipal? ValidateRefreshToken(string token, out bool expired);
     }
 }

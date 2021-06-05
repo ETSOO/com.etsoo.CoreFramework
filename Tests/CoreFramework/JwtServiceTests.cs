@@ -1,7 +1,5 @@
-﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.CoreFramework.Authentication;
+﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.CoreFramework.User;
-using com.etsoo.Utils.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -40,8 +38,6 @@ namespace Tests.CoreFramework
             // Act
             var token = service.CreateAccessToken(user);
 
-            var t = service.CreateRefreshToken(user);
-
             // Assert
             Assert.AreEqual(3, token.Split('.').Length);
         }
@@ -50,13 +46,14 @@ namespace Tests.CoreFramework
         public void ValidateToken_Tests()
         {
             // Arrange
-            var token = "1eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkV0c29vIiwibmFtZWlkIjoiMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2xvY2FsaXR5IjoiemgtQ04iLCJyb2xlIjoiQWRtaW4iLCJpcGFkZHJlc3MiOiIxMjcuMC4wLjEiLCJuYmYiOjE2MjI3MTk1OTgsImV4cCI6MTYyNDAxNTU5OCwiaWF0IjoxNjIyNzE5NTk4LCJpc3MiOiJldHNvbyIsImF1ZCI6IlJlZnJlc2hUb2tlbiJ9.Wdp-CQ-8R6c_s80IW8vkeDSYuxZ57Ue18_XDeoB-10EsMzbl2wIN8bTF2a8q1qTcB8nGNTj1NsChS4mrqNwcpw";
+            var token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkV0c29vIiwibmFtZWlkIjoiMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2xvY2FsaXR5IjoiemgtQ04iLCJyb2xlIjoiQWRtaW4iLCJpcGFkZHJlc3MiOiIxMjcuMC4wLjEiLCJuYmYiOjE2MjI4NzIzOTIsImV4cCI6MTYyMjg3MjM5MywiaWF0IjoxNjIyODcyMzkyLCJpc3MiOiJldHNvbyIsImF1ZCI6IlJlZnJlc2hUb2tlbiJ9.TYIba_fU9wamEHCv7UJu9V8hEN1zoMkq8UW70oy7hNNSbjrUkb-kMwn3JFh7akM7ceOBnaGoDRp4jqluvrVzNQ";
 
             // Act
-            var result = service.ValidateRefreshToken(token);
+            var result = service.ValidateRefreshToken(token, out var expired);
 
             // Assert
-            Assert.IsNull(result);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(true, expired);
         }
     }
 }
