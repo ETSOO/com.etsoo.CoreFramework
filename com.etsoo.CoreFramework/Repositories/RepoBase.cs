@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
-using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using com.etsoo.Utils.Serialization;
@@ -22,7 +21,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 基础仓库
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public abstract class RepositoryBase<C> : IRepositoryBase where C : DbConnection
+    public abstract class RepoBase<C> : IRepoBase where C : DbConnection
     {
         /// <summary>
         /// Application
@@ -31,17 +30,11 @@ namespace com.etsoo.CoreFramework.Repositories
         virtual protected ICoreApplication<C> App { get; }
 
         /// <summary>
-        /// Current user
-        /// 当前用户
-        /// </summary>
-        virtual protected ICurrentUser? User { get; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        public RepositoryBase(ICoreApplication<C> app, ICurrentUser? user) => (App, User) = (app, user);
+        public RepoBase(ICoreApplication<C> app) => (App) = (app);
 
         /// <summary>
         /// Create command, default parameters added
@@ -81,7 +74,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="parameters">Parameters</param>
         /// <returns>Result</returns>
-        protected object? FormatParameters(object? parameters)
+        virtual protected object? FormatParameters(object? parameters)
         {
             if (parameters == null)
                 return null;
@@ -98,7 +91,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (parameters is IModelParameters p)
             {
-                return p.AsParameters(App, User);
+                return p.AsParameters(App);
             }
 
             return parameters;

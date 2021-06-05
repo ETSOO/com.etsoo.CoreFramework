@@ -10,7 +10,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// Base repository interface
     /// 基础仓库接口
     /// </summary>
-    public interface IRepositoryBase
+    public interface IRepoBase
     {
         /// <summary>
         /// Query command as action result

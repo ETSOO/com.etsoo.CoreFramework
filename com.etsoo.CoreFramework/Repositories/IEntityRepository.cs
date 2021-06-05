@@ -11,7 +11,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// Entity repository interface for CURD(Create, Update, Read, Delete)
     /// 实体仓库接口，实现增删改查
     /// </summary>
-    public interface IEntityRepository<T> : IRepositoryBase where T : struct, IComparable
+    public interface IEntityRepository<T> : ILoginedRepoBase where T : struct, IComparable
     {
         /// <summary>
         /// Create entity

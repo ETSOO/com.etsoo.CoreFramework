@@ -20,9 +20,9 @@ namespace Tests.Repositories
         /// <summary>
         /// Repository base
         /// </summary>
-        private class RepositoryBaseTest : RepositoryBase<SqliteConnection>
+        private class RepositoryBaseTest : RepoBase<SqliteConnection>
         {
-            public RepositoryBaseTest(ICoreApplication<SqliteConnection> app) : base(app, null) { }
+            public RepositoryBaseTest(ICoreApplication<SqliteConnection> app) : base(app) { }
         }
 
         readonly SqliteDatabase db;

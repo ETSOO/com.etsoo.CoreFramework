@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using Microsoft.Extensions.Logging;
@@ -15,19 +14,13 @@ namespace com.etsoo.CoreFramework.Services
     /// </summary>
     public abstract class ServiceBase<C, R>
         where C : DbConnection
-        where R : IRepositoryBase
+        where R : IRepoBase
     {
         /// <summary>
         /// Application
         /// 程序对象
         /// </summary>
         virtual protected ICoreApplication<C> App { get; }
-
-        /// <summary>
-        /// Current user
-        /// 当前用户
-        /// </summary>
-        virtual protected ICurrentUser? User { get; }
 
         /// <summary>
         /// Logger
@@ -46,15 +39,13 @@ namespace com.etsoo.CoreFramework.Services
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public ServiceBase(ICoreApplication<C> app, ICurrentUser? user, R repo, ILogger logger)
+        public ServiceBase(ICoreApplication<C> app, R repo, ILogger logger)
         {
-            this.App = app;
-            this.User = user;
-            this.Repo = repo;
-            this.Logger = logger;
+            App = app;
+            Repo = repo;
+            Logger = logger;
         }
 
         /// <summary>
