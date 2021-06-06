@@ -165,6 +165,9 @@
   <data name="NoDataReturned" xml:space="preserve">
     <value>没有返回任何数据</value>
   </data>
+  <data name="NoDeviceMatch" xml:space="preserve">
+    <value>没有找到匹配的设备</value>
+  </data>
   <data name="NoId" xml:space="preserve">
     <value>传递的编号不存在</value>
   </data>

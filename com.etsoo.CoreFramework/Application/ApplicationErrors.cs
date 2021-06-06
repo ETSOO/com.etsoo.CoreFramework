@@ -143,6 +143,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError NoDataReturned => new(nameof(NoDataReturned), Resources.NoDataReturned);
 
         /// <summary>
+        /// No Device Matched
+        /// 没有找到匹配的设备
+        /// </summary>
+        public static ApplicationError NoDeviceMatch => new(nameof(NoDeviceMatch), Resources.NoDeviceMatch);
+
+        /// <summary>
         /// The passed ID does not exist
         /// 传递的编号不存在
         /// </summary>
@@ -240,6 +246,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,
+                nameof(NoDeviceMatch) => NoDeviceMatch,
                 nameof(NoId) => NoId,
                 nameof(NoOrgJoined) => NoOrgJoined,
                 nameof(NoUserAgent) => NoUserAgent,

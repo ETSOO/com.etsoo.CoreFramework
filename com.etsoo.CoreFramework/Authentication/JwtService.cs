@@ -165,7 +165,7 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // Useful forwarding the JWT in an outgoing request
                 // https://stackoverflow.com/questions/57057749/what-is-the-purpose-of-jwtbeareroptions-savetoken-property-in-asp-net-core-2-0
-                options.SaveToken = true;
+                options.SaveToken = false;
 
                 // Token validation parameters
                 options.TokenValidationParameters = parameters;

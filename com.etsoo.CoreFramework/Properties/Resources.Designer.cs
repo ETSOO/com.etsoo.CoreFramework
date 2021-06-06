@@ -205,6 +205,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Device Matched.
+        /// </summary>
+        public static string NoDeviceMatch {
+            get {
+                return ResourceManager.GetString("NoDeviceMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The passed ID does not exist.
         /// </summary>
         public static string NoId {
