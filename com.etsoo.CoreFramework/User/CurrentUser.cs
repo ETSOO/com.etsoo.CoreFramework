@@ -11,7 +11,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser(string Id, string Name, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
+    public record CurrentUser(string Id, string Name, string? Avatar, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
     {
         /// <summary>
         /// Int type id
@@ -40,6 +40,7 @@ namespace com.etsoo.CoreFramework.User
 
             // Claims
             var name = user.FindFirstValue(ClaimTypes.Name);
+            var avatar = user.FindFirstValue(AvatarClaim);
             var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var language = user.FindFirstValue(ClaimTypes.Locality);
             var role = user.FindFirstValue(ClaimTypes.Role);
@@ -53,7 +54,7 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, roles, ipAddress, new CultureInfo(language), connectionId);
+            return new CurrentUser(id, name, avatar, roles, ipAddress, new CultureInfo(language), connectionId);
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, roles, ip, language, null);
+            return new CurrentUser(id, name, data.Get("Avatar"), roles, ip, language, null);
         }
 
         /// <summary>
@@ -89,19 +90,25 @@ namespace com.etsoo.CoreFramework.User
         public const string IPAddressClaim = "ipaddress";
 
         /// <summary>
+        /// Avatar claim type
+        /// 头像声明类型
+        /// </summary>
+        public const string AvatarClaim = "avatar";
+
+        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
         public virtual IEnumerable<Claim> CreateClaims()
         {
-            return new Claim[] {
-                new (ClaimTypes.Name, Name),
-                new (ClaimTypes.NameIdentifier, Id),
-                new (ClaimTypes.Locality, Language.Name),
-                new (ClaimTypes.Role, string.Join(',', Roles)),
-                new (IPAddressClaim, ClientIp.ToString())
-            };
+            yield return new(ClaimTypes.Name, Name);
+            yield return new(ClaimTypes.NameIdentifier, Id);
+            yield return new(ClaimTypes.Locality, Language.Name);
+            yield return new(ClaimTypes.Role, string.Join(',', Roles));
+            yield return new(IPAddressClaim, ClientIp.ToString());
+            if (Avatar != null)
+                yield return new(AvatarClaim, Avatar);
         }
 
         /// <summary>

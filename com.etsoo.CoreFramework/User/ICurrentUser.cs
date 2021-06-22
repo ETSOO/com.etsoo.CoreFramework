@@ -25,6 +25,12 @@ namespace com.etsoo.CoreFramework.User
         string Name { get; }
 
         /// <summary>
+        /// Avatar
+        /// 头像
+        /// </summary>
+        string? Avatar { get; }
+
+        /// <summary>
         /// Id
         /// 编号
         /// </summary>
