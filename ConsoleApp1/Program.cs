@@ -1,9 +1,13 @@
 ﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Properties;
+using com.etsoo.Utils.Image;
 using com.etsoo.Utils.Localization;
 using com.etsoo.Utils.MessageQueue;
 using RabbitMQ.Client;
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,14 +26,17 @@ namespace ConsoleApp1
         static async Task Main(string[] args)
         {
             //await Task.CompletedTask;
-            Resources.Culture = LocalizationUtils.SetCulture("zh-CN");
-            Console.WriteLine(Resources.ResourceManager.GetString("NoUserFound"));
-
-            Resources.Culture = LocalizationUtils.SetCulture("en-US");
-            Console.WriteLine(Resources.NoUserFound);
-
             //PRCParallelCalls();
             //await RPCCallsAsync();
+
+            using var bm = new Bitmap("D:\\Personal\\xzrect.jpg");
+            using var resized = ImageUtils.Resize(bm, new Size(400, 300), false);
+            if (resized != null)
+                ImageUtils.SaveImage(resized, "D:\\Personal\\xzrect2.jpg");
+
+            Console.WriteLine("Done");
+
+            Console.Read();
         }
 
         static void PRCParallelCalls()

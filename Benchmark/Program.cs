@@ -1,6 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using com.etsoo.Utils.Actions;
-using com.etsoo.Utils.Serialization;
 
 namespace Benchmark
 {
@@ -10,8 +8,8 @@ namespace Benchmark
         {
             // BenchmarkRunner.Run<Utils.StringKeyDictionaryBM>();
             // BenchmarkRunner.Run<Utils.JsonSerializationBM>();
-            BenchmarkRunner.Run<Utils.ActionResultSerializationBM>();
-            //BenchmarkRunner.Run<Utils.DictionaryDeserializationBM>();
+            // BenchmarkRunner.Run<Utils.ActionResultSerializationBM>();
+            // BenchmarkRunner.Run<Utils.DictionaryDeserializationBM>();
         }
     }
 }
