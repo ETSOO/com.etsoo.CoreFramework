@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -59,25 +60,49 @@ namespace com.etsoo.Utils.Storage
         }
 
         /// <summary>
-        /// Delete file
-        /// 删除文件
+        /// Async delete file
+        /// 异步删除文件
         /// </summary>
         /// <param name="path">Path</param>
-        public void Delete(string path)
+        public async ValueTask DeleteAsync(string path)
         {
             var fi = GetFileInfo(path);
             if (fi.Exists)
-                fi.Delete();
+            {
+                await Task.Run(() =>
+                {
+                    fi.Delete();
+                });
+            }
         }
 
         /// <summary>
-        /// Get write stream
-        /// 获取写入流
+        /// Async delete url file
+        /// 异步删除URL文件
+        /// </summary>
+        /// <param name="url">URL</param>
+        public async ValueTask DeleteUrlAsync(string url)
+        {
+            var pos = url.IndexOf(URLRoot, StringComparison.OrdinalIgnoreCase);
+            if (pos != -1)
+            {
+                var path = url[URLRoot.Length..];
+                pos = path.IndexOf('?');
+                if (pos != -1)
+                    path = path[0..pos];
+
+                await DeleteAsync(path);
+            }
+        }
+
+        /// <summary>
+        /// Async get write stream
+        /// 异步获取写入流
         /// </summary>
         /// <param name="path">Path</param>
         /// <param name="writeCase">Write case</param>
         /// <returns>Stream</returns>
-        public Stream? GetWriteStream(string path, WriteCase writeCase = WriteCase.CreateNew)
+        public async ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew)
         {
             var fi = GetFileInfo(path);
             if (
@@ -102,7 +127,10 @@ namespace com.etsoo.Utils.Storage
             }
 
             // Current file stream
-            return fi.Exists ? fi.OpenWrite() : fi.Create();
+            return await Task.Run(() =>
+            {
+                return fi.Exists ? fi.OpenWrite() : fi.Create();
+            });
         }
 
         /// <summary>
@@ -117,19 +145,22 @@ namespace com.etsoo.Utils.Storage
         }
 
         /// <summary>
-        /// Read file
-        /// 读文件
+        /// Async read file
+        /// 异步读文件
         /// </summary>
         /// <param name="path">Path</param>
         /// <returns>Stream</returns>
-        public Stream? Read(string path)
+        public async ValueTask<Stream?> ReadAsync(string path)
         {
             var fi = GetFileInfo(path);
             if (!fi.Exists)
                 return null;
 
-            // Returns a read-only FileStream object with the FileShare mode set to Read
-            return fi.OpenRead();
+            return await Task.Run(() =>
+            {
+                // Returns a read-only FileStream object with the FileShare mode set to Read
+                return fi.OpenRead();
+            });
         }
 
         /// <summary>

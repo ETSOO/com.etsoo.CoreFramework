@@ -10,20 +10,27 @@ namespace com.etsoo.Utils.Storage
     public interface IStorage
     {
         /// <summary>
-        /// Delete file
-        /// 删除文件
+        /// Async delete file
+        /// 异步删除文件
         /// </summary>
         /// <param name="path">Path</param>
-        void Delete(string path);
+        ValueTask DeleteAsync(string path);
 
         /// <summary>
-        /// Get write stream
-        /// 获取写入流
+        /// Async delete url file
+        /// 异步删除URL文件
+        /// </summary>
+        /// <param name="url">URL</param>
+        ValueTask DeleteUrlAsync(string url);
+
+        /// <summary>
+        /// Async get write stream
+        /// 异步获取写入流
         /// </summary>
         /// <param name="path">Path</param>
         /// <param name="writeCase">Write case</param>
         /// <returns>Stream</returns>
-        Stream? GetWriteStream(string path, WriteCase writeCase = WriteCase.CreateNew);
+        ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew);
 
         /// <summary>
         /// Get Url address
@@ -34,12 +41,12 @@ namespace com.etsoo.Utils.Storage
         string GetUrl(string path);
 
         /// <summary>
-        /// Read file
-        /// 读文件
+        /// Async read file
+        /// 异步读文件
         /// </summary>
         /// <param name="path">Path</param>
         /// <returns>Stream</returns>
-        Stream? Read(string path);
+        ValueTask<Stream?> ReadAsync(string path);
 
         /// <summary>
         /// Async write file
