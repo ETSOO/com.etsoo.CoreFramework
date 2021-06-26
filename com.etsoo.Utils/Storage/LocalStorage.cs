@@ -195,7 +195,7 @@ namespace com.etsoo.Utils.Storage
             }
 
             // Current file stream
-            var fileStream = fi.Exists ? fi.OpenWrite() : fi.Create();
+            using var fileStream = fi.Exists ? fi.OpenWrite() : fi.Create();
 
             // Reset stream current position
             if (stream.CanSeek)
@@ -203,6 +203,12 @@ namespace com.etsoo.Utils.Storage
 
             // Copy the stream to the file stream
             await stream.CopyToAsync(fileStream);
+
+            // Flush and close
+            await fileStream.FlushAsync();
+
+            // Close the stream explicitly
+            fileStream.Close();
 
             // Return
             return true;
