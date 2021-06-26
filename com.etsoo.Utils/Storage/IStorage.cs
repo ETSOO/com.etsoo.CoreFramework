@@ -10,6 +10,13 @@ namespace com.etsoo.Utils.Storage
     public interface IStorage
     {
         /// <summary>
+        /// Delete file
+        /// 删除文件
+        /// </summary>
+        /// <param name="path">Path</param>
+        void Delete(string path);
+
+        /// <summary>
         /// Get write stream
         /// 获取写入流
         /// </summary>
@@ -17,6 +24,14 @@ namespace com.etsoo.Utils.Storage
         /// <param name="writeCase">Write case</param>
         /// <returns>Stream</returns>
         Stream? GetWriteStream(string path, WriteCase writeCase = WriteCase.CreateNew);
+
+        /// <summary>
+        /// Get Url address
+        /// 获取URL地址
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <returns>URL</returns>
+        string GetUrl(string path);
 
         /// <summary>
         /// Read file

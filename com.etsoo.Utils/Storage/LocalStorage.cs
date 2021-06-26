@@ -17,13 +17,21 @@ namespace com.etsoo.Utils.Storage
         public string Root { get; }
 
         /// <summary>
+        /// URL root
+        /// URL根路径
+        /// </summary>
+        public string URLRoot { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="root">Root</param>
-        public LocalStorage(string root)
+        /// <param name="urlRoot">URL root</param>
+        public LocalStorage(string root, string urlRoot)
         {
             Root = root;
+            URLRoot = urlRoot;
         }
 
         /// <summary>
@@ -31,7 +39,10 @@ namespace com.etsoo.Utils.Storage
         /// 构造函数
         /// </summary>
         /// <param name="section">Configuration section</param>
-        public LocalStorage(IConfigurationSection section) : this(section.GetValue<string>("Root"))
+        public LocalStorage(IConfigurationSection section) : this(
+            section.GetValue<string>("Root"),
+            section.GetValue<string>("URLRoot")
+        )
         {
 
         }
@@ -45,6 +56,18 @@ namespace com.etsoo.Utils.Storage
         protected FileInfo GetFileInfo(string path)
         {
             return new FileInfo(Root + path);
+        }
+
+        /// <summary>
+        /// Delete file
+        /// 删除文件
+        /// </summary>
+        /// <param name="path">Path</param>
+        public void Delete(string path)
+        {
+            var fi = GetFileInfo(path);
+            if (fi.Exists)
+                fi.Delete();
         }
 
         /// <summary>
@@ -80,6 +103,17 @@ namespace com.etsoo.Utils.Storage
 
             // Current file stream
             return fi.Exists ? fi.OpenWrite() : fi.Create();
+        }
+
+        /// <summary>
+        /// Get Url address
+        /// 获取URL地址
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <returns>URL</returns>
+        public string GetUrl(string path)
+        {
+            return URLRoot + path.Replace('\\', '/');
         }
 
         /// <summary>
