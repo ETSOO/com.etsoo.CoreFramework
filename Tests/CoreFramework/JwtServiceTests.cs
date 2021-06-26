@@ -33,7 +33,7 @@ namespace Tests.CoreFramework
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser("1", "Etsoo", new string[] { "Admin" }, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
+            var user = new CurrentUser("1", "Etsoo", null, new string[] { "Admin" }, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
 
             // Act
             var token = service.CreateAccessToken(user);
