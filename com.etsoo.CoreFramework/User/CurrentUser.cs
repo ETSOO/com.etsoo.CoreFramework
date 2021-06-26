@@ -11,8 +11,20 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser(string Id, string Name, string? Avatar, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
+    public record CurrentUser(string Id, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
     {
+        /// <summary>
+        /// Name
+        /// 姓名
+        /// </summary>
+        public string Name { get; set; } = null!;
+
+        /// <summary>
+        /// Avatar
+        /// 头像
+        /// </summary>
+        public string? Avatar { get; set; }
+
         /// <summary>
         /// Int type id
         /// 整形编号
@@ -54,7 +66,9 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, avatar, roles, ipAddress, new CultureInfo(language), connectionId);
+            return new CurrentUser(id, roles, ipAddress, new CultureInfo(language), connectionId) { 
+                Name = name, Avatar = avatar 
+            };
         }
 
         /// <summary>
@@ -80,7 +94,11 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, data.Get("Avatar"), roles, ip, language, null);
+            return new CurrentUser(id, roles, ip, language, null)
+            {
+                Name = name,
+                Avatar = data.Get("Avatar")
+            };
         }
 
         /// <summary>

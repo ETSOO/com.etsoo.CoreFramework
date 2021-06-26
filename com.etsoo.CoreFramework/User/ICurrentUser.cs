@@ -22,13 +22,13 @@ namespace com.etsoo.CoreFramework.User
         /// Name
         /// 姓名
         /// </summary>
-        string Name { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// Avatar
         /// 头像
         /// </summary>
-        string? Avatar { get; }
+        string? Avatar { get; set; }
 
         /// <summary>
         /// Id
