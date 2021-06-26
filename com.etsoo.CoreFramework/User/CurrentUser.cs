@@ -11,31 +11,19 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser(string Id, IEnumerable<string> Roles, IPAddress ClientIp, CultureInfo Language, string? ConnectionId) : ICurrentUser
+    public record CurrentUser : ICurrentUser
     {
         /// <summary>
-        /// Name
-        /// 姓名
+        /// IP Address claim type
+        /// IP地址声明类型
         /// </summary>
-        public string Name { get; set; } = null!;
+        public const string IPAddressClaim = "ipaddress";
 
         /// <summary>
-        /// Avatar
-        /// 头像
+        /// Avatar claim type
+        /// 头像声明类型
         /// </summary>
-        public string? Avatar { get; set; }
-
-        /// <summary>
-        /// Int type id
-        /// 整形编号
-        /// </summary>
-        public int IntId => int.Parse(Id);
-
-        /// <summary>
-        /// Guid type id
-        /// Guid类型编号
-        /// </summary>
-        public Guid GuidId => Guid.Parse(Id);
+        public const string AvatarClaim = "avatar";
 
         /// <summary>
         /// Create user
@@ -66,8 +54,9 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, roles, ipAddress, new CultureInfo(language), connectionId) { 
-                Name = name, Avatar = avatar 
+            return new CurrentUser(id, name, roles, ipAddress, new CultureInfo(language), connectionId)
+            {
+                Avatar = avatar
             };
         }
 
@@ -94,24 +83,85 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, roles, ip, language, null)
+            return new CurrentUser(id, name, roles, ip, language, null)
             {
-                Name = name,
                 Avatar = data.Get("Avatar")
             };
         }
 
         /// <summary>
-        /// IP Address claim type
-        /// IP地址声明类型
+        /// Id
+        /// 编号
         /// </summary>
-        public const string IPAddressClaim = "ipaddress";
+        public string Id { get; }
 
         /// <summary>
-        /// Avatar claim type
-        /// 头像声明类型
+        /// Name
+        /// 姓名
         /// </summary>
-        public const string AvatarClaim = "avatar";
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Roles
+        /// 角色
+        /// </summary>
+        public IEnumerable<string> Roles { get; }
+
+        /// <summary>
+        /// Client IP
+        /// 客户端IP地址
+        /// </summary>
+        public IPAddress ClientIp { get; }
+
+        /// <summary>
+        /// Language
+        /// 语言
+        /// </summary>
+        public CultureInfo Language { get; }
+
+        /// <summary>
+        /// Connection id
+        /// 链接编号
+        /// </summary>
+        public string? ConnectionId { get; }
+
+        /// <summary>
+        /// Avatar
+        /// 头像
+        /// </summary>
+        public string? Avatar { get; set; }
+
+        /// <summary>
+        /// Int type id
+        /// 整形编号
+        /// </summary>
+        public int IntId => int.Parse(Id);
+
+        /// <summary>
+        /// Guid type id
+        /// Guid类型编号
+        /// </summary>
+        public Guid GuidId => Guid.Parse(Id);
+
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="id">Id</param>
+        /// <param name="name">Name</param>
+        /// <param name="roles">Roles</param>
+        /// <param name="clientIp">Client IP</param>
+        /// <param name="language">Language</param>
+        /// <param name="connectionId">Connection id</param>
+        public CurrentUser(string id, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
+        {
+            Id = id;
+            Name = name;
+            Roles = roles;
+            ClientIp = clientIp;
+            Language = language;
+            ConnectionId = connectionId;
+        }
 
         /// <summary>
         /// Create claims
