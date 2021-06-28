@@ -232,6 +232,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Password Match.
+        /// </summary>
+        public static string NoPasswordMatch {
+            get {
+                return ResourceManager.GetString("NoPasswordMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No User Agent.
         /// </summary>
         public static string NoUserAgent {

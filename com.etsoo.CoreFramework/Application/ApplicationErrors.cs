@@ -161,6 +161,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError NoOrgJoined => new(nameof(NoOrgJoined), Resources.NoOrgJoined);
 
         /// <summary>
+        /// No Password Match
+        /// 密码不匹配
+        /// </summary>
+        public static ApplicationError NoPasswordMatch => new(nameof(NoPasswordMatch), Resources.NoPasswordMatch);
+
+        /// <summary>
         /// No user agent result error
         /// 没有用户代理错误
         /// </summary>
@@ -249,6 +255,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(NoDeviceMatch) => NoDeviceMatch,
                 nameof(NoId) => NoId,
                 nameof(NoOrgJoined) => NoOrgJoined,
+                nameof(NoPasswordMatch) => NoPasswordMatch,
                 nameof(NoUserAgent) => NoUserAgent,
                 nameof(NoUserFound) => NoUserFound,
                 nameof(NoUserMatch) => NoUserMatch,
