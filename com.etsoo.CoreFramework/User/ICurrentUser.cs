@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -10,7 +9,9 @@ namespace com.etsoo.CoreFramework.User
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    public interface ICurrentUser<T> where T : struct
+    /// <typeparam name="T">Id generic type</typeparam>
+    /// <typeparam name="O">Organization generic type</typeparam>
+    public interface ICurrentUser<T, O> where T : struct where O : struct
     {
         /// <summary>
         /// Unique connection id
@@ -35,6 +36,12 @@ namespace com.etsoo.CoreFramework.User
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
         T Id { get; }
+
+        /// <summary>
+        /// Organization id, support switch
+        /// 机构编号，可切换
+        /// </summary>
+        public O? Organization { get; set; }
 
         /// <summary>
         /// Role

@@ -11,7 +11,9 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser<T> : ICurrentUser<T> where T : struct
+    /// <typeparam name="T">Id generic type</typeparam>
+    /// <typeparam name="O">Organization generic type</typeparam>
+    public record CurrentUser<T, O> : ICurrentUser<T, O> where T : struct where O : struct
     {
         /// <summary>
         /// IP Address claim type
@@ -26,13 +28,19 @@ namespace com.etsoo.CoreFramework.User
         public const string AvatarClaim = "avatar";
 
         /// <summary>
+        /// Organization claim type
+        /// 机构声明类型
+        /// </summary>
+        public const string OrganizationClaim = "Organization";
+
+        /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>
         /// <param name="user">User</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser<T>? Create(ClaimsPrincipal? user, string? connectionId = null)
+        public static CurrentUser<T, O>? Create(ClaimsPrincipal? user, string? connectionId = null)
         {
             // Basic check
             if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
@@ -42,6 +50,7 @@ namespace com.etsoo.CoreFramework.User
             var name = user.FindFirstValue(ClaimTypes.Name);
             var avatar = user.FindFirstValue(AvatarClaim);
             var id = StringUtils.TryParse<T>(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            var organization = StringUtils.TryParse<O>(user.FindFirstValue(OrganizationClaim));
             var language = user.FindFirstValue(ClaimTypes.Locality);
             var role = user.FindFirstValue(ClaimTypes.Role);
             var ip = user.FindFirstValue(IPAddressClaim);
@@ -54,7 +63,7 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser<T>(id.Value, name, roles, ipAddress, new CultureInfo(language), connectionId)
+            return new CurrentUser<T, O>(id.Value, organization, name, roles, ipAddress, new CultureInfo(language), connectionId)
             {
                 Avatar = avatar
             };
@@ -68,10 +77,11 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <returns>User</returns>
-        public static CurrentUser<T>? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language)
+        public static CurrentUser<T, O>? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language)
         {
             // Get data
             var id = data.Get<T>("Id");
+            var organization = data.Get<O>("Organization");
             var name = data.Get("Name");
             var role = data.Get("Role");
 
@@ -83,7 +93,7 @@ namespace com.etsoo.CoreFramework.User
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser<T>(id.Value, name, roles, ip, language, null)
+            return new CurrentUser<T, O>(id.Value, organization, name, roles, ip, language, null)
             {
                 Avatar = data.Get("Avatar")
             };
@@ -94,6 +104,12 @@ namespace com.etsoo.CoreFramework.User
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
         public T Id { get; }
+
+        /// <summary>
+        /// Organization id
+        /// 机构编号
+        /// </summary>
+        public O? Organization { get; set; }
 
         /// <summary>
         /// Name
@@ -136,14 +152,16 @@ namespace com.etsoo.CoreFramework.User
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
+        /// <param name="organization">Organization</param>
         /// <param name="name">Name</param>
         /// <param name="roles">Roles</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="language">Language</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(T id, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
+        public CurrentUser(T id, O? organization, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
         {
             Id = id;
+            Organization = organization;
             Name = name;
             Roles = roles;
             ClientIp = clientIp;
@@ -163,6 +181,8 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(ClaimTypes.Role, string.Join(',', Roles));
             yield return new(IPAddressClaim, ClientIp.ToString());
+            if (Organization != null && Organization.Value.ToString() is var org && org != null)
+                yield return new(OrganizationClaim, org);
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
         }

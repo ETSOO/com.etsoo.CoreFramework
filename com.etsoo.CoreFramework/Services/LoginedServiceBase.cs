@@ -2,7 +2,6 @@
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.CoreFramework.User;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Services
@@ -11,16 +10,17 @@ namespace com.etsoo.CoreFramework.Services
     /// Logined service base for business logic
     /// 已登录业务逻辑的基础服务
     /// </summary>
-    public abstract class LoginedServiceBase<C, R, T> : ServiceBase<C, R>
+    public abstract class LoginedServiceBase<C, R, T, O> : ServiceBase<C, R>
         where C : DbConnection
         where R : IRepoBase
         where T : struct
+        where O : struct
     {
         /// <summary>
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected ICurrentUser<T> User { get; }
+        virtual protected ICurrentUser<T, O> User { get; }
 
         /// <summary>
         /// Constructor
@@ -30,7 +30,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">Current user</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser<T> user, R repo, ILogger logger) : base(app, repo, logger)
+        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser<T, O> user, R repo, ILogger logger) : base(app, repo, logger)
         {
             User = user;
         }
