@@ -7,5 +7,5 @@ namespace com.etsoo.CoreFramework.Authentication
     /// Authorization action
     /// 授权操作
     /// </summary>
-    public record AuthAction (ICurrentUser User, string Audience, TimeSpan LiveSpan, byte[] SecurityKeyBytes);
+    public record AuthAction<T> (ICurrentUser<T> User, string Audience, TimeSpan LiveSpan, byte[] SecurityKeyBytes) where T : struct;
 }

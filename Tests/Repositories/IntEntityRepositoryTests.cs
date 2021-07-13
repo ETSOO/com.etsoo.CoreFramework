@@ -19,7 +19,7 @@ namespace Tests.Repositories
         /// </summary>
         private class IntEntityRepository : EntityRepository<SqlConnection, int>
         {
-            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, null!, flag) { }
+            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag) { }
 
             /// <summary>
             /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
@@ -58,7 +58,7 @@ namespace Tests.Repositories
             var command = repo.GetCommandName("read", DataFormat.JSON.ToString().ToLower());
 
             // Assert
-            Assert.IsTrue(command == "ep_user_read_json");
+            Assert.AreEqual("ep_user_read_json", command);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace Tests.Repositories
             // Assert
             if(result.Success)
             {
-                Assert.IsTrue(result.DataAsIdModal().Id == 1021);
+                Assert.AreEqual(1021, result.DataAsIdModal().Id);
             }
         }
 

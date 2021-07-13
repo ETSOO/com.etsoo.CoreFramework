@@ -3,6 +3,7 @@ using com.etsoo.CoreFramework.User;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -13,7 +14,7 @@ namespace Tests.CoreFramework
     [TestFixture]
     public class JwtServiceTests
     {
-        readonly JwtService service;
+        readonly JwtService<int> service;
 
         public JwtServiceTests()
         {
@@ -26,14 +27,14 @@ namespace Tests.CoreFramework
             }"));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
 
-            service = new JwtService(new ServiceCollection(), false, section, Encoding.UTF8.GetBytes("SecurityKeyShouldBeLongerThan128"));
+            service = new JwtService<int>(new ServiceCollection(), false, section, Encoding.UTF8.GetBytes("SecurityKeyShouldBeLongerThan128"));
         }
 
         [Test]
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser("1", "Etsoo", null, new string[] { "Admin" }, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
+            var user = new CurrentUser<int>(1, "Etsoo", new string[] { "Admin" }, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
 
             // Act
             var token = service.CreateAccessToken(user);

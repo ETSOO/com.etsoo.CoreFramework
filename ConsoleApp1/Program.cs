@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using TableDependency.SqlClient;
@@ -29,14 +30,32 @@ namespace ConsoleApp1
             //PRCParallelCalls();
             //await RPCCallsAsync();
 
-            using var bm = new Bitmap("D:\\Personal\\xzrect.jpg");
-            using var resized = ImageUtils.Resize(bm, new Size(400, 300), false);
-            if (resized != null)
-                ImageUtils.SaveImage(resized, "D:\\Personal\\xzrect2.jpg");
-
-            Console.WriteLine("Done");
+            Console.WriteLine(IsPalindrome("abcba"));
+            Console.WriteLine(IsPalindrome("Never Odd Or Even"));
 
             Console.Read();
+        }
+
+        static bool IsPalindrome(string s)
+        {
+            // Remove empties and conver to upper case
+            s = Regex.Replace(s, "\\s", "").ToUpper();
+
+            var len = s.Length;
+
+            // Get the middle position, len = 5, mid = 2
+            var mid = len / 2;
+
+            for (var i = 0; i < mid; i++)
+            {
+                // Check the relative chars
+                if (!s[i].Equals(s[len - i - 1]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         static void PRCParallelCalls()
@@ -53,21 +72,6 @@ namespace ConsoleApp1
                 var bytes = Encoding.UTF8.GetBytes("Echo: " + message);
                 return Task.FromResult(new ReadOnlyMemory<byte>(bytes));
             }, queue);
-
-
-            var inputs = new string[] { "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10" };
-
-            // Each thread a channel
-            Parallel.ForEach(inputs, async (input) =>
-            {
-                // PRC Client
-                using var client = new RabbitMQEx(server.Connection);
-                client.PreparePRCClient();
-
-                Console.WriteLine($"Message sent at {DateTime.UtcNow:ss:fff}: {input}");
-                var result = await client.PRCCallAsync(Encoding.UTF8.GetBytes(input), queue);
-                Console.WriteLine($"Client {Thread.CurrentThread.ManagedThreadId} received at {DateTime.UtcNow:ss:fff} for {input}: {Encoding.UTF8.GetString(result.Span)}");
-            });
 
             Console.ReadKey();
         }

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.User;
+using System;
 using System.Security.Claims;
 
 namespace com.etsoo.CoreFramework.Authentication
@@ -7,7 +8,7 @@ namespace com.etsoo.CoreFramework.Authentication
     /// Authentification service
     /// 验证服务
     /// </summary>
-    public interface IAuthService
+    public interface IAuthService<T> where T : struct
     {
         /// <summary>
         /// Access token expiration minutes
@@ -27,7 +28,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="action">Action</param>
         /// <returns>Token</returns>
-        public string CreateToken(AuthAction action);
+        public string CreateToken(AuthAction<T> action);
 
         /// <summary>
         /// Create access token
@@ -35,7 +36,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <returns>Token</returns>
-        string CreateAccessToken(ICurrentUser user);
+        string CreateAccessToken(ICurrentUser<T> user);
 
         /// <summary>
         /// Create refresh token
@@ -43,7 +44,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <returns>Token</returns>
-        string CreateRefreshToken(ICurrentUser user);
+        string CreateRefreshToken(ICurrentUser<T> user);
 
         /// <summary>
         /// Validate refresh token

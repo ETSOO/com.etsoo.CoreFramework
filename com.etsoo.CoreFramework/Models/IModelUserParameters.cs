@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.User;
 using Dapper;
+using System;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -8,7 +9,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Export parameters model with user
     /// 导出参数模块带用户
     /// </summary>
-    public interface IModelUserParameters
+    public interface IModelUserParameters<T> where T : struct
     {
         /// <summary>
         /// Export parameters
@@ -17,6 +18,6 @@ namespace com.etsoo.CoreFramework.Models
         /// <param name="app">Application</param>
         /// <param name="user">Current user</param>
         /// <returns>Parameters</returns>
-        DynamicParameters AsParameters(ICoreApplicationBase app, ICurrentUser user);
+        DynamicParameters AsParameters(ICoreApplicationBase app, ICurrentUser<T> user);
     }
 }

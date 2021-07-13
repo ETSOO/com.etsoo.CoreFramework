@@ -15,7 +15,7 @@ namespace com.etsoo.CoreFramework.Authentication
     /// Jwt authentication service
     /// Jwt验证服务
     /// </summary>
-    public class JwtService : IAuthService
+    public class JwtService<T> : IAuthService<T> where T : struct
     {
         readonly string securityAlgorithms;
         readonly byte[] securityKeyBytes;
@@ -178,7 +178,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="action">Action</param>
         /// <returns>Token</returns>
-        public string CreateToken(AuthAction action)
+        public string CreateToken(AuthAction<T> action)
         {
             // Token handler
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -213,9 +213,9 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <returns>Token</returns>
-        public string CreateAccessToken(ICurrentUser user)
+        public string CreateAccessToken(ICurrentUser<T> user)
         {
-            return CreateToken(new AuthAction(user, audience, TimeSpan.FromMinutes(AccessTokenMinutes), securityKeyBytes));
+            return CreateToken(new AuthAction<T>(user, audience, TimeSpan.FromMinutes(AccessTokenMinutes), securityKeyBytes));
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <returns>Token</returns>
-        public string CreateRefreshToken(ICurrentUser user)
+        public string CreateRefreshToken(ICurrentUser<T> user)
         {
             /*
             /* This method just like a random password
@@ -233,7 +233,7 @@ namespace com.etsoo.CoreFramework.Authentication
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
             */
-            return CreateToken(new AuthAction(user, refreshTokenAudience, TimeSpan.FromDays(RefreshTokenDays), securityKeyBytesFK));
+            return CreateToken(new AuthAction<T>(user, refreshTokenAudience, TimeSpan.FromDays(RefreshTokenDays), securityKeyBytesFK));
         }
 
         /// <summary>

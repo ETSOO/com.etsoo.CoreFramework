@@ -10,7 +10,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    public interface ICurrentUser
+    public interface ICurrentUser<T> where T : struct
     {
         /// <summary>
         /// Unique connection id
@@ -31,22 +31,10 @@ namespace com.etsoo.CoreFramework.User
         string? Avatar { get; set; }
 
         /// <summary>
-        /// Id
-        /// 编号
+        /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
+        /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        string Id { get; }
-
-        /// <summary>
-        /// Int type id
-        /// 整形编号
-        /// </summary>
-        int IntId { get; }
-
-        /// <summary>
-        /// Guid type id
-        /// Guid类型编号
-        /// </summary>
-        Guid GuidId { get; }
+        T Id { get; }
 
         /// <summary>
         /// Role

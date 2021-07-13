@@ -48,7 +48,7 @@ namespace com.etsoo.Utils.Database
         /// <typeparam name="T">Id generic</typeparam>
         /// <param name="ids">Id list</param>
         /// <returns>Parameter value</returns>
-        object AsListParameter<T>(IEnumerable<T> ids) where T : struct, IComparable;
+        object AsListParameter<T>(IEnumerable<T> ids) where T : struct;
 
         /// <summary>
         /// With callback connection

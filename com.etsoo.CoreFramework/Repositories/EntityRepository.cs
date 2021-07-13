@@ -1,5 +1,4 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
@@ -18,7 +17,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityRepository<C, T> : LoginedRepoBase<C>, IEntityRepository<T> where C : DbConnection where T : struct, IComparable
+    public abstract class EntityRepository<C, T> : RepoBase<C>, IEntityRepository<T> where C : DbConnection where T : struct
     {
         /// <summary>
         /// Flag
@@ -46,7 +45,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepository(ICoreApplication<C> app, ICurrentUser user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
+        public EntityRepository(ICoreApplication<C> app, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app)
         {
             Flag = flag.AsMemory();
             ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();

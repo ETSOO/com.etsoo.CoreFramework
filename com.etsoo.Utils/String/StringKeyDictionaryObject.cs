@@ -51,7 +51,8 @@ namespace com.etsoo.Utils.String
         /// <returns>Value</returns>
         public T Get<T>(string key, T defaultValue) where T : struct
         {
-            return this.Get<T>(key).GetValueOrDefault(defaultValue);
+            var value = Get<T>(key);
+            return value.GetValueOrDefault(defaultValue);
         }
 
         /// <summary>

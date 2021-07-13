@@ -11,7 +11,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser : ICurrentUser
+    public record CurrentUser<T> : ICurrentUser<T> where T : struct
     {
         /// <summary>
         /// IP Address claim type
@@ -32,7 +32,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="user">User</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(ClaimsPrincipal? user, string? connectionId = null)
+        public static CurrentUser<T>? Create(ClaimsPrincipal? user, string? connectionId = null)
         {
             // Basic check
             if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
@@ -41,20 +41,20 @@ namespace com.etsoo.CoreFramework.User
             // Claims
             var name = user.FindFirstValue(ClaimTypes.Name);
             var avatar = user.FindFirstValue(AvatarClaim);
-            var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var id = StringUtils.TryParse<T>(user.FindFirstValue(ClaimTypes.NameIdentifier));
             var language = user.FindFirstValue(ClaimTypes.Locality);
             var role = user.FindFirstValue(ClaimTypes.Role);
             var ip = user.FindFirstValue(IPAddressClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(id) || language == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
+            if (string.IsNullOrEmpty(name) || id == null || language == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
                 return null;
 
             // Roles
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, roles, ipAddress, new CultureInfo(language), connectionId)
+            return new CurrentUser<T>(id.Value, name, roles, ipAddress, new CultureInfo(language), connectionId)
             {
                 Avatar = avatar
             };
@@ -68,32 +68,32 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language)
+        public static CurrentUser<T>? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language)
         {
             // Get data
-            var id = data.Get("Id");
+            var id = data.Get<T>("Id");
             var name = data.Get("Name");
             var role = data.Get("Role");
 
             // Validation
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(id))
+            if (id == null || string.IsNullOrEmpty(name))
                 return null;
 
             // Roles
             var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
 
             // New user
-            return new CurrentUser(id, name, roles, ip, language, null)
+            return new CurrentUser<T>(id.Value, name, roles, ip, language, null)
             {
                 Avatar = data.Get("Avatar")
             };
         }
 
         /// <summary>
-        /// Id
-        /// 编号
+        /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
+        /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        public string Id { get; }
+        public T Id { get; }
 
         /// <summary>
         /// Name
@@ -132,18 +132,6 @@ namespace com.etsoo.CoreFramework.User
         public string? Avatar { get; set; }
 
         /// <summary>
-        /// Int type id
-        /// 整形编号
-        /// </summary>
-        public int IntId => int.Parse(Id);
-
-        /// <summary>
-        /// Guid type id
-        /// Guid类型编号
-        /// </summary>
-        public Guid GuidId => Guid.Parse(Id);
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -153,7 +141,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="clientIp">Client IP</param>
         /// <param name="language">Language</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
+        public CurrentUser(T id, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
         {
             Id = id;
             Name = name;
@@ -171,7 +159,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual IEnumerable<Claim> CreateClaims()
         {
             yield return new(ClaimTypes.Name, Name);
-            yield return new(ClaimTypes.NameIdentifier, Id);
+            yield return new(ClaimTypes.NameIdentifier, Id.ToString()!);
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(ClaimTypes.Role, string.Join(',', Roles));
             yield return new(IPAddressClaim, ClientIp.ToString());

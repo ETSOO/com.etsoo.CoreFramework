@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace com.etsoo.Utils.String
@@ -12,6 +13,12 @@ namespace com.etsoo.Utils.String
     /// </summary>
     public static class StringUtils
     {
+        /// <summary>
+        /// String type
+        /// 字符串类型
+        /// </summary>
+        public static readonly Type StringType = typeof(string);
+
         /// <summary>
         /// IEnumerable to string
         /// 链接 IEnumerable 为字符串
@@ -76,7 +83,7 @@ namespace com.etsoo.Utils.String
             foreach (var item in items)
             {
                 var target = TryParse<T>(item);
-                if (target.HasValue)
+                if (target != null)
                     yield return target.Value;
             }
         }
@@ -219,7 +226,7 @@ namespace com.etsoo.Utils.String
                 return null;
 
             // Default value
-            T value = default;
+            var value = default(T);
 
             // Switch pattern
             var parser = value switch
@@ -277,6 +284,41 @@ namespace com.etsoo.Utils.String
             }
 
             return TryParse<T>(d.ToString());
+        }
+
+        /// <summary>
+        /// Try parse object to all possible type, may bear performance lost
+        /// 尝试解析对象到所有可能的类型，可能有效率损失
+        /// </summary>
+        /// <typeparam name="T">Generic target type</typeparam>
+        /// <param name="d">Object value</param>
+        /// <returns>Parsed result</returns>
+        public static T? TryParseObjectAll<T>(object? d)
+        {
+            if (d == null || d == DBNull.Value)
+            {
+                return default;
+            }
+
+            if (d is T t)
+            {
+                return t;
+            }
+
+            var s = d.ToString();
+
+            if (s is T st)
+            {
+                return st;
+            }
+
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            if (converter.CanConvertFrom(StringType))
+            {
+                return (T)converter.ConvertFromInvariantString(s);
+            }
+
+            return default;
         }
     }
 }
