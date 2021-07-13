@@ -46,6 +46,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="command">Command</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        Task ReaJsonToStreamAsync(CommandDefinition command, HttpResponse response);
+        Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response);
     }
 }
