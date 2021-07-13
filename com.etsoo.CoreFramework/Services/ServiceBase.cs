@@ -2,12 +2,9 @@
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
-using Dapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -90,22 +87,6 @@ namespace com.etsoo.CoreFramework.Services
                 Logger.LogCritical(ex, title);
             else
                 Logger.LogError(ex, title);
-        }
-
-        /// <summary>
-        /// Async read JSON data to HTTP Response
-        /// 异步读取JSON数据到HTTP响应
-        /// </summary>
-        /// <param name="command">Command</param>
-        /// <param name="response">HTTP Response</param>
-        /// <returns>Task</returns>
-        protected async Task ReaJsonToStreamAsync(CommandDefinition command, HttpResponse response)
-        {
-            // Content type
-            response.ContentType = "application/json";
-
-            // Write to
-            await Repo.ReadToStreamAsync(command, response.BodyWriter);
         }
     }
 }

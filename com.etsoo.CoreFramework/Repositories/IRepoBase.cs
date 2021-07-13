@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.Actions;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.IO.Pipelines;
 using System.Threading.Tasks;
@@ -37,5 +38,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="writer">PipeWriter</param>
         /// <returns>Has content or not</returns>
         Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer);
+
+        /// <summary>
+        /// Async read JSON data to HTTP Response
+        /// 异步读取JSON数据到HTTP响应
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        Task ReaJsonToStreamAsync(CommandDefinition command, HttpResponse response);
     }
 }

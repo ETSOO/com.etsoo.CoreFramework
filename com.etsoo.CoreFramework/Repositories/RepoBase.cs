@@ -5,6 +5,7 @@ using com.etsoo.Utils.Database;
 using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -178,6 +179,22 @@ namespace com.etsoo.CoreFramework.Repositories
             {
                 return connection.QueryToStreamAsync(command, writer);
             });
+        }
+
+        /// <summary>
+        /// Async read JSON data to HTTP Response
+        /// 异步读取JSON数据到HTTP响应
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        public async Task ReaJsonToStreamAsync(CommandDefinition command, HttpResponse response)
+        {
+            // Content type
+            response.ContentType = "application/json";
+
+            // Write to
+            await ReadToStreamAsync(command, response.BodyWriter);
         }
     }
 }
