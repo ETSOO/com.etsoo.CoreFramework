@@ -293,6 +293,43 @@ namespace com.etsoo.SourceGenerators
                 }
             }
 
+            if (tds.BaseList != null)
+            {
+                foreach (var bt in tds.BaseList.Types)
+                {
+                    if(bt.Type is IdentifierNameSyntax nameSyntax)
+                    {
+                        var sm = context.Compilation.GetSemanticModel(nameSyntax.SyntaxTree);
+                        var symbol = sm.GetSymbolInfo(nameSyntax).Symbol;
+                        if (symbol == null) continue;
+
+                        // symbol.ToDisplayString();
+                        var name = symbol.Name;
+
+                        var locations = symbol.Locations;
+                        if (locations != null)
+                        {
+                            foreach (var location in locations)
+                            {
+                                if (location.SourceTree != null)
+                                {
+                                    var declare = location.SourceTree.GetRoot().DescendantNodes()
+                                        .OfType<TypeDeclarationSyntax>()
+                                        .FirstOrDefault(d => d.Identifier.ValueText == name);
+
+                                    if(declare != null)
+                                    {
+                                        var declareItems = ParseMembers(context, declare, out _);
+                                        items.AddRange(declareItems);
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
             return items;
         }
 
