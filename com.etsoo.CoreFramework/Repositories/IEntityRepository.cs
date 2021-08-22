@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
+using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipelines;
@@ -16,10 +17,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Create entity
         /// 创建实体
         /// </summary>
-        /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> CreateAsync<M>(M model) where M : class;
+        Task<IActionResult> CreateAsync(object model);
 
         /// <summary>
         /// Delete single entity
@@ -75,7 +75,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <returns>Task</returns>
-        Task<IEnumerable<E>> ReportAsync<M, E>(string range, M? modal = null) where M : class;
+        Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null);
 
         /// <summary>
         /// Entity report to stream
@@ -86,7 +86,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        Task ReportAsync<M>(Stream stream, string range, M? modal = null, DataFormat format = DataFormat.JSON) where M : class;
+        Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat format = DataFormat.JSON);
 
         /// <summary>
         /// Entity report to PipeWriter
@@ -97,15 +97,32 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        Task ReportAsync<M>(PipeWriter writer, string range, M? modal = null, DataFormat format = DataFormat.JSON) where M : class;
+        Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat format = DataFormat.JSON);
 
         /// <summary>
         /// Update entity
         /// 更新实体
         /// </summary>
-        /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> UpdateAsync<M>(M model) where M : class;
+        Task<IActionResult> UpdateAsync(object model);
+
+        /// <summary>
+        /// Data list
+        /// 数据列表
+        /// </summary>
+        /// <param name="model">Data model</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        Task ListAsync(object model, HttpResponse response);
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="model">Data model</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        Task QueryAsync(object model, HttpResponse response);
     }
 }

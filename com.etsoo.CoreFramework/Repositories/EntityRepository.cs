@@ -2,6 +2,7 @@
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -115,27 +116,14 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Create entity command
-        /// 创建实体命令
-        /// </summary>
-        /// <param name="model">Model</param>
-        /// <returns>Command</returns>
-        protected virtual CommandDefinition NewCreateCommand<M>(M model) where M : class
-        {
-            var name = GetCommandName("create");
-            return CreateCommand(name, model);
-        }
-
-        /// <summary>
         /// Create entity
         /// 创建实体
         /// </summary>
-        /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> CreateAsync<M>(M model) where M : class
+        public virtual async Task<IActionResult> CreateAsync(object model)
         {
-            var command = NewCreateCommand(model);
+            var command = CreateCommand(GetCommandName("create"), model);
             return await QueryAsResultAsync(command);
         }
 
@@ -161,7 +149,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> DeleteAsync(T id)
+        public virtual async Task<IActionResult> DeleteAsync(T id)
         {
             return await DeleteAsync(new T[] { id });
         }
@@ -172,7 +160,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async Task<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
             var command = NewDeleteCommand(ids);
             return await QueryAsResultAsync(command);
@@ -208,7 +196,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public async Task<E> ReadAsync<E>(T id, string range = "default")
+        public virtual async Task<E> ReadAsync<E>(T id, string range = "default")
         {
             var command = NewReadCommand(id, range);
 
@@ -227,7 +215,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        public async Task ReadAsync(Stream stream, T id, string range = "default", DataFormat format = DataFormat.JSON)
+        public virtual async Task ReadAsync(Stream stream, T id, string range = "default", DataFormat format = DataFormat.JSON)
         {
             var command = NewReadCommand(id, range, format);
             await ReadToStreamAsync(command, stream);
@@ -241,7 +229,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        public async Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat format = DataFormat.JSON)
+        public virtual async Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat format = DataFormat.JSON)
         {
             var command = NewReadCommand(id, range, format);
             await ReadToStreamAsync(command, writer);
@@ -255,7 +243,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Condition model</param>
         /// <param name="format">Date format</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReportCommand<M>(ReadOnlySpan<char> range, M? model = null, DataFormat? format = null) where M : class
+        protected virtual CommandDefinition NewReportCommand(ReadOnlySpan<char> range, object? model = null, DataFormat? format = null)
         {
             // Avoid possible SQL injection attack
             FilterRange(range);
@@ -272,7 +260,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <returns>Task</returns>
-        public async Task<IEnumerable<E>> ReportAsync<M, E>(string range, M? modal = null) where M : class
+        public virtual async Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null)
         {
             var command = NewReportCommand(range, modal);
             return await App.DB.WithConnection((connection) =>
@@ -290,7 +278,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        public async Task ReportAsync<M>(Stream stream, string range, M? modal = null, DataFormat format = DataFormat.JSON) where M : class
+        public virtual async Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat format = DataFormat.JSON)
         {
             var command = NewReportCommand(range, modal, format);
             await ReadToStreamAsync(command, stream);
@@ -305,22 +293,24 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <returns>Task</returns>
-        public async Task ReportAsync<M>(PipeWriter writer, string range, M? modal = null, DataFormat format = DataFormat.JSON) where M : class
+        public virtual async Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat format = DataFormat.JSON)
         {
             var command = NewReportCommand(range, modal, format);
             await ReadToStreamAsync(command, writer);
         }
 
         /// <summary>
-        /// Create update entity command
-        /// 创建更新实体命令
+        /// Entity JSON report to HTTP Response
+        /// 实体报告JSON数据到HTTP响应
         /// </summary>
-        /// <param name="model">Model</param>
-        /// <returns>Command</returns>
-        protected virtual CommandDefinition NewUpdateCommand<M>(M model) where M : class
+        /// <param name="response">HTTP Response</param>
+        /// <param name="range">View range</param>
+        /// <param name="modal">Condition modal</param>
+        /// <returns>Task</returns>
+        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null)
         {
-            var name = GetCommandName("update");
-            return CreateCommand(name, model);
+            var command = NewReportCommand(range, modal, DataFormat.JSON);
+            await ReadJsonToStreamAsync(command, response);
         }
 
         /// <summary>
@@ -330,10 +320,36 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> UpdateAsync<M>(M model) where M : class
+        public virtual async Task<IActionResult> UpdateAsync(object model)
         {
-            var command = NewUpdateCommand(model);
+            var command = CreateCommand(GetCommandName("update"), model);
             return await QueryAsResultAsync(command);
+        }
+
+        /// <summary>
+        /// Data list
+        /// 数据列表
+        /// </summary>
+        /// <param name="model">Data model</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        public async Task ListAsync(object model, HttpResponse response)
+        {
+            var command = CreateCommand(GetCommandName("list_json"), model);
+            await ReadJsonToStreamAsync(command, response);
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="model">Data model</param>
+        /// <param name="response">HTTP Response</param>
+        /// <returns>Task</returns>
+        public async Task QueryAsync(object model, HttpResponse response)
+        {
+            var command = CreateCommand(GetCommandName("query_json"), model);
+            await ReadJsonToStreamAsync(command, response);
         }
     }
 }
