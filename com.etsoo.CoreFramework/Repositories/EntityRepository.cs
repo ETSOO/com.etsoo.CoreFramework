@@ -47,18 +47,25 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="procedureInitals">Procedure initials</param>
         public EntityRepository(ICoreApplication<C> app, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app)
         {
-            Flag = flag.AsMemory();
-            ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
+            try
+            {
+                Flag = flag.AsMemory();
+                ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
 
-            var p = procedureInitals.AsSpan();
-            var builder = new MemoryBuilder<char>(App.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
-            builder.Append(App.Configuration.AppId);
-            builder.Append(p);
-            builder.Append(ProcedureJoinChar.Span);
-            builder.Append(Flag.Span);
-            builder.Append(ProcedureJoinChar.Span);
+                var p = procedureInitals.AsSpan();
+                var builder = new MemoryBuilder<char>(app.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
+                builder.Append(app.Configuration.AppId);
+                builder.Append(p);
+                builder.Append(ProcedureJoinChar.Span);
+                builder.Append(Flag.Span);
+                builder.Append(ProcedureJoinChar.Span);
 
-            ProcedureFixInitals = builder.AsMemory();
+                ProcedureFixInitals = builder.AsMemory();
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         /// <summary>
