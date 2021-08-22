@@ -47,25 +47,21 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="procedureInitals">Procedure initials</param>
         public EntityRepository(ICoreApplication<C> app, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app)
         {
-            try
-            {
-                Flag = flag.AsMemory();
-                ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
+            Flag = flag.AsMemory();
+            ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
 
-                var p = procedureInitals.AsSpan();
-                var builder = new MemoryBuilder<char>(app.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
-                builder.Append(app.Configuration.AppId);
-                builder.Append(p);
-                builder.Append(ProcedureJoinChar.Span);
-                builder.Append(Flag.Span);
-                builder.Append(ProcedureJoinChar.Span);
+            var p = procedureInitals.AsSpan();
 
-                ProcedureFixInitals = builder.AsMemory();
-            }
-            catch
-            {
-                throw;
-            }
+            // app, not App, because override exists, null is here now
+            // Always use visible parameters
+            var builder = new MemoryBuilder<char>(app.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
+            builder.Append(app.Configuration.AppId);
+            builder.Append(p);
+            builder.Append(ProcedureJoinChar.Span);
+            builder.Append(Flag.Span);
+            builder.Append(ProcedureJoinChar.Span);
+
+            ProcedureFixInitals = builder.AsMemory();
         }
 
         /// <summary>
