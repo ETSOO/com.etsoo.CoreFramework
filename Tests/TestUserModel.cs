@@ -18,7 +18,7 @@ namespace Tests
     [AutoDataReaderGenerator]
     [AutoDictionaryGenerator]
     [AutoToParameters]
-    public partial record TestUserModule : BaseModule
+    public partial record TestUserModule
     {
         /// <summary>
         /// Status enum

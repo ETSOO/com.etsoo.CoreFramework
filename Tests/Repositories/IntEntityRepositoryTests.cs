@@ -19,7 +19,7 @@ namespace Tests.Repositories
         /// </summary>
         private class IntEntityRepository : EntityRepository<SqlConnection, int>
         {
-            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag) { }
+            public IntEntityRepository(ICoreApplication<SqlConnection> app) : base(app, "user") { }
 
             /// <summary>
             /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
@@ -43,7 +43,7 @@ namespace Tests.Repositories
             var config = new AppConfiguration("test");
             var app = new CoreApplication<SqlConnection>(config, db);
 
-            repo = new IntEntityRepository(app, "user");
+            repo = new IntEntityRepository(app);
         }
 
         [SetUp]
