@@ -41,13 +41,13 @@ namespace com.etsoo.CoreFramework.User
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        public O? Organization { get; set; }
+        O? Organization { get; set; }
 
         /// <summary>
-        /// Role
-        /// 角色
+        /// Role value
+        /// 角色值
         /// </summary>
-        IEnumerable<string> Roles { get; }
+        short RoleValue { get; }
 
         /// <summary>
         /// Client IP address

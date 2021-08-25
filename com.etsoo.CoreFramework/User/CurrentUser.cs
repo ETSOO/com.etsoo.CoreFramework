@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.String;
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -52,18 +51,15 @@ namespace com.etsoo.CoreFramework.User
             var id = StringUtils.TryParse<T>(user.FindFirstValue(ClaimTypes.NameIdentifier));
             var organization = StringUtils.TryParse<O>(user.FindFirstValue(OrganizationClaim));
             var language = user.FindFirstValue(ClaimTypes.Locality);
-            var role = user.FindFirstValue(ClaimTypes.Role);
+            var roleValue = StringUtils.TryParse<short>(user.FindFirstValue(ClaimTypes.Role)).GetValueOrDefault();
             var ip = user.FindFirstValue(IPAddressClaim);
 
             // Validate
             if (string.IsNullOrEmpty(name) || id == null || language == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
                 return null;
 
-            // Roles
-            var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
-
             // New user
-            return new CurrentUser<T, O>(id.Value, organization, name, roles, ipAddress, new CultureInfo(language), connectionId)
+            return new CurrentUser<T, O>(id.Value, organization, name, roleValue, ipAddress, new CultureInfo(language), connectionId)
             {
                 Avatar = avatar
             };
@@ -83,17 +79,14 @@ namespace com.etsoo.CoreFramework.User
             var id = data.Get<T>("Id");
             var organization = data.Get<O>("Organization");
             var name = data.Get("Name");
-            var role = data.Get("Role");
+            var roleValue = data.Get<short>("Role").GetValueOrDefault();
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
                 return null;
 
-            // Roles
-            var roles = string.IsNullOrEmpty(role) ? Array.Empty<string>() : role.Split(',');
-
             // New user
-            return new CurrentUser<T, O>(id.Value, organization, name, roles, ip, language, null)
+            return new CurrentUser<T, O>(id.Value, organization, name, roleValue, ip, language, null)
             {
                 Avatar = data.Get("Avatar")
             };
@@ -118,10 +111,10 @@ namespace com.etsoo.CoreFramework.User
         public string Name { get; set; }
 
         /// <summary>
-        /// Roles
-        /// 角色
+        /// Role value
+        /// 角色值
         /// </summary>
-        public IEnumerable<string> Roles { get; }
+        public short RoleValue { get; }
 
         /// <summary>
         /// Client IP
@@ -154,16 +147,16 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="id">Id</param>
         /// <param name="organization">Organization</param>
         /// <param name="name">Name</param>
-        /// <param name="roles">Roles</param>
+        /// <param name="roleValue">Role value</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="language">Language</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(T id, O? organization, string name, IEnumerable<string> roles, IPAddress clientIp, CultureInfo language, string? connectionId)
+        public CurrentUser(T id, O? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string? connectionId)
         {
             Id = id;
             Organization = organization;
             Name = name;
-            Roles = roles;
+            RoleValue = roleValue;
             ClientIp = clientIp;
             Language = language;
             ConnectionId = connectionId;
@@ -179,7 +172,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Name, Name);
             yield return new(ClaimTypes.NameIdentifier, Id.ToString()!);
             yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(ClaimTypes.Role, string.Join(',', Roles));
+            yield return new(ClaimTypes.Role, RoleValue.ToString());
             yield return new(IPAddressClaim, ClientIp.ToString());
             if (Organization != null && Organization.Value.ToString() is var org && org != null)
                 yield return new(OrganizationClaim, org);

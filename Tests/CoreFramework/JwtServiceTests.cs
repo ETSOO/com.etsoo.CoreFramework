@@ -34,7 +34,7 @@ namespace Tests.CoreFramework
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser<int, int>(1, null, "Etsoo", new string[] { "Admin" }, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
+            var user = new CurrentUser<int, int>(1, null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, null);
 
             // Act
             var token = service.CreateAccessToken(user);
