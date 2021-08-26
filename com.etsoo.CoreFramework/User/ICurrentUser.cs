@@ -47,7 +47,7 @@ namespace com.etsoo.CoreFramework.User
         /// Role value
         /// 角色值
         /// </summary>
-        short RoleValue { get; }
+        short RoleValue { get; set; }
 
         /// <summary>
         /// Client IP address

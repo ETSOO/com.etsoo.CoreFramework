@@ -114,7 +114,7 @@ namespace com.etsoo.CoreFramework.User
         /// Role value
         /// 角色值
         /// </summary>
-        public short RoleValue { get; }
+        public virtual short RoleValue { get; set; }
 
         /// <summary>
         /// Client IP
