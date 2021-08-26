@@ -33,6 +33,12 @@ namespace com.etsoo.CoreFramework.User
         public const string OrganizationClaim = "Organization";
 
         /// <summary>
+        /// Role value claim type
+        /// 角色值类型
+        /// </summary>
+        public const string RoleValueClaim = "RoleValue";
+
+        /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>
@@ -51,7 +57,7 @@ namespace com.etsoo.CoreFramework.User
             var id = StringUtils.TryParse<T>(user.FindFirstValue(ClaimTypes.NameIdentifier));
             var organization = StringUtils.TryParse<O>(user.FindFirstValue(OrganizationClaim));
             var language = user.FindFirstValue(ClaimTypes.Locality);
-            var roleValue = StringUtils.TryParse<short>(user.FindFirstValue(ClaimTypes.Role)).GetValueOrDefault();
+            var roleValue = StringUtils.TryParse<short>(user.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
             var ip = user.FindFirstValue(IPAddressClaim);
 
             // Validate
@@ -172,7 +178,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Name, Name);
             yield return new(ClaimTypes.NameIdentifier, Id.ToString()!);
             yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(ClaimTypes.Role, RoleValue.ToString());
+            yield return new(RoleValueClaim, RoleValue.ToString());
             yield return new(IPAddressClaim, ClientIp.ToString());
             if (Organization != null && Organization.Value.ToString() is var org && org != null)
                 yield return new(OrganizationClaim, org);
