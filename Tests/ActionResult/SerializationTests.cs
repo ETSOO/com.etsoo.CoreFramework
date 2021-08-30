@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Tests.ActionResult
@@ -26,7 +27,7 @@ namespace Tests.ActionResult
 
             // Act
             var writer = new ArrayBufferWriter<byte>();
-            await modal.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web) { IgnoreNullValues = true });
+            await modal.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web) { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull });
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 

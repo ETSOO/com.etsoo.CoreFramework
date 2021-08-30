@@ -74,7 +74,7 @@ namespace com.etsoo.Utils.Serialization
             if (options.DefaultIgnoreCondition == JsonIgnoreCondition.Always)
                 return false;
 
-            if ((options.IgnoreNullValues || options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull) && isNull)
+            if (options.DefaultIgnoreCondition == JsonIgnoreCondition.WhenWritingNull && isNull)
                 return false;
 
             if (isField)

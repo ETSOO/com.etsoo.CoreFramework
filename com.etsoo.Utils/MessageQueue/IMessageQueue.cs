@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace com.etsoo.Utils.MessageQueue
+﻿namespace com.etsoo.Utils.MessageQueue
 {
     /// <summary>
     /// Message queue interface

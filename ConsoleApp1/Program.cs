@@ -24,7 +24,7 @@ namespace ConsoleApp1
 
         static readonly ConnectionFactory factory = new ConnectionFactory { HostName = "localhost", UserName = "guest", Password = "guest", DispatchConsumersAsync = true };
 
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             //await Task.CompletedTask;
             //PRCParallelCalls();

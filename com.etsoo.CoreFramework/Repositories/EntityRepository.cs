@@ -3,12 +3,8 @@ using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.IO;
 using System.IO.Pipelines;
-using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Repositories
 {

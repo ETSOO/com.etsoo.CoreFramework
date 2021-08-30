@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Benchmark.Utils
@@ -59,12 +60,12 @@ namespace Benchmark.Utils
         {
             var json = JsonSerializer.Serialize(dic, new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
 
             JsonSerializer.Deserialize<TestModal>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 PropertyNameCaseInsensitive = true
             });
         }

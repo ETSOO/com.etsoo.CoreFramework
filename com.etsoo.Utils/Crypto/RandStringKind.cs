@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace com.etsoo.Utils.Crypto
+﻿namespace com.etsoo.Utils.Crypto
 {
     /// <summary>
     /// Random string kind

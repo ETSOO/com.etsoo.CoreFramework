@@ -1,8 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 
 namespace com.etsoo.Utils.Database

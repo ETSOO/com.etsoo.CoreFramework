@@ -3,7 +3,6 @@ using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Services

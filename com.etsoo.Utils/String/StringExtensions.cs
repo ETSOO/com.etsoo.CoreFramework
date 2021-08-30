@@ -1,6 +1,4 @@
 ﻿using Dapper;
-using System;
-using System.Linq;
 
 namespace com.etsoo.Utils.String
 {

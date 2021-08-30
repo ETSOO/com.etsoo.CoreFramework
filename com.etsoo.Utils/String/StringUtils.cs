@@ -1,7 +1,5 @@
 ﻿using com.etsoo.Utils.SpanMemory;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 
@@ -306,6 +304,7 @@ namespace com.etsoo.Utils.String
             }
 
             var s = d.ToString();
+            if (s == null) return default;
 
             if (s is T st)
             {
@@ -315,7 +314,7 @@ namespace com.etsoo.Utils.String
             var converter = TypeDescriptor.GetConverter(typeof(T));
             if (converter.CanConvertFrom(StringType))
             {
-                return (T)converter.ConvertFromInvariantString(s);
+                return (T?)converter.ConvertFromInvariantString(s);
             }
 
             return default;

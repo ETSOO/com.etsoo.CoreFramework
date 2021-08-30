@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.String;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -11,7 +10,7 @@ namespace com.etsoo.CoreFramework.User
     /// 当前用户数据
     /// </summary>
     /// <typeparam name="T">Id generic type</typeparam>
-    /// <typeparam name="O">Organization generic type</typeparam>
+    /// <typeparam name="O">Organization id generic type</typeparam>
     public record CurrentUser<T, O> : ICurrentUser<T, O> where T : struct where O : struct
     {
         /// <summary>

@@ -1,8 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace com.etsoo.Utils.Net.SMTP
 {

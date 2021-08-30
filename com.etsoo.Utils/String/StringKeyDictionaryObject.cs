@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace com.etsoo.Utils.String
+﻿namespace com.etsoo.Utils.String
 {
     /// <summary>
     /// Ignore case of string key and object value extended dictionary, better performance than dynamic value

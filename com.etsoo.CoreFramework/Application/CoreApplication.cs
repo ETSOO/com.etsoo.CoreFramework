@@ -3,6 +3,7 @@ using com.etsoo.Utils.Database;
 using System;
 using System.Data.Common;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
@@ -42,7 +43,7 @@ namespace com.etsoo.CoreFramework.Application
         )
         {
             // Json options
-            DefaultJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { IgnoreNullValues = true };
+            DefaultJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
             // Update
             (

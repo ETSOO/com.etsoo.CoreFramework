@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-namespace com.etsoo.Utils.Storage
+﻿namespace com.etsoo.Utils.Storage
 {
     /// <summary>
     /// Storage Interface, inherit for Local Storage, Network Storage and so on

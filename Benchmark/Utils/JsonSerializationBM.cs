@@ -6,6 +6,7 @@ using System.Buffers;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Benchmark.Utils
@@ -40,7 +41,7 @@ namespace Benchmark.Utils
 
             var json = JsonSerializer.Serialize(person, new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
 
             Console.WriteLine(json);
@@ -82,7 +83,7 @@ namespace Benchmark.Utils
 
             var json = JsonSerializer.Serialize(person, new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
-                IgnoreNullValues = true
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
 
             Console.WriteLine(json);
@@ -171,7 +172,7 @@ namespace Benchmark.Utils
                 var writer = new ArrayBufferWriter<byte>();
                 await jl.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web)
                 {
-                    IgnoreNullValues = true
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 });
                 var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 

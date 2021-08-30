@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.Localization;
 using NUnit.Framework;
-using System;
 
 namespace Tests.Utils
 {
@@ -34,10 +33,12 @@ namespace Tests.Utils
         }
 
         [Test]
+        [SetCulture("zh-CN")]
         public void GetTimeZone_Test()
         {
             // Correct
             var tz = LocalizationUtils.GetTimeZone("New Zealand Standard Time");
+
             Assert.AreEqual("新西兰标准时间", tz.StandardName);
 
             // Wrong

@@ -101,7 +101,7 @@ namespace com.etsoo.SourceGenerators
                                 typeName = "Byte";
                         }
 
-                        valuePart = $"({typeName.ToLower()}){fieldName}";
+                        valuePart = $"({typeName}){fieldName}";
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Array)
                     {

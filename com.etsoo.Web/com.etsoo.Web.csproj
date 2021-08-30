@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <Nullable>enable</Nullable>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>ETSOO</Company>
-    <Version>1.0.6</Version>
+    <Version>1.0.7</Version>
     <Description>ETSOO SmartERP NextGen shared web components.</Description>
-    <Copyright>Copyright © ETSOO 2004 - 2021</Copyright>
+    <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Web</RepositoryUrl>

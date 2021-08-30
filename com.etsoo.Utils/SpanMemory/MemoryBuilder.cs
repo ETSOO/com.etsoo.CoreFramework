@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace com.etsoo.Utils.SpanMemory
+﻿namespace com.etsoo.Utils.SpanMemory
 {
     /// <summary>
     /// Memory builder

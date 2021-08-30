@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using System;
 
 namespace com.etsoo.Utils.Database
 {

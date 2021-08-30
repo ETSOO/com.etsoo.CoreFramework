@@ -1,11 +1,8 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using Microsoft.IO;
 using Microsoft.Toolkit.HighPerformance;
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace com.etsoo.Utils.Crypto
 {
@@ -15,7 +12,7 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public static class CryptographyUtils
     {
-        private static AesManaged AESManagedCreate(string passPhrase)
+        private static Aes AESManagedCreate(string passPhrase)
         {
             // Random byte
             // 随机字节
@@ -28,12 +25,12 @@ namespace com.etsoo.Utils.Crypto
 
             // 32 x 8 = 256 bits
             // 16 x 8 = 128 bits
-            return new AesManaged()
-            {
-                Key = password.GetBytes(32),
-                IV = password.GetBytes(16),
-                Mode = CipherMode.CBC // Default
-            };
+            var aes = Aes.Create();
+            aes.Key = password.GetBytes(32);
+            aes.IV = password.GetBytes(16);
+            aes.Mode = CipherMode.CBC; // Default
+
+            return aes;
         }
 
         /// <summary>
@@ -95,11 +92,8 @@ namespace com.etsoo.Utils.Crypto
             // Init
             var bytes = new byte[size].AsSpan();
 
-            // RNGCryptoServiceProvider is essential
-            using (var crypto = new RNGCryptoServiceProvider())
-            {
-                crypto.GetBytes(bytes);
-            }
+            // Generator
+            RandomNumberGenerator.Create().GetBytes(bytes);
 
             // Return
             return bytes;

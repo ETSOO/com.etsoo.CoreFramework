@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace com.etsoo.Utils.String
+﻿namespace com.etsoo.Utils.String
 {
     /// <summary>
     /// Ignore case of string key and string value extended dictionary

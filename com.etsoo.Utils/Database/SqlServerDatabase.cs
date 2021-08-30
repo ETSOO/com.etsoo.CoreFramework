@@ -1,7 +1,5 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
 
 namespace com.etsoo.Utils.Database
 {
