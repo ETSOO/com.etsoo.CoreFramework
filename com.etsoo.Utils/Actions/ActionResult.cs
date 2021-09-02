@@ -196,7 +196,7 @@ namespace com.etsoo.Utils.Actions
             Data = data ?? new StringKeyDictionaryObject();
         }
 
-        private readonly List<ActionResultError> errors = new List<ActionResultError>();
+        private readonly List<ActionResultError> errors = new();
 
         /// <summary>
         /// Errors, grouped by field name

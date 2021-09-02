@@ -33,8 +33,7 @@ namespace com.etsoo.Web
 
             using var writer = new StringWriter();
 
-            var viewEngine = controller.HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) as ICompositeViewEngine;
-            if (viewEngine == null)
+            if (controller.HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) is not ICompositeViewEngine viewEngine)
             {
                 throw new ArgumentNullException(nameof(controller));
             }

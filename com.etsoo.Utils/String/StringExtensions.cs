@@ -61,7 +61,7 @@ namespace com.etsoo.Utils.String
             span[0] = char.ToUpper(input[0]);
 
             // Left letters to lower case
-            input.Slice(1).ToLowerInvariant(span.Slice(1));
+            input[1..].ToLowerInvariant(span[1..]);
 
             return span;
         }

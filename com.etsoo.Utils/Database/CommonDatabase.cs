@@ -91,6 +91,8 @@ namespace com.etsoo.Utils.Database
             await connection.OpenAsync();
 
             await func(connection);
+
+            await connection.CloseAsync();
         }
 
         /// <summary>

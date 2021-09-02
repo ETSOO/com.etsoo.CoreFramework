@@ -13,6 +13,9 @@
     <SignAssembly>true</SignAssembly>
 
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+
+	<EnablePreviewFeatures>true</EnablePreviewFeatures>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

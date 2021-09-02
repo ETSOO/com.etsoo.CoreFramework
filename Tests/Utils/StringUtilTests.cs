@@ -105,7 +105,7 @@ namespace Tests.Utils
         /// </summary>
         /// <param name="input">Input data</param>
         [Test, TestCaseSource(nameof(TryParsePerformanceBulkTestData))]
-        public void TryParse_Performance_Bulk(dynamic input)
+        public void TryParse_Performance_Bulk(object input)
         {
             var sw = new Stopwatch();
             sw.Start();

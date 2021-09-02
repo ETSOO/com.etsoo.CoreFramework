@@ -20,6 +20,8 @@
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
+	<EnablePreviewFeatures>true</EnablePreviewFeatures>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

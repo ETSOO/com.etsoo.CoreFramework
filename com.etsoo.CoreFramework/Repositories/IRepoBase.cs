@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Serialization;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
@@ -11,6 +12,24 @@ namespace com.etsoo.CoreFramework.Repositories
     /// </summary>
     public interface IRepoBase
     {
+        /// <summary>
+        /// Async query command as object
+        /// 异步执行命令返回对象
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        ValueTask<T?> QueryAsAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>;
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        IAsyncEnumerable<T> QueryAsListAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>;
+
         /// <summary>
         /// Query command as action result
         /// 执行命令返回操作结果

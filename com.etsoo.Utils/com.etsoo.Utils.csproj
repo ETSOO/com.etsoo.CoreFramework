@@ -19,6 +19,8 @@
     <FileVersion>1.0.5.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<EnablePreviewFeatures>true</EnablePreviewFeatures>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

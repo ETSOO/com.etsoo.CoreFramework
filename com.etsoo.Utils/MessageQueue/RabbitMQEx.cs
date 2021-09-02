@@ -161,7 +161,7 @@ namespace com.etsoo.Utils.MessageQueue
             }
         }
 
-        private IBasicProperties? createProperties(IDictionary<string, object>? arguments)
+        private IBasicProperties? CreateProperties(IDictionary<string, object>? arguments)
         {
             if (arguments == null)
                 return null;
@@ -216,7 +216,7 @@ namespace com.etsoo.Utils.MessageQueue
         public void Produce(ReadOnlyMemory<byte> body, string exchange, string routingKey, IDictionary<string, object>? arguments = null)
         {
             // Properties
-            var properties = createProperties(arguments);
+            var properties = CreateProperties(arguments);
 
             // Publish the message
             Channel.BasicPublish(exchange,
@@ -260,7 +260,7 @@ namespace com.etsoo.Utils.MessageQueue
                 throw new ArgumentNullException(nameof(RPCClientProperties));
 
             // Thread id based collection
-            var id = Thread.CurrentThread.ManagedThreadId;
+            var id = Environment.CurrentManagedThreadId;
             var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
 
             var properties = Channel.CreateBasicProperties();
@@ -289,7 +289,7 @@ namespace com.etsoo.Utils.MessageQueue
                 throw new ArgumentNullException(nameof(RPCClientProperties));
 
             // Thread id based collection
-            var id = Thread.CurrentThread.ManagedThreadId;
+            var id = Environment.CurrentManagedThreadId;
             var collection = RPCClientQueue.GetOrAdd(id, new BufferBlock<ReadOnlyMemory<byte>>());
 
             var properties = Channel.CreateBasicProperties();

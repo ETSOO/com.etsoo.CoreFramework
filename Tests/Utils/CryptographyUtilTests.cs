@@ -26,14 +26,14 @@ namespace Tests.Utils
         /// </summary>
         /// <returns></returns>
         [Test]
-        public async Task AESBase64_EncryptAndDecrypt_Test()
+        public void AESBase64_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var bytes = await CryptographyUtils.AESEncryptAsync(data, password);
+            var bytes = CryptographyUtils.AESEncrypt(data, password);
             var result = Convert.ToBase64String(bytes);
 
             // Act
-            var decryptedData = await CryptographyUtils.AESDecryptAsync(Convert.FromBase64String(result), password);
+            var decryptedData = CryptographyUtils.AESDecrypt(Convert.FromBase64String(result), password);
             var decriptedString = Encoding.UTF8.GetString(decryptedData);
 
             // Assert
@@ -45,13 +45,13 @@ namespace Tests.Utils
         /// </summary>
         /// <returns></returns>
         [Test]
-        public async Task AESHex_EncryptAndDecrypt_Test()
+        public void AESHex_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var result = Convert.ToHexString(await CryptographyUtils.AESEncryptAsync(data, password));
+            var result = Convert.ToHexString(CryptographyUtils.AESEncrypt(data, password));
 
             // Act
-            var decryptedData = await CryptographyUtils.AESDecryptAsync(Convert.FromHexString(result), password);
+            var decryptedData = CryptographyUtils.AESDecrypt(Convert.FromHexString(result), password);
             var decriptedString = Encoding.UTF8.GetString(decryptedData);
 
             // Assert

@@ -12,7 +12,7 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public static class CryptographyUtils
     {
-        private static Aes AESManagedCreate(string passPhrase)
+        private static (byte[], byte[]) AESManagedCreate(string passPhrase)
         {
             // Random byte
             // 随机字节
@@ -23,14 +23,9 @@ namespace com.etsoo.Utils.Crypto
             // https://stackoverflow.com/questions/2659214/why-do-i-need-to-use-the-rfc2898derivebytes-class-in-net-instead-of-directly
             using var password = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(passPhrase), new byte[] { 0, 1, 2, randByte, 4, 5, 6, 7 }, 10000);
 
-            // 32 x 8 = 256 bits
-            // 16 x 8 = 128 bits
-            var aes = Aes.Create();
-            aes.Key = password.GetBytes(32);
-            aes.IV = password.GetBytes(16);
-            aes.Mode = CipherMode.CBC; // Default
-
-            return aes;
+            // Key: 32 x 8 = 256 bits
+            // IV: 16 x 8 = 128 bits
+            return (password.GetBytes(32), password.GetBytes(16));
         }
 
         /// <summary>
@@ -42,15 +37,12 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="cipherTextBytes">Cipher text bytes</param>
         /// <param name="passPhrase">Password phrase</param>
         /// <returns>Encrypted bytes</returns>
-        public static async Task<byte[]> AESDecryptAsync(byte[] cipherTextBytes, string passPhrase)
+        public static byte[] AESDecrypt(byte[] cipherTextBytes, string passPhrase)
         {
-            using var aesAlg = AESManagedCreate(passPhrase);
-            using var decryptor = aesAlg.CreateDecryptor();
-            var manager = new RecyclableMemoryStreamManager();
-            using var csDecrypt = new CryptoStream(manager.GetStream(cipherTextBytes), decryptor, CryptoStreamMode.Read, true);
-            using var ms = new MemoryStream();
-            await csDecrypt.CopyToAsync(ms);
-            return ms.ToArray();
+            using var aes = Aes.Create();
+            var (key, iv) = AESManagedCreate(passPhrase);
+            aes.Key = key;
+            return aes.DecryptCbc(cipherTextBytes, iv);
         }
 
         /// <summary>
@@ -60,25 +52,12 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="plainText">Plain text</param>
         /// <param name="passPhrase">Password phrase</param>
         /// <returns>Encrypted bytes</returns>
-        public static async Task<byte[]> AESEncryptAsync(string plainText, string passPhrase)
+        public static byte[] AESEncrypt(string plainText, string passPhrase)
         {
-            using var aesAlg = AESManagedCreate(passPhrase);
-            using var encryptor = aesAlg.CreateEncryptor();
-
-            var manager = new RecyclableMemoryStreamManager();
-            using var msEncrypt = manager.GetStream();
-
-            // leaveOpen = true is critical
-            using var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write, true);
-
-            using var swEncrypt = new StreamWriter(csEncrypt);
-
-            // Write the plain text for encryption
-            await swEncrypt.WriteAsync(plainText);
-            await swEncrypt.DisposeAsync();
-
-            // Return byte array
-            return msEncrypt.ToArray();
+            using var aes = Aes.Create();
+            var (key, iv) = AESManagedCreate(passPhrase);
+            aes.Key = key;
+            return aes.EncryptCbc(Encoding.UTF8.GetBytes(plainText), iv);
         }
 
         /// <summary>

@@ -97,27 +97,37 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Async query command as object
         /// 异步执行命令返回对象
         /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="command">Command</param>
-        /// <returns>Action result</returns>
-        public async Task<T?> QueryAsAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
+        /// <returns>Result</returns>
+        public async ValueTask<T?> QueryAsAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>
         {
-            var list = await QueryAsListAsync<T>(command, callback);
-            return list.FirstOrDefault();
+            var list = QueryAsListAsync<T>(command);
+            return await list.FirstOrDefaultAsync();
         }
 
         /// <summary>
         /// Async query command as object list
         /// 异步执行命令返回对象列表
         /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="command">Command</param>
-        /// <returns>Action result</returns>
-        public async Task<IEnumerable<T>> QueryAsListAsync<T>(CommandDefinition command, Func<Task<DbDataReader>, Task<IEnumerable<T>>> callback)
+        /// <returns>Result</returns>
+        public async IAsyncEnumerable<T> QueryAsListAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>
         {
-            return await App.DB.WithConnection((connection) =>
+            using var connection = App.DB.NewConnection();
+
+            using var reader = await connection.ExecuteReaderAsync(command);
+
+            var items = T.CreateAsync(reader);
+
+            await foreach (var item in items)
             {
-                var readerTask = connection.ExecuteReaderAsync(command);
-                return callback(readerTask);
-            });
+                yield return item;
+            }
+
+            await reader.CloseAsync();
+            await connection.CloseAsync();
         }
 
         /// <summary>

@@ -152,29 +152,17 @@ namespace com.etsoo.SourceGenerators
 
                 namespace {ns}
                 {{
-                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDataReaderParser
+                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDataReaderParser<{name}>
                     {{
-                        public static async Task<IEnumerable<{name}>> CreateAsync(Task<DbDataReader> readerTask)
+                        public static async IAsyncEnumerable<{name}> CreateAsync(DbDataReader reader)
                         {{
-                            using var reader = await readerTask;
-                            var list = await CreateAsync(reader);
-                            return list;
-                        }}
-
-                        public static async Task<IEnumerable<{name}>> CreateAsync(DbDataReader reader)
-                        {{
-                            // Object list
-                            var list = new List<{name}>();
-                            
                             // Column names
                             var names = reader.GetColumnNames().ToList();
 
                             while(await reader.ReadAsync())
                             {{
-                                list.Add(new {name} {GenerateBody(context, tds, utcDateTime.GetValueOrDefault())});
+                                yield return new {name} {GenerateBody(context, tds, utcDateTime.GetValueOrDefault())};
                             }}
-
-                            return list;
                         }}
                     }}
                 }}
@@ -187,7 +175,7 @@ namespace com.etsoo.SourceGenerators
         {
             // The generator infrastructure will create a receiver and populate it
             // We can retrieve the populated instance via the context
-            if (!(context.SyntaxReceiver is SyntaxReceiver syntaxReceiver))
+            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
             {
                 return;
             }

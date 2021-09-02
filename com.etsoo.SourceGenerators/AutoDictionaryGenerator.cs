@@ -147,7 +147,7 @@ namespace com.etsoo.SourceGenerators
 
                 namespace {ns}
                 {{
-                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDictionaryParser
+                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDictionaryParser<{name}>
                     {{
                         public static {name} Create(StringKeyDictionaryObject dic)
                         {{
@@ -164,7 +164,7 @@ namespace com.etsoo.SourceGenerators
         {
             // The generator infrastructure will create a receiver and populate it
             // We can retrieve the populated instance via the context
-            if (!(context.SyntaxReceiver is SyntaxReceiver syntaxReceiver))
+            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
             {
                 return;
             }

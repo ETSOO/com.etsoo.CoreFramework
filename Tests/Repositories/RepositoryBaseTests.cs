@@ -5,9 +5,7 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
 using System.Data.Common;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Tests.Repositories
 {
@@ -58,10 +56,7 @@ namespace Tests.Repositories
             var command = new CommandDefinition(sql);
 
             // Act
-            var result = await repo.QueryAsAsync(command, (Task<DbDataReader> readerTask) =>
-            {
-                return TestUserModule.CreateAsync(readerTask);
-            });
+            var result = await repo.QueryAsAsync<TestUserModule>(command);
 
             // Assert
             Assert.IsTrue(result?.Name == "Admin 1");
