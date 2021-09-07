@@ -232,6 +232,20 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// View entity JSON data HTTP Response
+        /// 浏览实体JSON数据到HTTP响应
+        /// </summary>
+        /// <param name="response">HTTP Response</param>
+        /// <param name="id">Id</param>
+        /// <param name="range">Range</param>
+        /// <returns>Task</returns>
+        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default")
+        {
+            var command = NewReadCommand(id, range, DataFormat.JSON);
+            await ReadJsonToStreamAsync(command, response);
+        }
+
+        /// <summary>
         /// Create report command
         /// 创建报表命令
         /// </summary>

@@ -66,6 +66,16 @@ namespace com.etsoo.CoreFramework.Repositories
         Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat format = DataFormat.JSON);
 
         /// <summary>
+        /// View entity JSON data HTTP Response
+        /// 浏览实体JSON数据到HTTP响应
+        /// </summary>
+        /// <param name="response">HTTP Response</param>
+        /// <param name="id">Id</param>
+        /// <param name="range">Range</param>
+        /// <returns>Task</returns>
+        Task ReadAsync(HttpResponse response, T id, string range = "default");
+
+        /// <summary>
         /// Entity report
         /// 实体报告
         /// </summary>
