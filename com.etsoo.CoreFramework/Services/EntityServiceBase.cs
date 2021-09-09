@@ -41,7 +41,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> CreateAsync(object model)
+        public virtual async Task<IActionResult> CreateAsync(object model)
         {
             return await Repo.CreateAsync(model);
         }
@@ -87,7 +87,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ
+        public virtual async Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ
         {
             await Repo.QueryAsync(model, response);
         }
@@ -112,7 +112,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <returns>Task</returns>
-        public async Task ReportAsync(HttpResponse response, string range, object? modal = null)
+        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null)
         {
             await Repo.ReportAsync(response, range, modal);
         }
