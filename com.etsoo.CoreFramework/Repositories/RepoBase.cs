@@ -40,9 +40,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, object? parameters = null, CommandType type = CommandType.StoredProcedure)
+        protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType type = CommandType.StoredProcedure)
         {
-            return new CommandDefinition(name, FormatParameters(parameters), commandType: type);
+            return new CommandDefinition(name, parameters, commandType: type);
         }
 
         /// <summary>
@@ -70,11 +70,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="parameters">Parameters</param>
         /// <returns>Result</returns>
-        virtual protected object? FormatParameters(object? parameters)
+        virtual protected DynamicParameters FormatParameters(object parameters)
         {
-            if (parameters == null)
-                return null;
-
             if (parameters is DynamicParameters dp)
             {
                 return dp;
@@ -90,7 +87,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 return p.AsParameters(App);
             }
 
-            return parameters;
+            return new DynamicParameters(parameters);
         }
 
         /// <summary>

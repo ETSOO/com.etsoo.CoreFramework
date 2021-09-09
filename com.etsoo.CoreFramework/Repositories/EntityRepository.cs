@@ -1,4 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Models;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.SpanMemory;
 using Dapper;
@@ -13,8 +15,12 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 实体仓库，实现增删改查
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityRepository<C, T> : RepoBase<C>, IEntityRepository<T> where C : DbConnection where T : struct
+    /// <typeparam name="T">Generic user id type</typeparam>
+    /// <typeparam name="O">Generic organization id type</typeparam>
+    public abstract class EntityRepository<C, T, O> : LoginedRepo<C, T, O>, IEntityRepository<T, O>
+        where C : DbConnection
+        where T : struct
+        where O : struct
     {
         /// <summary>
         /// Flag
@@ -42,7 +48,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepository(ICoreApplication<C> app, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app)
+        public EntityRepository(ICoreApplication<C> app, ICurrentUser<T, O> user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
         {
             Flag = flag.AsMemory();
             ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
@@ -119,7 +125,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Action result</returns>
         public virtual async Task<IActionResult> CreateAsync(object model)
         {
-            var command = CreateCommand(GetCommandName("create"), model);
+            var parameters = FormatParameters(model);
+            
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("create"), parameters);
+
             return await QueryAsResultAsync(command);
         }
 
@@ -131,12 +142,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Command</returns>
         protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids)
         {
-            var name = GetCommandName("delete");
-
             var parameters = new DynamicParameters();
             parameters.Add("ids", App.DB.AsListParameter(ids));
 
-            return CreateCommand(name, parameters);
+            AddSystemParameters(parameters);
+
+            return CreateCommand(GetCommandName("delete"), parameters);
         }
 
         /// <summary>
@@ -175,11 +186,15 @@ namespace com.etsoo.CoreFramework.Repositories
             // Avoid possible SQL injection attack
             FilterRange(range);
 
-            var key = "read".AsSpan();
+            // read_for
+            var key = string.Concat("read", ProcedureJoinChar.Span, "for");
+            
             var name = format.HasValue ? GetCommandName(key, range, format.Value.ToString().ToLower()) : GetCommandName(key, range);
 
             var parameters = new DynamicParameters();
             parameters.Add("id", id);
+
+            AddSystemParameters(parameters);
 
             return CreateCommand(name, parameters);
         }
@@ -258,9 +273,13 @@ namespace com.etsoo.CoreFramework.Repositories
             // Avoid possible SQL injection attack
             FilterRange(range);
 
+            var parameters = FormatParameters(model ?? new DynamicParameters());
+
+            AddSystemParameters(parameters);
+
             var key = "read".AsSpan();
             var name = format.HasValue ? GetCommandName(key, range, format.Value.ToString().ToLower()) : GetCommandName(key, range);
-            return CreateCommand(name, model);
+            return CreateCommand(name, parameters);
         }
 
         /// <summary>
@@ -330,9 +349,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync(object model)
+        public virtual async Task<IActionResult> UpdateAsync<D>(D model) where D : IdModel<T>
         {
-            var command = CreateCommand(GetCommandName("update"), model);
+            var parameters = FormatParameters(model);
+
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("update"), parameters);
+
             return await QueryAsResultAsync(command);
         }
 
@@ -343,9 +367,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(object model, HttpResponse response)
+        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
         {
-            var command = CreateCommand(GetCommandName("list_json"), model);
+            var parameters = FormatParameters(model);
+
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("list_json"), parameters);
+
             await ReadJsonToStreamAsync(command, response);
         }
 
@@ -356,9 +385,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync(object model, HttpResponse response)
+        public async Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ
         {
-            var command = CreateCommand(GetCommandName("query_json"), model);
+            var parameters = FormatParameters(model);
+
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("query_json"), parameters);
+
             await ReadJsonToStreamAsync(command, response);
         }
     }

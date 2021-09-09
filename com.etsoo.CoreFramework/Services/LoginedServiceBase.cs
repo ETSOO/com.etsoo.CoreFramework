@@ -10,9 +10,13 @@ namespace com.etsoo.CoreFramework.Services
     /// Logined service base for business logic
     /// 已登录业务逻辑的基础服务
     /// </summary>
+    /// <typeparam name="C">Generic connection type</typeparam>
+    /// <typeparam name="R">Generic repository type</typeparam>
+    /// <typeparam name="T">Generic user id type</typeparam>
+    /// <typeparam name="O">Generic organization id type</typeparam>
     public abstract class LoginedServiceBase<C, R, T, O> : ServiceBase<C, R>
         where C : DbConnection
-        where R : IRepoBase
+        where R : ILoginedRepo<T, O>
         where T : struct
         where O : struct
     {

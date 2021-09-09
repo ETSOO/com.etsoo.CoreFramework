@@ -1,10 +1,9 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Database;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
 
 namespace Tests.Repositories
 {
@@ -17,9 +16,9 @@ namespace Tests.Repositories
         /// <summary>
         /// Int id entity repository
         /// </summary>
-        private class IntEntityRepository : EntityRepository<SqlConnection, int>
+        private class IntEntityRepository : EntityRepository<SqlConnection, int, int>
         {
-            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag) { }
+            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, null!, flag) { }
 
             /// <summary>
             /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
@@ -31,6 +30,11 @@ namespace Tests.Repositories
             public new string GetCommandName(ReadOnlySpan<char> part1, ReadOnlySpan<char> part2)
             {
                 return base.GetCommandName(part1, part2);
+            }
+
+            public override void AddSystemParameters(DynamicParameters parameters)
+            {
+                // No additional parameters will be passed
             }
         }
 

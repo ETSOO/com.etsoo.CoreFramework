@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Actions;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.Utils.Actions;
 using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
 
@@ -8,7 +9,11 @@ namespace com.etsoo.CoreFramework.Repositories
     /// Entity repository interface for CURD(Create, Update, Read, Delete)
     /// 实体仓库接口，实现增删改查
     /// </summary>
-    public interface IEntityRepository<T> : IRepoBase where T : struct
+    /// <typeparam name="T">Generic user id type</typeparam>
+    /// <typeparam name="O">Generic organization id type</typeparam>
+    public interface IEntityRepository<T, O> : ILoginedRepo<T, O>
+        where T : struct
+        where O : struct
     {
         /// <summary>
         /// Create entity
@@ -107,12 +112,22 @@ namespace com.etsoo.CoreFramework.Repositories
         Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat format = DataFormat.JSON);
 
         /// <summary>
+        /// Entity JSON report to HTTP Response
+        /// 实体报告JSON数据到HTTP响应
+        /// </summary>
+        /// <param name="response">HTTP Response</param>
+        /// <param name="range">View range</param>
+        /// <param name="modal">Condition modal</param>
+        /// <returns>Task</returns>
+        Task ReportAsync(HttpResponse response, string range, object? modal = null);
+
+        /// <summary>
         /// Update entity
         /// 更新实体
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> UpdateAsync(object model);
+        Task<IActionResult> UpdateAsync<D>(D model) where D : IdModel<T>;
 
         /// <summary>
         /// Data list
@@ -121,7 +136,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        Task ListAsync(object model, HttpResponse response);
+        Task ListAsync(TiplistRQ<T> model, HttpResponse response);
 
         /// <summary>
         /// Query data
@@ -130,6 +145,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        Task QueryAsync(object model, HttpResponse response);
+        Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ;
     }
 }
