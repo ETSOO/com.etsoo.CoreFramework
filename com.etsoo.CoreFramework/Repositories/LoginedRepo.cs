@@ -21,7 +21,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        public ICurrentUser<T, O> User { get; }
+        virtual protected ICurrentUser<T, O> User { get; }
 
         /// <summary>
         /// Constructor

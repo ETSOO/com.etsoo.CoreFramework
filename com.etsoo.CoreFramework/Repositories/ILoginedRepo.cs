@@ -1,5 +1,4 @@
-﻿using com.etsoo.CoreFramework.User;
-using Dapper;
+﻿using Dapper;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -13,12 +12,6 @@ namespace com.etsoo.CoreFramework.Repositories
         where T : struct
         where O : struct
     {
-        /// <summary>
-        /// Current user
-        /// 当前用户
-        /// </summary>
-        ICurrentUser<T, O> User { get; }
-
         /// <summary>
         /// Add system parameters
         /// 添加系统参数
