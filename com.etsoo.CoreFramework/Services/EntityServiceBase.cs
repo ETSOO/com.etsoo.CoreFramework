@@ -87,7 +87,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public virtual async Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ
+        public virtual async Task QueryAsync(QueryRQ model, HttpResponse response)
         {
             await Repo.QueryAsync(model, response);
         }
@@ -121,10 +121,9 @@ namespace com.etsoo.CoreFramework.Services
         /// Update
         /// 更新
         /// </summary>
-        /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync<D>(D model) where D : IdModel<T>
+        public virtual async Task<IActionResult> UpdateAsync(IdModel<T> model)
         {
             return await Repo.UpdateAsync(model);
         }
