@@ -135,7 +135,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Id</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public async Task UpdateViewAsync(T id, HttpResponse response)
+        public async Task UpdateReadAsync(T id, HttpResponse response)
         {
             await Repo.ReadAsync(response, id, "update");
         }
