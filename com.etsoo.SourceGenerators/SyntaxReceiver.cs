@@ -57,7 +57,6 @@ namespace com.etsoo.SourceGenerators
 
                 // Business logic to decide what we're interested in goes here
                 if (syntaxNode is RecordDeclarationSyntax rds
-                    && rds.HasToken(SyntaxKind.SealedKeyword)
                     && rds.AttributeLists.HasAttribute(AttributeType))
                 {
                     // Partial Record
@@ -70,7 +69,6 @@ namespace com.etsoo.SourceGenerators
                     StructCandidates.Add(sds);
                 }
                 else if (syntaxNode is ClassDeclarationSyntax cds
-                    && cds.HasToken(SyntaxKind.SealedKeyword)
                     && cds.AttributeLists.HasAttribute(AttributeType))
                 {
                     // Partial Class
