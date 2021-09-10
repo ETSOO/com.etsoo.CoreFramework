@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace com.etsoo.SourceGenerators
 {
@@ -15,11 +14,6 @@ namespace com.etsoo.SourceGenerators
         public ISymbol Symbol { get; }
 
         /// <summary>
-        /// Type syntax
-        /// </summary>
-        public TypeSyntax Type { get; }
-
-        /// <summary>
         /// Type symbol
         /// </summary>
         public ITypeSymbol TypeSymbol { get; }
@@ -33,11 +27,11 @@ namespace com.etsoo.SourceGenerators
         /// Constructor
         /// </summary>
         /// <param name="symbol">Member symbol</param>
-        /// <param name="type">Type syntax</param>
         /// <param name="typeSymbol">Type symbol</param>
         /// <param name="nullable">Nullable</param>
-        public ParsedMember(ISymbol symbol, TypeSyntax type, ITypeSymbol typeSymbol, bool nullable)
+        public ParsedMember(ISymbol symbol, ITypeSymbol typeSymbol)
         {
+            var nullable = typeSymbol.IsNullable();
             if (nullable)
             {
                 var enumType = typeSymbol.GetEnumType();
@@ -61,7 +55,7 @@ namespace com.etsoo.SourceGenerators
                 }
             }
 
-            (Symbol, Type, TypeSymbol, Nullable) = (symbol, type, typeSymbol, nullable);
+            (Symbol, TypeSymbol, Nullable) = (symbol, typeSymbol, nullable);
         }
 
         /// <summary>
@@ -71,7 +65,7 @@ namespace com.etsoo.SourceGenerators
         /// <param name="type">Type syntax</param>
         /// <param name="typeSymbol">Type symbol</param>
         /// <param name="nullable">Nullable</param>
-        public void Deconstruct(out ISymbol symbol, out TypeSyntax type, out ITypeSymbol typeSymbol, out bool nullable) => 
-            (symbol, type, typeSymbol, nullable) = (Symbol, Type, TypeSymbol, Nullable);
+        public void Deconstruct(out ISymbol symbol, out ITypeSymbol typeSymbol, out bool nullable) => 
+            (symbol, typeSymbol, nullable) = (Symbol, TypeSymbol, Nullable);
     }
 }

@@ -24,17 +24,17 @@ namespace com.etsoo.SourceGenerators
             return typeName.IsNumericType() ? "WriteNumber" : "WriteString";
         }
 
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds)
+        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances)
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds, out _);
+            var members = context.ParseMembers(tds, externalInheritances, out _);
 
             if(!context.CancellationToken.IsCancellationRequested)
             {
                 foreach (var member in members)
                 {
-                    var (symbol, type, typeSymbol, nullable) = member;
+                    var (symbol, typeSymbol, nullable) = member;
 
                     // Field name
                     var fieldName = symbol.Name;
@@ -43,7 +43,7 @@ namespace com.etsoo.SourceGenerators
                     var isField = (symbol.Kind == SymbolKind.Field).ToCode();
 
                     // Is readonly
-                    var isReadonly = type.HasToken(SyntaxKind.ReadOnlyKeyword).ToCode();
+                    var isReadonly = typeSymbol.IsReadOnly.ToCode();
 
                     // Is nullable
                     var isNullable = nullable ? $"{fieldName} == null" : "false";
@@ -65,7 +65,9 @@ namespace com.etsoo.SourceGenerators
                     {
                         // Value field
                         var valueField = nullable && typeSymbol.IsValueType ? $"{fieldName}.Value" : fieldName;
-                        var method = GetMethod(type.ToString());
+
+                        // typeSymbol.ToString() = "int", typeSymbol.Name = "Int32"
+                        var method = GetMethod(typeSymbol.ToString());
                         item.AppendLine($@"w.{method}({pName}, {valueField});");
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Enum)
@@ -138,10 +140,15 @@ namespace com.etsoo.SourceGenerators
             // Keyword
             var keyword = tds.Keyword.ToString();
 
+            // Inheritance
+            var externals = new List<string>();
+
             // Body
-            var body = GenerateBody(context, tds);
+            var body = GenerateBody(context, tds, externals);
             if (context.CancellationToken.IsCancellationRequested)
                 return;
+
+            externals.Add("com.etsoo.Utils.Serialization.IJsonSerialization");
 
             // Source code
             var source = $@"
@@ -152,7 +159,7 @@ namespace com.etsoo.SourceGenerators
 
                 namespace {ns}
                 {{
-                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IJsonSerialization
+                    public partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
                         /// <summary>
                         /// To Json
@@ -188,7 +195,7 @@ namespace com.etsoo.SourceGenerators
         {
             // The generator infrastructure will create a receiver and populate it
             // We can retrieve the populated instance via the context
-            if (!(context.SyntaxReceiver is SyntaxReceiver syntaxReceiver))
+            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
             {
                 return;
             }
@@ -215,14 +222,14 @@ namespace com.etsoo.SourceGenerators
         public void Initialize(GeneratorInitializationContext context)
         {
             /*
-            if (!Debugger.IsAttached)
+            if (!System.Diagnostics.Debugger.IsAttached)
             {
-                Debugger.Launch();
+                System.Diagnostics.Debugger.Launch();
             }
             */
 
             // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToJsonAttribute), SyntaxKind.PartialKeyword));
+            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToJsonAttribute)));
         }
     }
 }

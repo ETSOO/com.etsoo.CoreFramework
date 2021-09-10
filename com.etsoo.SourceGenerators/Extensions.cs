@@ -99,6 +99,18 @@ namespace com.etsoo.SourceGenerators
         }
 
         /// <summary>
+        /// Test SyntaxNode has multiple kinds of token
+        /// 测试 SyntaxNode 是否具有多个类型的令牌
+        /// </summary>
+        /// <param name="sn">SyntaxNode</param>
+        /// <param name="kinds">Syntax kinds</param>
+        /// <returns>Result</returns>
+        public static bool HasTokens(this SyntaxNode sn, IEnumerable<SyntaxKind> kinds)
+        {
+            return sn.ChildTokens().Count(token => kinds.Any(kind => token.IsKind(kind))) == kinds.Count();
+        }
+
+        /// <summary>
         /// Get parent SyntaxNode
         /// 获取父 SyntaxNode
         /// </summary>
@@ -226,7 +238,7 @@ namespace com.etsoo.SourceGenerators
         /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="td">TypeDeclarationSyntax</param>
         /// <returns>Public properties and fields</returns>
-        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, out bool isPositionalRecord)
+        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, out bool isPositionalRecord)
         {
             var items = new List<ParsedMember>();
 
@@ -244,8 +256,7 @@ namespace com.etsoo.SourceGenerators
                     var pSymbol = context.ParseSyntaxNode<IParameterSymbol>(p);
                     if (pSymbol != null)
                     {
-                        var (pNullable, type) = p.Type.IsNullable();
-                        items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
+                        items.Add(new ParsedMember(pSymbol, pSymbol.Type));
                     }
                 }
             }
@@ -267,8 +278,7 @@ namespace com.etsoo.SourceGenerators
                         var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
                         if (pSymbol != null)
                         {
-                            var (pNullable, type) = p.Type.IsNullable();
-                            items.Add(new ParsedMember(pSymbol, type, pSymbol.Type, pNullable));
+                            items.Add(new ParsedMember(pSymbol, pSymbol.Type));
                         }
                     }
                     else if (member is FieldDeclarationSyntax f)
@@ -280,9 +290,7 @@ namespace com.etsoo.SourceGenerators
                             var fSymbol = context.ParseSyntaxNode<IFieldSymbol>(variable);
                             if (fSymbol != null)
                             {
-                                var (fNullable, fType) = f.Declaration.Type.IsNullable();
-
-                                items.Add(new ParsedMember(fSymbol, fType, fSymbol.Type, fNullable));
+                                items.Add(new ParsedMember(fSymbol, fSymbol.Type));
                             }
                         }
                     }
@@ -301,12 +309,11 @@ namespace com.etsoo.SourceGenerators
                     {
                         var sm = context.Compilation.GetSemanticModel(nameSyntax.SyntaxTree);
                         var symbol = sm.GetSymbolInfo(nameSyntax).Symbol;
-                        if (symbol == null) continue;
+                        if (symbol == null || symbol is not INamedTypeSymbol namedSymbol) continue;
 
                         // symbol.ToDisplayString();
-                        var name = symbol.Name;
-
-                        var locations = symbol.Locations;
+                        var name = namedSymbol.Name;
+                        var locations = namedSymbol.Locations;
                         if (locations != null)
                         {
                             foreach (var location in locations)
@@ -319,11 +326,31 @@ namespace com.etsoo.SourceGenerators
 
                                     if(declare != null)
                                     {
-                                        var declareItems = ParseMembers(context, declare, out _);
+                                        var declareItems = ParseMembers(context, declare, externalInheritances, out _);
                                         items.AddRange(declareItems);
                                     }
                                 }
+                                else if(location.MetadataModule != null)
+                                {
+                                    // Same with namedSymbol.ToDisplayString(), namedSymbol.Name only the name of the class
+                                    externalInheritances.Add(namedSymbol.ToString());
 
+                                    var members = namedSymbol.GetMembers();
+                                    foreach(var member in members)
+                                    {
+                                        // Public properties only
+                                        if (member.DeclaredAccessibility != Accessibility.Public) continue;
+
+                                        if(member is IPropertySymbol property)
+                                        {
+                                            items.Add(new ParsedMember(property, property.Type));
+                                        }
+                                        else if(member is IFieldSymbol field)
+                                        {
+                                            items.Add(new ParsedMember(field, field.Type));
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

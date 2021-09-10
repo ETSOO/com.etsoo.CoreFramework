@@ -31,15 +31,18 @@ namespace com.etsoo.SourceGenerators
         /// </summary>
         public readonly Type AttributeType;
 
-        private readonly SyntaxKind? KeywordKind;
+        // Limited kinds
+        private readonly List<SyntaxKind> Kinds = new() { SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword };
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="attributeType">Attribute type</param>
-        /// <param name="keywordKind">Keyword kind required</param>
-        public SyntaxReceiver(Type attributeType, SyntaxKind? keywordKind) => (AttributeType, KeywordKind) = (attributeType, keywordKind);
+        public SyntaxReceiver(Type attributeType)
+        {
+            AttributeType = attributeType;
+        }
 
         /// <summary>
         /// Visit filter
@@ -49,23 +52,25 @@ namespace com.etsoo.SourceGenerators
         {
             try
             {
+                // Check token first
+                if (!syntaxNode.HasTokens(Kinds)) return;
+
                 // Business logic to decide what we're interested in goes here
                 if (syntaxNode is RecordDeclarationSyntax rds
-                    && (!KeywordKind.HasValue || rds.HasToken(KeywordKind.Value))
+                    && rds.HasToken(SyntaxKind.SealedKeyword)
                     && rds.AttributeLists.HasAttribute(AttributeType))
                 {
                     // Partial Record
                     RecordCandidates.Add(rds);
                 }
                 else if (syntaxNode is StructDeclarationSyntax sds
-                    && (!KeywordKind.HasValue || sds.HasToken(KeywordKind.Value))
                     && sds.AttributeLists.HasAttribute(AttributeType))
                 {
                     // Partial Struct
                     StructCandidates.Add(sds);
                 }
                 else if (syntaxNode is ClassDeclarationSyntax cds
-                    && (!KeywordKind.HasValue || cds.HasToken(KeywordKind.Value))
+                    && cds.HasToken(SyntaxKind.SealedKeyword)
                     && cds.AttributeLists.HasAttribute(AttributeType))
                 {
                     // Partial Class

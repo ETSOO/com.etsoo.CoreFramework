@@ -1,5 +1,5 @@
-﻿using com.etsoo.SourceGenerators.Attributes;
-using System.Collections.Generic;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.SourceGenerators.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,7 +9,11 @@ namespace Tests
     [AutoDictionaryGenerator]
     [AutoToJson]
     [AutoToParameters]
-    public partial record DirectUser (int? Id, string Name);
+    public sealed partial record DirectUser : QueryRQ
+    {
+        public int? Id { get; init; }
+        public string Name { get; init; } = null!;
+    }
 
     /// <summary>
     /// User module for test
@@ -18,7 +22,7 @@ namespace Tests
     [AutoDataReaderGenerator]
     [AutoDictionaryGenerator]
     [AutoToParameters]
-    public partial record TestUserModule
+    public sealed partial record TestUserModule
     {
         /// <summary>
         /// Status enum

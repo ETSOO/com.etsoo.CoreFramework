@@ -15,11 +15,11 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class AutoDictionaryGenerator : ISourceGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool snakeCase)
+        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool snakeCase, List<string> externalInheritances)
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds, out bool isPositionalRecord);
+            var members = context.ParseMembers(tds, externalInheritances, out bool isPositionalRecord);
 
             if (!context.CancellationToken.IsCancellationRequested)
             {
@@ -27,7 +27,7 @@ namespace com.etsoo.SourceGenerators
 
                 foreach (var member in members)
                 {
-                    var (symbol, _, typeSymbol, nullable) = member;
+                    var (symbol, typeSymbol, nullable) = member;
 
                     // Object field name
                     var fieldName = symbol.Name;
@@ -110,6 +110,8 @@ namespace com.etsoo.SourceGenerators
                 }
             }
 
+            // Limitation: When inheritanted, please keep the same style
+            // Define constructor for Positional Record
             if (isPositionalRecord)
                 return "(" + string.Join(",\n", body) + ")";
 
@@ -138,6 +140,16 @@ namespace com.etsoo.SourceGenerators
             // Name
             var name = tds.Identifier.ToString();
 
+            // Inheritance
+            var externals = new List<string>();
+
+            // Body
+            var body = GenerateBody(context, tds, snakeCase.GetValueOrDefault(), externals);
+            if (context.CancellationToken.IsCancellationRequested)
+                return;
+
+            externals.Add($"com.etsoo.Utils.Serialization.IDictionaryParser<{name}>");
+
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Utils.String;
@@ -147,11 +159,11 @@ namespace com.etsoo.SourceGenerators
 
                 namespace {ns}
                 {{
-                    public partial {keyword} {className} : com.etsoo.Utils.Serialization.IDictionaryParser<{name}>
+                    public partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
                         public static {name} Create(StringKeyDictionaryObject dic)
                         {{
-                            return new {name} {GenerateBody(context, tds, snakeCase.GetValueOrDefault())};
+                            return new {name} {body};
                         }}
                     }}
                 }}
@@ -191,14 +203,14 @@ namespace com.etsoo.SourceGenerators
         public void Initialize(GeneratorInitializationContext context)
         {
             /*
-            if (!Debugger.IsAttached)
+            if (!System.Diagnostics.Debugger.IsAttached)
             {
-                Debugger.Launch();
+                System.Diagnostics.Debugger.Launch();
             }
             */
 
             // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoDictionaryGeneratorAttribute), SyntaxKind.PartialKeyword));
+            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoDictionaryGeneratorAttribute)));
         }
     }
 }
