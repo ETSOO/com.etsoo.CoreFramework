@@ -235,10 +235,12 @@ namespace com.etsoo.SourceGenerators
         /// 解析 SyntaxNode 为命名空间和类名
         /// </summary>
         /// <param name="context">Context</param>
-        /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="td">TypeDeclarationSyntax</param>
+        /// <param name="isPositionalRecord">Is positional record</param>
+        /// <param name="externalInheritances">External inheritance</param>
+        /// <param name="depth">Inheritance depth</param>
         /// <returns>Public properties and fields</returns>
-        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, out bool isPositionalRecord)
+        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, out bool isPositionalRecord, int depth = 0)
         {
             var items = new List<ParsedMember>();
 
@@ -316,6 +318,13 @@ namespace com.etsoo.SourceGenerators
                         var locations = namedSymbol.Locations;
                         if (locations != null)
                         {
+                            if(depth == 0)
+                            {
+                                // Same with namedSymbol.ToDisplayString(), namedSymbol.Name only the name of the class
+                                // Only when depth = 0, keep same base classes
+                                externalInheritances.Add(namedSymbol.ToString());
+                            }
+
                             foreach (var location in locations)
                             {
                                 if (location.SourceTree != null)
@@ -326,15 +335,12 @@ namespace com.etsoo.SourceGenerators
 
                                     if(declare != null)
                                     {
-                                        var declareItems = ParseMembers(context, declare, externalInheritances, out _);
+                                        var declareItems = ParseMembers(context, declare, externalInheritances, out _, depth + 1);
                                         items.AddRange(declareItems);
                                     }
                                 }
                                 else if(location.MetadataModule != null)
                                 {
-                                    // Same with namedSymbol.ToDisplayString(), namedSymbol.Name only the name of the class
-                                    externalInheritances.Add(namedSymbol.ToString());
-
                                     var members = namedSymbol.GetMembers();
                                     foreach(var member in members)
                                     {
