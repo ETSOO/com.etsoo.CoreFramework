@@ -127,7 +127,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> UpdateAsync<D>(D model) where D : IdModel<T>;
+        Task<IActionResult> UpdateAsync<D>(D model) where D : IUpdateModel<T>;
 
         /// <summary>
         /// Data list

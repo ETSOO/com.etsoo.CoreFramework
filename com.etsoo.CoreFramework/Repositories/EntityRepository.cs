@@ -349,7 +349,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync<D>(D model) where D : IdModel<T>
+        public virtual async Task<IActionResult> UpdateAsync<D>(D model) where D : IUpdateModel<T>
         {
             var parameters = FormatParameters(model);
 

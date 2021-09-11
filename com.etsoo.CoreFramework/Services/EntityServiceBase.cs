@@ -123,7 +123,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync(IdModel<T> model)
+        public virtual async Task<IActionResult> UpdateAsync(UpdateModel<T> model)
         {
             return await Repo.UpdateAsync(model);
         }
