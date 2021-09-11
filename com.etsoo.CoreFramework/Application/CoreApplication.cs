@@ -32,6 +32,11 @@ namespace com.etsoo.CoreFramework.Application
         public virtual IDatabase<C> DB { get; }
 
         /// <summary>
+        /// ICoreApplicationBase.DB implementation
+        /// </summary>
+        IDatabase<DbConnection> ICoreApplicationBase.DB => (IDatabase<DbConnection>)DB;
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
