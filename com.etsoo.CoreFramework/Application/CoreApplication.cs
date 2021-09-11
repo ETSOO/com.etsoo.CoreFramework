@@ -34,7 +34,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <summary>
         /// ICoreApplicationBase.DB implementation
         /// </summary>
-        IDatabase<DbConnection> ICoreApplicationBase.DB => (IDatabase<DbConnection>)DB;
+        IDatabase ICoreApplicationBase.DB => DB;
 
         /// <summary>
         /// Constructor

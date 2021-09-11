@@ -20,7 +20,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Database
         /// 数据库
         /// </summary>
-        IDatabase<DbConnection> DB { get; }
+        IDatabase DB { get; }
 
         /// <summary>
         /// Default Json serializer options

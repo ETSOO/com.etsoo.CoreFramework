@@ -3,11 +3,10 @@
 namespace com.etsoo.Utils.Database
 {
     /// <summary>
-    /// Database interface
+    /// Databse interface
     /// 数据库接口
     /// </summary>
-    /// <typeparam name="C"></typeparam>
-    public interface IDatabase<C> where C : DbConnection
+    public interface IDatabase
     {
         /// <summary>
         /// Snake naming, like user_id
@@ -24,6 +23,23 @@ namespace com.etsoo.Utils.Database
         IDbExceptionResult GetExceptionResult(Exception ex);
 
         /// <summary>
+        /// Convert id list to parameter value
+        /// 转换编号列表为参数值
+        /// </summary>
+        /// <typeparam name="T">Id generic</typeparam>
+        /// <param name="ids">Id list</param>
+        /// <returns>Parameter value</returns>
+        object AsListParameter<T>(IEnumerable<T> ids) where T : struct;
+    }
+
+    /// <summary>
+    /// Generic database interface
+    /// 通用数据库接口
+    /// </summary>
+    /// <typeparam name="C">Generic connection type</typeparam>
+    public interface IDatabase<C> : IDatabase where C : DbConnection
+    {
+        /// <summary>
         /// New database connection
         /// 新数据库链接对象
         /// </summary>
@@ -37,15 +53,6 @@ namespace com.etsoo.Utils.Database
         /// <typeparam name="M">Generic context class</typeparam>
         /// <returns>Context</returns>
         CommonDbContext<M> NewDbContext<M>() where M : class;
-
-        /// <summary>
-        /// Convert id list to parameter value
-        /// 转换编号列表为参数值
-        /// </summary>
-        /// <typeparam name="T">Id generic</typeparam>
-        /// <param name="ids">Id list</param>
-        /// <returns>Parameter value</returns>
-        object AsListParameter<T>(IEnumerable<T> ids) where T : struct;
 
         /// <summary>
         /// With callback connection
