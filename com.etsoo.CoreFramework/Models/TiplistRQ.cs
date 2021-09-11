@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using com.etsoo.CoreFramework.Application;
+using Dapper;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -6,13 +8,19 @@ namespace com.etsoo.CoreFramework.Models
     /// Tiplist Request data
     /// 动态列表请求数据
     /// </summary>
-    public record TiplistRQ<T> where T : struct
+    public record TiplistRQ<T> : IModelParameters where T : struct
     {
         /// <summary>
         /// Current id
         /// 当前编号
         /// </summary>
         public T? Id { get; init; }
+
+        /// <summary>
+        /// Excluded ids
+        /// 排除的编号
+        /// </summary>
+        public IEnumerable<T>? ExcludedIds { get; set; }
 
         /// <summary>
         /// Search keyword
@@ -24,6 +32,7 @@ namespace com.etsoo.CoreFramework.Models
         /// Maximum items
         /// 最大项目数
         /// </summary>
+        [Range(1, 1000)]
         public int? Items { get; init; }
 
         /// <summary>
@@ -31,11 +40,13 @@ namespace com.etsoo.CoreFramework.Models
         /// 获取参数集合
         /// </summary>
         /// <returns></returns>
-        public DynamicParameters AsParameters()
+        public DynamicParameters AsParameters(ICoreApplicationBase app)
         {
             var parameters = new DynamicParameters();
 
             parameters.Add("Id", Id);
+            if (ExcludedIds != null)
+                parameters.Add("ExcludedIds", app.DB.AsListParameter(ExcludedIds));
             if (!string.IsNullOrEmpty(Keyword))
                 parameters.Add("Keyword", new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
             parameters.Add("Items", Items);

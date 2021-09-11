@@ -1,10 +1,8 @@
 ﻿using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.Database;
-using System;
 using System.Data.Common;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
 {

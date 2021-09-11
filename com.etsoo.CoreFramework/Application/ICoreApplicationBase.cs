@@ -1,6 +1,6 @@
-﻿using System;
+﻿using com.etsoo.Utils.Database;
+using System.Data.Common;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -15,6 +15,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 程序配置
         /// </summary>
         IAppConfiguration Configuration { get; }
+
+        /// <summary>
+        /// Database
+        /// 数据库
+        /// </summary>
+        IDatabase<DbConnection> DB { get; }
 
         /// <summary>
         /// Default Json serializer options
