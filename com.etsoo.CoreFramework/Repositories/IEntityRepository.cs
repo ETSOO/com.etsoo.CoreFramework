@@ -146,5 +146,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
         Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ;
+
+        /// <summary>
+        /// Quick update
+        /// 快速更新
+        /// </summary>
+        /// <typeparam name="D">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        Task<IActionResult> QuickUpdateAsync<D>(D model, QuickUpdateConfigs configs) where D : IUpdateModel<T>;
     }
 }

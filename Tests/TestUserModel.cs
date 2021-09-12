@@ -15,6 +15,11 @@ namespace Tests
         public string Name { get; init; } = null!;
     }
 
+    public sealed partial record UserUpdateModule : UpdateModel<int>
+    {
+        public string? Name { get; init; }
+    }
+
     /// <summary>
     /// User module for test
     /// </summary>

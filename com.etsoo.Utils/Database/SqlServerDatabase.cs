@@ -20,6 +20,17 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Escape identifier
+        /// 转义标识符
+        /// </summary>
+        /// <param name="name">Input name</param>
+        /// <returns>Escaped name</returns>
+        public override string EscapeIdentifier(string name)
+        {
+            return $"[{name.Replace("[", "[[").Replace("]", "]]")}]";
+        }
+
+        /// <summary>
         /// Get exception result
         /// https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors?view=sql-server-ver15
         /// 获取数据库异常结果

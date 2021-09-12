@@ -54,7 +54,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns></returns>
         protected bool FilterRange(ReadOnlySpan<char> range, bool triggerFailureExcpetion = true)
         {
-            var valid = range.All(char.IsLetterOrDigit);
+            var valid = range.All(c => c is '_' or (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9'));
 
             if (!valid && triggerFailureExcpetion)
             {
@@ -197,6 +197,22 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Write to
             await ReadToStreamAsync(command, response.BodyWriter);
+        }
+
+        /// <summary>
+        /// Quick read data
+        /// 快速读取数据
+        /// </summary>
+        /// <typeparam name="E">Generic return type</typeparam>
+        /// <returns>Result</returns>
+        public async Task<E> QuickReadAsync<E>(string sql, DynamicParameters? parameters = null)
+        {
+            var command = CreateCommand(sql, parameters, CommandType.Text);
+
+            return await App.DB.WithConnection((connection) =>
+            {
+                return connection.QueryFirstAsync<E>(command);
+            });
         }
     }
 }

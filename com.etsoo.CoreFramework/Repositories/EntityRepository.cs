@@ -2,11 +2,15 @@
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Database;
 using com.etsoo.Utils.SpanMemory;
+using com.etsoo.Utils.String;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
+using System.Text;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -394,6 +398,81 @@ namespace com.etsoo.CoreFramework.Repositories
             var command = CreateCommand(GetCommandName("query_json"), parameters);
 
             await ReadJsonToStreamAsync(command, response);
+        }
+
+        /// <summary>
+        /// Quick update
+        /// 快速更新
+        /// </summary>
+        /// <typeparam name="D">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        public async Task<IActionResult> QuickUpdateAsync<D>(D model, QuickUpdateConfigs configs) where D : IUpdateModel<T>
+        {
+            // Validate
+            if (model.ChangedFields == null || !model.ChangedFields.Any())
+            {
+                return ApplicationErrors.NoValidData.AsResultWithTraceId("ChangedFields");
+            }
+
+            if (!configs.UpdatableFields.Any())
+            {
+                return ApplicationErrors.NoValidData.AsResultWithTraceId("UpdatableFields");
+            }
+
+            if(!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
+            {
+                return ApplicationErrors.NoValidData.AsResultWithTraceId("Conditions");
+            }
+
+            // Update fields
+            var updateFields = configs.UpdatableFields
+                .Where(field => model.ChangedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
+                .Select(field => $"{App.DB.EscapeIdentifier(field)} = @{field}");
+
+            if (!updateFields.Any())
+            {
+                return ApplicationErrors.NoValidData.AsResultWithTraceId("UpdateFields");
+            }
+
+            // Default table name
+            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag.Span).ToString();
+            var tableName = App.DB.EscapeIdentifier(configs.TableName);
+
+            // SQL
+            var sql = new StringBuilder("UPDATE ");
+            sql.Append(tableName);
+            sql.Append(" SET ");
+            sql.Append(string.Join(", ", updateFields));
+            sql.Append(" FROM ");
+            sql.Append(tableName);
+            sql.Append(" u WHERE u.");
+            sql.Append(App.DB.EscapeIdentifier(configs.IdField));
+            sql.Append(" = @Id");
+
+            if (!string.IsNullOrEmpty(configs.Conditions))
+            {
+                sql.Append(" AND ");
+                sql.Append(configs.Conditions);
+            }
+
+            // Parameters
+            var parameters = FormatParameters(model);
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
+            var records = await App.DB.NewConnection().ExecuteAsync(command);
+            if (records == 0)
+            {
+                return ApplicationErrors.NoValidData.AsResultWithTraceId("Records");
+            }
+
+            // Success
+            var result = ActionResult.OK;
+            result.Data.Add("Id", model.Id);
+            result.Data.Add("Records", records);
+            return result;
         }
     }
 }

@@ -19,6 +19,17 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Escape identifier
+        /// 转义标识符
+        /// </summary>
+        /// <param name="name">Input name</param>
+        /// <returns>Escaped name</returns>
+        public override string EscapeIdentifier(string name)
+        {
+            return $"\"{name}\"";
+        }
+
+        /// <summary>
         /// Get exception result
         /// https://www.sqlite.org/rescode.html
         /// 获取数据库异常结果

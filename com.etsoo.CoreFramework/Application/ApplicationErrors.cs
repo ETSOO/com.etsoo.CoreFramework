@@ -14,24 +14,22 @@ namespace com.etsoo.CoreFramework.Application
         /// 输出为操作结果
         /// </summary>
         /// <param name="title">Title</param>
-        /// <param name="traceId">Trace id</param>
         /// <returns>Action result</returns>
-        public IActionResult AsResult(string? title = null, string? traceId = null)
+        public IActionResult AsResult(string? title = null)
         {
             return new ActionResult(Type)
             {
-                Title = title ?? Title,
-                TraceId = traceId
+                Title = title ?? Title
             };
         }
 
         /// <summary>
-        /// As AcionResult
-        /// 输出为操作结果
+        /// As AcionResult with trace id
+        /// 输出为带追踪编号的操作结果
         /// </summary>
         /// <param name="traceId">Trace id</param>
         /// <returns>Action result</returns>
-        public IActionResult AsResult(string traceId)
+        public IActionResult AsResultWithTraceId(string traceId)
         {
             return new ActionResult(Type)
             {

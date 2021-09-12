@@ -44,6 +44,14 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Escape identifier
+        /// 转义标识符
+        /// </summary>
+        /// <param name="name">Input name</param>
+        /// <returns>Escaped name</returns>
+        public abstract string EscapeIdentifier(string name);
+
+        /// <summary>
         /// Get exception result
         /// 获取数据库异常结果
         /// </summary>

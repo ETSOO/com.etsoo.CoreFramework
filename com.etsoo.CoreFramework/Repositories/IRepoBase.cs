@@ -64,5 +64,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
         Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response);
+
+        /// <summary>
+        /// Quick read data
+        /// 快速读取数据
+        /// </summary>
+        /// <typeparam name="E">Generic return type</typeparam>
+        /// <returns>Result</returns>
+        Task<E> QuickReadAsync<E>(string sql, DynamicParameters? parameters = null);
     }
 }

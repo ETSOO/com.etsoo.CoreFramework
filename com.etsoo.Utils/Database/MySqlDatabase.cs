@@ -19,6 +19,17 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Escape identifier
+        /// 转义标识符
+        /// </summary>
+        /// <param name="name">Input name</param>
+        /// <returns>Escaped name</returns>
+        public override string EscapeIdentifier(string name)
+        {
+            return $"`{name}`";
+        }
+
+        /// <summary>
         /// Get exception result
         /// https://dev.mysql.com/doc/dev/connector-net/8.0/html/T_MySql_Data_MySqlClient_MySqlErrorCode.htm
         /// 获取数据库异常结果

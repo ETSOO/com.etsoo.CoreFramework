@@ -86,6 +86,24 @@ namespace Tests.Repositories
         }
 
         [Test]
+        public async Task UpdateAsync_Test()
+        {
+            // Arrange
+            var user = new UserUpdateModule
+            {
+                Id = 1021,
+                Name = "Admin 21",
+                ChangedFields = new[] { "name" }
+            };
+
+            // Act
+            var result = await repo.QuickUpdateAsync(user, new() { UpdatableFields = new[] { "Name" } });
+
+            // Assert
+            Assert.IsTrue(result.Success);
+        }
+
+        [Test]
         public async Task DeleteAsync_Test()
         {
             // Act
