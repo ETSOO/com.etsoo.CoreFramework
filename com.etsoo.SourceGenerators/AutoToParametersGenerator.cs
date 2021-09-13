@@ -120,7 +120,7 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
+                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
                         }
                         else
                         {
@@ -146,7 +146,7 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
+                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
                         }
                         else
                         {
@@ -238,7 +238,7 @@ namespace com.etsoo.SourceGenerators
             externals.Add("com.etsoo.Utils.Serialization.IAutoParameters");
 
             // Source code
-            var source = $@"
+            var source = $@"#nullable enable
                 using Dapper;
                 using com.etsoo.Utils.Database;
                 using com.etsoo.Utils.String;
@@ -253,8 +253,9 @@ namespace com.etsoo.SourceGenerators
                         /// Data modal to Dapper parameters
                         /// 数据模型转化为Dapper参数
                         /// </summary>
+                        /// <param name=""databaseName"">Database name, see com.etsoo.Utils.Database.Name</param>
                         /// <returns>Dynamic parameters</returns>
-                        public DynamicParameters AsParameters()
+                        public DynamicParameters AsParameters(string? databaseName = null)
                         {{
                             var parameters = new DynamicParameters();
 

@@ -9,13 +9,19 @@ namespace Tests
     [AutoDictionaryGenerator]
     [AutoToJson]
     [AutoToParameters]
-    public sealed partial record DirectUser : QueryRQ
+    public partial record DirectUser : QueryRQ
     {
         public int? Id { get; init; }
         public string Name { get; init; } = null!;
     }
 
-    public sealed partial record UserUpdateModule : UpdateModel<int>
+    [AutoToParameters]
+    public partial record UpdateUser : UpdateModel<int>
+    {
+        public string? Name { get; init; }
+    }
+
+    public partial record UserUpdateModule : UpdateModel<int>
     {
         public string? Name { get; init; }
     }
@@ -27,7 +33,7 @@ namespace Tests
     [AutoDataReaderGenerator]
     [AutoDictionaryGenerator]
     [AutoToParameters]
-    public sealed partial record TestUserModule
+    public partial record TestUserModule
     {
         /// <summary>
         /// Status enum

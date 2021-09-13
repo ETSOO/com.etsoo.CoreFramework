@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
 using System.Collections;
 using System.Data;
@@ -27,6 +28,24 @@ namespace com.etsoo.Utils.Database
                 DbType.UInt64                   => SqlDbType.BigInt,
                 _                               => new SqlParameter { DbType = type }.SqlDbType
             };
+        }
+
+        /// <summary>
+        /// Transform list to TVP
+        /// 转化列表到TVP参数列表
+        /// </summary>
+        /// <param name="list">List</param>
+        /// <param name="field">TVP field name</param>
+        /// <returns>TVP value</returns>
+        public static object ListToTVP<T>(IEnumerable<T> ids, string field = "id")
+        {
+            // Type => SqlDbType, like Int
+            var type = DbTypeToSql(DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
+
+            // Parameter UDT name
+            var udt = $"et_{type.ToString().ToLower()}_ids";
+
+            return ListToIdRecords(ids, type, field).AsTableValuedParameter(udt);
         }
 
         /// <summary>

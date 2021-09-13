@@ -15,6 +15,12 @@ namespace com.etsoo.Utils.Database
         bool SnakeNaming { get; }
 
         /// <summary>
+        /// Database name
+        /// 数据库名称
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Escape identifier
         /// 转义标识符
         /// </summary>

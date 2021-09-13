@@ -307,56 +307,42 @@ namespace com.etsoo.SourceGenerators
             {
                 foreach (var bt in tds.BaseList.Types)
                 {
-                    if(bt.Type is IdentifierNameSyntax nameSyntax)
+                    // IdentifierNameSyntax
+                    // GenericNameSyntax
+                    if (bt.Type is NameSyntax nameSyntax)
                     {
                         var sm = context.Compilation.GetSemanticModel(nameSyntax.SyntaxTree);
                         var symbol = sm.GetSymbolInfo(nameSyntax).Symbol;
-                        if (symbol == null || symbol is not INamedTypeSymbol namedSymbol) continue;
+                        if (symbol == null || symbol is not INamedTypeSymbol namedSymbol || namedSymbol.Locations == null) continue;
+
+                        if (depth == 0)
+                        {
+                            // Same with namedSymbol.ToDisplayString(), namedSymbol.Name only the name of the class
+                            // Only when depth = 0, keep same base classes
+                            // GenericNameSyntax namedSymbol is a specific type, not generic
+                            externalInheritances.Add(namedSymbol.ToString());
+                        }
 
                         // symbol.ToDisplayString();
                         var name = namedSymbol.Name;
-                        var locations = namedSymbol.Locations;
-                        if (locations != null)
+
+                        foreach (var location in namedSymbol.Locations)
                         {
-                            if(depth == 0)
+                            if (location.SourceTree != null)
                             {
-                                // Same with namedSymbol.ToDisplayString(), namedSymbol.Name only the name of the class
-                                // Only when depth = 0, keep same base classes
-                                externalInheritances.Add(namedSymbol.ToString());
+                                var declare = location.SourceTree.GetRoot().DescendantNodes()
+                                    .OfType<TypeDeclarationSyntax>()
+                                    .FirstOrDefault(d => d.Identifier.ValueText == name);
+
+                                if (declare != null)
+                                {
+                                    var declareItems = ParseMembers(context, declare, externalInheritances, out _, depth + 1);
+                                    items.AddRange(declareItems);
+                                }
                             }
-
-                            foreach (var location in locations)
+                            else
                             {
-                                if (location.SourceTree != null)
-                                {
-                                    var declare = location.SourceTree.GetRoot().DescendantNodes()
-                                        .OfType<TypeDeclarationSyntax>()
-                                        .FirstOrDefault(d => d.Identifier.ValueText == name);
-
-                                    if(declare != null)
-                                    {
-                                        var declareItems = ParseMembers(context, declare, externalInheritances, out _, depth + 1);
-                                        items.AddRange(declareItems);
-                                    }
-                                }
-                                else if(location.MetadataModule != null)
-                                {
-                                    var members = namedSymbol.GetMembers();
-                                    foreach(var member in members)
-                                    {
-                                        // Public properties only
-                                        if (member.DeclaredAccessibility != Accessibility.Public) continue;
-
-                                        if(member is IPropertySymbol property)
-                                        {
-                                            items.Add(new ParsedMember(property, property.Type));
-                                        }
-                                        else if(member is IFieldSymbol field)
-                                        {
-                                            items.Add(new ParsedMember(field, field.Type));
-                                        }
-                                    }
-                                }
+                                ParseInheritance(namedSymbol, items);
                             }
                         }
                     }
@@ -364,6 +350,35 @@ namespace com.etsoo.SourceGenerators
             }
 
             return items;
+        }
+
+        private static void ParseMember(ISymbol member, List<ParsedMember> items)
+        {
+            if (member is IFieldSymbol field)
+            {
+                items.Add(new ParsedMember(field, field.Type));
+            }
+            else if (member is IMethodSymbol method && method.MethodKind == MethodKind.PropertyGet && method.AssociatedSymbol != null)
+            {
+                items.Add(new ParsedMember(method.AssociatedSymbol, method.ReturnType));
+            }
+        }
+
+        private static void ParseInheritance(INamedTypeSymbol namedSymbol, List<ParsedMember> items)
+        {
+            var members = namedSymbol.GetMembers();
+            foreach (var member in members)
+            {
+                // Public properties only
+                if (member.DeclaredAccessibility != Accessibility.Public) continue;
+
+                ParseMember(member, items);
+            }
+
+            if (namedSymbol.BaseType != null && namedSymbol.SpecialType != SpecialType.System_Object)
+            {
+                ParseInheritance(namedSymbol.BaseType, items);
+            }
         }
 
         /// <summary>
@@ -422,7 +437,7 @@ namespace com.etsoo.SourceGenerators
         /// <returns>List or not</returns>
         public static bool IsList(this ITypeSymbol type)
         {
-            if (type.TypeKind == TypeKind.Class
+            if ((type.TypeKind == TypeKind.Class || type.TypeKind == TypeKind.Interface || type.TypeKind == TypeKind.Struct)
                 && type is INamedTypeSymbol nts
                 && nts.IsGenericType
                 && nts.TypeArguments.Length == 1

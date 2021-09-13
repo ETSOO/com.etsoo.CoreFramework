@@ -79,7 +79,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (parameters is IAutoParameters ap)
             {
-                return ap.AsParameters();
+                return ap.AsParameters(App.DB.Name);
             }
 
             if (parameters is IModelParameters p)

@@ -4,7 +4,6 @@ using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
-using System.Data.Common;
 using System.Text;
 
 namespace Tests.Repositories

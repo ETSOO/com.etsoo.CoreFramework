@@ -97,7 +97,7 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.QuickUpdateAsync(user, new() { UpdatableFields = new[] { "Name" } });
+            var result = await repo.QuickUpdateAsync(user, new(new[] { "Name" }));
 
             // Assert
             Assert.IsTrue(result.Success);

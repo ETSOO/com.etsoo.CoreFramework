@@ -23,6 +23,12 @@ namespace com.etsoo.Utils.Database
         public bool SnakeNaming { get; }
 
         /// <summary>
+        /// Database name
+        /// 数据库名称
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>

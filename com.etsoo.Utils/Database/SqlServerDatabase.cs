@@ -10,6 +10,12 @@ namespace com.etsoo.Utils.Database
     public sealed class SqlServerDatabase : CommonDatabase<SqlConnection>
     {
         /// <summary>
+        /// Database name
+        /// 数据库名称
+        /// </summary>
+        public override string Name => "SQLSERVER";
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -82,13 +88,7 @@ namespace com.etsoo.Utils.Database
         /// <returns>Parameter value</returns>
         public override object AsListParameter<T>(IEnumerable<T> ids)
         {
-            // Type => SqlDbType, like Int
-            var type = SqlServerUtils.DbTypeToSql(DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
-
-            // Parameter UDT name
-            var udt = $"et_{type.ToString().ToLower()}_ids";
-
-            return SqlServerUtils.ListToIdRecords(ids, type).AsTableValuedParameter(udt);
+            return SqlServerUtils.ListToTVP(ids);
         }
     }
 }
