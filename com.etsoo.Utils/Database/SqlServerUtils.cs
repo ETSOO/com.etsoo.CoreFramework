@@ -72,7 +72,11 @@ namespace com.etsoo.Utils.Database
         public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, string field = "id")
         {
             // SqlDataRecord definition
-            var sdr = new SqlDataRecord(new SqlMetaData(field, type));
+            SqlDataRecord sdr;
+            if (type is SqlDbType.Char or SqlDbType.NChar or SqlDbType.VarChar or SqlDbType.NVarChar)
+                sdr = new SqlDataRecord(new SqlMetaData(field, type, 50)); // 50 is the maximum length
+            else
+                sdr = new SqlDataRecord(new SqlMetaData(field, type));
 
             // List enumerator
             var enumerator = list.GetEnumerator();
