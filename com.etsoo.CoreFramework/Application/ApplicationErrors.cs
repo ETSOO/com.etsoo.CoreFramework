@@ -45,6 +45,12 @@ namespace com.etsoo.CoreFramework.Application
     public class ApplicationErrors
     {
         /// <summary>
+        /// Access denied
+        /// 访问被拒绝
+        /// </summary>
+        public static ApplicationError AccessDenied => new(nameof(AccessDenied), Resources.AccessDenied);
+
+        /// <summary>
         /// Your account has been disabled
         /// 您的帐户已被禁用
         /// </summary>
@@ -234,6 +240,7 @@ namespace com.etsoo.CoreFramework.Application
         {
             return name switch
             {
+                nameof(AccessDenied) => AccessDenied,
                 nameof(AccountDisabled) => AccountDisabled,
                 nameof(AccountExpired) => AccountExpired,
                 nameof(CodeExpired) => CodeExpired,
