@@ -61,6 +61,11 @@ namespace com.etsoo.Utils.Database
             return ListToIdRecords(list, DbTypeToSql(type), field);
         }
 
+        private static bool IsLengthSpecifiedType(SqlDbType type)
+        {
+            return type is SqlDbType.Binary or SqlDbType.VarBinary or SqlDbType.Image or SqlDbType.Text or SqlDbType.NText or SqlDbType.Char or SqlDbType.NChar or SqlDbType.VarChar or SqlDbType.NVarChar;
+        }
+
         /// <summary>
         /// Transform list to SqlDataRecord list
         /// 转化列表到TVP参数列表
@@ -68,15 +73,12 @@ namespace com.etsoo.Utils.Database
         /// <param name="list">List</param>
         /// <param name="type">Data type</param>
         /// <param name="field">TVP field name</param>
+        /// <param name="maxLength">Max length for char/byte related lists</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, string field = "id")
+        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, string field = "id", long maxLength = 50)
         {
             // SqlDataRecord definition
-            SqlDataRecord sdr;
-            if (type is SqlDbType.Char or SqlDbType.NChar or SqlDbType.VarChar or SqlDbType.NVarChar)
-                sdr = new SqlDataRecord(new SqlMetaData(field, type, 50)); // 50 is the maximum length
-            else
-                sdr = new SqlDataRecord(new SqlMetaData(field, type));
+            var sdr = IsLengthSpecifiedType(type) ? new SqlDataRecord(new SqlMetaData(field, type, maxLength)) : new SqlDataRecord(new SqlMetaData(field, type));
 
             // List enumerator
             var enumerator = list.GetEnumerator();
@@ -115,11 +117,14 @@ namespace com.etsoo.Utils.Database
         /// <param name="dic">Dictionary</param>
         /// <param name="keyType">Key data type</param>
         /// <param name="itemType">Item data type</param>
+        /// <param name="maxLength">Max length for char/byte related item lists</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, SqlDbType keyType, SqlDbType itemType)
+        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, SqlDbType keyType, SqlDbType itemType, long maxLength = 50)
         {
             // SqlDataRecord definition
-            var sdr = new SqlDataRecord(new SqlMetaData("key", keyType), new SqlMetaData("item", itemType));
+            var keyMeta = IsLengthSpecifiedType(keyType) ? new SqlMetaData("key", keyType, 50) : new SqlMetaData("key", keyType);
+            var itemMeta = IsLengthSpecifiedType(itemType) ? new SqlMetaData("item", itemType, maxLength) : new SqlMetaData("item", itemType);
+            var sdr = new SqlDataRecord(keyMeta, itemMeta);
 
             // List enumerator
             var enumerator = dic.GetEnumerator();
