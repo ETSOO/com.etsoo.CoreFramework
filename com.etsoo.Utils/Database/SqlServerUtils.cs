@@ -35,17 +35,36 @@ namespace com.etsoo.Utils.Database
         /// 转化列表到TVP参数列表
         /// </summary>
         /// <param name="list">List</param>
+        /// <param name="maxLength">Max length for char/byte related lists</param>
         /// <param name="field">TVP field name</param>
         /// <returns>TVP value</returns>
-        public static object ListToTVP<T>(IEnumerable<T> ids, string field = "id")
+        public static object ListToTVP<T>(IEnumerable<T> ids, long? maxLength = null, string field = "id")
         {
-            // Type => SqlDbType, like Int
-            var type = DbTypeToSql(DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
+            var type = typeof(T);
+            return ListToTVP(ids, DatabaseUtils.TypeToDbType(type).GetValueOrDefault(), maxLength, field, GetTypeName(type));
+        }
 
+        private static string GetTypeName(Type type)
+        {
+            return type.ToString().ToLower();
+        }
+
+        /// <summary>
+        /// Transform list to TVP
+        /// 转化列表到TVP参数列表
+        /// </summary>
+        /// <param name="ids">Id list</param>
+        /// <param name="type">Data type</param>
+        /// <param name="maxLength">Max length for char/byte related lists</param>
+        /// <param name="field">TVP field name</param>
+        /// <param name="udtKey">Default type key</param>
+        /// <returns>TVP value</returns>
+        public static object ListToTVP<T>(IEnumerable<T> ids, DbType type, long? maxLength = null, string field = "id", string? udtKey = null)
+        {
             // Parameter UDT name
-            var udt = $"et_{type.ToString().ToLower()}_ids";
+            var udt = $"et_{udtKey ?? GetTypeName(typeof(T))}_ids";
 
-            return ListToIdRecords(ids, type, field).AsTableValuedParameter(udt);
+            return ListToIdRecords(ids, type, maxLength, field).AsTableValuedParameter(udt);
         }
 
         /// <summary>
@@ -54,11 +73,12 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <param name="list">List</param>
         /// <param name="type">Data type</param>
+        /// <param name="maxLength">Max length for char/byte related lists</param>
         /// <param name="field">TVP field name</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, DbType type, string field = "id")
+        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, DbType type, long? maxLength = null, string field = "id")
         {
-            return ListToIdRecords(list, DbTypeToSql(type), field);
+            return ListToIdRecords(list, DbTypeToSql(type), maxLength, field);
         }
 
         private static bool IsLengthSpecifiedType(SqlDbType type)
@@ -72,13 +92,13 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <param name="list">List</param>
         /// <param name="type">Data type</param>
-        /// <param name="field">TVP field name</param>
         /// <param name="maxLength">Max length for char/byte related lists</param>
+        /// <param name="field">TVP field name</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, string field = "id", long maxLength = 50)
+        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, long? maxLength = null, string field = "id")
         {
             // SqlDataRecord definition
-            var sdr = IsLengthSpecifiedType(type) ? new SqlDataRecord(new SqlMetaData(field, type, maxLength)) : new SqlDataRecord(new SqlMetaData(field, type));
+            var sdr = IsLengthSpecifiedType(type) ? new SqlDataRecord(new SqlMetaData(field, type, maxLength.GetValueOrDefault(50))) : new SqlDataRecord(new SqlMetaData(field, type));
 
             // List enumerator
             var enumerator = list.GetEnumerator();

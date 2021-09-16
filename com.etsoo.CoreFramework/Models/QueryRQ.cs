@@ -9,6 +9,12 @@ namespace com.etsoo.CoreFramework.Models
     public record QueryRQ
     {
         /// <summary>
+        /// Id
+        /// 编号
+        /// </summary>
+        public int? Id { get; init;}
+
+        /// <summary>
         /// Current page
         /// 当前页码
         /// </summary>

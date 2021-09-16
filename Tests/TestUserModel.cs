@@ -11,7 +11,6 @@ namespace Tests
     [AutoToParameters]
     public partial record DirectUser : QueryRQ
     {
-        public int? Id { get; init; }
         public string Name { get; init; } = null!;
     }
 

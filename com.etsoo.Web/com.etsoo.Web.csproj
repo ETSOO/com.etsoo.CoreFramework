@@ -16,6 +16,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
+	<ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

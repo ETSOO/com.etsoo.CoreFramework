@@ -16,6 +16,7 @@
 
 	<EnablePreviewFeatures>true</EnablePreviewFeatures>
 	<LangVersion>preview</LangVersion>
+	<ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

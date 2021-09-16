@@ -111,6 +111,7 @@ namespace com.etsoo.SourceGenerators
                         {
                             continue;
                         }
+                        var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
 
                         if (string.IsNullOrEmpty(typeName))
                         {
@@ -120,12 +121,12 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
+                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}, {itemDbType}, {length.ToIntCode()}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
                         }
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if (typeSymbol.IsList())
@@ -137,6 +138,7 @@ namespace com.etsoo.SourceGenerators
                         {
                             continue;
                         }
+                        var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
 
                         if (string.IsNullOrEmpty(typeName))
                         {
@@ -146,12 +148,12 @@ namespace com.etsoo.SourceGenerators
                             var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
 
                             // String
-                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
+                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}, {itemDbType}, {length.ToIntCode()}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
                         }
                         else
                         {
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemTypeSymbol.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else if(typeSymbol.IsDictionary())
@@ -203,6 +205,11 @@ namespace com.etsoo.SourceGenerators
             }
 
             return body;
+        }
+
+        private string GetDbType(ITypeSymbol symbol, bool? isAnsi)
+        {
+            return isAnsi.GetValueOrDefault() ? "DbType.AnsiString" : symbol.Name.ToDbType();
         }
 
         private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
