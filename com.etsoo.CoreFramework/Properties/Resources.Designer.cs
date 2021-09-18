@@ -160,6 +160,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; contains an invalid email address.
+        /// </summary>
+        public static string EmailListAttributeError {
+            get {
+                return ResourceManager.GetString("EmailListAttributeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
         public static string InvalidAction {
@@ -327,6 +336,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string UserFrozen {
             get {
                 return ResourceManager.GetString("UserFrozen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid username.
+        /// </summary>
+        public static string UserIdAttributeError {
+            get {
+                return ResourceManager.GetString("UserIdAttributeError", resourceCulture);
             }
         }
         

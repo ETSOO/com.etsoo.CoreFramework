@@ -150,6 +150,9 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>该设备已被暂时禁止使用至 {0}</value>
   </data>
+  <data name="EmailListAttributeError" xml:space="preserve">
+    <value>'{0}'包含无效的电子邮件地址</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>无效的操作</value>
   </data>
@@ -206,6 +209,9 @@
   </data>
   <data name="UserFrozen" xml:space="preserve">
     <value>您的帐户已被暂时禁止使用至 {0}</value>
+  </data>
+  <data name="UserIdAttributeError" xml:space="preserve">
+    <value>'{0}'不是有效的用户名</value>
   </data>
   <data name="UserRegistered" xml:space="preserve">
     <value>用户名已注册</value>

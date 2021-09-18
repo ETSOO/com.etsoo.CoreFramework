@@ -150,6 +150,9 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>The device has been temporarily blocked until {0}</value>
   </data>
+  <data name="EmailListAttributeError" xml:space="preserve">
+    <value>'{0}' contains an invalid email address</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>Invalid Action</value>
   </data>
@@ -206,6 +209,9 @@
   </data>
   <data name="UserFrozen" xml:space="preserve">
     <value>Your account has been temporarily blocked until {0}</value>
+  </data>
+  <data name="UserIdAttributeError" xml:space="preserve">
+    <value>'{0}' is not a valid username</value>
   </data>
   <data name="UserRegistered" xml:space="preserve">
     <value>Username is already registered</value>

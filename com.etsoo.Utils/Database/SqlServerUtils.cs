@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using com.etsoo.Utils.Models;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
 using System.Collections;
@@ -158,6 +159,29 @@ namespace com.etsoo.Utils.Database
                 // Set value
                 sdr.SetValue(0, enumerator.Key);
                 sdr.SetValue(1, enumerator.Value);
+
+                // Yield return for the current item
+                // Memory saving
+                yield return sdr;
+            }
+        }
+
+        /// <summary>
+        /// Guid items to records
+        /// 转化Guid项目到TVP参数列表
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<SqlDataRecord> GuidItemToRecords(IEnumerable<GuidItem> items)
+        {
+            // SqlDataRecord definition
+            var sdr = new SqlDataRecord(new SqlMetaData("Id", SqlDbType.UniqueIdentifier), new SqlMetaData("Item", SqlDbType.VarChar, 128));
+
+            foreach (var item in items)
+            {
+                // Set value
+                sdr.SetValue(0, item.Id);
+                sdr.SetValue(1, item.Item);
 
                 // Yield return for the current item
                 // Memory saving

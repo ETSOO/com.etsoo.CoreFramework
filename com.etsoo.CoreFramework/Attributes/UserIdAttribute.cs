@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace com.etsoo.CoreFramework.Authentication
+namespace com.etsoo.CoreFramework.Attributes
 {
     /// <summary>
     /// User id validation attribute
@@ -8,6 +8,15 @@ namespace com.etsoo.CoreFramework.Authentication
     /// </summary>
     public class UserIdAttribute : ValidationAttribute
     {
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        public UserIdAttribute()
+            : base(Properties.Resources.UserIdAttributeError)
+        {
+        }
+
         /// <summary>
         /// Validity check
         /// 有效性检查
@@ -18,7 +27,7 @@ namespace com.etsoo.CoreFramework.Authentication
         {
             if (value is not string valueAsString)
             {
-                return true;
+                return false;
             }
 
             if (valueAsString.Contains('@'))
@@ -31,6 +40,17 @@ namespace com.etsoo.CoreFramework.Authentication
                 var phone = new PhoneAttribute();
                 return phone.IsValid(value);
             }
+        }
+
+        /// <summary>
+        /// Override format error message
+        /// 覆盖格式化错误信息
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <returns>Formated string</returns>
+        public override string FormatErrorMessage(string name)
+        {
+            return string.Format(this.ErrorMessageString, name);
         }
     }
 }
