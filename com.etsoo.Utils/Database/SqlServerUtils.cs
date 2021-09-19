@@ -190,6 +190,18 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Guid items to parameters
+        /// 转换Guid项目为TVP参数
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <param name="udt">Udt name</param>
+        /// <returns>Result</returns>
+        public static object GuidItemsToParameter(IEnumerable<GuidItem> items, string udt = "et_guid_items")
+        {
+            return GuidItemToRecords(items).AsTableValuedParameter(udt);
+        }
+
+        /// <summary>
         /// Convert to SQL Server DateTime same accuracy
         /// https://stackoverflow.com/questions/715432/why-is-sql-server-losing-a-millisecond
         /// 转换为SQL Server DateTime 一样的精度
