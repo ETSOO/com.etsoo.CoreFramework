@@ -35,5 +35,12 @@
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
         string? SymmetricKey { get; }
+
+        /// <summary>
+        /// Web url
+        /// 网页地址
+        /// </summary>
+
+        string WebUrl { get; }
     }
 }

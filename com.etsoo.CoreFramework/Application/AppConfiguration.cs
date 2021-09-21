@@ -17,12 +17,14 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="cultures">Supported cultures</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
+        /// <param name="webUrl">Web Url</param>
         public AppConfiguration(
             string privateKey,
             string? appId = null,
             string[]? cultures = null,
             bool modelValidated = false,
-            string? symmetricKey = null
+            string? symmetricKey = null,
+            string? webUrl = null
         )
         {
             // Default languages
@@ -34,13 +36,15 @@ namespace com.etsoo.CoreFramework.Application
                 Cultures,
                 ModelValidated,
                 PrivateKey,
-                SymmetricKey
+                SymmetricKey,
+                WebUrl
             ) = (
                 appId ?? "e",
                 cultures,
                 modelValidated,
                 privateKey,
-                symmetricKey
+                symmetricKey,
+                webUrl ?? "http://localhost"
             );
         }
 
@@ -55,7 +59,8 @@ namespace com.etsoo.CoreFramework.Application
             section.GetValue<string>("AppId"),
             section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
             modelValidated,
-            section.GetValue<string>("SymmetricKey"))
+            section.GetValue<string?>("SymmetricKey"),
+            section.GetValue<string?>("WebUrl"))
         {
         }
 
@@ -88,5 +93,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
         /// </summary>
         public string? SymmetricKey { get; }
+
+        /// <summary>
+        /// Web url
+        /// 网页地址
+        /// </summary>
+
+        public string WebUrl { get; }
     }
 }
