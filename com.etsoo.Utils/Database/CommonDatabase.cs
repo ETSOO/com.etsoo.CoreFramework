@@ -86,8 +86,9 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <typeparam name="T">Id generic</typeparam>
         /// <param name="ids">Id list</param>
+        /// <param name="maxLength">Max length</param>
         /// <returns>Parameter value</returns>
-        public virtual object AsListParameter<T>(IEnumerable<T> ids) where T : struct
+        public virtual object AsListParameter<T>(IEnumerable<T> ids, long? maxLength = null) where T : struct
         {
             return StringUtils.IEnumerableToString(ids);
         }

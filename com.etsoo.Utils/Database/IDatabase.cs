@@ -42,8 +42,9 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <typeparam name="T">Id generic</typeparam>
         /// <param name="ids">Id list</param>
+        /// <param name="maxLength">Max length</param>
         /// <returns>Parameter value</returns>
-        object AsListParameter<T>(IEnumerable<T> ids) where T : struct;
+        object AsListParameter<T>(IEnumerable<T> ids, long? maxLength = null) where T : struct;
     }
 
     /// <summary>

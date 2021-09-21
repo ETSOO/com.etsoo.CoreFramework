@@ -38,14 +38,15 @@ namespace com.etsoo.Utils.Database
         /// <param name="list">List</param>
         /// <param name="maxLength">Max length for char/byte related lists</param>
         /// <param name="field">TVP field name</param>
+        /// <param name="udtKey">Default type key</param>
         /// <returns>TVP value</returns>
-        public static object ListToTVP<T>(IEnumerable<T> ids, long? maxLength = null, string field = "id")
+        public static object ListToTVP<T>(IEnumerable<T> ids, long? maxLength = null, string field = "id", string? udtKey = null)
         {
             var type = typeof(T);
-            return ListToTVP(ids, DatabaseUtils.TypeToDbType(type).GetValueOrDefault(), maxLength, field, GetTypeName(type));
+            return ListToTVP(ids, DatabaseUtils.TypeToDbType(type).GetValueOrDefault(), maxLength, field, udtKey);
         }
 
-        private static string GetTypeName(Type type)
+        private static string GetTypeName(SqlDbType type)
         {
             return type.ToString().ToLower();
         }
@@ -62,10 +63,12 @@ namespace com.etsoo.Utils.Database
         /// <returns>TVP value</returns>
         public static object ListToTVP<T>(IEnumerable<T> ids, DbType type, long? maxLength = null, string field = "id", string? udtKey = null)
         {
-            // Parameter UDT name
-            var udt = $"et_{udtKey ?? GetTypeName(typeof(T))}_ids";
+            var sqlType = DbTypeToSql(type);
 
-            return ListToIdRecords(ids, type, maxLength, field).AsTableValuedParameter(udt);
+            // Parameter UDT name
+            var udt = $"et_{udtKey ?? GetTypeName(sqlType)}_ids";
+
+            return ListToIdRecords(ids, sqlType, maxLength, field).AsTableValuedParameter(udt);
         }
 
         /// <summary>

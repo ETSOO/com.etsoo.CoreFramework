@@ -85,10 +85,11 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <typeparam name="T">Id generic</typeparam>
         /// <param name="ids">Id list</param>
+        /// <param name="maxLength">Max length</param>
         /// <returns>Parameter value</returns>
-        public override object AsListParameter<T>(IEnumerable<T> ids)
+        public override object AsListParameter<T>(IEnumerable<T> ids, long? maxLength = null)
         {
-            return SqlServerUtils.ListToTVP(ids);
+            return SqlServerUtils.ListToTVP(ids, maxLength);
         }
     }
 }
