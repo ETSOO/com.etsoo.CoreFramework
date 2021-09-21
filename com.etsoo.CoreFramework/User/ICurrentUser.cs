@@ -61,6 +61,12 @@ namespace com.etsoo.CoreFramework.User
         CultureInfo Language { get; }
 
         /// <summary>
+        /// Country or region
+        /// 国家或地区
+        /// </summary>
+        string Country { get; }
+
+        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
