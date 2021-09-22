@@ -236,11 +236,12 @@ namespace com.etsoo.SourceGenerators
         /// </summary>
         /// <param name="context">Context</param>
         /// <param name="td">TypeDeclarationSyntax</param>
+        /// <param name="isRead">Is read, otherwise, is write</param>
         /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="externalInheritances">External inheritance</param>
         /// <param name="depth">Inheritance depth</param>
         /// <returns>Public properties and fields</returns>
-        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, out bool isPositionalRecord, int depth = 0)
+        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool isRead, List<string> externalInheritances, out bool isPositionalRecord, int depth = 0)
         {
             var items = new List<ParsedMember>();
 
@@ -280,11 +281,18 @@ namespace com.etsoo.SourceGenerators
                         var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
                         if (pSymbol != null)
                         {
+                            if ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly))
+                                continue;
+
                             items.Add(new ParsedMember(pSymbol, pSymbol.Type));
                         }
                     }
                     else if (member is FieldDeclarationSyntax f)
                     {
+                        // Is write required but has ReadOnly token
+                        if (!isRead && member.HasToken(SyntaxKind.ReadOnlyKeyword))
+                            continue;
+
                         // Field
                         foreach (var variable in f.Declaration.Variables)
                         {
@@ -336,13 +344,13 @@ namespace com.etsoo.SourceGenerators
 
                                 if (declare != null)
                                 {
-                                    var declareItems = ParseMembers(context, declare, externalInheritances, out _, depth + 1);
+                                    var declareItems = ParseMembers(context, declare, isRead, externalInheritances, out _, depth + 1);
                                     items.AddRange(declareItems);
                                 }
                             }
                             else
                             {
-                                ParseInheritance(namedSymbol, items);
+                                ParseInheritance(namedSymbol, items, isRead);
                             }
                         }
                     }
@@ -364,7 +372,7 @@ namespace com.etsoo.SourceGenerators
             }
         }
 
-        private static void ParseInheritance(INamedTypeSymbol namedSymbol, List<ParsedMember> items)
+        private static void ParseInheritance(INamedTypeSymbol namedSymbol, List<ParsedMember> items, bool isRead)
         {
             var members = namedSymbol.GetMembers();
             foreach (var member in members)
@@ -372,12 +380,21 @@ namespace com.etsoo.SourceGenerators
                 // Public properties only
                 if (member.DeclaredAccessibility != Accessibility.Public) continue;
 
+                if(member is IPropertySymbol pSymbol && ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly)))
+                {
+                    continue;
+                }
+                else if(member is IFieldSymbol fs && !isRead && fs.IsReadOnly)
+                {
+                    continue;
+                }
+
                 ParseMember(member, items);
             }
 
             if (namedSymbol.BaseType != null && namedSymbol.SpecialType != SpecialType.System_Object)
             {
-                ParseInheritance(namedSymbol.BaseType, items);
+                ParseInheritance(namedSymbol.BaseType, items, isRead);
             }
         }
 

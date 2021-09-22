@@ -12,6 +12,10 @@ namespace Tests
     public partial record DirectUser : QueryRQ
     {
         public string Name { get; init; } = null!;
+
+        public readonly int ReadOnlyField;
+
+        public bool WriteOnlyProperty { set { } }
     }
 
     [AutoToParameters]

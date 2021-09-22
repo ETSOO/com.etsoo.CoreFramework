@@ -27,7 +27,7 @@ namespace com.etsoo.SourceGenerators
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds, externalInheritances, out _);
+            var members = context.ParseMembers(tds, true, externalInheritances, out _);
 
             if(!context.CancellationToken.IsCancellationRequested)
             {
