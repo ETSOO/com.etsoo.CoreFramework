@@ -67,10 +67,21 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new ApplicationException(Properties.Resources.AccessDenied);
             }
 
-            parameters.Add("CurrentUser", User.Id, DbType.AnsiString, ParameterDirection.Input, 40);
+            AddSystemParameters(User, parameters);
+        }
 
-            if (!string.IsNullOrEmpty(User.Organization))
-                parameters.Add("CurrentOrg", User.Organization, DbType.AnsiString, ParameterDirection.Input, 40);
+        /// <summary>
+        /// Add system parameters, override it to localize parameters' type
+        /// 添加系统参数，可以重写本地化参数类型
+        /// </summary>
+        /// <param name="user">Current user</param>
+        /// <param name="parameters">Parameters</param>
+        protected virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
+        {
+            parameters.Add("CurrentUser", user.Id, DbType.AnsiString, ParameterDirection.Input, 40);
+
+            if (!string.IsNullOrEmpty(user.Organization))
+                parameters.Add("CurrentOrg", user.Organization, DbType.AnsiString, ParameterDirection.Input, 40);
         }
 
         /// <summary>
