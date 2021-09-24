@@ -19,12 +19,10 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 实体仓库，实现增删改查
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    /// <typeparam name="T">Generic user id type</typeparam>
-    /// <typeparam name="O">Generic organization id type</typeparam>
-    public abstract class EntityRepo<C, T, O> : RepoBase<C, T, O>, IEntityRepo<T, O>
+    /// <typeparam name="T">Generic id type</typeparam>
+    public abstract class EntityRepo<C, T> : RepoBase<C>, IEntityRepo<T>
         where C : DbConnection
         where T : struct
-        where O : struct
     {
         /// <summary>
         /// Flag
@@ -52,7 +50,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepo(ICoreApplication<C> app, ICurrentUser<T, O>? user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
+        public EntityRepo(ICoreApplication<C> app, ICurrentUser? user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
         {
             Flag = flag.AsMemory();
             ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();

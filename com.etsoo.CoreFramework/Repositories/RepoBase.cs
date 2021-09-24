@@ -18,16 +18,14 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 基础仓库
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public abstract class RepoBase<C, T, O> : IRepoBase
+    public abstract class RepoBase<C> : IRepoBase
         where C : DbConnection
-        where T : struct
-        where O : struct
     {
         /// <summary>
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected ICurrentUser<T, O>? User { get; }
+        virtual protected ICurrentUser? User { get; }
 
         /// <summary>
         /// Application
@@ -40,7 +38,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        public RepoBase(ICoreApplication<C> app, ICurrentUser<T, O>? user = null) => (App, User) = (app, user);
+        /// <param name="user">Current user</param>
+        public RepoBase(ICoreApplication<C> app, ICurrentUser? user = default) => (App, User) = (app, user);
 
         /// <summary>
         /// Create command, default parameters added
@@ -68,8 +67,10 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new ApplicationException(Properties.Resources.AccessDenied);
             }
 
-            parameters.Add("CurrentUser", User.Id);
-            parameters.Add("CurrentOrg", User.Organization);
+            parameters.Add("CurrentUser", User.Id, DbType.AnsiString, ParameterDirection.Input, 40);
+
+            if (!string.IsNullOrEmpty(User.Organization))
+                parameters.Add("CurrentOrg", User.Organization, DbType.AnsiString, ParameterDirection.Input, 40);
         }
 
         /// <summary>

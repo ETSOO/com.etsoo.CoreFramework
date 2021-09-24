@@ -12,19 +12,15 @@ namespace com.etsoo.CoreFramework.Services
     /// </summary>
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
-    /// <typeparam name="T">Generic user id type</typeparam>
-    /// <typeparam name="O">Generic organization id type</typeparam>
-    public abstract class LoginedServiceBase<C, R, T, O> : ServiceBase<C, R>
+    public abstract class LoginedServiceBase<C, R> : ServiceBase<C, R>
         where C : DbConnection
         where R : IRepoBase
-        where T : struct
-        where O : struct
     {
         /// <summary>
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected ICurrentUser<T, O> User { get; }
+        virtual protected ICurrentUser User { get; }
 
         /// <summary>
         /// Constructor
@@ -34,7 +30,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">Current user</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser<T, O> user, R repo, ILogger logger) : base(app, repo, logger)
+        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, repo, logger)
         {
             User = user;
         }

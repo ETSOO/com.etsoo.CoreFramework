@@ -8,9 +8,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    /// <typeparam name="T">Id generic type</typeparam>
-    /// <typeparam name="O">Organization generic type</typeparam>
-    public interface ICurrentUser<T, O> where T : struct where O : struct
+    public interface ICurrentUser
     {
         /// <summary>
         /// Unique connection id
@@ -34,13 +32,13 @@ namespace com.etsoo.CoreFramework.User
         /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        T Id { get; }
+        string Id { get; }
 
         /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        O? Organization { get; set; }
+        string? Organization { get; set; }
 
         /// <summary>
         /// Role value

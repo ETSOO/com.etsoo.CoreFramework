@@ -9,9 +9,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    /// <typeparam name="T">Id generic type</typeparam>
-    /// <typeparam name="O">Organization id generic type</typeparam>
-    public record CurrentUser<T, O> : ICurrentUser<T, O> where T : struct where O : struct
+    public record CurrentUser : ICurrentUser
     {
         /// <summary>
         /// IP Address claim type
@@ -44,7 +42,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="user">User</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser<T, O>? Create(ClaimsPrincipal? user, string? connectionId = null)
+        public static CurrentUser? Create(ClaimsPrincipal? user, string? connectionId = null)
         {
             // Basic check
             if (user == null || user.Identity == null || !user.Identity.IsAuthenticated)
@@ -53,8 +51,8 @@ namespace com.etsoo.CoreFramework.User
             // Claims
             var name = user.FindFirstValue(ClaimTypes.Name);
             var avatar = user.FindFirstValue(AvatarClaim);
-            var id = StringUtils.TryParse<T>(user.FindFirstValue(ClaimTypes.NameIdentifier));
-            var organization = StringUtils.TryParse<O>(user.FindFirstValue(OrganizationClaim));
+            var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            var organization = user.FindFirstValue(OrganizationClaim);
             var language = user.FindFirstValue(ClaimTypes.Locality);
             var country = user.FindFirstValue(ClaimTypes.Country);
             var roleValue = StringUtils.TryParse<short>(user.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
@@ -65,7 +63,7 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // New user
-            return new CurrentUser<T, O>(id.Value, organization, name, roleValue, ipAddress, new CultureInfo(language), country, connectionId)
+            return new CurrentUser(id, organization, name, roleValue, ipAddress, new CultureInfo(language), country, connectionId)
             {
                 Avatar = avatar
             };
@@ -80,11 +78,11 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="country">Country or region</param>
         /// <returns>User</returns>
-        public static CurrentUser<T, O>? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string country)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string country)
         {
             // Get data
-            var id = data.Get<T>("Id");
-            var organization = data.Get<O>("Organization");
+            var id = data.Get("Id");
+            var organization = data.Get("Organization");
             var name = data.Get("Name");
             var roleValue = data.Get<short>("Role").GetValueOrDefault();
 
@@ -93,7 +91,7 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // New user
-            return new CurrentUser<T, O>(id.Value, organization, name, roleValue, ip, language, country, null)
+            return new CurrentUser(id, organization, name, roleValue, ip, language, country, null)
             {
                 Avatar = data.Get("Avatar")
             };
@@ -103,13 +101,13 @@ namespace com.etsoo.CoreFramework.User
         /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        public T Id { get; }
+        public string Id { get; }
 
         /// <summary>
         /// Organization id
         /// 机构编号
         /// </summary>
-        public O? Organization { get; set; }
+        public string? Organization { get; set; }
 
         /// <summary>
         /// Name
@@ -165,7 +163,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="country">Country or region</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(T id, O? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string country, string? connectionId)
+        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string country, string? connectionId)
         {
             Id = id;
             Organization = organization;
@@ -185,13 +183,13 @@ namespace com.etsoo.CoreFramework.User
         public virtual IEnumerable<Claim> CreateClaims()
         {
             yield return new(ClaimTypes.Name, Name);
-            yield return new(ClaimTypes.NameIdentifier, Id.ToString()!);
+            yield return new(ClaimTypes.NameIdentifier, Id);
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(ClaimTypes.Country, Country);
             yield return new(RoleValueClaim, RoleValue.ToString());
             yield return new(IPAddressClaim, ClientIp.ToString());
-            if (Organization != null && Organization.Value.ToString() is var org && org != null)
-                yield return new(OrganizationClaim, org);
+            if (!string.IsNullOrEmpty(Organization))
+                yield return new(OrganizationClaim, Organization);
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
         }

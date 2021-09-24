@@ -1,5 +1,4 @@
 ﻿using com.etsoo.CoreFramework.User;
-using System;
 
 namespace com.etsoo.CoreFramework.Authentication
 {
@@ -7,5 +6,5 @@ namespace com.etsoo.CoreFramework.Authentication
     /// Authorization action
     /// 授权操作
     /// </summary>
-    public record AuthAction<T, O> (ICurrentUser<T, O> User, string Audience, TimeSpan LiveSpan, byte[] SecurityKeyBytes) where T : struct where O : struct;
+    public record AuthAction(ICurrentUser User, string Audience, TimeSpan LiveSpan, byte[] SecurityKeyBytes);
 }

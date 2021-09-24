@@ -6,13 +6,14 @@ namespace com.etsoo.CoreFramework.Models
     /// Search request data
     /// 查询请求数据
     /// </summary>
-    public record QueryRQ
+    /// <typeparam name="T">Generic id type</typeparam>
+    public record QueryRQ<T> where T : struct
     {
         /// <summary>
         /// Id
         /// 编号
         /// </summary>
-        public int? Id { get; init;}
+        public T? Id { get; init;}
 
         /// <summary>
         /// Current page
@@ -41,4 +42,10 @@ namespace com.etsoo.CoreFramework.Models
         /// </summary>
         public bool? OrderByAsc { get; init; }
     }
+
+    /// <summary>
+    /// Query with int id request data
+    /// 整型编号查询请求数据
+    /// </summary>
+    public record QueryIntRQ : QueryRQ<int>;
 }

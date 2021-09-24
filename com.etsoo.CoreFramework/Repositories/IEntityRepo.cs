@@ -9,11 +9,9 @@ namespace com.etsoo.CoreFramework.Repositories
     /// Entity repository interface for CURD(Create, Update, Read, Delete)
     /// 实体仓库接口，实现增删改查
     /// </summary>
-    /// <typeparam name="T">Generic user id type</typeparam>
-    /// <typeparam name="O">Generic organization id type</typeparam>
-    public interface IEntityRepo<T, O> : IRepoBase
+    /// <typeparam name="T">Generic id type</typeparam>
+    public interface IEntityRepo<T> : IRepoBase
         where T : struct
-        where O : struct
     {
         /// <summary>
         /// Create entity

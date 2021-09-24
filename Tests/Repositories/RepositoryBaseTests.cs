@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -17,7 +18,7 @@ namespace Tests.Repositories
         /// <summary>
         /// Repository base
         /// </summary>
-        private class RepositoryBaseTest : RepoBase<SqliteConnection, int, int>
+        private class RepositoryBaseTest : RepoBase<SqliteConnection>
         {
             public RepositoryBaseTest(ICoreApplication<SqliteConnection> app) : base(app) { }
         }

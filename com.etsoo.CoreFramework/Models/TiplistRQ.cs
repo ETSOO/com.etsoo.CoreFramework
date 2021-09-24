@@ -8,6 +8,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Tiplist Request data
     /// 动态列表请求数据
     /// </summary>
+    /// <typeparam name="T">Generic id type</typeparam>
     public record TiplistRQ<T> : IModelParameters where T : struct
     {
         /// <summary>
