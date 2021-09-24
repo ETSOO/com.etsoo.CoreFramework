@@ -21,6 +21,7 @@ namespace Tests
     [AutoToParameters]
     public partial record UpdateUser : UpdateModel<int>
     {
+        // Name
         public string? Name { get; init; }
     }
 
