@@ -21,7 +21,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// <typeparam name="C">Generic database conneciton type</typeparam>
     /// <typeparam name="T">Generic user id type</typeparam>
     /// <typeparam name="O">Generic organization id type</typeparam>
-    public abstract class EntityRepository<C, T, O> : LoginedRepo<C, T, O>, IEntityRepository<T, O>
+    public abstract class EntityRepo<C, T, O> : RepoBase<C, T, O>, IEntityRepo<T, O>
         where C : DbConnection
         where T : struct
         where O : struct
@@ -52,7 +52,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepository(ICoreApplication<C> app, ICurrentUser<T, O> user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
+        public EntityRepo(ICoreApplication<C> app, ICurrentUser<T, O> user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
         {
             Flag = flag.AsMemory();
             ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();

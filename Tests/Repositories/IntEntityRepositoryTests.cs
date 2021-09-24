@@ -16,7 +16,7 @@ namespace Tests.Repositories
         /// <summary>
         /// Int id entity repository
         /// </summary>
-        private class IntEntityRepository : EntityRepository<SqlConnection, int, int>
+        private class IntEntityRepository : EntityRepo<SqlConnection, int, int>
         {
             public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, null!, flag) { }
 

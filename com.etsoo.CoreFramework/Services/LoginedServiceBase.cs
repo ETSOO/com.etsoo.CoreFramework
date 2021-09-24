@@ -16,7 +16,7 @@ namespace com.etsoo.CoreFramework.Services
     /// <typeparam name="O">Generic organization id type</typeparam>
     public abstract class LoginedServiceBase<C, R, T, O> : ServiceBase<C, R>
         where C : DbConnection
-        where R : ILoginedRepo<T, O>
+        where R : IRepoBase
         where T : struct
         where O : struct
     {

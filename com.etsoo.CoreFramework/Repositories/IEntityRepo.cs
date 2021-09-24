@@ -11,7 +11,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// </summary>
     /// <typeparam name="T">Generic user id type</typeparam>
     /// <typeparam name="O">Generic organization id type</typeparam>
-    public interface IEntityRepository<T, O> : ILoginedRepo<T, O>
+    public interface IEntityRepo<T, O> : IRepoBase
         where T : struct
         where O : struct
     {

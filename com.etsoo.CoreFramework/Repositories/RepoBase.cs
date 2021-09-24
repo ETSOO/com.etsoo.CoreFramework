@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using com.etsoo.Utils.Serialization;
@@ -17,8 +18,17 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 基础仓库
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public abstract class RepoBase<C> : IRepoBase where C : DbConnection
+    public abstract class RepoBase<C, T, O> : IRepoBase
+        where C : DbConnection
+        where T : struct
+        where O : struct
     {
+        /// <summary>
+        /// Current user
+        /// 当前用户
+        /// </summary>
+        virtual protected ICurrentUser<T, O>? User { get; }
+
         /// <summary>
         /// Application
         /// 程序对象
@@ -30,7 +40,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        public RepoBase(ICoreApplication<C> app) => (App) = (app);
+        public RepoBase(ICoreApplication<C> app, ICurrentUser<T, O>? user = null) => (App, User) = (app, user);
 
         /// <summary>
         /// Create command, default parameters added
@@ -43,6 +53,23 @@ namespace com.etsoo.CoreFramework.Repositories
         protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType type = CommandType.StoredProcedure)
         {
             return new CommandDefinition(name, parameters, commandType: type);
+        }
+
+        /// <summary>
+        /// Add system parameters
+        /// 添加系统参数
+        /// </summary>
+        /// <param name="parameters">Parameters</param>
+        public virtual void AddSystemParameters(DynamicParameters parameters)
+        {
+            if (User == null)
+            {
+                // Make sure the repository initialized with valid user
+                throw new ApplicationException(Properties.Resources.AccessDenied);
+            }
+
+            parameters.Add("CurrentUser", User.Id);
+            parameters.Add("CurrentOrg", User.Organization);
         }
 
         /// <summary>
@@ -97,9 +124,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public async ValueTask<T?> QueryAsAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>
+        public async ValueTask<D?> QueryAsAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
-            var list = QueryAsListAsync<T>(command);
+            var list = QueryAsListAsync<D>(command);
             return await list.FirstOrDefaultAsync();
         }
 
@@ -110,13 +137,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public async IAsyncEnumerable<T> QueryAsListAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>
+        public async IAsyncEnumerable<D> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
             using var connection = App.DB.NewConnection();
 
             using var reader = await connection.ExecuteReaderAsync(command);
 
-            var items = T.CreateAsync(reader);
+            var items = D.CreateAsync(reader);
 
             await foreach (var item in items)
             {

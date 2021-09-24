@@ -13,6 +13,13 @@ namespace com.etsoo.CoreFramework.Repositories
     public interface IRepoBase
     {
         /// <summary>
+        /// Add system parameters
+        /// 添加系统参数
+        /// </summary>
+        /// <param name="parameters">Parameters</param>
+        void AddSystemParameters(DynamicParameters parameters);
+
+        /// <summary>
         /// Async query command as object
         /// 异步执行命令返回对象
         /// </summary>
