@@ -143,7 +143,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        Task QueryAsync<D>(D model, HttpResponse response) where D : QueryRQ;
+        Task QueryAsync<E, D>(D model, HttpResponse response) where E : struct where D : QueryRQ<E>;
 
         /// <summary>
         /// Quick update

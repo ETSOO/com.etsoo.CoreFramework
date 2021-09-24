@@ -78,14 +78,14 @@ namespace com.etsoo.CoreFramework.Services
         /// 登记异常日志
         /// </summary>
         /// <param name="ex">Exception</param>
-        /// <param name="title">Title</param>
+        /// <param name="message">Message</param>
         /// <param name="critical">Is critical</param>
-        protected void LogException(Exception ex, string title, bool critical = false)
+        protected void LogException(Exception ex, string message, bool critical = false)
         {
             if (critical)
-                Logger.LogCritical(ex, title);
+                Logger.LogCritical(ex, message);
             else
-                Logger.LogError(ex, title);
+                Logger.LogError(ex, message);
         }
     }
 }

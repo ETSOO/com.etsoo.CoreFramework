@@ -85,9 +85,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        public virtual async Task QueryAsync(QueryRQ model, HttpResponse response)
+        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response) where E : struct
         {
-            await Repo.QueryAsync(model, response);
+            await Repo.QueryAsync<E, QueryRQ<E>>(model, response);
         }
 
         /// <summary>
