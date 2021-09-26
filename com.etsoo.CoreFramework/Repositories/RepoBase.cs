@@ -78,10 +78,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="parameters">Parameters</param>
         protected virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
         {
-            parameters.Add("CurrentUser", user.Id, DbType.AnsiString, ParameterDirection.Input, 40);
+            parameters.Add("CurrentUser", user.Id);
 
-            if (!string.IsNullOrEmpty(user.Organization))
-                parameters.Add("CurrentOrg", user.Organization, DbType.AnsiString, ParameterDirection.Input, 40);
+            if (user.Organization != null)
+                parameters.Add("CurrentOrg", user.Organization);
         }
 
         /// <summary>
