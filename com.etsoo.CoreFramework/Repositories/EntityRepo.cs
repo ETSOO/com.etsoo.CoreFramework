@@ -52,20 +52,20 @@ namespace com.etsoo.CoreFramework.Repositories
         {
             if (parts.Length == 1)
             {
-                // Only one item, support to pass blank seperated item, like "read as json" to be "read_as_json"
-                return GetCommandName(parts[0].Split(' ', StringSplitOptions.RemoveEmptyEntries));
+                // Only one item, support to pass blank or underscore seperated item, like "read as json" to be "read_as_json"
+                return GetCommandNameBase(parts[0].Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries));
             }
 
-            return GetCommandName(parts);
+            return GetCommandNameBase(parts);
         }
 
         /// <summary>
-        /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
-        /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
+        /// Get command name base, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
+        /// 获取命令名称基础，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
         /// </summary>
         /// <param name="parts">Parts</param>
         /// <returns>Command name</returns>
-        protected virtual string GetCommandName(IEnumerable<string> parts)
+        protected virtual string GetCommandNameBase(IEnumerable<string> parts)
         {
             if (!parts.Any())
             {
@@ -152,7 +152,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (format.HasValue)
                 keys.Add(format.Value.ToString().ToLower());
 
-            var name = GetCommandName(keys);
+            var name = GetCommandNameBase(keys);
 
             var parameters = new DynamicParameters();
             parameters.Add("id", id);
@@ -246,7 +246,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (format.HasValue)
                 keys.Add(format.Value.ToString().ToLower());
 
-            var name = GetCommandName(keys);
+            var name = GetCommandNameBase(keys);
 
             return CreateCommand(name, parameters);
         }
