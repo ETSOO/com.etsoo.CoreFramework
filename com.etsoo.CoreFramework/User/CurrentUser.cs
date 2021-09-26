@@ -203,5 +203,28 @@ namespace com.etsoo.CoreFramework.User
         {
             return new ClaimsIdentity(CreateClaims());
         }
+
+        /// <summary>
+        /// Id as target type
+        /// 目标类型的编号
+        /// </summary>
+        /// <typeparam name="T">Generic target type</typeparam>
+        /// <returns>Result</returns>
+        public T IdAs<T>() where T : struct
+        {
+            return StringUtils.TryParse<T>(Id).GetValueOrDefault();
+        }
+
+        /// <summary>
+        /// Organization id as target type
+        /// 目标类型的机构编号
+        /// </summary>
+        /// <typeparam name="T">Generic target type</typeparam>
+        /// <returns>Result</returns>
+        public T? OrganizationAs<T>() where T : struct
+        {
+            if (Organization == null) return default(T);
+            return StringUtils.TryParse<T>(Organization).GetValueOrDefault();
+        }
     }
 }

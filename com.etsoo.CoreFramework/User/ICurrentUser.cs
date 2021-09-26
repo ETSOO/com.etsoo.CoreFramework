@@ -77,5 +77,21 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <returns>Identity</returns>
         ClaimsIdentity CreateIdentity();
+
+        /// <summary>
+        /// Id as target type
+        /// 目标类型的编号
+        /// </summary>
+        /// <typeparam name="T">Generic target type</typeparam>
+        /// <returns>Result</returns>
+        T IdAs<T>() where T : struct;
+
+        /// <summary>
+        /// Organization id as target type
+        /// 目标类型的机构编号
+        /// </summary>
+        /// <typeparam name="T">Generic target type</typeparam>
+        /// <returns>Result</returns>
+        T? OrganizationAs<T>() where T : struct;
     }
 }
