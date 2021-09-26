@@ -145,7 +145,7 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <param name="builder">Builder</param>
         /// <returns>Command</returns>
-        public static string GetDicCommand(CommandBuilderDelegate builder)
+        public static string GetGuidItemCommand(CommandBuilderDelegate builder)
         {
             return builder(CommandIdentifier.Type, GetGuidItemParts());
         }
