@@ -36,7 +36,7 @@ namespace Tests.Utils
         public void DbTypeToSql_All_Test(DbType type, SqlDbType sqlType)
         {
             // Arrange & act
-            var result = SqlServerUtils.DbTypeToSql(type);
+            var result = SqlServerUtils.GetSqlType(type);
 
             // Assert
             Assert.AreEqual(sqlType, result, $"{type} is not converted with {sqlType}");

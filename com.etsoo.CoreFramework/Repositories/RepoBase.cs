@@ -64,7 +64,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (User == null)
             {
                 // Make sure the repository initialized with valid user
-                throw new ApplicationException(Properties.Resources.AccessDenied);
+                throw new UnauthorizedAccessException();
             }
 
             AddSystemParameters(User, parameters);
@@ -118,7 +118,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (parameters is IAutoParameters ap)
             {
-                return ap.AsParameters(App.DB.Name);
+                return ap.AsParameters();
             }
 
             if (parameters is IModelParameters p)

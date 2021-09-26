@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Utils.Database;
 using Dapper;
 using System.ComponentModel.DataAnnotations;
 
@@ -46,8 +47,13 @@ namespace com.etsoo.CoreFramework.Models
             var parameters = new DynamicParameters();
 
             parameters.Add("Id", Id);
+
             if (ExcludedIds != null)
-                parameters.Add("ExcludedIds", app.DB.AsListParameter(ExcludedIds));
+            {
+                var idParameter = app.DB.ListToParameter(ExcludedIds, null, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName));
+                parameters.Add("ExcludedIds", idParameter);
+            }
+
             if (!string.IsNullOrEmpty(Keyword))
                 parameters.Add("Keyword", new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
             parameters.Add("Items", Items);

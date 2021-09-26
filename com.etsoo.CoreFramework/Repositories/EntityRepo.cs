@@ -3,7 +3,6 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
-using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
 using Microsoft.AspNetCore.Http;
@@ -28,19 +27,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Flag
         /// 标识
         /// </summary>
-        protected ReadOnlyMemory<char> Flag { get; }
-
-        /// <summary>
-        /// Procedure parts join char
-        /// 存储过程部分连接字符
-        /// </summary>
-        protected ReadOnlyMemory<char> ProcedureJoinChar { get; }
-
-        /// <summary>
-        /// Procedure fixed inital part
-        /// 存储过程固定首部分
-        /// </summary>
-        protected ReadOnlyMemory<char> ProcedureFixInitals { get; }
+        protected string Flag { get; }
 
         /// <summary>
         /// Constructor
@@ -50,73 +37,42 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepo(ICoreApplication<C> app, ICurrentUser? user, string flag, string procedureInitals = "p", char? procedureJoinChar = '_') : base(app, user)
+        public EntityRepo(ICoreApplication<C> app, ICurrentUser? user, string flag) : base(app, user)
         {
-            Flag = flag.AsMemory();
-            ProcedureJoinChar = procedureJoinChar.HasValue ? new char[] { procedureJoinChar.Value } : Array.Empty<char>();
-
-            var p = procedureInitals.AsSpan();
-
-            // app, not App, because override exists, null is here now
-            // Always use visible parameters
-            var builder = new MemoryBuilder<char>(app.Configuration.AppId.Length + p.Length + ProcedureJoinChar.Length + Flag.Length + ProcedureJoinChar.Length);
-            builder.Append(app.Configuration.AppId);
-            builder.Append(p);
-            builder.Append(ProcedureJoinChar.Span);
-            builder.Append(Flag.Span);
-            builder.Append(ProcedureJoinChar.Span);
-
-            ProcedureFixInitals = builder.AsMemory();
+            Flag = flag;
         }
 
         /// <summary>
         /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
         /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
         /// </summary>
-        /// <param name="part">Part</param>
+        /// <param name="parts">Parts</param>
         /// <returns>Command name</returns>
-        protected virtual string GetCommandName(ReadOnlySpan<char> part)
+        protected string GetCommandName(params string[] parts)
         {
-            return string.Concat(
-                ProcedureFixInitals.Span,
-                part
-            );
+            if (parts.Length == 1)
+            {
+                // Only one item, support to pass blank seperated item, like "read as json" to be "read_as_json"
+                return GetCommandName(parts[0].Split(' ', StringSplitOptions.RemoveEmptyEntries));
+            }
+
+            return GetCommandName(parts);
         }
 
         /// <summary>
         /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
         /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
         /// </summary>
-        /// <param name="part1">Part 1</param>
-        /// <param name="part2">Part 2</param>
+        /// <param name="parts">Parts</param>
         /// <returns>Command name</returns>
-        protected virtual string GetCommandName(ReadOnlySpan<char> part1, ReadOnlySpan<char> part2)
+        protected virtual string GetCommandName(IEnumerable<string> parts)
         {
-            var builder = new SpanBuilder<char>(part1.Length + ProcedureJoinChar.Length + part2.Length);
-            builder.Append(part1);
-            builder.Append(ProcedureJoinChar.Span);
-            builder.Append(part2);
-            return GetCommandName(builder.AsSpan());
-        }
+            if (!parts.Any())
+            {
+                throw new ArgumentNullException(nameof(parts));
+            }
 
-        /// <summary>
-        /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
-        /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
-        /// </summary>
-        /// <param name="part1">Part 1</param>
-        /// <param name="part2">Part 2</param>
-        /// <param name="part3">Part 3</param>
-        /// <returns>Command name</returns>
-        protected virtual string GetCommandName(ReadOnlySpan<char> part1, ReadOnlySpan<char> part2, ReadOnlySpan<char> part3)
-        {
-            var jLen = ProcedureJoinChar.Length;
-            var builder = new SpanBuilder<char>(part1.Length + jLen + part2.Length + jLen + part3.Length);
-            builder.Append(part1);
-            builder.Append(ProcedureJoinChar.Span);
-            builder.Append(part2);
-            builder.Append(ProcedureJoinChar.Span);
-            builder.Append(part3);
-            return GetCommandName(builder.AsSpan());
+            return App.Configuration.BuildCommandName(CommandIdentifier.Procedure, parts.Prepend(Flag));
         }
 
         /// <summary>
@@ -145,7 +101,9 @@ namespace com.etsoo.CoreFramework.Repositories
         protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("ids", App.DB.AsListParameter(ids));
+
+            var idParameter = App.DB.ListToParameter(ids, null, (type) => SqlServerUtils.GetListCommand(type, App.Configuration.BuildCommandName));
+            parameters.Add("ids", idParameter);
 
             AddSystemParameters(parameters);
 
@@ -183,15 +141,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="format">Date format</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReadCommand(T id, ReadOnlySpan<char> range, DataFormat? format = null)
+        protected virtual CommandDefinition NewReadCommand(T id, string range, DataFormat? format = null)
         {
             // Avoid possible SQL injection attack
             FilterRange(range);
 
-            // read_for
-            var key = string.Concat("read", ProcedureJoinChar.Span, "for");
-            
-            var name = format.HasValue ? GetCommandName(key, range, format.Value.ToString().ToLower()) : GetCommandName(key, range);
+            // Keys
+            var keys = new List<string> { "read", "for", range };
+
+            if (format.HasValue)
+                keys.Add(format.Value.ToString().ToLower());
+
+            var name = GetCommandName(keys);
 
             var parameters = new DynamicParameters();
             parameters.Add("id", id);
@@ -270,7 +231,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Condition model</param>
         /// <param name="format">Date format</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReportCommand(ReadOnlySpan<char> range, object? model = null, DataFormat? format = null)
+        protected virtual CommandDefinition NewReportCommand(string range, object? model = null, DataFormat? format = null)
         {
             // Avoid possible SQL injection attack
             FilterRange(range);
@@ -279,8 +240,14 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            var key = "read".AsSpan();
-            var name = format.HasValue ? GetCommandName(key, range, format.Value.ToString().ToLower()) : GetCommandName(key, range);
+            // Keys
+            var keys = new List<string> { "report", "for", range };
+
+            if (format.HasValue)
+                keys.Add(format.Value.ToString().ToLower());
+
+            var name = GetCommandName(keys);
+
             return CreateCommand(name, parameters);
         }
 
@@ -393,7 +360,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("query_json"), parameters);
+            var command = CreateCommand(GetCommandName("query as json"), parameters);
 
             await ReadJsonToStreamAsync(command, response);
         }
@@ -435,7 +402,7 @@ namespace com.etsoo.CoreFramework.Repositories
             }
 
             // Default table name
-            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag.Span).ToString();
+            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
             var tableName = App.DB.EscapeIdentifier(configs.TableName);
 
             // SQL

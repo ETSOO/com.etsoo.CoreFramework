@@ -1,4 +1,7 @@
-﻿using System.Data.Common;
+﻿using com.etsoo.Utils.Models;
+using System.Collections;
+using System.Data;
+using System.Data.Common;
 
 namespace com.etsoo.Utils.Database
 {
@@ -13,12 +16,6 @@ namespace com.etsoo.Utils.Database
         /// 蛇形命名，如 user_id
         /// </summary>
         bool SnakeNaming { get; }
-
-        /// <summary>
-        /// Database name
-        /// 数据库名称
-        /// </summary>
-        string Name { get; }
 
         /// <summary>
         /// Escape identifier
@@ -37,14 +34,69 @@ namespace com.etsoo.Utils.Database
         IDbExceptionResult GetExceptionResult(Exception ex);
 
         /// <summary>
-        /// Convert id list to parameter value
-        /// 转换编号列表为参数值
+        /// Dictionary to Dapper parameter
+        /// 字典转换为Dapper参数
         /// </summary>
-        /// <typeparam name="T">Id generic</typeparam>
-        /// <param name="ids">Id list</param>
-        /// <param name="maxLength">Max length</param>
-        /// <returns>Parameter value</returns>
-        object AsListParameter<T>(IEnumerable<T> ids, long? maxLength = null) where T : struct;
+        /// <typeparam name="K">Generic key type</typeparam>
+        /// <typeparam name="V">Generic value type</typeparam>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>Result</returns>
+        object DictionaryToParameter<K, V>(Dictionary<K, V> dic, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
+            where K : struct
+            where V : struct;
+
+        /// <summary>
+        /// Dictionary to Dapper parameter
+        /// 字典转换为Dapper参数
+        /// </summary>
+        /// <typeparam name="K">Generic key type</typeparam>
+        /// <typeparam name="V">Generic value type</typeparam>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="keyType">Key type</param>
+        /// <param name="valueType">Value type</param>
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>Result</returns>
+        object DictionaryToParameter<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
+            where K : struct
+            where V : struct;
+
+        /// <summary>
+        /// Guid items to Dapper parameters
+        /// 转换Guid项目为Dapper参数
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <param name="maxLength">Item max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>Result</returns>
+        object GuidItemsToParameter(IEnumerable<GuidItem> items, long? maxLength = null, Func<string>? tvpFunc = null);
+
+        /// <summary>
+        /// List to Dapper parameter
+        /// 列表转换为Dapper参数
+        /// </summary>
+        /// <typeparam name="T">Generic item type</typeparam>
+        /// <param name="list">List</param>
+        /// <param name="maxLength">Char/byte item max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>Result</returns>
+        object ListToParameter<T>(IEnumerable<T> list, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null) where T : struct;
+
+        /// <summary>
+        /// List to Dapper parameter
+        /// 列表转换为Dapper参数
+        /// </summary>
+        /// <typeparam name="T">Generic item type</typeparam>
+        /// <param name="list">List</param>
+        /// <param name="type">DbType</param>
+        /// <param name="maxLength">Char/byte item max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>Result</returns>
+        object ListToParameter(IEnumerable list, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null);
     }
 
     /// <summary>

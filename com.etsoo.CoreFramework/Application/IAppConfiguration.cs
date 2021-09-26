@@ -7,12 +7,6 @@
     public interface IAppConfiguration
     {
         /// <summary>
-        /// Application id
-        /// 程序编号
-        /// </summary>
-        string AppId { get; }
-
-        /// <summary>
         /// Supported cultures, like zh-CN, en
         /// 支持的文化，比如zh-CN, en
         /// </summary>
@@ -42,5 +36,14 @@
         /// </summary>
 
         string WebUrl { get; }
+
+        /// <summary>
+        /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)
+        /// 构建命令名称
+        /// </summary>
+        /// <param name="identifier">Identifier, like procedure with 'p'</param>
+        /// <param name="parts">Parts</param>
+        /// <returns>Result</returns>
+        string BuildCommandName(string identifier, IEnumerable<string> parts);
     }
 }

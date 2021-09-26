@@ -12,8 +12,7 @@ namespace com.etsoo.Utils.Serialization
         /// Export parameters
         /// 导出参数
         /// </summary>
-        /// <param name="databaseName">Database name, see com.etsoo.Utils.Database.Name</param>
         /// <returns>Parameters</returns>
-        DynamicParameters AsParameters(string? databaseName = null);
+        DynamicParameters AsParameters();
     }
 }

@@ -56,7 +56,6 @@ namespace Tests
         /// <summary>
         /// List
         /// </summary>
-        [ArrayProperty(';')]
         public List<int> List;
 
         public bool? Valid { get; set; }

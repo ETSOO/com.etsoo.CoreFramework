@@ -9,12 +9,6 @@ namespace com.etsoo.Utils.Database
     public sealed class MySqlDatabase : CommonDatabase<MySqlConnection>
     {
         /// <summary>
-        /// Database name
-        /// 数据库名称
-        /// </summary>
-        public override string Name => "MYSQL";
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>

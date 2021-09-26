@@ -13,14 +13,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 构造函数
         /// </summary>
         /// <param name="privateKey">Private key for encryption/decryption</param>
-        /// <param name="appId">Application id, default is "e"</param>
         /// <param name="cultures">Supported cultures</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
         /// <param name="webUrl">Web Url</param>
         public AppConfiguration(
             string privateKey,
-            string? appId = null,
             string[]? cultures = null,
             bool modelValidated = false,
             string? symmetricKey = null,
@@ -32,14 +30,12 @@ namespace com.etsoo.CoreFramework.Application
 
             // Update
             (
-                AppId,
                 Cultures,
                 ModelValidated,
                 PrivateKey,
                 SymmetricKey,
                 WebUrl
             ) = (
-                appId ?? "e",
                 cultures,
                 modelValidated,
                 privateKey,
@@ -56,19 +52,12 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(
             section.GetValue<string>("PrivateKey"),
-            section.GetValue<string>("AppId"),
             section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
             modelValidated,
             section.GetValue<string?>("SymmetricKey"),
             section.GetValue<string?>("WebUrl"))
         {
         }
-
-        /// <summary>
-        /// Application id
-        /// 程序编号
-        /// </summary>
-        public string AppId { get; }
 
         /// <summary>
         /// Supported cultures, like zh-CN, en
@@ -100,5 +89,18 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
 
         public string WebUrl { get; }
+
+        /// <summary>
+        /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)
+        /// 构建命令名称
+        /// </summary>
+        /// <param name="identifier">Identifier, like procedure with 'p'</param>
+        /// <param name="parts">Parts</param>
+        /// <returns>Result</returns>
+        public virtual string BuildCommandName(string identifier, IEnumerable<string> parts)
+        {
+            var command = $"e{identifier}_" + string.Join("_", parts);
+            return command.ToLower();
+        }
     }
 }

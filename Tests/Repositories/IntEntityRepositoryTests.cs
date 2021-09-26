@@ -27,9 +27,9 @@ namespace Tests.Repositories
             /// <param name="part1">Part 1</param>
             /// <param name="part2">Part 2</param>
             /// <returns>Command name</returns>
-            public new string GetCommandName(ReadOnlySpan<char> part1, ReadOnlySpan<char> part2)
+            public new string GetCommandName(params string[] parts)
             {
-                return base.GetCommandName(part1, part2);
+                return base.GetCommandName(parts);
             }
 
             public override void AddSystemParameters(DynamicParameters parameters)

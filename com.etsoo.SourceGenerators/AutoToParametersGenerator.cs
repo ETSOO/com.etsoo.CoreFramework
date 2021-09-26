@@ -23,7 +23,6 @@ namespace com.etsoo.SourceGenerators
             if(!context.CancellationToken.IsCancellationRequested)
             {
                 var propertyType = typeof(PropertyAttribute);
-                var arrayPropertyType = typeof(ArrayPropertyAttribute);
                 var ignoreName = nameof(PropertyAttribute.Ignore);
                 var isAnsiName = nameof(PropertyAttribute.IsAnsi);
                 var fixedLengthName = nameof(PropertyAttribute.FixedLength);
@@ -60,9 +59,6 @@ namespace com.etsoo.SourceGenerators
 
                     // Data type name
                     var typeName = attributeData?.GetValue<string>(typeNameField);
-
-                    // Array data
-                    var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
 
                     // Line parts
                     string valuePart;
@@ -113,15 +109,12 @@ namespace com.etsoo.SourceGenerators
                         }
                         var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
 
+                        isDbString = true;
+
                         if (string.IsNullOrEmpty(typeName))
                         {
-                            isDbString = true;
-
-                            // Splitter
-                            var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
-
                             // String
-                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}, {itemDbType}, {length.ToIntCode()}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
+                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName))";
                         }
                         else
                         {
@@ -140,15 +133,12 @@ namespace com.etsoo.SourceGenerators
                         }
                         var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
 
+                        isDbString = true;
+
                         if (string.IsNullOrEmpty(typeName))
                         {
-                            isDbString = true;
-
-                            // Splitter
-                            var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
-
                             // String
-                            valuePart = $"(databaseName == \"SQLSERVER\" ? SqlServerUtils.ListToTVP({fieldName}, {itemDbType}, {length.ToIntCode()}) : StringUtils.IEnumerableToString({fieldName}, '{splitter}').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()}))";
+                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName))";
                         }
                         else
                         {
@@ -158,28 +148,27 @@ namespace com.etsoo.SourceGenerators
                     }
                     else if(typeSymbol.IsDictionary())
                     {
+                        var dicSymbol = (INamedTypeSymbol)typeSymbol;
+
+                        // Key type
+                        var keyType = dicSymbol.TypeArguments[0];
+                        var keyDbType = keyType.Name.ToDbType();
+
+                        // Item value type
+                        var itemType = dicSymbol.TypeArguments[1];
+                        var itemDbType = GetDbType(itemType, isAnsi);
+
+                        isDbString = true;
+
                         if (string.IsNullOrEmpty(typeName))
                         {
-                            isDbString = true;
-
-                            // Splitter
-                            var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? '&');
-
                             // String
-                            valuePart = $"StringUtils.DictionaryToString({fieldName}, '{splitter}', '=').ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
+                            valuePart = $"app.DB.DictionaryToTVP({fieldName}, {keyDbType}, {itemDbType}, null, {length.ToIntCode()}, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, app.Configuration.BuildCommandName))";
                         }
                         else
                         {
-                            var dicSymbol = (INamedTypeSymbol)typeSymbol;
-
-                            // Key type
-                            var keyType = dicSymbol.TypeArguments[0];
-
-                            // Item value type
-                            var itemType = dicSymbol.TypeArguments[1];
-
                             // SQL Server TVP
-                            valuePart = $"SqlServerUtils.DictionaryToRecords({fieldName}, {keyType.Name.ToDbType()}, {itemType.Name.ToDbType()}).AsTableValuedParameter(\"{typeName}\")";
+                            valuePart = $"SqlServerUtils.DictionaryToRecords({fieldName}, {keyDbType}, {itemDbType}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
                     else
@@ -242,13 +231,14 @@ namespace com.etsoo.SourceGenerators
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
-            externals.Add("com.etsoo.Utils.Serialization.IAutoParameters");
+            externals.Add("com.etsoo.CoreFramework.Models.IModelParameters");
 
             // Source code
             var source = $@"#nullable enable
                 using Dapper;
                 using com.etsoo.Utils.Database;
                 using com.etsoo.Utils.String;
+                using com.etsoo.CoreFramework.Application;
                 using System;
                 using System.Data;
 
@@ -260,9 +250,9 @@ namespace com.etsoo.SourceGenerators
                         /// Data modal to Dapper parameters
                         /// 数据模型转化为Dapper参数
                         /// </summary>
-                        /// <param name=""databaseName"">Database name, see com.etsoo.Utils.Database.Name</param>
+                        /// <param name=""app"">Application</param>
                         /// <returns>Dynamic parameters</returns>
-                        public DynamicParameters AsParameters(string? databaseName = null)
+                        public DynamicParameters AsParameters(ICoreApplicationBase app)
                         {{
                             var parameters = new DynamicParameters();
 

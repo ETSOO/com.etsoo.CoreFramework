@@ -14,12 +14,12 @@ namespace com.etsoo.Utils.Database
     public static class SqlServerUtils
     {
         /// <summary>
-        /// Convert DbType to SqlDbType
-        /// 转化 DbType 为 SqlDbType
+        /// Get SqlDbType from DbType
+        /// 从DbType获取SqlDbType
         /// </summary>
         /// <param name="type">DbType</param>
         /// <returns>SqlDbType</returns>
-        public static SqlDbType DbTypeToSql(DbType type)
+        public static SqlDbType GetSqlType(DbType type)
         {
             return type switch
             {
@@ -32,23 +32,127 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
+        /// Get SqlDbType from type
+        /// 从类型获取SqlDbType
+        /// </summary>
+        /// <param name="type">Data type</param>
+        /// <returns>SqlDbType</returns>
+        public static SqlDbType GetSqlType(Type type)
+        {
+            return GetSqlType(DatabaseUtils.TypeToDbType(type).GetValueOrDefault());
+        }
+
+        /// <summary>
         /// Transform list to TVP
         /// 转化列表到TVP参数列表
         /// </summary>
         /// <param name="list">List</param>
         /// <param name="maxLength">Max length for char/byte related lists</param>
-        /// <param name="field">TVP field name</param>
-        /// <param name="udtKey">Default type key</param>
+        /// <param name="tvpFunc">TVP building function</param>
         /// <returns>TVP value</returns>
-        public static object ListToTVP<T>(IEnumerable<T> ids, long? maxLength = null, string field = "id", string? udtKey = null)
+        public static object ListToTVP<T>(IEnumerable<T> list, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null)
         {
-            var type = typeof(T);
-            return ListToTVP(ids, DatabaseUtils.TypeToDbType(type).GetValueOrDefault(), maxLength, field, udtKey);
+            return ListToTVP(list, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault(), maxLength, tvpFunc);
         }
 
-        private static string GetTypeName(SqlDbType type)
+        /// <summary>
+        /// Get type name
+        /// 获取类型名称
+        /// </summary>
+        /// <param name="type">Sql type</param>
+        /// <returns>Result</returns>
+        public static string GetTypeName(SqlDbType type)
         {
             return type.ToString().ToLower();
+        }
+
+        /// <summary>
+        /// Get list parts
+        /// 获取列表部分
+        /// </summary>
+        /// <param name="type">Sql type</param>
+        /// <returns>Parts</returns>
+        public static string[] GetListParts(SqlDbType type)
+        {
+            return new[] { GetTypeName(type), "ids" };
+        }
+
+        /// <summary>
+        /// Get list command
+        /// 获取列表命令
+        /// </summary>
+        /// <param name="type">Sql type</param>
+        /// <param name="builder">Builder</param>
+        /// <returns>Command</returns>
+        public static string GetListCommand(SqlDbType type, CommandBuilderDelegate builder)
+        {
+            return builder(CommandIdentifier.Type, GetListParts(type));
+        }
+
+        private static string DefaultListTvpFunc(SqlDbType type)
+        {
+            return string.Join('_', GetListParts(type).Prepend("et"));
+        }
+
+        /// <summary>
+        /// Get dictionary parts
+        /// 获取字典部分
+        /// </summary>
+        /// <param name="keyType">Sql type</param>
+        /// <param name="valueType">Value type</param>
+        /// <returns>Parts</returns>
+        public static string[] GetDicParts(SqlDbType keyType, SqlDbType valueType)
+        {
+            // Simple case, string key, example: et_int_items
+            if (IsLengthSpecifiedType(keyType))
+                return new[] { GetTypeName(valueType), "items" };
+
+            // Other cases, example: et_int_int_items
+            return new[] { GetTypeName(keyType), GetTypeName(valueType), "items" };
+        }
+
+        /// <summary>
+        /// Get dictionary command
+        /// 获取字典命令
+        /// </summary>
+        /// <param name="keyType">Key type</param>
+        /// <param name="type">Value type</param>
+        /// <param name="builder">Builder</param>
+        /// <returns>Command</returns>
+        public static string GetDicCommand(SqlDbType keyType, SqlDbType valueType, CommandBuilderDelegate builder)
+        {
+            return builder(CommandIdentifier.Type, GetDicParts(keyType, valueType));
+        }
+
+        private static string DefaultDicTvpFunc(SqlDbType keyType, SqlDbType valueType)
+        {
+            return string.Join('_', GetDicParts(keyType, valueType).Prepend("et"));
+        }
+
+        /// <summary>
+        /// Get Guid item parts
+        /// 获取标识项目部分
+        /// </summary>
+        /// <returns>Parts</returns>
+        public static string[] GetGuidItemParts()
+        {
+            return new[] { "guid", "items" };
+        }
+
+        /// <summary>
+        /// Get Guid item command
+        /// 获取字典命令
+        /// </summary>
+        /// <param name="builder">Builder</param>
+        /// <returns>Command</returns>
+        public static string GetDicCommand(CommandBuilderDelegate builder)
+        {
+            return builder(CommandIdentifier.Type, GetGuidItemParts());
+        }
+
+        private static string DefaultGuidItemTvpFunc()
+        {
+            return string.Join('_', GetGuidItemParts().Prepend("et"));
         }
 
         /// <summary>
@@ -58,17 +162,15 @@ namespace com.etsoo.Utils.Database
         /// <param name="ids">Id list</param>
         /// <param name="type">Data type</param>
         /// <param name="maxLength">Max length for char/byte related lists</param>
-        /// <param name="field">TVP field name</param>
-        /// <param name="udtKey">Default type key</param>
+        /// <param name="tvpFunc">TVP building function</param>
         /// <returns>TVP value</returns>
-        public static object ListToTVP<T>(IEnumerable<T> ids, DbType type, long? maxLength = null, string field = "id", string? udtKey = null)
+        public static object ListToTVP(IEnumerable ids, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null)
         {
-            var sqlType = DbTypeToSql(type);
+            var sqlType = GetSqlType(type);
 
-            // Parameter UDT name
-            var udt = $"et_{udtKey ?? GetTypeName(sqlType)}_ids";
+            tvpFunc ??= DefaultListTvpFunc;
 
-            return ListToIdRecords(ids, sqlType, maxLength, field).AsTableValuedParameter(udt);
+            return ListToIdRecords(ids, sqlType, maxLength).AsTableValuedParameter(tvpFunc(sqlType));
         }
 
         /// <summary>
@@ -78,11 +180,10 @@ namespace com.etsoo.Utils.Database
         /// <param name="list">List</param>
         /// <param name="type">Data type</param>
         /// <param name="maxLength">Max length for char/byte related lists</param>
-        /// <param name="field">TVP field name</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, DbType type, long? maxLength = null, string field = "id")
+        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, DbType type, long? maxLength = null)
         {
-            return ListToIdRecords(list, DbTypeToSql(type), maxLength, field);
+            return ListToIdRecords(list, GetSqlType(type), maxLength);
         }
 
         private static bool IsLengthSpecifiedType(SqlDbType type)
@@ -99,10 +200,10 @@ namespace com.etsoo.Utils.Database
         /// <param name="maxLength">Max length for char/byte related lists</param>
         /// <param name="field">TVP field name</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, long? maxLength = null, string field = "id")
+        public static IEnumerable<SqlDataRecord> ListToIdRecords(IEnumerable list, SqlDbType type, long? maxLength = null)
         {
             // SqlDataRecord definition
-            var sdr = IsLengthSpecifiedType(type) ? new SqlDataRecord(new SqlMetaData(field, type, maxLength.GetValueOrDefault(50))) : new SqlDataRecord(new SqlMetaData(field, type));
+            var sdr = IsLengthSpecifiedType(type) ? new SqlDataRecord(new SqlMetaData("id", type, maxLength.GetValueOrDefault(50))) : new SqlDataRecord(new SqlMetaData("id", type));
 
             // List enumerator
             var enumerator = list.GetEnumerator();
@@ -122,16 +223,44 @@ namespace com.etsoo.Utils.Database
         }
 
         /// <summary>
-        /// Transform dictionary to SqlDataRecord list
+        /// Transform dictionary to TVP
         /// 转化字典到TVP参数列表
         /// </summary>
         /// <param name="dic">Dictionary</param>
-        /// <param name="keyType">Key data type</param>
-        /// <param name="itemType">Item data type</param>
-        /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, DbType keyType, DbType itemType)
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>TVP value</returns>
+        public static object DictionaryToTVP<K, V>(Dictionary<K, V> dic, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
+            where K : struct
+            where V : struct
         {
-            return DictionaryToRecords(dic, DbTypeToSql(keyType), DbTypeToSql(itemType));
+            var keyType = DatabaseUtils.TypeToDbType(typeof(K)).GetValueOrDefault();
+            var valueType = DatabaseUtils.TypeToDbType(typeof(V)).GetValueOrDefault();
+            return DictionaryToTVP(dic, keyType, valueType, keyMaxLength, valueMaxLength, tvpFunc);
+        }
+
+        /// <summary>
+        /// Transform dictionary to TVP
+        /// 转化字典到TVP参数列表
+        /// </summary>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="keyType">Key type</param>
+        /// <param name="valueType">Value type</param>
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
+        /// <returns>TVP value</returns>
+        public static object DictionaryToTVP<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
+            where K : struct
+            where V : struct
+        {
+            var keySqlType = GetSqlType(keyType);
+            var valueSqlType = GetSqlType(valueType);
+
+            tvpFunc ??= DefaultDicTvpFunc;
+
+            return DictionaryToRecords(dic, keySqlType, valueSqlType, keyMaxLength, valueMaxLength).AsTableValuedParameter(tvpFunc(keySqlType, valueSqlType));
         }
 
         /// <summary>
@@ -141,13 +270,29 @@ namespace com.etsoo.Utils.Database
         /// <param name="dic">Dictionary</param>
         /// <param name="keyType">Key data type</param>
         /// <param name="itemType">Item data type</param>
-        /// <param name="maxLength">Max length for char/byte related item lists</param>
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
         /// <returns>TVP list</returns>
-        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, SqlDbType keyType, SqlDbType itemType, long maxLength = 50)
+        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, DbType keyType, DbType itemType, long? keyMaxLength = null, long? valueMaxLength = null)
+        {
+            return DictionaryToRecords(dic, GetSqlType(keyType), GetSqlType(itemType), keyMaxLength, valueMaxLength);
+        }
+
+        /// <summary>
+        /// Transform dictionary to SqlDataRecord list
+        /// 转化字典到TVP参数列表
+        /// </summary>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="keyType">Key data type</param>
+        /// <param name="itemType">Item data type</param>
+        /// <param name="keyMaxLength">Char/byte key max length</param>
+        /// <param name="valueMaxLength">Char/byte value max length</param>
+        /// <returns>TVP list</returns>
+        public static IEnumerable<SqlDataRecord> DictionaryToRecords(IDictionary dic, SqlDbType keyType, SqlDbType itemType, long? keyMaxLength = null, long? valueMaxLength = null)
         {
             // SqlDataRecord definition
-            var keyMeta = IsLengthSpecifiedType(keyType) ? new SqlMetaData("key", keyType, 50) : new SqlMetaData("key", keyType);
-            var itemMeta = IsLengthSpecifiedType(itemType) ? new SqlMetaData("item", itemType, maxLength) : new SqlMetaData("item", itemType);
+            var keyMeta = IsLengthSpecifiedType(keyType) ? new SqlMetaData("key", keyType, keyMaxLength.GetValueOrDefault(40)) : new SqlMetaData("key", keyType);
+            var itemMeta = IsLengthSpecifiedType(itemType) ? new SqlMetaData("item", itemType, valueMaxLength.GetValueOrDefault(128)) : new SqlMetaData("item", itemType);
             var sdr = new SqlDataRecord(keyMeta, itemMeta);
 
             // List enumerator
@@ -175,10 +320,10 @@ namespace com.etsoo.Utils.Database
         /// </summary>
         /// <param name="items">Items</param>
         /// <returns>Result</returns>
-        public static IEnumerable<SqlDataRecord> GuidItemToRecords(IEnumerable<GuidItem> items)
+        public static IEnumerable<SqlDataRecord> GuidItemToRecords(IEnumerable<GuidItem> items, long? maxLength = null)
         {
             // SqlDataRecord definition
-            var sdr = new SqlDataRecord(new SqlMetaData("Id", SqlDbType.UniqueIdentifier), new SqlMetaData("Item", SqlDbType.VarChar, 128));
+            var sdr = new SqlDataRecord(new SqlMetaData("Id", SqlDbType.UniqueIdentifier), new SqlMetaData("Item", SqlDbType.VarChar, maxLength ?? 128));
 
             foreach (var item in items)
             {
@@ -197,11 +342,13 @@ namespace com.etsoo.Utils.Database
         /// 转换Guid项目为TVP参数
         /// </summary>
         /// <param name="items">Items</param>
-        /// <param name="udt">Udt name</param>
+        /// <param name="maxLength">Item max length</param>
+        /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
-        public static object GuidItemsToParameter(IEnumerable<GuidItem> items, string udt = "et_guid_items")
+        public static object GuidItemsToParameter(IEnumerable<GuidItem> items, long? maxLength = null, Func<string>? tvpFunc = null)
         {
-            return GuidItemToRecords(items).AsTableValuedParameter(udt);
+            tvpFunc ??= DefaultGuidItemTvpFunc;
+            return GuidItemToRecords(items, maxLength).AsTableValuedParameter(tvpFunc());
         }
 
         /// <summary>

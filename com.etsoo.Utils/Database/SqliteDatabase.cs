@@ -9,12 +9,6 @@ namespace com.etsoo.Utils.Database
     public sealed class SqliteDatabase : CommonDatabase<SqliteConnection>
     {
         /// <summary>
-        /// Database name
-        /// 数据库名称
-        /// </summary>
-        public override string Name => "SQLITE";
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
