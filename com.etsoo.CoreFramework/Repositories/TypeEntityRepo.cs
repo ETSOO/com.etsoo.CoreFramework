@@ -26,6 +26,27 @@ namespace com.etsoo.CoreFramework.Repositories
     }
 
     /// <summary>
+    /// Long id type entity repository
+    /// 长整形实体仓库
+    /// </summary>
+    /// <typeparam name="C">Generic database conneciton type</typeparam>
+    public abstract class LongEntityRepo<C> : EntityRepo<C, long> where C : DbConnection
+    {
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="app">Application</param>
+        /// <param name="user">Current user</param>
+        /// <param name="flag">Flag</param>
+        /// <param name="procedureInitals">Procedure initials</param>
+        public LongEntityRepo(ICoreApplication<C> app, ICurrentUser? user, string flag)
+            : base(app, user, flag)
+        {
+        }
+    }
+
+    /// <summary>
     /// Guid id type entity repository
     /// 标识类型实体仓库
     /// </summary>
