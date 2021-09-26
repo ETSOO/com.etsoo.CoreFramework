@@ -11,9 +11,11 @@ namespace com.etsoo.CoreFramework.Services
     /// 整形编号实体服务
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public class IntEntityService<C> : EntityServiceBase<C, IntEntityRepo<C>, int> where C : DbConnection
+    public class IntEntityService<C, R> : EntityServiceBase<C, R, int>
+        where C : DbConnection
+        where R: IntEntityRepo<C>
     {
-        public IntEntityService(ICoreApplication<C> app, ICurrentUser user, IntEntityRepo<C> repo, ILogger logger) : base(app, user, repo, logger)
+        public IntEntityService(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, user, repo, logger)
         {
         }
     }
@@ -23,9 +25,11 @@ namespace com.etsoo.CoreFramework.Services
     /// 长整形编号实体服务
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public class LongEntityService<C> : EntityServiceBase<C, LongEntityRepo<C>, long> where C : DbConnection
+    public class LongEntityService<C, R> : EntityServiceBase<C, R, long>
+        where C : DbConnection
+        where R : LongEntityRepo<C>
     {
-        public LongEntityService(ICoreApplication<C> app, ICurrentUser user, LongEntityRepo<C> repo, ILogger logger) : base(app, user, repo, logger)
+        public LongEntityService(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, user, repo, logger)
         {
         }
     }
@@ -35,9 +39,11 @@ namespace com.etsoo.CoreFramework.Services
     /// 标识编号实体服务
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public class GuidEntityService<C> : EntityServiceBase<C, GuidEntityRepo<C>, Guid> where C : DbConnection
+    public class GuidEntityService<C, R> : EntityServiceBase<C, R, Guid>
+        where C : DbConnection
+        where R : GuidEntityRepo<C>
     {
-        public GuidEntityService(ICoreApplication<C> app, ICurrentUser user, GuidEntityRepo<C> repo, ILogger logger) : base(app, user, repo, logger)
+        public GuidEntityService(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, user, repo, logger)
         {
         }
     }
