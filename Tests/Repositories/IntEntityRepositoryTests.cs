@@ -18,7 +18,7 @@ namespace Tests.Repositories
         /// </summary>
         private class IntEntityRepository : EntityRepo<SqlConnection, int>
         {
-            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, null, flag) { }
+            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag, null) { }
 
             /// <summary>
             /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection

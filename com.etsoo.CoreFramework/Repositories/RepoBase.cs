@@ -34,12 +34,19 @@ namespace com.etsoo.CoreFramework.Repositories
         virtual protected ICoreApplication<C> App { get; }
 
         /// <summary>
+        /// Flag
+        /// 标识
+        /// </summary>
+        public string Flag { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
+        /// <param name="flag">Flag</param>
         /// <param name="user">Current user</param>
-        public RepoBase(ICoreApplication<C> app, ICurrentUser? user = default) => (App, User) = (app, user);
+        protected RepoBase(ICoreApplication<C> app, string flag, ICurrentUser? user = null) => (App, Flag, User) = (app, flag, user);
 
         /// <summary>
         /// Create command, default parameters added
@@ -145,7 +152,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new ArgumentNullException(nameof(parts));
             }
 
-            return App.BuildCommandName(CommandIdentifier.Procedure, parts);
+            return App.BuildCommandName(CommandIdentifier.Procedure, parts.Prepend(Flag));
         }
 
         /// <summary>

@@ -23,34 +23,8 @@ namespace com.etsoo.CoreFramework.Repositories
         where C : DbConnection
         where T : struct
     {
-        /// <summary>
-        /// Flag
-        /// 标识
-        /// </summary>
-        protected string Flag { get; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
-        /// <param name="flag">Flag</param>
-        /// <param name="procedureInitals">Procedure initials</param>
-        public EntityRepo(ICoreApplication<C> app, ICurrentUser? user, string flag) : base(app, user)
+        protected EntityRepo(ICoreApplication<C> app, string flag, ICurrentUser? user = null) : base(app, flag, user)
         {
-            Flag = flag;
-        }
-
-        /// <summary>
-        /// Get command name base, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
-        /// 获取命令名称基础，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
-        /// </summary>
-        /// <param name="parts">Parts</param>
-        /// <returns>Command name</returns>
-        protected override string GetCommandNameBase(IEnumerable<string> parts)
-        {
-            return base.GetCommandNameBase(parts.Prepend(Flag));
         }
 
         /// <summary>

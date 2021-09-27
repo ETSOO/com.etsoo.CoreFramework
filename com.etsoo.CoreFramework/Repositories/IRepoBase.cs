@@ -13,6 +13,12 @@ namespace com.etsoo.CoreFramework.Repositories
     public interface IRepoBase
     {
         /// <summary>
+        /// Flag
+        /// 标识
+        /// </summary>
+        string Flag { get; }
+
+        /// <summary>
         /// Add system parameters
         /// 添加系统参数
         /// </summary>
