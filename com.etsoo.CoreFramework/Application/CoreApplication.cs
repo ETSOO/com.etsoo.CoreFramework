@@ -79,10 +79,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="parameters">Parameters</param>
         public virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
         {
-            parameters.Add("CurrentUser", user.Id);
-
-            if (user.Organization != null)
-                parameters.Add("CurrentOrg", user.Organization);
+            // Keep blank
         }
 
         /// <summary>

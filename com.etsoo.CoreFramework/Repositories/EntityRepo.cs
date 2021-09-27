@@ -222,7 +222,10 @@ namespace com.etsoo.CoreFramework.Repositories
             var keys = new List<string> { "report", "for", range };
 
             if (format.HasValue)
+            {
+                keys.Add("as");
                 keys.Add(format.Value.ToString().ToLower());
+            }
 
             var name = GetCommandNameBase(keys);
 
@@ -320,7 +323,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("list_json"), parameters);
+            var command = CreateCommand(GetCommandName("list as json"), parameters);
 
             await ReadJsonToStreamAsync(command, response);
         }
