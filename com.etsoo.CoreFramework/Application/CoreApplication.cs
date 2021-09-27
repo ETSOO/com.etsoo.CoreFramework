@@ -1,5 +1,7 @@
-﻿using com.etsoo.Utils.Crypto;
+﻿using com.etsoo.CoreFramework.User;
+using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.Database;
+using Dapper;
 using System.Data.Common;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -67,6 +69,33 @@ namespace com.etsoo.CoreFramework.Application
             IDatabase<C> db) init) : this(init.configuration, init.db)
         {
 
+        }
+
+        /// <summary>
+        /// Add system parameters, override it to localize parameters' type
+        /// 添加系统参数，可以重写本地化参数类型
+        /// </summary>
+        /// <param name="user">Current user</param>
+        /// <param name="parameters">Parameters</param>
+        public virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
+        {
+            parameters.Add("CurrentUser", user.Id);
+
+            if (user.Organization != null)
+                parameters.Add("CurrentOrg", user.Organization);
+        }
+
+        /// <summary>
+        /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)
+        /// 构建命令名称
+        /// </summary>
+        /// <param name="identifier">Identifier, like procedure with 'p'</param>
+        /// <param name="parts">Parts</param>
+        /// <returns>Result</returns>
+        public virtual string BuildCommandName(string identifier, IEnumerable<string> parts)
+        {
+            var command = $"e{identifier}_" + string.Join("_", parts);
+            return command.ToLower();
         }
 
         /// <summary>

@@ -29,28 +29,16 @@ namespace com.etsoo.CoreFramework.User
         string? Avatar { get; set; }
 
         /// <summary>
-        /// Raw id
-        /// 原始编号
-        /// </summary>
-        string RawId { get; }
-
-        /// <summary>
         /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        object Id { get; }
-
-        /// <summary>
-        /// Raw organization id
-        /// 原始机构编号
-        /// </summary>
-        string? RawOrganization { get; set; }
+        string Id { get; }
 
         /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        object? Organization { get; }
+        string? Organization { get; }
 
         /// <summary>
         /// Role value

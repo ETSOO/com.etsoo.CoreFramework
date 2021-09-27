@@ -67,21 +67,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new UnauthorizedAccessException();
             }
 
-            AddSystemParameters(User, parameters);
-        }
-
-        /// <summary>
-        /// Add system parameters, override it to localize parameters' type
-        /// 添加系统参数，可以重写本地化参数类型
-        /// </summary>
-        /// <param name="user">Current user</param>
-        /// <param name="parameters">Parameters</param>
-        protected virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
-        {
-            parameters.Add("CurrentUser", user.Id);
-
-            if (user.Organization != null)
-                parameters.Add("CurrentOrg", user.Organization);
+            App.AddSystemParameters(User, parameters);
         }
 
         /// <summary>
@@ -127,6 +113,39 @@ namespace com.etsoo.CoreFramework.Repositories
             }
 
             return new DynamicParameters(parameters);
+        }
+
+        /// <summary>
+        /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
+        /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
+        /// </summary>
+        /// <param name="parts">Parts</param>
+        /// <returns>Command name</returns>
+        protected string GetCommandName(params string[] parts)
+        {
+            if (parts.Length == 1)
+            {
+                // Only one item, support to pass blank or underscore seperated item, like "read as json" to be "read_as_json"
+                return GetCommandNameBase(parts[0].Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries));
+            }
+
+            return GetCommandNameBase(parts);
+        }
+
+        /// <summary>
+        /// Get command name base, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
+        /// 获取命令名称基础，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
+        /// </summary>
+        /// <param name="parts">Parts</param>
+        /// <returns>Command name</returns>
+        protected virtual string GetCommandNameBase(IEnumerable<string> parts)
+        {
+            if (!parts.Any())
+            {
+                throw new ArgumentNullException(nameof(parts));
+            }
+
+            return App.BuildCommandName(CommandIdentifier.Procedure, parts);
         }
 
         /// <summary>

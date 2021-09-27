@@ -36,14 +36,5 @@
         /// </summary>
 
         string WebUrl { get; }
-
-        /// <summary>
-        /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)
-        /// 构建命令名称
-        /// </summary>
-        /// <param name="identifier">Identifier, like procedure with 'p'</param>
-        /// <param name="parts">Parts</param>
-        /// <returns>Result</returns>
-        string BuildCommandName(string identifier, IEnumerable<string> parts);
     }
 }

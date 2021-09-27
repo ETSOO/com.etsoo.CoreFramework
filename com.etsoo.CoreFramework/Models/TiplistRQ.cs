@@ -50,7 +50,7 @@ namespace com.etsoo.CoreFramework.Models
 
             if (ExcludedIds != null)
             {
-                var idParameter = app.DB.ListToParameter(ExcludedIds, null, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName));
+                var idParameter = app.DB.ListToParameter(ExcludedIds, null, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName));
                 parameters.Add("ExcludedIds", idParameter);
             }
 

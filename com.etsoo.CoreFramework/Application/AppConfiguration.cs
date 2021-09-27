@@ -89,18 +89,5 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
 
         public string WebUrl { get; }
-
-        /// <summary>
-        /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)
-        /// 构建命令名称
-        /// </summary>
-        /// <param name="identifier">Identifier, like procedure with 'p'</param>
-        /// <param name="parts">Parts</param>
-        /// <returns>Result</returns>
-        public virtual string BuildCommandName(string identifier, IEnumerable<string> parts)
-        {
-            var command = $"e{identifier}_" + string.Join("_", parts);
-            return command.ToLower();
-        }
     }
 }

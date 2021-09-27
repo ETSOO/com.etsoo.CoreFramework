@@ -43,36 +43,14 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
-        /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
-        /// </summary>
-        /// <param name="parts">Parts</param>
-        /// <returns>Command name</returns>
-        protected string GetCommandName(params string[] parts)
-        {
-            if (parts.Length == 1)
-            {
-                // Only one item, support to pass blank or underscore seperated item, like "read as json" to be "read_as_json"
-                return GetCommandNameBase(parts[0].Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries));
-            }
-
-            return GetCommandNameBase(parts);
-        }
-
-        /// <summary>
         /// Get command name base, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
         /// 获取命令名称基础，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
         /// </summary>
         /// <param name="parts">Parts</param>
         /// <returns>Command name</returns>
-        protected virtual string GetCommandNameBase(IEnumerable<string> parts)
+        protected override string GetCommandNameBase(IEnumerable<string> parts)
         {
-            if (!parts.Any())
-            {
-                throw new ArgumentNullException(nameof(parts));
-            }
-
-            return App.Configuration.BuildCommandName(CommandIdentifier.Procedure, parts.Prepend(Flag));
+            return base.GetCommandNameBase(parts.Prepend(Flag));
         }
 
         /// <summary>
@@ -102,7 +80,7 @@ namespace com.etsoo.CoreFramework.Repositories
         {
             var parameters = new DynamicParameters();
 
-            var idParameter = App.DB.ListToParameter(ids, null, (type) => SqlServerUtils.GetListCommand(type, App.Configuration.BuildCommandName));
+            var idParameter = App.DB.ListToParameter(ids, null, (type) => SqlServerUtils.GetListCommand(type, App.BuildCommandName));
             parameters.Add("ids", idParameter);
 
             AddSystemParameters(parameters);

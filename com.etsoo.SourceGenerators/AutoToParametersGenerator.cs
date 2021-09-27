@@ -114,7 +114,7 @@ namespace com.etsoo.SourceGenerators
                         if (string.IsNullOrEmpty(typeName))
                         {
                             // String
-                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName))";
+                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
                         }
                         else
                         {
@@ -138,7 +138,7 @@ namespace com.etsoo.SourceGenerators
                         if (string.IsNullOrEmpty(typeName))
                         {
                             // String
-                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.Configuration.BuildCommandName))";
+                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
                         }
                         else
                         {

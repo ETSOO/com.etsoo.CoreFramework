@@ -98,28 +98,16 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
-        /// Raw id
-        /// 原始编号
-        /// </summary>
-        public string RawId { get; }
-
-        /// <summary>
         /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
         /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
         /// </summary>
-        public virtual object Id => RawId;
-
-        /// <summary>
-        /// Raw organization id
-        /// 原始机构编号
-        /// </summary>
-        public string? RawOrganization { get; set; }
+        public string Id { get; }
 
         /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        public virtual object? Organization => RawOrganization;
+        public string? Organization { get; }
 
         /// <summary>
         /// Name
@@ -177,8 +165,8 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="connectionId">Connection id</param>
         public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string country, string? connectionId)
         {
-            RawId = id;
-            RawOrganization = organization;
+            Id = id;
+            Organization = organization;
             Name = name;
             RoleValue = roleValue;
             ClientIp = clientIp;
@@ -195,13 +183,13 @@ namespace com.etsoo.CoreFramework.User
         public virtual IEnumerable<Claim> CreateClaims()
         {
             yield return new(ClaimTypes.Name, Name);
-            yield return new(ClaimTypes.NameIdentifier, RawId);
+            yield return new(ClaimTypes.NameIdentifier, Id);
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(ClaimTypes.Country, Country);
             yield return new(RoleValueClaim, RoleValue.ToString());
             yield return new(IPAddressClaim, ClientIp.ToString());
-            if (!string.IsNullOrEmpty(RawOrganization))
-                yield return new(OrganizationClaim, RawOrganization);
+            if (!string.IsNullOrEmpty(Organization))
+                yield return new(OrganizationClaim, Organization);
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
         }
