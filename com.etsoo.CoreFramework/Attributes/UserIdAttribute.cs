@@ -25,6 +25,8 @@ namespace com.etsoo.CoreFramework.Attributes
         /// <returns>Result</returns>
         public override bool IsValid(object? value)
         {
+            if (value == null) return true;
+
             if (value is not string valueAsString)
             {
                 return false;
