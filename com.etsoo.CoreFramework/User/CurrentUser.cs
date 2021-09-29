@@ -27,13 +27,13 @@ namespace com.etsoo.CoreFramework.User
         /// Organization claim type
         /// 机构声明类型
         /// </summary>
-        public const string OrganizationClaim = "Organization";
+        public const string OrganizationClaim = "organization";
 
         /// <summary>
         /// Role value claim type
         /// 角色值类型
         /// </summary>
-        public const string RoleValueClaim = "RoleValue";
+        public const string RoleValueClaim = "rolevalue";
 
         /// <summary>
         /// Create user
@@ -69,6 +69,16 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
+        private static (string? Organization, string? Name, short? Role, string? Avatar) GetData(StringKeyDictionaryObject data)
+        {
+            return (
+                data.Get("Organization"),
+                data.Get("Name"),
+                data.Get<short>("Role"),
+                data.Get("Avatar")
+            );
+        }
+
         /// <summary>
         /// Create user from result data
         /// 从操作结果数据创建用户
@@ -82,18 +92,16 @@ namespace com.etsoo.CoreFramework.User
         {
             // Get data
             var id = data.Get("Id");
-            var organization = data.Get("Organization");
-            var name = data.Get("Name");
-            var roleValue = data.Get<short>("Role").GetValueOrDefault();
+            var (organization, name, role, avatar) = GetData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
-            return new CurrentUser(id, organization, name, roleValue, ip, language, country, null)
+            return new CurrentUser(id, organization, name, role.GetValueOrDefault(), ip, language, country, null)
             {
-                Avatar = data.Get("Avatar")
+                Avatar = avatar
             };
         }
 
@@ -107,19 +115,19 @@ namespace com.etsoo.CoreFramework.User
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        public string? Organization { get; }
+        public string? Organization { get; private set; }
 
         /// <summary>
         /// Name
         /// 姓名
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Role value
         /// 角色值
         /// </summary>
-        public virtual short RoleValue { get; set; }
+        public virtual short RoleValue { get; private set; }
 
         /// <summary>
         /// Client IP
@@ -149,7 +157,7 @@ namespace com.etsoo.CoreFramework.User
         /// Avatar
         /// 头像
         /// </summary>
-        public string? Avatar { get; set; }
+        public string? Avatar { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -202,6 +210,31 @@ namespace com.etsoo.CoreFramework.User
         public virtual ClaimsIdentity CreateIdentity()
         {
             return new ClaimsIdentity(CreateClaims());
+        }
+
+        /// <summary>
+        /// Update
+        /// 更新
+        /// </summary>
+        /// <param name="data">Data collection</param>
+        public virtual void Update(StringKeyDictionaryObject data)
+        {
+            // Editable fields
+            var (organization, name, role, avatar) = GetData(data);
+
+            // Name
+            if (name != null)
+                Name = name;
+
+            // Avatar
+            Avatar = avatar;
+
+            // Organization
+            Organization = organization;
+
+            // Role
+            if (role != null && RoleValue != role)
+                RoleValue = role.Value;
         }
     }
 }

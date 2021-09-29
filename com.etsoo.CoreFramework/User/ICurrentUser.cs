@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using com.etsoo.Utils.String;
+using System.Globalization;
 using System.Net;
 using System.Security.Claims;
 
@@ -20,13 +21,13 @@ namespace com.etsoo.CoreFramework.User
         /// Name
         /// 姓名
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
 
         /// <summary>
         /// Avatar
         /// 头像
         /// </summary>
-        string? Avatar { get; set; }
+        string? Avatar { get; }
 
         /// <summary>
         /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
@@ -44,7 +45,7 @@ namespace com.etsoo.CoreFramework.User
         /// Role value
         /// 角色值
         /// </summary>
-        short RoleValue { get; set; }
+        short RoleValue { get; }
 
         /// <summary>
         /// Client IP address
@@ -77,5 +78,12 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <returns>Identity</returns>
         ClaimsIdentity CreateIdentity();
+
+        /// <summary>
+        /// Update
+        /// 更新
+        /// </summary>
+        /// <param name="data">Data collection</param>
+        void Update(StringKeyDictionaryObject data);
     }
 }
