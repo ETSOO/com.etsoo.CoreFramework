@@ -1,19 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using com.etsoo.Utils.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.CoreFramework.Attributes
 {
     /// <summary>
-    /// Email address list
-    /// 电子邮箱列表
+    /// Country id validation attribute
+    /// 国家标识验证属性
     /// </summary>
-    public class EmailListAttribute : ValidationAttribute
+    public class CountryIdAttribute : ValidationAttribute
     {
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        public EmailListAttribute()
-            : base(Properties.Resources.EmailListAttributeError)
+        public CountryIdAttribute()
+            : base(Properties.Resources.CountryIdAttributeError)
         {
         }
 
@@ -25,13 +26,12 @@ namespace com.etsoo.CoreFramework.Attributes
         /// <returns>Result</returns>
         public override bool IsValid(object? value)
         {
-            if (value is not IEnumerable<string> values)
+            if (value is not string valueAsString)
             {
                 return false;
             }
 
-            var emailAttribute = new EmailAddressAttribute();
-            return values.All(email => emailAttribute.IsValid(email));
+            return GlobalData.CountryIds.Contains(valueAsString);
         }
 
         /// <summary>

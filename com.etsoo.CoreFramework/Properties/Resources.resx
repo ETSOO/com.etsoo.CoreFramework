@@ -138,6 +138,9 @@
   <data name="CodesNoMatch" xml:space="preserve">
     <value>Codes do not match</value>
   </data>
+  <data name="CountryIdAttributeError" xml:space="preserve">
+    <value>Wrong or unsupported country code</value>
+  </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>Data Processing Failed</value>
   </data>
@@ -164,6 +167,9 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
+  </data>
+  <data name="LanguageCodeAttributeError" xml:space="preserve">
+    <value>Language code error</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>No Action Result</value>

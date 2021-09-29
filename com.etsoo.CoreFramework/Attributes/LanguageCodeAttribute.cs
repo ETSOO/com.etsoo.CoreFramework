@@ -1,19 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Attributes
 {
     /// <summary>
-    /// Email address list
-    /// 电子邮箱列表
+    /// Language code validation attribute
+    /// 语言代码验证属性
     /// </summary>
-    public class EmailListAttribute : ValidationAttribute
+    public class LanguageCodeAttribute : ValidationAttribute
     {
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        public EmailListAttribute()
-            : base(Properties.Resources.EmailListAttributeError)
+        public LanguageCodeAttribute()
+            : base(Properties.Resources.LanguageCodeAttributeError)
         {
         }
 
@@ -25,13 +26,12 @@ namespace com.etsoo.CoreFramework.Attributes
         /// <returns>Result</returns>
         public override bool IsValid(object? value)
         {
-            if (value is not IEnumerable<string> values)
+            if (value is not string valueAsString)
             {
                 return false;
             }
 
-            var emailAttribute = new EmailAddressAttribute();
-            return values.All(email => emailAttribute.IsValid(email));
+            return Regex.IsMatch(valueAsString, "^[a-z]{2}(-[A-Z]{2})?$");
         }
 
         /// <summary>

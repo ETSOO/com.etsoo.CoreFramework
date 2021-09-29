@@ -124,6 +124,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Wrong or unsupported country code.
+        /// </summary>
+        public static string CountryIdAttributeError {
+            get {
+                return ResourceManager.GetString("CountryIdAttributeError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         public static string DataProcessingFailed {
@@ -201,6 +210,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string JoinOrgRequired {
             get {
                 return ResourceManager.GetString("JoinOrgRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language code error.
+        /// </summary>
+        public static string LanguageCodeAttributeError {
+            get {
+                return ResourceManager.GetString("LanguageCodeAttributeError", resourceCulture);
             }
         }
         

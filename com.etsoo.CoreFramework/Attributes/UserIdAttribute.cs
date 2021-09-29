@@ -50,7 +50,7 @@ namespace com.etsoo.CoreFramework.Attributes
         /// <returns>Formated string</returns>
         public override string FormatErrorMessage(string name)
         {
-            return string.Format(this.ErrorMessageString, name);
+            return string.Format(ErrorMessageString, name);
         }
     }
 }

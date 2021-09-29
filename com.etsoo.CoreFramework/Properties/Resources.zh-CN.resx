@@ -138,6 +138,9 @@
   <data name="CodesNoMatch" xml:space="preserve">
     <value>验证码不匹配</value>
   </data>
+  <data name="CountryIdAttributeError" xml:space="preserve">
+    <value>国家编号错误或不受支持</value>
+  </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>数据处理失败</value>
   </data>
@@ -164,6 +167,9 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入组织</value>
+  </data>
+  <data name="LanguageCodeAttributeError" xml:space="preserve">
+    <value>语言代码错误</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>没有返回操作结果</value>
