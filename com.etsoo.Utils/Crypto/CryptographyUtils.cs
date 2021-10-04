@@ -207,5 +207,19 @@ namespace com.etsoo.Utils.Crypto
 
             return await alg.ComputeHashAsync(manager.GetStream(Encoding.UTF8.GetBytes(message)));
         }
+
+        /// <summary>
+        /// MD5 hash
+        /// MD5哈希
+        /// </summary>
+        /// <param name="source">Source</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> MD5Async(string source)
+        {
+            using var md5 = MD5.Create();
+
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(source));
+            return await md5.ComputeHashAsync(ms);
+        }
     }
 }

@@ -34,12 +34,13 @@ namespace Tests.Utils
 
         [Test]
         [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
         public void GetTimeZone_Test()
         {
             // Correct
-            var tz = LocalizationUtils.GetTimeZone("New Zealand Standard Time");
+            var tz = LocalizationUtils.GetTimeZone("新西兰标准时间");
 
-            Assert.AreEqual("新西兰标准时间", tz.StandardName);
+            Assert.AreEqual("New Zealand Standard Time", tz.StandardName);
 
             // Wrong
             tz = LocalizationUtils.GetTimeZone("China Time");

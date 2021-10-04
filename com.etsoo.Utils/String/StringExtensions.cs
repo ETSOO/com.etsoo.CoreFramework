@@ -1,4 +1,6 @@
 ﻿using Dapper;
+using System.Text;
+using System.Web;
 
 namespace com.etsoo.Utils.String
 {
@@ -17,6 +19,34 @@ namespace com.etsoo.Utils.String
         public static bool IsAnsi(this string input)
         {
             return !input.Any(c => c > 127);
+        }
+
+        /// <summary>
+        /// Join as string, ended with itemSplitter
+        /// 链接成字符串，以 itemSplitter 结尾
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items">Items</param>
+        /// <param name="valueSplitter">Name / value splitter</param>
+        /// <param name="itemSplitter">Item splitter</param>
+        /// <returns></returns>
+        public static string JoinAsString<T>(this IEnumerable<KeyValuePair<string, T>> items, string valueSplitter = "=", string itemSplitter = "&")
+        {
+            return items.Aggregate(new StringBuilder(), (s, x) => s.Append(x.Key + valueSplitter + x.Value + itemSplitter), s => s.ToString());
+        }
+
+        /// <summary>
+        /// Join as web query, ended with itemSplitter
+        /// 链接成网页查询字符串，以 itemSplitter 结尾
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items">Items</param>
+        /// <param name="valueSplitter">Name / value splitter</param>
+        /// <param name="itemSplitter">Item splitter</param>
+        /// <returns>Result</returns>
+        public static string JoinAsQuery<T>(this IEnumerable<KeyValuePair<string, T>> items, string valueSplitter = "=", string itemSplitter = "&")
+        {
+            return items.Aggregate(new StringBuilder(), (s, x) => s.Append(HttpUtility.UrlEncode(x.Key) + valueSplitter + (x.Value == null ? string.Empty : HttpUtility.UrlEncode(x.Value.ToString())) + itemSplitter), s => s.ToString());
         }
 
         /// <summary>

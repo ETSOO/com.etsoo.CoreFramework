@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Models;
+﻿using com.etsoo.Utils.Address;
 using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.CoreFramework.Attributes
@@ -33,7 +33,7 @@ namespace com.etsoo.CoreFramework.Attributes
                 return false;
             }
 
-            return GlobalData.CountryIds.Contains(valueAsString);
+            return AddressRegion.All.Any(region => region.Id == valueAsString);
         }
 
         /// <summary>

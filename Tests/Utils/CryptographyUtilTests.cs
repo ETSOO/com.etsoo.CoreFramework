@@ -96,5 +96,18 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual("0c08206a9e3c0fed6c7f828ff92ae06d6971e267cff7378017ffe7b69aad18834079de96285ab829a548f0ac92185d0447852f2fa415f7bb994112c9e606bbc7".ToUpper(), Convert.ToHexString(result));
         }
+
+        /// <summary>
+        /// MD5 to Hexadecimal string (X2) test
+        /// </summary>
+        [Test]
+        public async Task MD5_Hex_Test()
+        {
+            // Arrange & act
+            var result = await CryptographyUtils.MD5Async("info@etsoo.com");
+
+            // Assert
+            Assert.AreEqual("9c7ce665e6f4f4c807912a7486244c90", Convert.ToHexString(result).ToLower());
+        }
     }
 }

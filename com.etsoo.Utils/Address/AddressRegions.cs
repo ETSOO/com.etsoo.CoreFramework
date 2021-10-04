@@ -1,16 +1,16 @@
-﻿namespace com.etsoo.Utils.Models
+﻿namespace com.etsoo.Utils.Address
 {
     /// <summary>
-    /// Country or region
+    /// Countries or regions
     /// 国家或地区
     /// </summary>
-    public record AddressRegion
+    public partial record AddressRegion
     {
         /// <summary>
         /// CN - China
         /// 中国
         /// </summary>
-        public static AddressRegion CN => new("CN", "CHN", "156", AddressContinent.AS, "00", "86", "CNY", new[] { "zh-CN" });
+        public static AddressRegion CN => new("CN", "CHN", "156", AddressContinent.AS, "00", "86", "CNY", new[] { "zh-CN" }) { PhoneValidator = AddressRegionPhoneValidator.CN };
 
         /// <summary>
         /// HK - HK, China
@@ -52,7 +52,7 @@
         /// NZ - New Zealand
         /// 新西兰
         /// </summary>
-        public static AddressRegion NZ => new("NZ", "NZL", "554", AddressContinent.OC, "00", "64", "NZD", new[] { "en-NZ", "mi-NZ" });
+        public static AddressRegion NZ => new("NZ", "NZL", "554", AddressContinent.OC, "00", "64", "NZD", new[] { "en-NZ", "mi-NZ" }) { PhoneValidator = AddressRegionPhoneValidator.NZ };
 
         /// <summary>
         /// GB - Great Britain
@@ -134,112 +134,5 @@
         {
             return All.FirstOrDefault(c => c.Idd == idd);
         }
-
-        /// <summary>
-        // Id, like CN for China
-        // https://www.iban.com/country-codes
-        // 国家编号
-        /// </summary>
-        public string Id { get; }
-
-        /// <summary>
-        // 3-code id like CHN for China
-        // 三个字母国家编号
-        /// </summary>
-        public string Id3 { get; }
-
-        /// <summary>
-        // Number id, like 156 for China
-        // 数字编号
-        /// </summary>
-        public string Nid { get; }
-
-        /// <summary>
-        // Continent
-        // 洲
-        /// </summary>
-        public AddressContinent Continent { get; }
-
-        /// <summary>
-        /// Phone exit code for international dial, like 00 in China
-        /// 国际拨号的电话退出代码
-        /// </summary>
-        public string ExitCode { get; }
-
-        /// <summary>
-        /// Area code for international dial, like 86 for China
-        /// 国际电话区号
-        /// </summary>
-        public string Idd { get; }
-
-        /// <summary>
-        /// Currency, like CNY for China's currency
-        /// 币种
-        /// </summary>
-        public string Currency { get; }
-
-        /// <summary>
-        /// Languages
-        /// 语言
-        /// </summary>
-        public IEnumerable<string> Languages { get; }
-
-        // Constructor
-        // 构造函数
-        public AddressRegion(string id, string id3, string nid, AddressContinent continent, string exitCode, string idd, string currency, IEnumerable<string> languages)
-        {
-            (Id, Id3, Nid, continent, ExitCode, Idd, Currency, Languages)
-                =
-            (id, id3, nid, Continent, exitCode, idd, currency, languages);
-        }
-    }
-
-    /// <summary>
-    /// Continent
-    /// 洲
-    /// </summary>
-    public enum AddressContinent
-    {
-        /// <summary>
-        /// Africa
-        /// 非洲
-        /// </summary>
-        AF = 1,
-
-        /// <summary>
-        /// Antarctica
-        /// 南极洲
-        /// </summary>
-        AN = 2,
-
-        /// <summary>
-        /// Asia
-        /// 亚洲
-        /// </summary>
-        AS = 3,
-
-        /// <summary>
-        /// Europe
-        /// 欧洲
-        /// </summary>
-        EU = 4,
-
-        /// <summary>
-        /// North America
-        /// 北美洲
-        /// </summary>
-        NA = 5,
-
-        /// <summary>
-        /// Oceania
-        /// 大洋洲
-        /// </summary>
-        OC = 6,
-
-        /// <summary>
-        /// South America
-        /// 南美洲
-        /// </summary>
-        SA = 7
     }
 }

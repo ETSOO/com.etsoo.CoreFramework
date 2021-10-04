@@ -13,7 +13,7 @@ namespace com.etsoo.Utils.Localization
         /// <returns>Changed or not</returns>
         public static CultureInfo SetCulture(string language)
         {
-            if (CultureInfo.CurrentCulture.Name == language)
+            if (CultureInfo.CurrentCulture.Name == language && CultureInfo.CurrentUICulture.Name == language)
                 return CultureInfo.CurrentCulture;
 
             // Set related cultures
