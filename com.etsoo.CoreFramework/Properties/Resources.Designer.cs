@@ -124,15 +124,6 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wrong or unsupported country code.
-        /// </summary>
-        public static string CountryIdAttributeError {
-            get {
-                return ResourceManager.GetString("CountryIdAttributeError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         public static string DataProcessingFailed {
@@ -336,6 +327,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string OutOfMemory {
             get {
                 return ResourceManager.GetString("OutOfMemory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong or unsupported country/region code.
+        /// </summary>
+        public static string RegionIdAttributeError {
+            get {
+                return ResourceManager.GetString("RegionIdAttributeError", resourceCulture);
             }
         }
         

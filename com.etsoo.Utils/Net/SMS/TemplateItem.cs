@@ -33,7 +33,7 @@
         TemplateKind Kind,
         string TemplateId,
         string? EndPoint = null,
-        string? Country = null,
+        string? Region = null,
         string? Language = null,
         string? Signature = null,
         bool Default = false

@@ -34,10 +34,10 @@
         /// </summary>
         /// <param name="kind">Template kind</param>
         /// <param name="templateId">Template id</param>
-        /// <param name="country">Country</param>
+        /// <param name="region">Country or region</param>
         /// <param name="language">Language</param>
         /// <returns>Resource</returns>
-        public TemplateItem? GetTemplate(TemplateKind kind, string? templateId = null, string? country = null, string? language = null)
+        public TemplateItem? GetTemplate(TemplateKind kind, string? templateId = null, string? region = null, string? language = null)
         {
             if (!string.IsNullOrEmpty(templateId))
             {
@@ -45,18 +45,18 @@
                 return allTemplates.FirstOrDefault(t => t.Kind == kind && t.TemplateId == templateId);
             }
 
-            if (string.IsNullOrEmpty(country) && string.IsNullOrEmpty(language))
+            if (string.IsNullOrEmpty(region) && string.IsNullOrEmpty(language))
             {
                 // Return first default item
-                return allTemplates.FirstOrDefault(t => t.Kind == kind && t.Default && t.Country == null && t.Language == null);
+                return allTemplates.FirstOrDefault(t => t.Kind == kind && t.Default && t.Region == null && t.Language == null);
             }
 
             var subTemplates = allTemplates.Where(t => t.Kind == kind);
 
-            if (!string.IsNullOrEmpty(country))
+            if (!string.IsNullOrEmpty(region))
             {
                 // All countries or the specific country
-                subTemplates = subTemplates.Where(r => r.Country == null || r.Country == country).OrderByDescending(r => r.Country == country).ThenByDescending(r => r.Default);
+                subTemplates = subTemplates.Where(r => r.Region == null || r.Region == region).OrderByDescending(r => r.Region == region).ThenByDescending(r => r.Default);
             }
 
             if (!string.IsNullOrEmpty(language))

@@ -4,17 +4,17 @@ using System.ComponentModel.DataAnnotations;
 namespace com.etsoo.CoreFramework.Attributes
 {
     /// <summary>
-    /// Country id validation attribute
-    /// 国家标识验证属性
+    /// Country or region id validation attribute
+    /// 国家或地区标识验证属性
     /// </summary>
-    public class CountryIdAttribute : ValidationAttribute
+    public class RegionIdAttribute : ValidationAttribute
     {
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        public CountryIdAttribute()
-            : base(Properties.Resources.CountryIdAttributeError)
+        public RegionIdAttribute()
+            : base(Properties.Resources.RegionIdAttributeError)
         {
         }
 

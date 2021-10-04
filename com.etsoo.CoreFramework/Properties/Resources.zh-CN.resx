@@ -138,9 +138,6 @@
   <data name="CodesNoMatch" xml:space="preserve">
     <value>验证码不匹配</value>
   </data>
-  <data name="CountryIdAttributeError" xml:space="preserve">
-    <value>国家编号错误或不受支持</value>
-  </data>
   <data name="DataProcessingFailed" xml:space="preserve">
     <value>数据处理失败</value>
   </data>
@@ -209,6 +206,9 @@
   </data>
   <data name="OutOfMemory" xml:space="preserve">
     <value>内存不足</value>
+  </data>
+  <data name="RegionIdAttributeError" xml:space="preserve">
+    <value>国家或地区编号错误或不受支持</value>
   </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>您的令牌已过期</value>

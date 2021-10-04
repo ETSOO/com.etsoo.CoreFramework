@@ -39,12 +39,12 @@ namespace Tests.Utils
         }
 
         [Test, TestCaseSource(nameof(CreatePhoneBulkTestData))]
-        public void Countries_CreatePhone_BulkTests(string phoneNumber, string country, string formatedNumber, bool isMobile)
+        public void Countries_CreatePhone_BulkTests(string phoneNumber, string region, string formatedNumber, bool isMobile)
         {
             // Arrange & act
             var phone = AddressRegion.CreatePhone(phoneNumber);
 
-            Assert.AreEqual(country, phone?.Country);
+            Assert.AreEqual(region, phone?.Region);
             Assert.AreEqual(formatedNumber, phone?.PhoneNumber);
             Assert.AreEqual(isMobile, phone?.IsMobile);
         }

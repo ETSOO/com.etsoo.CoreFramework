@@ -12,7 +12,7 @@
         {
             return x?.PhoneNumber == y?.PhoneNumber &&
                 x?.IsMobile == y?.IsMobile &&
-                x?.Country == y?.Country;
+                x?.Region == y?.Region;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@
         /// <returns>Result</returns>
         public int GetHashCode(AddressRegion.Phone obj)
         {
-            return obj.PhoneNumber.GetHashCode() ^ obj.IsMobile.GetHashCode() ^ obj.Country.GetHashCode();
+            return obj.PhoneNumber.GetHashCode() ^ obj.IsMobile.GetHashCode() ^ obj.Region.GetHashCode();
         }
     }
 }

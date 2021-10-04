@@ -55,13 +55,13 @@
         /// 创建多个电话对象
         /// </summary>
         /// <param name="phoneNumbers">Phone numbers</param>
-        /// <param name="countryId">Default country id</param>
+        /// <param name="regionId">Default country or region id</param>
         /// <returns>Result</returns>
-        public static IEnumerable<Phone> CreatePhones(IEnumerable<string> phoneNumbers, string? countryId = null)
+        public static IEnumerable<Phone> CreatePhones(IEnumerable<string> phoneNumbers, string? regionId = null)
         {
             foreach (var phoneNumber in phoneNumbers)
             {
-                var phone = CreatePhone(phoneNumber, countryId);
+                var phone = CreatePhone(phoneNumber, regionId);
                 if (phone == null)
                     yield break;
 
@@ -88,16 +88,16 @@
             public bool IsMobile { get; init; }
 
             /// <summary>
-            /// Country
-            /// 所在国家
+            /// Country or region
+            /// 所在国家或地区
             /// </summary>
-            public string Country { get; init; }
+            public string Region { get; init; }
 
-            internal Phone(string phoneNumber, bool isMobile, string country)
+            internal Phone(string phoneNumber, bool isMobile, string region)
             {
                 PhoneNumber = phoneNumber;
                 IsMobile = isMobile;
-                Country = country;
+                Region = region;
             }
 
             /// <summary>
@@ -108,7 +108,7 @@
             /// <returns>Result</returns>
             public string ToInternationalFormat(string exitCode = "+")
             {
-                return string.Concat(exitCode, GetById(Country)?.Idd, PhoneNumber.TrimStart('0'));
+                return string.Concat(exitCode, GetById(Region)?.Idd, PhoneNumber.TrimStart('0'));
             }
         }
 

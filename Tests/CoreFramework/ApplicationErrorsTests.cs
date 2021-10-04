@@ -16,10 +16,6 @@ namespace Tests.CoreFramework
             // Arrange
             LocalizationUtils.SetCulture("zh-CN");
 
-            var culture = Thread.CurrentThread.CurrentCulture;
-            var cultrue1 = Thread.CurrentThread.CurrentUICulture;
-
-
             // Action & assert
             // Resources depend on CurrentUICulture, not CurrentCulture
             Assert.AreEqual("找不到用户", ApplicationErrors.NoUserFound.Title);
