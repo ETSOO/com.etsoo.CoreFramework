@@ -54,16 +54,16 @@ namespace com.etsoo.CoreFramework.User
             var id = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var organization = user.FindFirstValue(OrganizationClaim);
             var language = user.FindFirstValue(ClaimTypes.Locality);
-            var country = user.FindFirstValue(ClaimTypes.Country);
+            var region = user.FindFirstValue(ClaimTypes.Country);
             var roleValue = StringUtils.TryParse<short>(user.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
             var ip = user.FindFirstValue(IPAddressClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(name) || id == null || language == null || country == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
+            if (string.IsNullOrEmpty(name) || id == null || language == null || region == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
                 return null;
 
             // New user
-            return new CurrentUser(id, organization, name, roleValue, ipAddress, new CultureInfo(language), country, connectionId)
+            return new CurrentUser(id, organization, name, roleValue, ipAddress, new CultureInfo(language), region, connectionId)
             {
                 Avatar = avatar
             };
@@ -86,9 +86,9 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="data">Result data</param>
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
-        /// <param name="country">Country or region</param>
+        /// <param name="region">Country or region</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string country)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
         {
             // Get data
             var id = data.Get("Id");
@@ -99,7 +99,7 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // New user
-            return new CurrentUser(id, organization, name, role.GetValueOrDefault(), ip, language, country, null)
+            return new CurrentUser(id, organization, name, role.GetValueOrDefault(), ip, language, region, null)
             {
                 Avatar = avatar
             };
@@ -145,7 +145,7 @@ namespace com.etsoo.CoreFramework.User
         /// Country or region, like CN means China
         /// 国家和地区，比如 CN = 中国
         /// </summary>
-        public string Country { get; }
+        public string Region { get; }
 
         /// <summary>
         /// Connection id
@@ -169,9 +169,9 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="roleValue">Role value</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="language">Language</param>
-        /// <param name="country">Country or region</param>
+        /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string country, string? connectionId)
+        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, CultureInfo language, string region, string? connectionId)
         {
             Id = id;
             Organization = organization;
@@ -179,7 +179,7 @@ namespace com.etsoo.CoreFramework.User
             RoleValue = roleValue;
             ClientIp = clientIp;
             Language = language;
-            Country = country;
+            Region = region;
             ConnectionId = connectionId;
         }
 
@@ -193,7 +193,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Name, Name);
             yield return new(ClaimTypes.NameIdentifier, Id);
             yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(ClaimTypes.Country, Country);
+            yield return new(ClaimTypes.Country, Region);
             yield return new(RoleValueClaim, RoleValue.ToString());
             yield return new(IPAddressClaim, ClientIp.ToString());
             if (!string.IsNullOrEmpty(Organization))

@@ -26,9 +26,9 @@
         /// </summary>
         /// <param name="kind">Template kind</param>
         /// <param name="templateId">Template id</param>
-        /// <param name="country">Country</param>
+        /// <param name="region">Country or region</param>
         /// <param name="language">Language</param>
         /// <returns>Resource</returns>
-        TemplateItem? GetTemplate(TemplateKind kind, string? templateId = null, string? country = null, string? language = null);
+        TemplateItem? GetTemplate(TemplateKind kind, string? templateId = null, string? region = null, string? language = null);
     }
 }

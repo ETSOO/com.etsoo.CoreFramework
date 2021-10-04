@@ -63,7 +63,7 @@ namespace com.etsoo.CoreFramework.User
         /// Country or region
         /// 国家或地区
         /// </summary>
-        string Country { get; }
+        string Region { get; }
 
         /// <summary>
         /// Create claims
