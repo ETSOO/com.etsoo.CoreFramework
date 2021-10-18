@@ -235,5 +235,21 @@ namespace Tests.Utils
         {
             Assert.AreEqual(isAnsi, input.IsAnsi());
         }
+
+        private static IEnumerable<TestCaseData> RemoveNonLettersTestData
+        {
+            get
+            {
+                yield return new TestCaseData(" 123 ", "123");
+                yield return new TestCaseData("0532-5557 9200", "053255579200");
+                yield return new TestCaseData("02,s*", "02s");
+            }
+        }
+
+        [Test, TestCaseSource(nameof(RemoveNonLettersTestData))]
+        public void RemoveNonLetters_Test(string input, string result)
+        {
+            Assert.AreEqual(StringUtils.RemoveNonLetters(input), result);
+        }
     }
 }

@@ -201,6 +201,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError OrgDisabled => new(nameof(OrgDisabled), Resources.OrgDisabled);
 
         /// <summary>
+        /// The organization already exists
+        /// 机构已存在
+        /// </summary>
+        public static ApplicationError OrgExists => new(nameof(OrgExists), Resources.OrgExists);
+
+        /// <summary>
         /// Organization service has expired
         /// 机构服务已到期
         /// </summary>
@@ -266,6 +272,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(NoUserMatch) => NoUserMatch,
                 nameof(NoValidData) => NoValidData,
                 nameof(OrgDisabled) => OrgDisabled,
+                nameof(OrgExists) => OrgExists,
                 nameof(OrgExpired) => OrgExpired,
                 nameof(OutOfMemory) => OutOfMemory,
                 nameof(TokenExpired) => TokenExpired,

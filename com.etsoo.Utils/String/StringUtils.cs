@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.Utils.String
 {
@@ -198,6 +199,17 @@ namespace com.etsoo.Utils.String
 
             // Return
             return builder.AsSpan();
+        }
+
+        /// <summary>
+        /// Remove all non letters
+        /// 移除所有非字母数字符号
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>Result</returns>
+        public static string RemoveNonLetters(string input)
+        {
+            return new Regex("[^a-zA-Z0-9]").Replace(input, "");
         }
 
         private delegate bool TryParseDelegate<T>(string s, out T input);

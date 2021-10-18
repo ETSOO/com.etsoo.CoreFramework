@@ -201,6 +201,9 @@
   <data name="OrgDisabled" xml:space="preserve">
     <value>机构已被禁用</value>
   </data>
+  <data name="OrgExists" xml:space="preserve">
+    <value>机构已存在</value>
+  </data>
   <data name="OrgExpired" xml:space="preserve">
     <value>机构服务已于 {0} 到期</value>
   </data>

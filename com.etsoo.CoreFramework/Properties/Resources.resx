@@ -201,6 +201,9 @@
   <data name="OrgDisabled" xml:space="preserve">
     <value>The organization has been disabled</value>
   </data>
+  <data name="OrgExists" xml:space="preserve">
+    <value>The organization already exists</value>
+  </data>
   <data name="OrgExpired" xml:space="preserve">
     <value>Organization service expired on {0}</value>
   </data>

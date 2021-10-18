@@ -313,6 +313,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The organization already exists.
+        /// </summary>
+        public static string OrgExists {
+            get {
+                return ResourceManager.GetString("OrgExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Organization service expired on {0}.
         /// </summary>
         public static string OrgExpired {
