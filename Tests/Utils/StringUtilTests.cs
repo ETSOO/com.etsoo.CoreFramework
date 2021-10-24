@@ -60,6 +60,44 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void HideData_Test()
+        {
+            // Act 1
+            var result = StringUtils.HideData("4000609917");
+
+            // Assert 1
+            Assert.AreEqual("400***917", result);
+
+            // Act 2
+            result = StringUtils.HideData("+8653255579200");
+
+            // Assert 2
+            Assert.AreEqual("+865***9200", result);
+        }
+
+        [Test]
+        public void HideEmail_Test()
+        {
+            // Act 1
+            var result = StringUtils.HideEmail("info@etsoo.com");
+
+            // Assert 1
+            Assert.AreEqual("in***@etsoo.com", result);
+
+            // Act 2
+            result = StringUtils.HideEmail("helloworld@etsoo.com");
+
+            // Assert 2
+            Assert.AreEqual("hel***rld@etsoo.com", result);
+
+            // Act 3
+            result = StringUtils.HideEmail("a@etsoo.com");
+
+            // Assert 3
+            Assert.AreEqual("***@etsoo.com", result);
+        }
+
+        [Test]
         public void IEnumerableToString_Test()
         {
             // Arrange

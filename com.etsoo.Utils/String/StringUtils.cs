@@ -19,6 +19,49 @@ namespace com.etsoo.Utils.String
         public static readonly Type StringType = typeof(string);
 
         /// <summary>
+        /// Hide normal data
+        /// 隐藏一般信息
+        /// </summary>
+        /// <param name="data">Input data</param>
+        /// <returns>Result</returns>
+        public static string HideData(string data, char? endChar = null)
+        {
+            if (endChar != null)
+            {
+                var index = data.IndexOf(endChar.Value);
+                if (index == -1)
+                {
+                    return HideData(data, null);
+                }
+
+                return HideData(data[..index], null) + data[index..];
+            }
+
+            var len = data.Length;
+            if (len < 4)
+                return "***";
+            if (len < 6)
+                return data[..2] + "***";
+            if (len < 8)
+                return data[..2] + "***" + data[^2..];
+            if (len < 12)
+                return data[..3] + "***" + data[^3..];
+
+            return data[..4] + "***" + data[^4..];
+        }
+
+        /// <summary>
+        /// Hide email address
+        /// 隐藏电子邮箱地址
+        /// </summary>
+        /// <param name="email">Input email</param>
+        /// <returns>Result</returns>
+        public static string HideEmail(string email)
+        {
+            return HideData(email, '@');
+        }
+
+        /// <summary>
         /// IEnumerable to string
         /// 链接 IEnumerable 为字符串
         /// </summary>
