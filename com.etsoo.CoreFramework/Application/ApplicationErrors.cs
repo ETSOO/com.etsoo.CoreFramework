@@ -33,6 +33,7 @@ namespace com.etsoo.CoreFramework.Application
         {
             return new ActionResult(Type)
             {
+                Title = Title,
                 TraceId = traceId
             };
         }

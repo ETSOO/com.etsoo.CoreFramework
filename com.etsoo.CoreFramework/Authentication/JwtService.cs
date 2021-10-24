@@ -87,7 +87,12 @@ namespace com.etsoo.CoreFramework.Authentication
         {
             // Jwt section is required
             if (!section.Exists())
-                throw new ArgumentNullException(nameof(section));
+                throw new ArgumentNullException(nameof(section), "No Section");
+
+            // Hold the private RSA key in a key container
+            // https://docs.microsoft.com/en-us/dotnet/standard/security/how-to-store-asymmetric-keys-in-a-key-container
+            // https://stackoverflow.com/questions/48791488/using-asymmetric-key-on-net-core
+            // https://docs.microsoft.com/en-us/dotnet/standard/security/cross-platform-cryptography
 
             securityKeyBytes = keyBytes;
 
