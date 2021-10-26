@@ -159,7 +159,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Async query command as object
         /// 异步执行命令返回对象
         /// </summary>
-        /// <typeparam name="T">Generic object type</typeparam>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
         public async ValueTask<D?> QueryAsAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
@@ -172,7 +172,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Async query command as object list
         /// 异步执行命令返回对象列表
         /// </summary>
-        /// <typeparam name="T">Generic object type</typeparam>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
         public async IAsyncEnumerable<D> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
@@ -196,26 +196,31 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Async query command as action result
         /// 异步执行命令返回操作结果
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async Task<IActionResult> QueryAsResultAsync(CommandDefinition command)
+        public async Task<ActionResult<D>> QueryAsResultAsync<D>(CommandDefinition command)
         {
             var result = await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryAsResultAsync(command);
+                return connection.QueryAsResultAsync<D>(command);
             });
 
-            if (result != null && !result.Success && result.Title == null)
+            if (result == null)
             {
-                var name = result.Type.ToString().Split('/')[0];
-                var error = ApplicationErrors.Get(name);
+                return ApplicationErrors.NoActionResult.AsResult<D>();
+            }
+
+            if (!result.Ok && result.Title == null && result.Type != null)
+            {
+                var error = ApplicationErrors.Get(result.Type);
                 if (error != null)
                 {
                     result.Title = error.Title;
                 }
             }
 
-            return result ?? ApplicationErrors.NoActionResult.AsResult();
+            return result;
         }
 
         /// <summary>

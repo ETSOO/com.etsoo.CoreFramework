@@ -1,6 +1,8 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
+using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
@@ -76,12 +78,12 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.CreateAsync(user);
+            var result = await repo.CreateAsync<IntIdItem>(user);
 
             // Assert
-            if(result.Success)
+            if (result.Ok)
             {
-                Assert.AreEqual(1021, result.DataAsIdModal().Id);
+                Assert.AreEqual(1021, result.Data?.Id);
             }
         }
 
@@ -100,17 +102,17 @@ namespace Tests.Repositories
             var result = await repo.QuickUpdateAsync(user, new(new[] { "Name" }));
 
             // Assert
-            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.Ok);
         }
 
         [Test]
         public async Task DeleteAsync_Test()
         {
             // Act
-            var result = await repo.DeleteAsync(1001);
+            var result = await repo.DeleteAsync<ActionResultData>(1001);
 
             // Assert
-            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.Ok);
         }
     }
 }

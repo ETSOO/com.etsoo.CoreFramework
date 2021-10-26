@@ -1,6 +1,7 @@
-﻿using com.etsoo.Utils.Database;
+﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Database;
+using com.etsoo.Utils.String;
 using NUnit.Framework;
-using System.Threading.Tasks;
 
 namespace Tests.ActionResult
 {
@@ -33,7 +34,7 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync(new("SELECT TOP 0 NULL"));
+            var result = await connection.QueryAsResultAsync<ActionResultData>(new("SELECT TOP 0 NULL"));
 
             // Assert
             Assert.IsNull(result);
@@ -46,11 +47,12 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync(new("SELECT 'NoId/Organization' AS [type]"));
+            var result = await connection.QueryAsResultAsync<ActionResultData>(new("SELECT 'NoId/Organization' AS [type]"));
 
             // Assert
-            Assert.IsFalse(result!.Success);
-            Assert.IsTrue(result!.Type.ToString() == "NoId/Organization");
+            Assert.IsFalse(result!.Ok);
+            Assert.AreEqual(result!.Type, "NoId");
+            Assert.AreEqual(result!.Field, "Organization");
         }
 
         [Test]
@@ -60,14 +62,38 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync(new("SELECT 1 AS success, 'test' AS field, 1234 AS id, 44.3 AS amount"));
+            var result = await connection.QueryAsResultAsync<ActionResultTestData>(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
 
             // Assert
-            Assert.IsTrue(result?.Type.ToString() == "about:blank");
-            Assert.IsTrue(result!.Success);
-            Assert.IsTrue(result.Data.GetExact<int>("id") == 1234);
-            Assert.IsTrue(result.Data.GetExact<decimal>("amount") == 44.3M);
-            Assert.IsNull(result.Data.GetExact<bool?>("ok"));
+            Assert.IsNull(result?.Type);
+            Assert.IsTrue(result!.Ok);
+            Assert.AreEqual(result.Data?.Id, 1234);
+            Assert.AreEqual(result.Data?.Amount, 44.3M);
+            Assert.IsTrue(result.Data?.Ok);
         }
+
+        [Test]
+        public async Task Create_StringKeyDictionary_Test()
+        {
+            // Arrange
+            using var connection = db.NewConnection();
+
+            // Act
+            var result = await connection.QueryAsResultAsync<StringKeyDictionaryObject>(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
+
+            // Assert
+            Assert.IsTrue(result!.Ok);
+            Assert.AreEqual(result?.Field, "test");
+            Assert.AreEqual(result?.Data?.Count, 2);
+            Assert.IsTrue(result?.Data?.ContainsValue(1234));
+            Assert.IsTrue(result?.Data?.ContainsKey("amount"));
+        }
+    }
+
+    internal record ActionResultTestData : ActionResultData
+    {
+        public int Id { get; init; }
+        public decimal Amount { get; init; }
+        public bool? Ok { get; init; }
     }
 }

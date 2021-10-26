@@ -37,33 +37,36 @@ namespace com.etsoo.CoreFramework.Services
         /// Create
         /// 创建
         /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> CreateAsync(object model)
+        public virtual async Task<ActionResult<D>> CreateAsync<D>(object model)
         {
-            return await Repo.CreateAsync(model);
+            return await Repo.CreateAsync<D>(model);
         }
 
         /// <summary>
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> DeleteAsync(T id)
+        public virtual async Task<ActionResult<D>> DeleteAsync<D>(T id)
         {
-            return await Repo.DeleteAsync(id);
+            return await Repo.DeleteAsync<D>(id);
         }
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async Task<ActionResult<D>> DeleteAsync<D>(IEnumerable<T> ids)
         {
-            return await Repo.DeleteAsync(ids);
+            return await Repo.DeleteAsync<D>(ids);
         }
 
         /// <summary>
@@ -119,11 +122,12 @@ namespace com.etsoo.CoreFramework.Services
         /// Update
         /// 更新
         /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync(UpdateModel<T> model)
+        public virtual async Task<ActionResult<D>> UpdateAsync<D>(UpdateModel<T> model)
         {
-            return await Repo.UpdateAsync(model);
+            return await Repo.UpdateAsync<UpdateModel<T>, D>(model);
         }
 
         /// <summary>

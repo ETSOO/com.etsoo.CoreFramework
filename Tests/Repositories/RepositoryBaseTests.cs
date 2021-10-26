@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.CoreFramework.User;
+using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
@@ -70,12 +71,12 @@ namespace Tests.Repositories
             var command = new CommandDefinition(sql);
 
             // Act
-            var result = await repo.QueryAsResultAsync(command);
+            var result = await repo.QueryAsResultAsync<ActionResultData>(command);
 
             // Assert
             var error = ApplicationErrors.NoActionResult;
-            Assert.IsFalse(result.Success);
-            Assert.AreEqual(error.Type, result.Type.ToString());
+            Assert.IsFalse(result.Ok);
+            Assert.AreEqual(error.Type, result.Type);
             Assert.AreEqual(error.Title, result.Title);
         }
 
@@ -83,14 +84,14 @@ namespace Tests.Repositories
         public async Task QueryAsResult_NoData()
         {
             // Arrange
-            var sql = "SELECT 1 AS success";
+            var sql = "SELECT 1 AS ok";
             var command = new CommandDefinition(sql);
 
             // Act
-            var result = await repo.QueryAsResultAsync(command);
+            var result = await repo.QueryAsResultAsync<ActionResultData>(command);
 
             // Assert
-            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.Ok);
         }
 
         [Test]

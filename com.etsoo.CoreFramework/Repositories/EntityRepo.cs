@@ -31,17 +31,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Create entity
         /// 创建实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> CreateAsync(object model)
+        public virtual async Task<ActionResult<D>> CreateAsync<D>(object model)
         {
             var parameters = FormatParameters(model);
-            
+
             AddSystemParameters(parameters);
 
             var command = CreateCommand(GetCommandName("create"), parameters);
 
-            return await QueryAsResultAsync(command);
+            return await QueryAsResultAsync<D>(command);
         }
 
         /// <summary>
@@ -66,23 +67,25 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> DeleteAsync(T id)
+        public virtual async Task<ActionResult<D>> DeleteAsync<D>(T id)
         {
-            return await DeleteAsync(new T[] { id });
+            return await DeleteAsync<D>(new T[] { id });
         }
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async Task<ActionResult<D>> DeleteAsync<D>(IEnumerable<T> ids)
         {
             var command = NewDeleteCommand(ids);
-            return await QueryAsResultAsync(command);
+            return await QueryAsResultAsync<D>(command);
         }
 
         /// <summary>
@@ -210,6 +213,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Entity report
         /// 实体报告
         /// </summary>
+        /// <typeparam name="E">Generic list item type</typeparam>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <returns>Task</returns>
@@ -271,9 +275,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 更新实体
         /// </summary>
         /// <typeparam name="M">Generic entity model type</typeparam>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult> UpdateAsync<D>(D model) where D : IUpdateModel<T>
+        public virtual async Task<ActionResult<D>> UpdateAsync<M, D>(M model) where M : IUpdateModel<T>
         {
             var parameters = FormatParameters(model);
 
@@ -281,7 +286,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(GetCommandName("update"), parameters);
 
-            return await QueryAsResultAsync(command);
+            return await QueryAsResultAsync<D>(command);
         }
 
         /// <summary>
@@ -324,26 +329,26 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Quick update
         /// 快速更新
         /// </summary>
-        /// <typeparam name="D">Generic model type</typeparam>
+        /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        public async Task<IActionResult> QuickUpdateAsync<D>(D model, QuickUpdateConfigs configs) where D : IUpdateModel<T>
+        public async Task<ActionResult<ActionResultUpdateData<T>>> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
         {
             // Validate
             if (model.ChangedFields == null || !model.ChangedFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResultWithTraceId("ChangedFields");
+                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.ChangedFields);
             }
 
             if (!configs.UpdatableFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResultWithTraceId("UpdatableFields");
+                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.UpdatableFields);
             }
 
-            if(!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
+            if (!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
             {
-                return ApplicationErrors.NoValidData.AsResultWithTraceId("Conditions");
+                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.Conditions);
             }
 
             // Update fields
@@ -353,7 +358,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (!updateFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResultWithTraceId("UpdateFields");
+                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.UpdateFields);
             }
 
             // Default table name
@@ -383,16 +388,13 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
             var records = await App.DB.NewConnection().ExecuteAsync(command);
-            if (records == 0)
-            {
-                return ApplicationErrors.NoValidData.AsResultWithTraceId("Records");
-            }
 
             // Success
-            var result = ActionResult.OK;
-            result.Data.Add("Id", model.Id);
-            result.Data.Add("Records", records);
-            return result;
+            return new ActionResult<ActionResultUpdateData<T>>
+            {
+                Ok = true,
+                Data = new ActionResultUpdateData<T> { Id = model.Id, RowsAffected = records }
+            };
         }
     }
 }

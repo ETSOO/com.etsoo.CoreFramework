@@ -329,7 +329,7 @@ namespace com.etsoo.Utils.Database
             {
                 // Set value
                 sdr.SetValue(0, item.Id);
-                sdr.SetValue(1, item.Item);
+                sdr.SetValue(1, item.Label);
 
                 // Yield return for the current item
                 // Memory saving

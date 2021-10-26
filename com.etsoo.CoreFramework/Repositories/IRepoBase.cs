@@ -47,9 +47,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Query command as action result
         /// 执行命令返回操作结果
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> QueryAsResultAsync(CommandDefinition command);
+        Task<ActionResult<D>> QueryAsResultAsync<D>(CommandDefinition command);
 
         /// <summary>
         /// Async read text data (JSON/XML) to stream

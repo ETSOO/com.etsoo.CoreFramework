@@ -17,25 +17,28 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Create entity
         /// 创建实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> CreateAsync(object model);
+        Task<ActionResult<D>> CreateAsync<D>(object model);
 
         /// <summary>
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> DeleteAsync(T id);
+        Task<ActionResult<D>> DeleteAsync<D>(T id);
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> DeleteAsync(IEnumerable<T> ids);
+        Task<ActionResult<D>> DeleteAsync<D>(IEnumerable<T> ids);
 
         /// <summary>
         /// View entity
@@ -82,6 +85,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Entity report
         /// 实体报告
         /// </summary>
+        /// <typeparam name="D">Generic list item type</typeparam>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <returns>Task</returns>
@@ -123,9 +127,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Update entity
         /// 更新实体
         /// </summary>
+        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<IActionResult> UpdateAsync<D>(D model) where D : IUpdateModel<T>;
+        Task<ActionResult<D>> UpdateAsync<M, D>(M model) where M : IUpdateModel<T>;
 
         /// <summary>
         /// Data list
@@ -140,19 +145,21 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Query data
         /// 查询数据
         /// </summary>
+        /// <typeparam name="E">Generic query id type</typeparam>
+        /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <returns>Task</returns>
-        Task QueryAsync<E, D>(D model, HttpResponse response) where E : struct where D : QueryRQ<E>;
+        Task QueryAsync<E, M>(M model, HttpResponse response) where E : struct where M : QueryRQ<E>;
 
         /// <summary>
         /// Quick update
         /// 快速更新
         /// </summary>
-        /// <typeparam name="D">Generic model type</typeparam>
+        /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        Task<IActionResult> QuickUpdateAsync<D>(D model, QuickUpdateConfigs configs) where D : IUpdateModel<T>;
+        Task<ActionResult<ActionResultUpdateData<T>>> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
     }
 }

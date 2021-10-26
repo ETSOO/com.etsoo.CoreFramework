@@ -1,9 +1,7 @@
 ﻿using com.etsoo.Utils.Localization;
-using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
-using System.Buffers;
+using Dapper;
 using System.Data.Common;
-using System.Text.Json;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -12,49 +10,25 @@ namespace com.etsoo.Utils.Actions
     /// https://tools.ietf.org/html/rfc7807
     /// 操作结果
     /// </summary>
-    public record ActionResult : IActionResult
+    public record ActionResult<T> : ActionResultBase
     {
-        /// <summary>
-        /// Default type
-        /// 默认类型
-        /// </summary>
-        public const string DefaultType = "about:blank";
-
-        private static Uri ParseType(string? type)
-        {
-            if (!string.IsNullOrEmpty(type) && Uri.TryCreate(type, UriKind.RelativeOrAbsolute, out var typeUri))
-            {
-                return typeUri;
-            }
-
-            return new Uri(DefaultType);
-        }
-
-        /// <summary>
-        /// Is auto set datetime to Utc kind
-        /// 是否设置日期时间为Utc类型
-        /// </summary>
-        public static bool UtcDateTime { get; set; }
-
         /// <summary>
         /// Create action result
         /// 创建操作结果
         /// </summary>
         /// <param name="reader">DataReader</param>
         /// <returns>Action result</returns>
-        public static async Task<ActionResult?> CreateAsync(DbDataReader reader)
+        public static async Task<ActionResult<T>?> CreateAsync(DbDataReader reader)
         {
             if (await reader.ReadAsync())
             {
                 // Fields
-                var success = false;
-                var data = new StringKeyDictionaryObject();
-
-                string? title = null;
+                var ok = false;
                 string? type = null;
-                string? detail = null;
-                int? status = null;
-                string? traceId = null;
+                string? title = null;
+                string? field = null;
+
+                var data = new StringKeyDictionaryObject();
 
                 for (var f = 0; f < reader.FieldCount; f++)
                 {
@@ -65,10 +39,10 @@ namespace com.etsoo.Utils.Actions
                     // Column name
                     var name = reader.GetName(f);
 
-                    if (name.Equals("success", StringComparison.OrdinalIgnoreCase))
+                    if (name.Equals("ok", StringComparison.OrdinalIgnoreCase))
                     {
                         // true/false, 1/0
-                        success = StringUtils.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
+                        ok = StringUtils.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
                         continue;
                     }
 
@@ -84,27 +58,15 @@ namespace com.etsoo.Utils.Actions
                         continue;
                     }
 
-                    if (name.Equals("detail", StringComparison.OrdinalIgnoreCase))
+                    if (name.Equals("field", StringComparison.OrdinalIgnoreCase))
                     {
-                        detail = await reader.GetFieldValueAsync<string>(f);
-                        continue;
-                    }
-
-                    if (name.Equals("status", StringComparison.OrdinalIgnoreCase))
-                    {
-                        status = await reader.GetFieldValueAsync<int>(f);
-                        continue;
-                    }
-
-                    if (name == "trace_id" || name.Equals("traceId", StringComparison.OrdinalIgnoreCase))
-                    {
-                        traceId = await reader.GetFieldValueAsync<string>(f);
+                        field = await reader.GetFieldValueAsync<string>(f);
                         continue;
                     }
 
                     // Additional data
                     var addValue = await reader.GetFieldValueAsync<object>(f);
-                    if(UtcDateTime && addValue is DateTime dt)
+                    if (UtcDateTime && addValue is DateTime dt)
                     {
                         addValue = LocalizationUtils.SetUtcKind(dt);
                     }
@@ -112,297 +74,55 @@ namespace com.etsoo.Utils.Actions
                     data.Add(name, addValue);
                 }
 
-                return new ActionResult(type, data)
+                var result = new ActionResult<T>
                 {
-                    Success = success,
-                    Title = title,
-                    Detail = detail,
-                    Status = status,
-                    TraceId = traceId
+                    Ok = ok,
+                    Field = field,
+                    Type = type, // Field first, type may contain field data
+                    Title = title
                 };
+
+                if(data.Count > 0)
+                {
+                    // Type
+                    var dataType = typeof(T);
+
+                    if (dataType.IsValueType)
+                    {
+                        // Value type, read the returned data field value
+                        result.Data = (T?)data.GetItem("Data");
+                    }
+                    else if (data is T d)
+                    {
+                        result.Data = d;
+                    }
+                    else
+                    {
+                        var parser = reader.GetRowParser<T>(dataType);
+                        result.Data = parser(reader);
+                    }
+                }
+
+                return result;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Create a successful result
+        /// Create a success result
         /// 创建一个成功的操作结果
         /// </summary>
         /// <returns></returns>
-        public static IActionResult OK => new ActionResult
+        public static ActionResult<T> Success => new()
         {
-            Success = true
+            Ok = true
         };
 
         /// <summary>
-        /// Successful or not result
-        /// 是否为成功结果
+        /// Data
+        /// 数据
         /// </summary>
-        public bool Success { get; init; }
-
-        /// <summary>
-        /// Type
-        /// 类型
-        /// </summary>
-        public Uri Type { get; init; }
-
-        /// <summary>
-        /// Title
-        /// 标题
-        /// </summary>
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// Detail
-        /// 细节
-        /// </summary>
-        public string? Detail { get; set; }
-
-        /// <summary>
-        /// The HTTP status code
-        /// HTTP状态码
-        /// </summary>
-        public int? Status { get; init; }
-
-        /// <summary>
-        /// Log trace id
-        /// 日志跟踪编号
-        /// </summary>
-        public string? TraceId { get; set; }
-
-        /// <summary>
-        /// Additional data
-        /// 更多数据
-        /// </summary>
-        public StringKeyDictionaryObject Data { get; init; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        public ActionResult(string? type = null, StringKeyDictionaryObject? data = null) : this(ParseType(type), data)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        public ActionResult(Uri type, StringKeyDictionaryObject ? data = null)
-        {
-            Success = false;
-            Type = type;
-            Data = data ?? new StringKeyDictionaryObject();
-        }
-
-        private readonly List<ActionResultError> errors = new();
-
-        /// <summary>
-        /// Errors, grouped by field name
-        /// 错误，按字段名称分组
-        /// </summary>
-        public Dictionary<string, string[]>? Errors
-        {
-            get
-            {
-                if (errors.Count == 0)
-                    return null;
-
-                return errors.GroupBy(e => e.Name, StringComparer.InvariantCultureIgnoreCase).ToDictionary(k => k.Key, v => v.Select(f => f.Reason).ToArray());
-            }
-        }
-
-        /// <summary>
-        /// Add error
-        /// 添加错误
-        /// </summary>
-        /// <param name="error">Error</param>
-        public void AddError(ActionResultError error)
-        {
-            errors.Add(error);
-        }
-
-        /// <summary>
-        /// Add errors
-        /// 添加多个错误
-        /// </summary>
-        /// <param name="errors">Errors</param>
-        public void AddErrors(IEnumerable<ActionResultError> errors)
-        {
-            this.errors.AddRange(errors);
-        }
-
-        /// <summary>
-        /// Format title
-        /// 格式化标题
-        /// </summary>
-        /// <param name="data">Format data</param>
-        /// <returns>Self</returns>
-        public IActionResult FormatTitle(params object[] data)
-        {
-            if(this.Title != null)
-            {
-                this.Title = string.Format(this.Title, data);
-            }
-            return this;
-        }
-
-        /// <summary>
-        /// Has any error
-        /// 是否有任何错误
-        /// </summary>
-        /// <returns>Has or not</returns>
-        public bool HasError()
-        {
-            return errors.Count > 0;
-        }
-
-        /// <summary>
-        /// Has specific field error
-        /// 是否存在特定字段的错误
-        /// </summary>
-        /// <param name="name">Field name</param>
-        /// <returns>Has or not</returns>
-        public bool HasError(string name)
-        {
-            return errors.Exists(error => error.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        /// <summary>
-        /// Data to id modal
-        /// 转化数据为编号模块
-        /// </summary>
-        /// <typeparam name="T">Generic id type</typeparam>
-        /// <returns>Modal</returns>
-        public IdModal<T> DataAsIdModal<T>()
-        {
-            return IdModal<T>.Create(Data);
-        }
-
-        /// <summary>
-        /// Data to int id modal
-        /// 转化数据为整数编号模块
-        /// </summary>
-        /// <returns>Modal</returns>
-        public IdModal<int> DataAsIdModal()
-        {
-            return IdModal<int>.Create(Data);
-        }
-
-        /// <summary>
-        /// To Json
-        /// 转化为 Json
-        /// </summary>
-        /// <param name="writer">Writer</param>
-        /// <param name="options">Options</param>
-        public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
-        {
-            // Utf8JsonWriter
-            using var w = options.CreateJsonWriter(writer);
-
-            // Object start {
-            w.WriteStartObject();
-
-            if (options.IsWritable(false))
-            {
-                var successName = options.ConvertName("Success");
-                w.WriteBoolean(successName, Success);
-            }
-
-            if (options.IsWritable(false))
-            {
-                var typeValue = Type.ToString();
-                if(typeValue != DefaultType)
-                {
-                    var typeName = options.ConvertName("Type");
-                    w.WriteString(typeName, typeValue);
-                }
-            }
-
-            if (options.IsWritable(Title == null))
-            {
-                var titleName = options.ConvertName("Title");
-                if (Title == null)
-                    w.WriteNull(titleName);
-                else
-                    w.WriteString(titleName, Title);
-            }
-
-            if (options.IsWritable(Detail == null))
-            {
-                var detailName = options.ConvertName("Detail");
-                if (Detail == null)
-                    w.WriteNull(detailName);
-                else
-                    w.WriteString(detailName, Detail);
-            }
-
-            if (options.IsWritable(Status == null))
-            {
-                var statusName = options.ConvertName("Status");
-                if (Status == null)
-                    w.WriteNull(statusName);
-                else
-                    w.WriteNumber(statusName, Status.Value);
-            }
-
-            if (options.IsWritable(TraceId == null))
-            {
-                var traceIdName = options.ConvertName("TraceId");
-                if (TraceId == null)
-                    w.WriteNull(traceIdName);
-                else
-                    w.WriteString(traceIdName, TraceId);
-            }
-
-            var errors = Errors;
-            if (options.IsWritable(errors == null))
-            {
-                var errorsName = options.ConvertName("Errors");
-                if (errors == null)
-                    w.WriteNull(errorsName);
-                else
-                {
-                    w.WriteStartObject(errorsName);
-
-                    foreach (var errorItem in errors)
-                    {
-                        w.WritePropertyName(options.ConvertKeyName(errorItem.Key));
-
-                        w.WriteStartArray();
-
-                        foreach (var errorReason in errorItem.Value)
-                        {
-                            w.WriteStringValue(errorReason);
-                        }
-
-                        w.WriteEndArray();
-                    }
-
-                    w.WriteEndObject();
-                }
-            }
-
-            if (options.IsWritable(Data == null))
-            {
-                var dataName = options.ConvertName("Data");
-                if (Data == null)
-                    w.WriteNull(dataName);
-                else if(Data.Count > 0)
-                {
-                    w.WritePropertyName(dataName);
-
-                    // Serialization for the Data
-                    JsonSerializer.Serialize(w, Data, options);
-                }
-            }
-
-            // Object end }
-            w.WriteEndObject();
-
-            // Flush & dispose
-            await w.DisposeAsync();
-        }
+        public T? Data { get; set; }
     }
 }

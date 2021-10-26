@@ -13,28 +13,16 @@ namespace com.etsoo.CoreFramework.Application
         /// As AcionResult
         /// 输出为操作结果
         /// </summary>
-        /// <param name="title">Title</param>
+        /// <typeparam name="D">Generic result data type</typeparam>
+        /// <param name="field">Field</param>
         /// <returns>Action result</returns>
-        public IActionResult AsResult(string? title = null)
+        public ActionResult<D> AsResult<D>(string? field = null)
         {
-            return new ActionResult(Type)
+            return new ActionResult<D>
             {
-                Title = title ?? Title
-            };
-        }
-
-        /// <summary>
-        /// As AcionResult with trace id
-        /// 输出为带追踪编号的操作结果
-        /// </summary>
-        /// <param name="traceId">Trace id</param>
-        /// <returns>Action result</returns>
-        public IActionResult AsResultWithTraceId(string traceId)
-        {
-            return new ActionResult(Type)
-            {
+                Type = Type,
                 Title = Title,
-                TraceId = traceId
+                Field = field
             };
         }
     }

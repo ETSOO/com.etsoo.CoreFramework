@@ -51,9 +51,10 @@ namespace com.etsoo.CoreFramework.Services
         /// Log exception and return simple user result
         /// 登记异常结果日志，并返回简介的用户结果
         /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="ex">Exception</param>
         /// <returns>Result</returns>
-        protected IActionResult LogException(Exception ex)
+        protected ActionResult<D> LogException<D>(Exception ex)
         {
             // Get the Db connection failure result
             var exResult = App.DB.GetExceptionResult(ex);
@@ -61,9 +62,9 @@ namespace com.etsoo.CoreFramework.Services
             // Transform
             var result = exResult.Type switch
             {
-                DbExceptionType.OutOfMemory => ApplicationErrors.OutOfMemory.AsResult(),
-                DbExceptionType.ConnectionFailed => ApplicationErrors.DbConnectionFailed.AsResult(),
-                _ => ApplicationErrors.DataProcessingFailed.AsResult()
+                DbExceptionType.OutOfMemory => ApplicationErrors.OutOfMemory.AsResult<D>(),
+                DbExceptionType.ConnectionFailed => ApplicationErrors.DbConnectionFailed.AsResult<D>(),
+                _ => ApplicationErrors.DataProcessingFailed.AsResult<D>()
             };
 
             // Log the exception

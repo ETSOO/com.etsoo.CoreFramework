@@ -34,7 +34,7 @@
         /// <returns>Value</returns>
         public V? GetItem(string key)
         {
-            if (this.TryGetValue(key, out var value))
+            if (TryGetValue(key, out var value))
             {
                 return value;
             }

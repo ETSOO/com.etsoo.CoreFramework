@@ -120,10 +120,10 @@ namespace com.etsoo.Utils.Database
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public static async Task<IActionResult?> QueryAsResultAsync(this DbConnection connection, CommandDefinition command)
+        public static async Task<ActionResult<D>?> QueryAsResultAsync<D>(this DbConnection connection, CommandDefinition command)
         {
             using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult & CommandBehavior.SingleRow);
-            return await ActionResult.CreateAsync(reader);
+            return await ActionResult<D>.CreateAsync(reader);
         }
 
         /// <summary>

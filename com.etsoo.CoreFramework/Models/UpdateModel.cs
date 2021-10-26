@@ -1,11 +1,13 @@
-﻿namespace com.etsoo.CoreFramework.Models
+﻿using com.etsoo.Utils.Models;
+
+namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Update model
     /// 更新模块
     /// </summary>
     /// <typeparam name="T">Generic id type</typeparam>
-    public record UpdateModel<T> : IdModel<T>, IUpdateModel<T> where T : struct
+    public record UpdateModel<T> : IdItem<T>, IUpdateModel<T> where T : struct
     {
         /// <summary>
         /// Changed fields
