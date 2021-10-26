@@ -61,5 +61,17 @@
         /// 状态码
         /// </summary>
         public int? Status { get; init; }
+
+        /// <summary>
+        /// Detail
+        /// 细节
+        /// </summary>
+        public string? Detail { get; set; }
+
+        /// <summary>
+        /// Trace id
+        /// 跟踪编号
+        /// </summary>
+        public string? TraceId { get; set; }
     }
 }

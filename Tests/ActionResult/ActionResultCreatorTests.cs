@@ -62,14 +62,18 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync<ActionResultTestData>(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
+            var result = await connection.QueryAsResultAsync<ActionResultTestData>(new("SELECT 1 AS ok, 'test' AS field, 90900 as traceId, 1234 AS id, 44.3 AS amount, 0 AS ok"));
 
             // Assert
             Assert.IsNull(result?.Type);
             Assert.IsTrue(result!.Ok);
+            Assert.AreEqual(result.TraceId, "90900");
             Assert.AreEqual(result.Data?.Id, 1234);
             Assert.AreEqual(result.Data?.Amount, 44.3M);
-            Assert.IsTrue(result.Data?.Ok);
+
+            // Support same name property
+            // Should after all ActionResult fields
+            Assert.IsFalse(result.Data?.Ok);
         }
 
         [Test]

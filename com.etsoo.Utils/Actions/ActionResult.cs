@@ -28,6 +28,11 @@ namespace com.etsoo.Utils.Actions
                 string? title = null;
                 string? field = null;
                 int? status = null;
+                string? detail = null;
+                string? traceId = null;
+
+                // For object field
+                var startIndex = 0;
 
                 var data = new StringKeyDictionaryObject();
 
@@ -40,35 +45,57 @@ namespace com.etsoo.Utils.Actions
                     // Column name
                     var name = reader.GetName(f);
 
-                    if (name.Equals("ok", StringComparison.OrdinalIgnoreCase))
+                    // Support same name properties
+                    // Should after all ActionResult fields
+                    if (startIndex == 0)
                     {
-                        // true/false, 1/0
-                        ok = StringUtils.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
-                        continue;
-                    }
+                        if (name.Equals("ok", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // true/false, 1/0
+                            ok = StringUtils.TryParseObject<bool>(await reader.GetFieldValueAsync<object>(f)).GetValueOrDefault();
+                            continue;
+                        }
 
-                    if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
-                    {
-                        type = await reader.GetFieldValueAsync<string>(f);
-                        continue;
-                    }
+                        if (name.Equals("type", StringComparison.OrdinalIgnoreCase))
+                        {
+                            type = await reader.GetFieldValueAsync<string>(f);
+                            continue;
+                        }
 
-                    if (name.Equals("title", StringComparison.OrdinalIgnoreCase))
-                    {
-                        title = await reader.GetFieldValueAsync<string>(f);
-                        continue;
-                    }
+                        if (name.Equals("title", StringComparison.OrdinalIgnoreCase))
+                        {
+                            title = await reader.GetFieldValueAsync<string>(f);
+                            continue;
+                        }
 
-                    if (name.Equals("field", StringComparison.OrdinalIgnoreCase))
-                    {
-                        field = await reader.GetFieldValueAsync<string>(f);
-                        continue;
-                    }
+                        if (name.Equals("field", StringComparison.OrdinalIgnoreCase))
+                        {
+                            field = await reader.GetFieldValueAsync<string>(f);
+                            continue;
+                        }
 
-                    if (name.Equals("status", StringComparison.OrdinalIgnoreCase))
-                    {
-                        status = await reader.GetFieldValueAsync<int>(f);
-                        continue;
+                        if (name.Equals("status", StringComparison.OrdinalIgnoreCase))
+                        {
+                            status = await reader.GetFieldValueAsync<int>(f);
+                            continue;
+                        }
+
+                        if (name.Equals("detail", StringComparison.OrdinalIgnoreCase))
+                        {
+                            detail = await reader.GetFieldValueAsync<string>(f);
+                            continue;
+                        }
+
+                        if (name == "trace_id" || name.Equals("traceId", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Number or string are supported
+                            // await reader.GetFieldValueAsync<string>(f) will fail for numbers
+                            traceId = Convert.ToString(await reader.GetFieldValueAsync<object>(f));
+                            continue;
+                        }
+
+                        // Custom properties
+                        startIndex = f;
                     }
 
                     // Additional data
@@ -86,7 +113,10 @@ namespace com.etsoo.Utils.Actions
                     Ok = ok,
                     Field = field,
                     Type = type, // Field first, type may contain field data
-                    Title = title
+                    Title = title,
+                    Status = status,
+                    Detail = detail,
+                    TraceId = traceId
                 };
 
                 if(data.Count > 0)
@@ -105,7 +135,7 @@ namespace com.etsoo.Utils.Actions
                     }
                     else
                     {
-                        var parser = reader.GetRowParser<T>(dataType);
+                        var parser = reader.GetRowParser<T>(dataType, startIndex);
                         result.Data = parser(reader);
                     }
                 }
