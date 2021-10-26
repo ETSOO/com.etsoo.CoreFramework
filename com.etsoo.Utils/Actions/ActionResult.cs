@@ -27,6 +27,7 @@ namespace com.etsoo.Utils.Actions
                 string? type = null;
                 string? title = null;
                 string? field = null;
+                int? status = null;
 
                 var data = new StringKeyDictionaryObject();
 
@@ -61,6 +62,12 @@ namespace com.etsoo.Utils.Actions
                     if (name.Equals("field", StringComparison.OrdinalIgnoreCase))
                     {
                         field = await reader.GetFieldValueAsync<string>(f);
+                        continue;
+                    }
+
+                    if (name.Equals("status", StringComparison.OrdinalIgnoreCase))
+                    {
+                        status = await reader.GetFieldValueAsync<int>(f);
                         continue;
                     }
 

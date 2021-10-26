@@ -55,5 +55,11 @@
         /// 字段
         /// </summary>
         public string? Field { get; init; }
+
+        /// <summary>
+        /// Status code
+        /// 状态码
+        /// </summary>
+        public int? Status { get; init; }
     }
 }
