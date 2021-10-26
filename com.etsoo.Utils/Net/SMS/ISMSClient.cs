@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Actions;
+﻿using ActionResultDic = com.etsoo.Utils.Actions.ActionResult<com.etsoo.Utils.String.StringKeyDictionaryObject>;
 using com.etsoo.Utils.Address;
 
 namespace com.etsoo.Utils.Net.SMS

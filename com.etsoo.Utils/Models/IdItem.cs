@@ -13,13 +13,4 @@
         /// </summary>
         public T Id { get; init; }
     }
-
-    /// <summary>
-    /// Item with int id
-    /// 带整型编号的项目
-    /// </summary>
-    public record IntIdItem : IdItem<int>
-    {
-
-    }
 }

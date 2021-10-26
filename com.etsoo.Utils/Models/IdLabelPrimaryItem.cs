@@ -13,12 +13,4 @@
         /// </summary>
         public bool? IsPrimary {  get; set; }
     }
-
-    /// <summary>
-    /// Item with int id, label and is primary
-    /// 带整型编号、标签和是否为默认的项目
-    /// </summary>
-    public record IntIdLabelPrimaryItem : IdLabelPrimaryItem<int>
-    {
-    }
 }

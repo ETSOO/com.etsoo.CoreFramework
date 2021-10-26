@@ -78,7 +78,7 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.CreateAsync<IntIdItem>(user);
+            var result = await repo.CreateAsync<IdItem<int>>(user);
 
             // Assert
             if (result.Ok)
