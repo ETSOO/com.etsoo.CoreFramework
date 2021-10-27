@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.Localization;
 using com.etsoo.Utils.String;
-using Dapper;
 using System.Data.Common;
 
 namespace com.etsoo.Utils.Actions
@@ -10,15 +9,21 @@ namespace com.etsoo.Utils.Actions
     /// https://tools.ietf.org/html/rfc7807
     /// 操作结果
     /// </summary>
-    public record ActionResult<T> : ActionResultBase
+    public record ActionResult : IActionResult
     {
+        /// <summary>
+        /// Is auto set datetime to Utc kind
+        /// 是否设置日期时间为Utc类型
+        /// </summary>
+        public static bool UtcDateTime { get; set; }
+
         /// <summary>
         /// Create action result
         /// 创建操作结果
         /// </summary>
         /// <param name="reader">DataReader</param>
         /// <returns>Action result</returns>
-        public static async Task<ActionResult<T>?> CreateAsync(DbDataReader reader)
+        public static async Task<ActionResult?> CreateAsync(DbDataReader reader)
         {
             if (await reader.ReadAsync())
             {
@@ -108,39 +113,17 @@ namespace com.etsoo.Utils.Actions
                     data.Add(name, addValue);
                 }
 
-                var result = new ActionResult<T>
+                return new ActionResult
                 {
                     Ok = ok,
                     Field = field,
-                    Type = type, // Field first, type may contain field data
+                    Type = type,
                     Title = title,
                     Status = status,
                     Detail = detail,
-                    TraceId = traceId
+                    TraceId = traceId,
+                    Data = data
                 };
-
-                if(data.Count > 0)
-                {
-                    // Type
-                    var dataType = typeof(T);
-
-                    if (dataType.IsValueType)
-                    {
-                        // Value type, read the returned data field value
-                        result.Data = (T?)data.GetItem("Data");
-                    }
-                    else if (data is T d)
-                    {
-                        result.Data = d;
-                    }
-                    else
-                    {
-                        var parser = reader.GetRowParser<T>(dataType, startIndex);
-                        result.Data = parser(reader);
-                    }
-                }
-
-                return result;
             }
 
             return null;
@@ -151,15 +134,86 @@ namespace com.etsoo.Utils.Actions
         /// 创建一个成功的操作结果
         /// </summary>
         /// <returns></returns>
-        public static ActionResult<T> Success => new()
+        public static ActionResult Success => new()
         {
             Ok = true
         };
 
         /// <summary>
+        /// Ok or not
+        /// 是否成功
+        /// </summary>
+        public bool Ok { get; init; }
+
+        string? type;
+        /// <summary>
+        /// Type
+        /// 类型
+        /// </summary>
+        public string? Type
+        {
+            get { return type; }
+            init
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    // Support type/field format
+                    var items = value.Split('/');
+                    if (items.Length > 1)
+                    {
+                        type = items[0];
+                        field = items[1];
+                        return;
+                    }
+                }
+
+                type = value;
+            }
+        }
+
+        /// <summary>
+        /// Title
+        /// 标题
+        /// </summary>
+        public string? Title { get; set; }
+
+        string? field;
+        /// <summary>
+        /// Field
+        /// 字段
+        /// </summary>
+        public string? Field
+        {
+            get { return field; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    field = value;
+            }
+        }
+
+        /// <summary>
+        /// Status code
+        /// 状态码
+        /// </summary>
+        public int? Status { get; init; }
+
+        /// <summary>
+        /// Detail
+        /// 细节
+        /// </summary>
+        public string? Detail { get; set; }
+
+        /// <summary>
+        /// Trace id
+        /// 跟踪编号
+        /// </summary>
+        public string? TraceId { get; set; }
+
+        /// <summary>
         /// Data
         /// 数据
         /// </summary>
-        public T? Data { get; set; }
+        public StringKeyDictionaryObject Data { get; init; } = new StringKeyDictionaryObject();
     }
 }

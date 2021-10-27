@@ -31,10 +31,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Create entity
         /// 创建实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult<D>> CreateAsync<D>(object model)
+        public virtual async Task<ActionResult> CreateAsync(object model)
         {
             var parameters = FormatParameters(model);
 
@@ -42,7 +41,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(GetCommandName("create"), parameters);
 
-            return await QueryAsResultAsync<D>(command);
+            return await QueryAsResultAsync(command);
         }
 
         /// <summary>
@@ -67,25 +66,23 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult<D>> DeleteAsync<D>(T id)
+        public virtual async Task<ActionResult> DeleteAsync(T id)
         {
-            return await DeleteAsync<D>(new T[] { id });
+            return await DeleteAsync(new T[] { id });
         }
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult<D>> DeleteAsync<D>(IEnumerable<T> ids)
+        public virtual async Task<ActionResult> DeleteAsync(IEnumerable<T> ids)
         {
             var command = NewDeleteCommand(ids);
-            return await QueryAsResultAsync<D>(command);
+            return await QueryAsResultAsync(command);
         }
 
         /// <summary>
@@ -275,10 +272,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 更新实体
         /// </summary>
         /// <typeparam name="M">Generic entity model type</typeparam>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult<D>> UpdateAsync<M, D>(M model) where M : IUpdateModel<T>
+        public virtual async Task<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>
         {
             var parameters = FormatParameters(model);
 
@@ -286,7 +282,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(GetCommandName("update"), parameters);
 
-            return await QueryAsResultAsync<D>(command);
+            return await QueryAsResultAsync(command);
         }
 
         /// <summary>
@@ -333,22 +329,22 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        public async Task<ActionResult<ActionResultUpdateData<T>>> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
+        public async Task<ActionResult> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
         {
             // Validate
             if (model.ChangedFields == null || !model.ChangedFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.ChangedFields);
+                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.ChangedFields);
             }
 
             if (!configs.UpdatableFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.UpdatableFields);
+                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdatableFields);
             }
 
             if (!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
             {
-                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.Conditions);
+                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.Conditions);
             }
 
             // Update fields
@@ -358,7 +354,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (!updateFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult<ActionResultUpdateData<T>>(ActionResultUpdateData<T>.UpdateFields);
+                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdateFields);
             }
 
             // Default table name
@@ -390,10 +386,10 @@ namespace com.etsoo.CoreFramework.Repositories
             var records = await App.DB.NewConnection().ExecuteAsync(command);
 
             // Success
-            return new ActionResult<ActionResultUpdateData<T>>
+            return new ActionResult
             {
                 Ok = true,
-                Data = new ActionResultUpdateData<T> { Id = model.Id, RowsAffected = records }
+                Data = new StringKeyDictionaryObject() { ["Id"] = model.Id, ["RowsAffected"] = records }
             };
         }
     }

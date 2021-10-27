@@ -1,4 +1,4 @@
-﻿using ActionResultDic = com.etsoo.Utils.Actions.ActionResult<com.etsoo.Utils.String.StringKeyDictionaryObject>;
+﻿using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Address;
 
 namespace com.etsoo.Utils.Net.SMS
@@ -23,7 +23,7 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="vars">Variables</param>
         /// <param name="templateId">Template id</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, string templateId);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, string templateId);
 
         /// <summary>
         /// Async send SMS with template id
@@ -34,7 +34,7 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="vars">Variables</param>
         /// <param name="templateId">Template id</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, string templateId);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, string templateId);
 
         /// <summary>
         /// Async send SMS
@@ -45,7 +45,7 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="vars">Variables</param>
         /// <param name="template">Template</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
 
         /// <summary>
         /// Async send SMS
@@ -56,7 +56,7 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="vars">Variables</param>
         /// <param name="template">Template</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
 
         /// <summary>
         /// Async send code with template id
@@ -66,7 +66,7 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="code">Code</param>
         /// <param name="templateId">Template id</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendCodeAsync(AddressRegion.Phone mobile, string code, string templateId);
+        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, string templateId);
 
         /// <summary>
         /// Async send code
@@ -76,6 +76,6 @@ namespace com.etsoo.Utils.Net.SMS
         /// <param name="code">Code</param>
         /// <param name="template">Template</param>
         /// <returns>Result</returns>
-        Task<ActionResultDic> SendCodeAsync(AddressRegion.Phone mobile, string code, TemplateItem? template = null);
+        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, TemplateItem? template = null);
     }
 }

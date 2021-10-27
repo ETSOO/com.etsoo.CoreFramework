@@ -78,12 +78,12 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.CreateAsync<IdItem<int>>(user);
+            var result = await repo.CreateAsync(user);
 
             // Assert
             if (result.Ok)
             {
-                Assert.AreEqual(1021, result.Data?.Id);
+                Assert.AreEqual(1021, result.Data["Id"]);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Tests.Repositories
         public async Task DeleteAsync_Test()
         {
             // Act
-            var result = await repo.DeleteAsync<ActionResultData>(1001);
+            var result = await repo.DeleteAsync(1001);
 
             // Assert
             Assert.IsTrue(result.Ok);

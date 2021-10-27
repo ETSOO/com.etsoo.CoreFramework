@@ -17,28 +17,25 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Create entity
         /// 创建实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<ActionResult<D>> CreateAsync<D>(object model);
+        Task<ActionResult> CreateAsync(object model);
 
         /// <summary>
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        Task<ActionResult<D>> DeleteAsync<D>(T id);
+        Task<ActionResult> DeleteAsync(T id);
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        Task<ActionResult<D>> DeleteAsync<D>(IEnumerable<T> ids);
+        Task<ActionResult> DeleteAsync(IEnumerable<T> ids);
 
         /// <summary>
         /// View entity
@@ -127,10 +124,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Update entity
         /// 更新实体
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<ActionResult<D>> UpdateAsync<M, D>(M model) where M : IUpdateModel<T>;
+        Task<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>;
 
         /// <summary>
         /// Data list
@@ -160,6 +156,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        Task<ActionResult<ActionResultUpdateData<T>>> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
+        Task<ActionResult> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
     }
 }

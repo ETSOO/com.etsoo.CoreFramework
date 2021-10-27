@@ -196,19 +196,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Async query command as action result
         /// 异步执行命令返回操作结果
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async Task<ActionResult<D>> QueryAsResultAsync<D>(CommandDefinition command)
+        public async Task<ActionResult> QueryAsResultAsync(CommandDefinition command)
         {
             var result = await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryAsResultAsync<D>(command);
+                return connection.QueryAsResultAsync(command);
             });
 
             if (result == null)
             {
-                return ApplicationErrors.NoActionResult.AsResult<D>();
+                return ApplicationErrors.NoActionResult.AsResult();
             }
 
             if (!result.Ok && result.Title == null && result.Type != null)

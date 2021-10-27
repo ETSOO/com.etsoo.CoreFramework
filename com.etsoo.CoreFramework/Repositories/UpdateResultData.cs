@@ -1,10 +1,10 @@
-﻿namespace com.etsoo.Utils.Actions
+﻿namespace com.etsoo.CoreFramework.Repositories
 {
     /// <summary>
     /// Update action result data
     /// 更新操作结果数据
     /// </summary>
-    public record ActionResultUpdateData<T> where T : struct
+    public record UpdateResultData<T> where T : struct
     {
         /// <summary>
         /// ChangedFields data invalid

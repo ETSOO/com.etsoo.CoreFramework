@@ -1,5 +1,6 @@
 ﻿using com.etsoo.SourceGenerators.Attributes;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
@@ -223,6 +224,9 @@ namespace com.etsoo.SourceGenerators
             // Keyword
             var keyword = tds.Keyword.ToString();
 
+            // Is Public
+            var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
+
             // Inheritance
             var externals = new List<string>();
 
@@ -244,7 +248,7 @@ namespace com.etsoo.SourceGenerators
 
                 namespace {ns}
                 {{
-                    public partial {keyword} {className} : {string.Join(", ", externals)}
+                    {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
                         /// <summary>
                         /// Data modal to Dapper parameters

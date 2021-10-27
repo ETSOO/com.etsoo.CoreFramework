@@ -71,7 +71,7 @@ namespace Tests.Repositories
             var command = new CommandDefinition(sql);
 
             // Act
-            var result = await repo.QueryAsResultAsync<ActionResultData>(command);
+            var result = await repo.QueryAsResultAsync(command);
 
             // Assert
             var error = ApplicationErrors.NoActionResult;
@@ -88,7 +88,7 @@ namespace Tests.Repositories
             var command = new CommandDefinition(sql);
 
             // Act
-            var result = await repo.QueryAsResultAsync<ActionResultData>(command);
+            var result = await repo.QueryAsResultAsync(command);
 
             // Assert
             Assert.IsTrue(result.Ok);

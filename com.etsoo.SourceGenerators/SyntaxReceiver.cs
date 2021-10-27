@@ -32,7 +32,7 @@ namespace com.etsoo.SourceGenerators
         public readonly Type AttributeType;
 
         // Limited kinds
-        private readonly List<SyntaxKind> Kinds = new() { SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword };
+        private readonly List<SyntaxKind> Kinds = new() { SyntaxKind.PartialKeyword };
 
         /// <summary>
         /// Constructor
@@ -53,7 +53,7 @@ namespace com.etsoo.SourceGenerators
             try
             {
                 // Check token first
-                if (!syntaxNode.HasTokens(Kinds)) return;
+                if (!syntaxNode.HasTokens(Kinds) || (!syntaxNode.HasToken(SyntaxKind.PublicKeyword) && !syntaxNode.HasToken(SyntaxKind.InternalKeyword))) return;
 
                 // Business logic to decide what we're interested in goes here
                 if (syntaxNode is RecordDeclarationSyntax rds

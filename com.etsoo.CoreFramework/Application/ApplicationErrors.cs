@@ -13,12 +13,11 @@ namespace com.etsoo.CoreFramework.Application
         /// As AcionResult
         /// 输出为操作结果
         /// </summary>
-        /// <typeparam name="D">Generic result data type</typeparam>
         /// <param name="field">Field</param>
         /// <returns>Action result</returns>
-        public ActionResult<D> AsResult<D>(string? field = null)
+        public ActionResult AsResult(string? field = null)
         {
-            return new ActionResult<D>
+            return new ActionResult
             {
                 Type = Type,
                 Title = Title,

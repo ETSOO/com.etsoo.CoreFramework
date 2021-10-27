@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.Utils.String
+﻿using com.etsoo.Utils.Serialization;
+
+namespace com.etsoo.Utils.String
 {
     /// <summary>
     /// Ignore case of string key and object value extended dictionary, better performance than dynamic value
@@ -80,6 +82,22 @@
 
             // If T is bool then false, bool? then null
             return default;
+        }
+
+        /// <summary>
+        /// As target object
+        /// 转换为目标对象
+        /// </summary>
+        /// <typeparam name="TSelf">Generic return type</typeparam>
+        /// <param name="requiredFields">Required fields</param>
+        /// <returns>Result</returns>
+        public TSelf? As<TSelf>(params string[] requiredFields) where TSelf : IDictionaryParser<TSelf>
+        {
+            // Check the required fields
+            if (requiredFields.Length > 0 && requiredFields.Any(field => !ContainsKey(field))) return default;
+
+            // Create the object
+            return TSelf.Create(this);
         }
     }
 }

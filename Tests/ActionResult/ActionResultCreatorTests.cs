@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Actions;
+﻿using com.etsoo.SourceGenerators.Attributes;
+using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using com.etsoo.Utils.String;
 using NUnit.Framework;
@@ -34,7 +35,7 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync<ActionResultData>(new("SELECT TOP 0 NULL"));
+            var result = await connection.QueryAsResultAsync(new("SELECT TOP 0 NULL"));
 
             // Assert
             Assert.IsNull(result);
@@ -47,7 +48,7 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync<ActionResultData>(new("SELECT 'NoId/Organization' AS [type]"));
+            var result = await connection.QueryAsResultAsync(new("SELECT 'NoId/Organization' AS [type]"));
 
             // Assert
             Assert.IsFalse(result!.Ok);
@@ -62,18 +63,20 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync<ActionResultTestData>(new("SELECT 1 AS ok, 'test' AS field, 90900 as traceId, 1234 AS id, 44.3 AS amount, 0 AS ok"));
+            var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 90900 as traceId, 1234 AS id, 44.3 AS amount, CAST(0 AS bit) AS ok"));
 
             // Assert
             Assert.IsNull(result?.Type);
             Assert.IsTrue(result!.Ok);
             Assert.AreEqual(result.TraceId, "90900");
-            Assert.AreEqual(result.Data?.Id, 1234);
-            Assert.AreEqual(result.Data?.Amount, 44.3M);
+
+            var data = result.Data.As<ActionResultTestData>("id", "ok");
+            Assert.AreEqual(data?.Id, 1234);
+            Assert.AreEqual(data?.Amount, 44.3M);
 
             // Support same name property
             // Should after all ActionResult fields
-            Assert.IsFalse(result.Data?.Ok);
+            Assert.IsFalse(data?.Ok);
         }
 
         [Test]
@@ -83,7 +86,7 @@ namespace Tests.ActionResult
             using var connection = db.NewConnection();
 
             // Act
-            var result = await connection.QueryAsResultAsync<StringKeyDictionaryObject>(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
+            var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
 
             // Assert
             Assert.IsTrue(result!.Ok);
@@ -94,7 +97,8 @@ namespace Tests.ActionResult
         }
     }
 
-    internal record ActionResultTestData : ActionResultData
+    [AutoDictionaryGenerator]
+    internal partial record ActionResultTestData
     {
         public int Id { get; init; }
         public decimal Amount { get; init; }
