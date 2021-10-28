@@ -99,10 +99,12 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.QuickUpdateAsync(user, new(new[] { "Name" }));
+            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name" }));
 
             // Assert
             Assert.IsTrue(result.Ok);
+            Assert.IsNotNull(data);
+            Assert.AreEqual(1, data?.RowsAffected);
         }
 
         [Test]

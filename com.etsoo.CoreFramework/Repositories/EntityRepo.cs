@@ -329,22 +329,22 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        public async Task<ActionResult> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
+        public async Task<(ActionResult, UpdateResultData<T>?)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
         {
             // Validate
             if (model.ChangedFields == null || !model.ChangedFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.ChangedFields);
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.ChangedFields), null);
             }
 
             if (!configs.UpdatableFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdatableFields);
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdatableFields), null);
             }
 
             if (!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
             {
-                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.Conditions);
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.Conditions), null);
             }
 
             // Update fields
@@ -354,7 +354,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             if (!updateFields.Any())
             {
-                return ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdateFields);
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdateFields), null);
             }
 
             // Default table name
@@ -386,11 +386,7 @@ namespace com.etsoo.CoreFramework.Repositories
             var records = await App.DB.NewConnection().ExecuteAsync(command);
 
             // Success
-            return new ActionResult
-            {
-                Ok = true,
-                Data = new StringKeyDictionaryObject() { ["Id"] = model.Id, ["RowsAffected"] = records }
-            };
+            return (ActionResult.Success, new UpdateResultData<T> { Id = model.Id, RowsAffected = records });
         }
     }
 }
