@@ -1,6 +1,9 @@
 ﻿using com.etsoo.Utils.Localization;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
+using System.Buffers;
 using System.Data.Common;
+using System.Text.Json;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -215,5 +218,91 @@ namespace com.etsoo.Utils.Actions
         /// 数据
         /// </summary>
         public StringKeyDictionaryObject Data { get; init; } = new StringKeyDictionaryObject();
+
+        /// <summary>
+        /// To Json
+        /// 转化为 Json
+        /// </summary>
+        /// <param name="writer">Writer</param>
+        /// <param name="options">Options</param>
+        public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
+        {
+            // Utf8JsonWriter
+            using var w = options.CreateJsonWriter(writer);
+
+            // Object start {
+            w.WriteStartObject();
+
+            if (options.IsWritable(false))
+            {
+                var okName = options.ConvertName("Ok");
+                w.WriteBoolean(okName, Ok);
+            }
+
+            if (options.IsWritable(Type == null))
+            {
+                var typeName = options.ConvertName("Type");
+                if (Type == null)
+                    w.WriteNull(typeName);
+                else
+                    w.WriteString(typeName, Type);
+            }
+
+            if (options.IsWritable(Title == null))
+            {
+                var titleName = options.ConvertName("Title");
+                if (Title == null)
+                    w.WriteNull(titleName);
+                else
+                    w.WriteString(titleName, Title);
+            }
+
+            if (options.IsWritable(Detail == null))
+            {
+                var detailName = options.ConvertName("Detail");
+                if (Detail == null)
+                    w.WriteNull(detailName);
+                else
+                    w.WriteString(detailName, Detail);
+            }
+
+            if (options.IsWritable(Status == null))
+            {
+                var statusName = options.ConvertName("Status");
+                if (Status == null)
+                    w.WriteNull(statusName);
+                else
+                    w.WriteNumber(statusName, Status.Value);
+            }
+
+            if (options.IsWritable(TraceId == null))
+            {
+                var traceIdName = options.ConvertName("TraceId");
+                if (TraceId == null)
+                    w.WriteNull(traceIdName);
+                else
+                    w.WriteString(traceIdName, TraceId);
+            }
+
+            if (options.IsWritable(Data == null))
+            {
+                var dataName = options.ConvertName("Data");
+                if (Data == null)
+                    w.WriteNull(dataName);
+                else
+                {
+                    w.WritePropertyName(dataName);
+
+                    // Serialization for the Data
+                    JsonSerializer.Serialize(w, Data, options);
+                }
+            }
+
+            // Object end }
+            w.WriteEndObject();
+
+            // Flush & dispose
+            await w.DisposeAsync();
+        }
     }
 }

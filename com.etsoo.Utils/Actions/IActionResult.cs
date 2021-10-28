@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.Utils.Serialization;
+using com.etsoo.Utils.String;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -6,7 +7,7 @@ namespace com.etsoo.Utils.Actions
     /// Action result interface
     /// 操作结果接口
     /// </summary>
-    public interface IActionResult
+    public interface IActionResult : IJsonSerialization
     {
         /// <summary>
         /// Ok or not
