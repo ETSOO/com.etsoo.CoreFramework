@@ -34,7 +34,7 @@ namespace com.etsoo.Utils.Database
         /// <param name="name">Field name</param>
         /// <param name="names">Fields</param>
         /// <returns>Value</returns>
-        public static async Task<T?> GetValueAsync<T>(this DbDataReader reader, string name, List<string> names)
+        public static async ValueTask<T?> GetValueAsync<T>(this DbDataReader reader, string name, List<string> names)
         {
             // Match cases
             var caseName = (name.Contains('_') ? name.ToPascalCase() : name.ToSnakeCase()).ToString();
@@ -120,7 +120,7 @@ namespace com.etsoo.Utils.Database
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public static async Task<ActionResult?> QueryAsResultAsync(this DbConnection connection, CommandDefinition command)
+        public static async ValueTask<ActionResult?> QueryAsResultAsync(this DbConnection connection, CommandDefinition command)
         {
             using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult & CommandBehavior.SingleRow);
             return await ActionResult.CreateAsync(reader);

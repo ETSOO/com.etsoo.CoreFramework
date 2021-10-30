@@ -200,7 +200,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Action result</returns>
         public async Task<ActionResult> QueryAsResultAsync(CommandDefinition command)
         {
-            var result = await App.DB.WithConnection((connection) =>
+            var result = await App.DB.WithValueConnection((connection) =>
             {
                 return connection.QueryAsResultAsync(command);
             });

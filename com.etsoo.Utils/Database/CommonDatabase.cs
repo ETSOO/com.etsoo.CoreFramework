@@ -196,5 +196,21 @@ namespace com.etsoo.Utils.Database
 
             return await func(connection);
         }
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="func">Callback function</param>
+        /// <returns>Result</returns>
+        public async ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func)
+        {
+            using var connection = NewConnection();
+
+            await connection.OpenAsync();
+
+            return await func(connection);
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace com.etsoo.Utils.Actions
         /// </summary>
         /// <param name="reader">DataReader</param>
         /// <returns>Action result</returns>
-        public static async Task<ActionResult?> CreateAsync(DbDataReader reader)
+        public static async ValueTask<ActionResult?> CreateAsync(DbDataReader reader)
         {
             if (await reader.ReadAsync())
             {

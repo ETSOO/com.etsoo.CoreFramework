@@ -137,5 +137,14 @@ namespace com.etsoo.Utils.Database
         /// <param name="func">Callback function</param>
         /// <returns>Result</returns>
         Task<T> WithConnection<T>(Func<C, Task<T>> func);
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="func">Callback function</param>
+        /// <returns>Result</returns>
+        ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func);
     }
 }

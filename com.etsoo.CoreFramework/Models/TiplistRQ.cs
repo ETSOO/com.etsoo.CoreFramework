@@ -61,10 +61,4 @@ namespace com.etsoo.CoreFramework.Models
             return parameters;
         }
     }
-
-    /// <summary>
-    /// Tiplist with int id request data
-    /// 整型编号动态列表请求数据
-    /// </summary>
-    public record TiplistIntRQ : TiplistRQ<int>;
 }
