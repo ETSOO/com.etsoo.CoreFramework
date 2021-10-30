@@ -39,7 +39,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult> CreateAsync(object model)
+        public virtual async ValueTask<ActionResult> CreateAsync(object model)
         {
             return await Repo.CreateAsync(model);
         }
@@ -50,7 +50,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult> DeleteAsync(T id)
+        public virtual async ValueTask<ActionResult> DeleteAsync(T id)
         {
             return await Repo.DeleteAsync(id);
         }
@@ -61,7 +61,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async ValueTask<ActionResult> DeleteAsync(IEnumerable<T> ids)
         {
             return await Repo.DeleteAsync(ids);
         }
@@ -121,7 +121,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async Task<ActionResult> UpdateAsync(UpdateModel<T> model)
+        public virtual async ValueTask<ActionResult> UpdateAsync(UpdateModel<T> model)
         {
             return await Repo.UpdateAsync(model);
         }

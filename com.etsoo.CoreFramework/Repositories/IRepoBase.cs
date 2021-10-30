@@ -49,7 +49,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        Task<ActionResult> QueryAsResultAsync(CommandDefinition command);
+        ValueTask<ActionResult> QueryAsResultAsync(CommandDefinition command);
 
         /// <summary>
         /// Async read text data (JSON/XML) to stream

@@ -19,7 +19,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<ActionResult> CreateAsync(object model);
+        ValueTask<ActionResult> CreateAsync(object model);
 
         /// <summary>
         /// Delete single entity
@@ -27,7 +27,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        Task<ActionResult> DeleteAsync(T id);
+        ValueTask<ActionResult> DeleteAsync(T id);
 
         /// <summary>
         /// Delete multiple entities
@@ -35,7 +35,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        Task<ActionResult> DeleteAsync(IEnumerable<T> ids);
+        ValueTask<ActionResult> DeleteAsync(IEnumerable<T> ids);
 
         /// <summary>
         /// View entity
@@ -126,7 +126,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        Task<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>;
+        ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>;
 
         /// <summary>
         /// Data list
@@ -156,6 +156,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        Task<(ActionResult, UpdateResultData<T>?)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
+        ValueTask<(ActionResult, UpdateResultData<T>?)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
     }
 }

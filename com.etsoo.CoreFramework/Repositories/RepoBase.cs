@@ -198,7 +198,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async Task<ActionResult> QueryAsResultAsync(CommandDefinition command)
+        public async ValueTask<ActionResult> QueryAsResultAsync(CommandDefinition command)
         {
             var result = await App.DB.WithValueConnection((connection) =>
             {
