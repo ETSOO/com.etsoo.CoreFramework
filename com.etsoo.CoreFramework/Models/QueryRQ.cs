@@ -42,10 +42,4 @@ namespace com.etsoo.CoreFramework.Models
         /// </summary>
         public bool? OrderByAsc { get; init; }
     }
-
-    /// <summary>
-    /// Query with int id request data
-    /// 整型编号查询请求数据
-    /// </summary>
-    public record QueryIntRQ : QueryRQ<int>;
 }
