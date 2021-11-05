@@ -118,111 +118,111 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccessDenied" xml:space="preserve">
-    <value>访问被拒绝</value>
+    <value>訪問被拒絕</value>
   </data>
   <data name="AccountDisabled" xml:space="preserve">
-    <value>您的帐户已被禁用</value>
+    <value>您的帳戶已被禁用</value>
   </data>
   <data name="AccountExpired" xml:space="preserve">
-    <value>账户已于 {0} 到期</value>
+    <value>賬戶已於 {0} 到期</value>
   </data>
   <data name="CodeExpired" xml:space="preserve">
-    <value>验证码已过期</value>
+    <value>驗證碼已過期</value>
   </data>
   <data name="CodeFrozen" xml:space="preserve">
-    <value>验证码功能已被临时禁用</value>
+    <value>驗證碼功能已被臨時禁用</value>
   </data>
   <data name="CodeSendingFailed" xml:space="preserve">
-    <value>验证码发送失败</value>
+    <value>驗證碼發送失敗</value>
   </data>
   <data name="CodesNoMatch" xml:space="preserve">
     <value>验证码不匹配</value>
   </data>
   <data name="DataProcessingFailed" xml:space="preserve">
-    <value>数据处理失败</value>
+    <value>數據處理失敗</value>
   </data>
   <data name="DbConnectionFailed" xml:space="preserve">
-    <value>数据库连接失败</value>
+    <value>數據庫連接失敗</value>
   </data>
   <data name="DeviceDisabled" xml:space="preserve">
-    <value>设备已禁用</value>
+    <value>設備已禁用</value>
   </data>
   <data name="DeviceFrozen" xml:space="preserve">
-    <value>该设备已被暂时禁止使用至 {0}</value>
+    <value>該設備已被暫時禁止使用至 {0}</value>
   </data>
   <data name="EmailListAttributeError" xml:space="preserve">
-    <value>'{0}'包含无效的电子邮件地址</value>
+    <value>'{0}'包含無效的電子郵件地址</value>
   </data>
   <data name="InvalidAction" xml:space="preserve">
-    <value>无效的操作</value>
+    <value>無效的操作</value>
   </data>
   <data name="InvalidEmail" xml:space="preserve">
     <value>不是有效的Email地址</value>
   </data>
   <data name="InvalidMobile" xml:space="preserve">
-    <value>不是有效的手机号码</value>
+    <value>不是有效的手機號碼</value>
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
-    <value>需要加入机构</value>
+    <value>需要加入機構</value>
   </data>
   <data name="LanguageCodeAttributeError" xml:space="preserve">
-    <value>语言代码错误</value>
+    <value>語言代碼錯誤</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
-    <value>没有返回操作结果</value>
+    <value>沒有返回操作結果</value>
   </data>
   <data name="NoDataReturned" xml:space="preserve">
-    <value>没有返回任何数据</value>
+    <value>沒有返回任何數據</value>
   </data>
   <data name="NoDeviceMatch" xml:space="preserve">
-    <value>没有找到匹配的设备</value>
+    <value>沒有找到匹配的設備</value>
   </data>
   <data name="NoId" xml:space="preserve">
-    <value>传递的编号不存在</value>
+    <value>傳遞的編號不存在</value>
   </data>
   <data name="NoOrgJoined" xml:space="preserve">
-    <value>未加入任何机构</value>
+    <value>未加入任何機構</value>
   </data>
   <data name="NoPasswordMatch" xml:space="preserve">
-    <value>密码不匹配</value>
+    <value>密碼不匹配</value>
   </data>
   <data name="NoUserAgent" xml:space="preserve">
-    <value>没有用户代理信息</value>
+    <value>沒有用戶代理信息</value>
   </data>
   <data name="NoUserFound" xml:space="preserve">
-    <value>找不到用户</value>
+    <value>找不到用戶</value>
   </data>
   <data name="NoUserMatch" xml:space="preserve">
-    <value>用户名和密码不匹配</value>
+    <value>用戶名和密碼不匹配</value>
   </data>
   <data name="NoValidData" xml:space="preserve">
-    <value>没有传递有效的数据</value>
+    <value>沒有傳遞有效的數據</value>
   </data>
   <data name="OrgDisabled" xml:space="preserve">
-    <value>机构已被禁用</value>
+    <value>機構已被禁用</value>
   </data>
   <data name="OrgExists" xml:space="preserve">
-    <value>机构已存在</value>
+    <value>機構已存在</value>
   </data>
   <data name="OrgExpired" xml:space="preserve">
-    <value>机构服务已于 {0} 到期</value>
+    <value>機構服務已於 {0} 到期</value>
   </data>
   <data name="OutOfMemory" xml:space="preserve">
-    <value>内存不足</value>
+    <value>內存不足</value>
   </data>
   <data name="RegionIdAttributeError" xml:space="preserve">
-    <value>国家或地区编号错误或不受支持</value>
+    <value>國家或地區編號錯誤或不受支持</value>
   </data>
   <data name="TokenExpired" xml:space="preserve">
-    <value>您的令牌已过期</value>
+    <value>您的令牌已過期</value>
   </data>
   <data name="UserFrozen" xml:space="preserve">
-    <value>您的帐户已被暂时禁止使用至 {0}</value>
+    <value>您的帳戶已被暫時禁止使用至 {0}</value>
   </data>
   <data name="UserIdAttributeError" xml:space="preserve">
-    <value>'{0}'不是有效的用户名</value>
+    <value>'{0}'不是有效的用戶名</value>
   </data>
   <data name="UserRegistered" xml:space="preserve">
-    <value>用户名已注册</value>
+    <value>用戶名已註冊</value>
   </data>
 </root>

@@ -78,6 +78,33 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Execute a command asynchronously
+        /// </summary>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> ExecuteAsync(CommandDefinition command)
+        {
+            return await App.DB.WithConnection((connection) =>
+            {
+                return connection.ExecuteAsync(command);
+            });
+        }
+
+        /// <summary>
+        /// Execute parameterized SQL that selects a single value
+        /// </summary>
+        /// <typeparam name="T">Generic return type</typeparam>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The first cell selected as T</returns>
+        public async Task<T> ExecuteScalarAsync<T>(CommandDefinition command)
+        {
+            return await App.DB.WithConnection((connection) =>
+            {
+                return connection.ExecuteScalarAsync<T>(command);
+            });
+        }
+
+        /// <summary>
         /// Filter range
         /// 过滤区域
         /// </summary>

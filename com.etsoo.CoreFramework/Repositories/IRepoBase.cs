@@ -26,6 +26,21 @@ namespace com.etsoo.CoreFramework.Repositories
         void AddSystemParameters(DynamicParameters parameters);
 
         /// <summary>
+        /// Execute a command asynchronously
+        /// </summary>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The number of rows affected</returns>
+        Task<int> ExecuteAsync(CommandDefinition command);
+
+        /// <summary>
+        /// Execute parameterized SQL that selects a single value
+        /// </summary>
+        /// <typeparam name="T">Generic return type</typeparam>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The first cell selected as T</returns>
+        Task<T> ExecuteScalarAsync<T>(CommandDefinition command);
+
+        /// <summary>
         /// Async query command as object
         /// 异步执行命令返回对象
         /// </summary>
