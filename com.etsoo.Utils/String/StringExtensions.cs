@@ -130,8 +130,12 @@ namespace com.etsoo.Utils.String
         /// <param name="length">Length</param>
         /// <param name="fixedLength">Fixed length</param>
         /// <returns>DbString</returns>
-        public static DbString ToDbString(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
+        public static DbString? ToDbString(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
         {
+            // Remove unnecessary empty
+            input = input.Trim();
+            if (input == string.Empty) return null;
+
             return new DbString { IsAnsi = isAnsi ?? input.IsAnsi(), IsFixedLength = fixedLength.GetValueOrDefault(), Value = input, Length = length ?? input.Length };
         }
     }
