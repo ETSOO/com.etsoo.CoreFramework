@@ -29,7 +29,10 @@
                 phoneNumber = phoneNumber[(Idd.Length + 1)..];
             }
 
-            var isMobileActual = phoneNumber.StartsWith("13") || phoneNumber.StartsWith("15");
+            // https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%9B%BD%E5%A4%A7%E9%99%86%E7%A7%BB%E5%8A%A8%E7%BB%88%E7%AB%AF%E9%80%9A%E4%BF%A1%E5%8F%B7%E7%A0%81
+            var isMobileActual = phoneNumber.StartsWith("13") || phoneNumber.StartsWith("15") 
+                || phoneNumber.StartsWith("16") || phoneNumber.StartsWith("17") 
+                || phoneNumber.StartsWith("18") || phoneNumber.StartsWith("19");
 
             if (isMobile == null)
             {
