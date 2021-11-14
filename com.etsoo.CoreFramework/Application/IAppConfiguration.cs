@@ -25,10 +25,10 @@
         string PrivateKey { get; }
 
         /// <summary>
-        /// Symmetric security key, for data exchange, null means prevention exchange
-        /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
+        /// Unique name
+        /// 唯一名称
         /// </summary>
-        string? SymmetricKey { get; }
+        string Name { get; }
 
         /// <summary>
         /// Web url

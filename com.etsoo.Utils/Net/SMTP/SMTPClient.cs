@@ -1,4 +1,5 @@
-﻿using MailKit.Net.Smtp;
+﻿using com.etsoo.Utils.Crypto;
+using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 
@@ -10,15 +11,15 @@ namespace com.etsoo.Utils.Net.SMTP
     /// </summary>
     public class SMTPClient : ISMTPClient
     {
-        private static SMTPClientSettings Parse(IConfigurationSection section)
+        private static SMTPClientSettings Parse(IConfigurationSection section, Func<string, string>? secureManager)
         {
             return new SMTPClientSettings(
                 section.GetValue<string>("Host"),
                 section.GetValue("Port", 0),
                 section.GetValue("UseSsl", false),
                 section.GetValue<string?>("Sender"),
-                section.GetValue<string?>("UserName"),
-                section.GetValue<string?>("Password")
+                CryptographyUtils.UnsealData(section.GetValue<string?>("UserName"), secureManager),
+                CryptographyUtils.UnsealData(section.GetValue<string?>("Password"), secureManager)
             );
         }
 
@@ -43,7 +44,8 @@ namespace com.etsoo.Utils.Net.SMTP
         /// 构造函数
         /// </summary>
         /// <param name="section">Configuration section</param>
-        public SMTPClient(IConfigurationSection section) : this(Parse(section))
+        /// <param name="secureManager">Secure manager</param>
+        public SMTPClient(IConfigurationSection section, Func<string, string>? secureManager = null) : this(Parse(section, secureManager))
         {
 
         }
@@ -87,7 +89,7 @@ namespace com.etsoo.Utils.Net.SMTP
             await client.ConnectAsync(Settings.Host, Settings.Port, Settings.UseSsl, token);
 
             // Auth
-            if (!string.IsNullOrEmpty(Settings.UserName))
+            if (!string.IsNullOrEmpty(Settings.UserName) && !string.IsNullOrEmpty(Settings.Password))
             {
                 await client.AuthenticateAsync(Settings.UserName, Settings.Password, token);
             }

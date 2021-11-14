@@ -8,6 +8,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,14 +27,34 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            //await Task.CompletedTask;
-            //PRCParallelCalls();
-            //await RPCCallsAsync();
-
-            Console.WriteLine(IsPalindrome("abcba"));
-            Console.WriteLine(IsPalindrome("Never Odd Or Even"));
+            try
+            {
+                Console.WriteLine("Main starts at " + DateTime.Now.ToLongTimeString());
+                Task.Run(TestTask);
+                Console.WriteLine("Main done at " + DateTime.Now.ToLongTimeString() + ", " + Thread.CurrentThread.ManagedThreadId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ex: " + ex.Message);
+            }
 
             Console.Read();
+        }
+
+        static void TestTask()
+        {
+            try
+            {
+                Console.WriteLine("TestTask at " + DateTime.Now.ToLongTimeString() + ", " + Thread.CurrentThread.ManagedThreadId);
+
+                Thread.Sleep(3000);
+                Task.Delay(3000);
+                throw new InvalidOperationException();
+            }
+            catch
+            {
+                Console.WriteLine("TestTask exception at " + DateTime.Now.ToLongTimeString() + ", " + Thread.CurrentThread.ManagedThreadId);
+            }
         }
 
         static bool IsPalindrome(string s)

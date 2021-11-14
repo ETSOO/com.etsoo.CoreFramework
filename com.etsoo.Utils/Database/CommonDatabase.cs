@@ -118,7 +118,7 @@ namespace com.etsoo.Utils.Database
             where K : struct
             where V : struct
         {
-            return JsonSerializer.Serialize(dic, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbString(true);
+            return JsonSerializer.Serialize(dic, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace com.etsoo.Utils.Database
         /// <returns>Result</returns>
         public virtual object GuidItemsToParameter(IEnumerable<GuidItem> items, long? maxLength = null, Func<string>? tvpFunc = null)
         {
-            return JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbString(true);
+            return JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace com.etsoo.Utils.Database
         public virtual object ListToParameter(IEnumerable list, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null)
         {
             // Default to be ANSI
-            return string.Join(';', list).ToDbString(true);
+            return string.Join(';', list).ToDbStringSafe(true);
         }
 
         /// <summary>

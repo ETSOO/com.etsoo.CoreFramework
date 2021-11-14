@@ -136,6 +136,20 @@ namespace com.etsoo.Utils.String
             input = input.Trim();
             if (input == string.Empty) return null;
 
+            return input.ToDbStringSafe(isAnsi, length, fixedLength);
+        }
+
+        /// <summary>
+        /// To Dapper DbString without empty by any chance.
+        /// 确保没有任何空白的转化为 Dapper DbString
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <param name="isAnsi">Is non-unicode</param>
+        /// <param name="length">Length</param>
+        /// <param name="fixedLength">Fixed length</param>
+        /// <returns>DbString</returns>
+        public static DbString ToDbStringSafe(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
+        {
             return new DbString { IsAnsi = isAnsi ?? input.IsAnsi(), IsFixedLength = fixedLength.GetValueOrDefault(), Value = input, Length = length ?? input.Length };
         }
     }

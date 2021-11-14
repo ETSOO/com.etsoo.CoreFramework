@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using com.etsoo.Utils.Crypto;
+using Microsoft.Extensions.Configuration;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -14,34 +15,36 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="privateKey">Private key for encryption/decryption</param>
         /// <param name="cultures">Supported cultures</param>
+        /// <param name="name">Unique name</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        /// <param name="symmetricKey">Symmetric security key, for data exchange</param>
         /// <param name="webUrl">Web Url</param>
         public AppConfiguration(
             string privateKey,
             string[]? cultures = null,
+            string? name = null,
             bool modelValidated = false,
-            string? symmetricKey = null,
             string? webUrl = null
         )
         {
             // Default languages
-            cultures ??= Array.Empty<string>();
+            Cultures = cultures ?? Array.Empty<string>();
 
-            // Update
-            (
-                Cultures,
-                ModelValidated,
-                PrivateKey,
-                SymmetricKey,
-                WebUrl
-            ) = (
-                cultures,
-                modelValidated,
-                privateKey,
-                symmetricKey,
-                webUrl ?? "http://localhost"
-            );
+            ModelValidated = modelValidated;
+            WebUrl = webUrl ?? "http://localhost";
+
+            if (string.IsNullOrEmpty(name))
+            {
+                // Default case
+                name = "SmartERP";
+            }
+            else
+            {
+                // Add variable for security
+                privateKey = name + privateKey;
+            }
+
+            Name = name;
+            PrivateKey = privateKey;
         }
 
         /// <summary>
@@ -49,12 +52,13 @@ namespace com.etsoo.CoreFramework.Application
         /// 使用配置的构造函数
         /// </summary>
         /// <param name="section">Configuration section</param>
+        /// <param name="secureManager">Secure manager</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        public AppConfiguration(IConfigurationSection section, bool modelValidated = false) : this(
-            section.GetValue<string>("PrivateKey"),
+        public AppConfiguration(IConfigurationSection section, Func<string, string>? secureManager = null, bool modelValidated = false) : this(
+            CryptographyUtils.UnsealData(section.GetValue<string>("PrivateKey"), secureManager),
             section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
+            section.GetValue<string?>("Name"),
             modelValidated,
-            section.GetValue<string?>("SymmetricKey"),
             section.GetValue<string?>("WebUrl"))
         {
         }
@@ -72,22 +76,21 @@ namespace com.etsoo.CoreFramework.Application
         public bool ModelValidated { get; }
 
         /// <summary>
-        /// Private key for encryption/decryption, required
-        /// 加解密私匙，必填
+        /// Private key for hash or simple encryption/decryption, required
+        /// 哈希或简单加密/解密私匙，必填
         /// </summary>
         public string PrivateKey { get; }
 
         /// <summary>
-        /// Symmetric security key, for data exchange, null means prevention exchange
-        /// 对称安全私匙，用于数据交换，不设置标识禁止交换信息
+        /// Unique name
+        /// 唯一名称
         /// </summary>
-        public string? SymmetricKey { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Web url
         /// 网页地址
         /// </summary>
-
         public string WebUrl { get; }
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
 using NUnit.Framework;
-using System.IO;
 using System.Text;
 
 namespace Tests.Utils

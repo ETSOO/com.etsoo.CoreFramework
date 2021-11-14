@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Runtime.Versioning;
 
 namespace com.etsoo.Utils.Image
 {
@@ -8,6 +9,7 @@ namespace com.etsoo.Utils.Image
     /// Image related utilites
     /// 图片相关工具
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public static class ImageUtils
     {
         /// <summary>

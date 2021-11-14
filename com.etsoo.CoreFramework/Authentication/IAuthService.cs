@@ -1,5 +1,5 @@
 ﻿using com.etsoo.CoreFramework.User;
-using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace com.etsoo.CoreFramework.Authentication
 {
@@ -34,16 +34,35 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 创建访问令牌
         /// </summary>
         /// <param name="user">User</param>
+        /// <param name="audience">Audience</param>
         /// <returns>Token</returns>
-        string CreateAccessToken(ICurrentUser user);
+        string CreateAccessToken(ICurrentUser user, string? audience = null);
 
         /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
-        /// <param name="user">User</param>
+        /// <param name="token">Refresh token</param>
         /// <returns>Token</returns>
-        string CreateRefreshToken(ICurrentUser user);
+        string CreateRefreshToken(IRefreshToken token);
+
+        /// <summary>
+        /// Sign data
+        /// 数据签名
+        /// </summary>
+        /// <param name="data">Raw UTF8 data</param>
+        /// <param name="hashAlgorithm">Hash algorithm</param>
+        /// <returns>RSA signature</returns>
+        byte[] SignData(ReadOnlySpan<char> data, HashAlgorithmName? hashAlgorithm = null);
+
+        /// <summary>
+        /// Sign data
+        /// 数据签名
+        /// </summary>
+        /// <param name="data">Data bytes</param>
+        /// <param name="hashAlgorithm">Hash algorithm</param>
+        /// <returns>RSA signature</returns>
+        byte[] SignData(byte[] data, HashAlgorithmName? hashAlgorithm = null);
 
         /// <summary>
         /// Validate refresh token
@@ -52,6 +71,26 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="token">Token</param>
         /// <param name="expired">Expired or not</param>
         /// <returns>Claims</returns>
-        ClaimsPrincipal? ValidateRefreshToken(string token, out bool expired);
+        IRefreshToken? ValidateRefreshToken(string token, out bool expired);
+
+        /// <summary>
+        /// Verify data
+        /// 验证签名数据
+        /// </summary>
+        /// <param name="data">Raw UTF8 data</param>
+        /// <param name="signature">Raw UTF8 signature</param>
+        /// <param name="hashAlgorithm">Hash algorithm</param>
+        /// <returns>Result</returns>
+        bool VerifyData(ReadOnlySpan<char> data, ReadOnlySpan<char> signature, HashAlgorithmName? hashAlgorithm = null);
+
+        /// <summary>
+        /// Verify data
+        /// 验证签名数据
+        /// </summary>
+        /// <param name="data">Date bytes</param>
+        /// <param name="signature">Signature bytes</param>
+        /// <param name="hashAlgorithm">Hash algorithm</param>
+        /// <returns>Result</returns>
+        bool VerifyData(byte[] data, byte[] signature, HashAlgorithmName? hashAlgorithm = null);
     }
 }

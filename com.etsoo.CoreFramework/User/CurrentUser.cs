@@ -59,7 +59,11 @@ namespace com.etsoo.CoreFramework.User
             var ip = user.FindFirstValue(IPAddressClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(name) || id == null || language == null || region == null || ip == null || !IPAddress.TryParse(ip, out var ipAddress))
+            if (string.IsNullOrEmpty(name)
+                || string.IsNullOrEmpty(id)
+                || string.IsNullOrEmpty(language)
+                || string.IsNullOrEmpty(region)
+                || string.IsNullOrEmpty(ip) || !IPAddress.TryParse(ip, out var ipAddress))
                 return null;
 
             // New user
@@ -69,13 +73,14 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? Organization, string? Name, short? Role, string? Avatar) GetData(StringKeyDictionaryObject data)
+        private static (string? Organization, string? Name, short? Role, string? Avatar, string? JsonData) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Organization"),
                 data.Get("Name"),
                 data.Get<short>("Role"),
-                data.Get("Avatar")
+                data.Get("Avatar"),
+                data.Get("JsonData")
             );
         }
 
@@ -92,7 +97,7 @@ namespace com.etsoo.CoreFramework.User
         {
             // Get data
             var id = data.Get("Id");
-            var (organization, name, role, avatar) = GetData(data);
+            var (organization, name, role, avatar, jsonData) = GetData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
@@ -101,7 +106,8 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new CurrentUser(id, organization, name, role.GetValueOrDefault(), ip, language, region, null)
             {
-                Avatar = avatar
+                Avatar = avatar,
+                JsonData = jsonData
             };
         }
 
@@ -160,6 +166,12 @@ namespace com.etsoo.CoreFramework.User
         public string? Avatar { get; private set; }
 
         /// <summary>
+        /// Json data
+        /// Json数据
+        /// </summary>
+        public string? JsonData { get; set; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -200,6 +212,8 @@ namespace com.etsoo.CoreFramework.User
                 yield return new(OrganizationClaim, Organization);
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
+            if (!string.IsNullOrEmpty(JsonData))
+                yield return new(ClaimTypes.UserData, JsonData);
         }
 
         /// <summary>
@@ -220,7 +234,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (organization, name, role, avatar) = GetData(data);
+            var (organization, name, role, avatar, jsonData) = GetData(data);
 
             // Name
             if (name != null)
@@ -231,6 +245,9 @@ namespace com.etsoo.CoreFramework.User
 
             // Organization
             Organization = organization;
+
+            // Json data
+            JsonData = jsonData;
 
             // Role
             if (role != null && RoleValue != role)

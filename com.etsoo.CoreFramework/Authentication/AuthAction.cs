@@ -1,4 +1,4 @@
-﻿using com.etsoo.CoreFramework.User;
+﻿using System.Security.Claims;
 
 namespace com.etsoo.CoreFramework.Authentication
 {
@@ -6,5 +6,5 @@ namespace com.etsoo.CoreFramework.Authentication
     /// Authorization action
     /// 授权操作
     /// </summary>
-    public record AuthAction(ICurrentUser User, string Audience, TimeSpan LiveSpan, byte[] SecurityKeyBytes);
+    public record AuthAction(ClaimsIdentity Claims, string Audience, TimeSpan LiveSpan);
 }

@@ -11,10 +11,7 @@ namespace com.etsoo.Utils.Localization
         /// <inheritdoc />
         public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
         {
-            if (httpContext == null)
-            {
-                throw new ArgumentNullException(nameof(httpContext));
-            }
+            ArgumentNullException.ThrowIfNull(httpContext);
 
             var contentLanguage = httpContext.Request.Headers["Content-Language"].FirstOrDefault();
 

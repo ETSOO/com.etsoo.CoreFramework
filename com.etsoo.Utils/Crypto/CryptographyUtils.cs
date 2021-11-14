@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using Microsoft.IO;
 using Microsoft.Toolkit.HighPerformance;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -220,6 +221,23 @@ namespace com.etsoo.Utils.Crypto
 
             var ms = new MemoryStream(Encoding.UTF8.GetBytes(source));
             return await md5.ComputeHashAsync(ms);
+        }
+
+        /// <summary>
+        /// Unseal data
+        /// 解封信息
+        /// Attributes for null-state static analysis
+        /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/attributes/nullable-analysis
+        /// </summary>
+        /// <param name="input">Input data</param>
+        /// <param name="secureManager">Secure manager</param>
+        /// <returns>Unsealed data</returns>
+        [return:NotNullIfNotNull("input")]
+        public static string? UnsealData(string? input, Func<string, string>? secureManager)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            return secureManager == null ? input : secureManager(input);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -18,14 +19,15 @@ namespace com.etsoo.Utils.MessageQueue
         /// 创建连接工厂
         /// </summary>
         /// <param name="section">Configuration section</param>
+        /// <param name="secureManager">Secure manager</param>
         /// <returns>Connection factory</returns>
-        public static ConnectionFactory CreateFactory(IConfigurationSection section)
+        public static ConnectionFactory CreateFactory(IConfigurationSection section, Func<string, string>? secureManager)
         {
             var factory = new ConnectionFactory
             {
                 HostName = section.GetValue<string>("HostName"),
-                UserName = section.GetValue<string>("UserName"),
-                Password = section.GetValue<string>("Password"),
+                UserName = CryptographyUtils.UnsealData(section.GetValue<string>("UserName"), secureManager),
+                Password = CryptographyUtils.UnsealData(section.GetValue<string>("Password"), secureManager),
                 ClientProvidedName = section.GetValue<string>("ClientProvidedName"),
                 AutomaticRecoveryEnabled = section.GetValue("AutomaticRecoveryEnabled", true),
                 DispatchConsumersAsync = section.GetValue("DispatchConsumersAsync", false),
@@ -107,7 +109,8 @@ namespace com.etsoo.Utils.MessageQueue
         /// 使用配置的构造函数
         /// </summary>
         /// <param name="section">Configuration section</param>
-        public RabbitMQEx(IConfigurationSection section) : this(CreateFactory(section), section.GetValue<string>("ClientName"))
+        /// <param name="secureManager">Secure manager</param>
+        public RabbitMQEx(IConfigurationSection section, Func<string, string>? secureManager = null) : this(CreateFactory(section, secureManager), section.GetValue<string>("ClientName"))
         {
 
         }
@@ -256,8 +259,7 @@ namespace com.etsoo.Utils.MessageQueue
         /// <param name="queue">Queue name</param>
         public ReadOnlyMemory<byte> PRCCall(ReadOnlyMemory<byte> body, string queue)
         {
-            if (RPCClientProperties == null)
-                throw new ArgumentNullException(nameof(RPCClientProperties));
+            ArgumentNullException.ThrowIfNull(RPCClientProperties);
 
             // Thread id based collection
             var id = Environment.CurrentManagedThreadId;
@@ -285,8 +287,7 @@ namespace com.etsoo.Utils.MessageQueue
         /// <param name="queue">Queue name</param>
         public async Task<ReadOnlyMemory<byte>> PRCCallAsync(ReadOnlyMemory<byte> body, string queue)
         {
-            if (RPCClientProperties == null)
-                throw new ArgumentNullException(nameof(RPCClientProperties));
+            ArgumentNullException.ThrowIfNull(RPCClientProperties);
 
             // Thread id based collection
             var id = Environment.CurrentManagedThreadId;

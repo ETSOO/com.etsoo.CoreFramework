@@ -66,6 +66,12 @@ namespace com.etsoo.CoreFramework.User
         string Region { get; }
 
         /// <summary>
+        /// Json data
+        /// Json数据
+        /// </summary>
+        string? JsonData { get; set; }
+
+        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>

@@ -60,7 +60,7 @@
         /// <returns>Span</returns>
         public ReadOnlySpan<T> AsSpan()
         {
-            return span.Slice(0, pos);
+            return span[..pos];
         }
 
         /// <summary>

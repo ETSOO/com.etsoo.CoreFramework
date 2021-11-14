@@ -9,7 +9,7 @@ namespace Tests
     [AutoDictionaryGenerator]
     [AutoToJson]
     [AutoToParameters]
-    public partial record DirectUser : QueryIntRQ
+    public partial record DirectUser : QueryRQ<int>
     {
         public string Name { get; init; } = null!;
 

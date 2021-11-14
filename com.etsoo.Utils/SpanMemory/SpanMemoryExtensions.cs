@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Buffers;
+using System.Text;
 
 namespace com.etsoo.Utils.SpanMemory
 {
@@ -27,6 +28,19 @@ namespace com.etsoo.Utils.SpanMemory
         }
 
         /// <summary>
+        /// Base64 char array to byte array
+        /// Base64编码字符数组转化为字节数组
+        /// </summary>
+        /// <param name="chars">Base64 chars</param>
+        /// <returns>Bytes</returns>
+        public static ReadOnlySpan<byte> ToBase64Bytes(this ReadOnlySpan<char> chars)
+        {
+            Span<byte> bytes = new byte[chars.Length];
+            Convert.TryFromBase64Chars(chars, bytes, out var bytesWritten);
+            return bytes[..bytesWritten];
+        }
+
+        /// <summary>
         /// Char array to UTF8 byte array
         /// 字符数组转化为 UTF8 字节数组
         /// </summary>
@@ -45,11 +59,9 @@ namespace com.etsoo.Utils.SpanMemory
         /// <returns>Bytes</returns>
         public static ReadOnlySpan<byte> ToEncodingBytes(this ReadOnlySpan<char> chars, Encoding encoding)
         {
-            Span<byte> bytes = new byte[encoding.GetMaxByteCount(chars.Length)];
-
-            var bytesCount = encoding.GetBytes(chars, bytes);
-
-            return bytes[0..bytesCount];
+            var writer = new ArrayBufferWriter<byte>();
+            encoding.GetBytes(chars, writer);
+            return writer.WrittenSpan;
         }
 
         /// <summary>
@@ -58,7 +70,7 @@ namespace com.etsoo.Utils.SpanMemory
         /// </summary>
         /// <param name="chars">Chars</param>
         /// <returns>Bytes</returns>
-        public static Memory<byte> ToEncodingBytes(this ReadOnlyMemory<char> chars)
+        public static ReadOnlyMemory<byte> ToEncodingBytes(this ReadOnlyMemory<char> chars)
         {
             return chars.ToEncodingBytes(Encoding.UTF8);
         }
@@ -69,13 +81,11 @@ namespace com.etsoo.Utils.SpanMemory
         /// </summary>
         /// <param name="chars">Chars</param>
         /// <returns>Bytes</returns>
-        public static Memory<byte> ToEncodingBytes(this ReadOnlyMemory<char> chars, Encoding encoding)
+        public static ReadOnlyMemory<byte> ToEncodingBytes(this ReadOnlyMemory<char> chars, Encoding encoding)
         {
-            Memory<byte> bytes = new byte[encoding.GetMaxByteCount(chars.Length)];
-
-            var bytesCount = encoding.GetBytes(chars.Span, bytes.Span);
-
-            return bytes[0..bytesCount];
+            var writer = new ArrayBufferWriter<byte>();
+            encoding.GetBytes(chars.Span, writer);
+            return writer.WrittenMemory;
         }
     }
 }
