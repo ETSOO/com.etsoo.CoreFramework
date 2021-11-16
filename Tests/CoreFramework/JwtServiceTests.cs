@@ -3,6 +3,7 @@ using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.SpanMemory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using NUnit.Framework;
 using System;
 using System.Globalization;
@@ -41,14 +42,14 @@ namespace Tests.CoreFramework
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtTextPrivate));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
 
-            service = new JwtService(new ServiceCollection(), false, section);
+            service = new JwtService(new ServiceCollection(), false, section, null);
         }
 
         [Test]
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser("1", null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), CultureInfo.CurrentCulture, "CN", null) { JsonData = "{ body: \"In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.\" }" };
+            var user = new CurrentUser("1", null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), 1, CultureInfo.CurrentCulture, "CN", null, null) { JsonData = "{ body: \"In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.\" }" };
 
             // Act
             var token = service.CreateAccessToken(user);
@@ -60,16 +61,23 @@ namespace Tests.CoreFramework
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
 
-            var publicService = new JwtService(new ServiceCollection(), false, section);
+            /**
+             * , (string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
+            {
+                return new List<RsaSecurityKey> { };
+            }
+             */
+            var publicService = new JwtService(new ServiceCollection(), false, section, null);
 
             // Refresh token
-            var refreshToken = service.CreateRefreshToken(new RefreshToken("1", IPAddress.Parse("127.0.0.1"), "CN", "service"));
+            var refreshToken = service.CreateRefreshToken(new RefreshToken("1", IPAddress.Parse("127.0.0.1"), "CN", 1, "service"));
 
             // Validate refresh token
-            var claimsPrincipal = publicService.ValidateRefreshToken(refreshToken, out bool expired);
+            var (claimsPrincipal, expired, securityToken) = publicService.ValidateRefreshToken(refreshToken);
 
             Assert.IsFalse(expired);
             Assert.IsNotNull(claimsPrincipal);
+            Assert.AreEqual(securityToken.SecurityKey.KeyId, "service");
 
             // Public service should not generate token
             Assert.Throws<InvalidOperationException>(() =>

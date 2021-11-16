@@ -5,6 +5,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
 	<ImplicitUsings>true</ImplicitUsings>
+	<EnablePreviewFeatures>true</EnablePreviewFeatures>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -11,12 +11,15 @@ namespace com.etsoo.CoreFramework.Authentication
 {
     /// <summary>
     /// Jwt authentication service
+    /// https://andrewlock.net/a-look-behind-the-jwt-bearer-authentication-middleware-in-asp-net-core/
+    /// https://stackoverflow.com/questions/49694383/use-multiple-jwt-bearer-authentication or IssuerSigningKeys
     /// Jwt验证服务
     /// </summary>
     public class JwtService : IAuthService
     {
         private readonly RSACrypto crypto;
         private readonly string securityAlgorithms;
+        private readonly IssuerSigningKeyResolver issuerSigningKeyResolver;
 
         private readonly string defaultIssuer;
         private readonly string? validIssuer;
@@ -46,7 +49,8 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="sslOnly">SSL only?</param>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
-        public JwtService(IServiceCollection services, bool sslOnly, IConfigurationSection section, Func<string, string>? secureManager = null)
+        /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
+        public JwtService(IServiceCollection services, bool sslOnly, IConfigurationSection section, Func<string, string>? secureManager = null, IssuerSigningKeyResolver? issuerSigningKeyResolver = null)
         {
             // Jwt section is required
             if (!section.Exists())
@@ -81,6 +85,13 @@ namespace com.etsoo.CoreFramework.Authentication
             // RSA crypto provider
             crypto = new RSACrypto(section, secureManager);
 
+            // Default signing key resolver
+            issuerSigningKeyResolver ??= (token, securityToken, kid, validationParameters) =>
+            {
+                return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
+            };
+            this.issuerSigningKeyResolver = issuerSigningKeyResolver;
+
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -104,7 +115,8 @@ namespace com.etsoo.CoreFramework.Authentication
                 RequireExpirationTime = true,
                 RequireAudience = true,
 
-                IssuerSigningKey = new RsaSecurityKey(crypto.RSA),
+                //IssuerSigningKey = new RsaSecurityKey(crypto.RSA),
+                IssuerSigningKeyResolver = issuerSigningKeyResolver,
 
                 // false to valid additional data
                 ValidateLifetime = validateLifetime,
@@ -130,13 +142,21 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Token</returns>
         public string CreateToken(AuthAction action)
         {
+            // Token validation parameters
+            var validataionParameters = new TokenValidationParameters
+            {
+                ValidIssuer = validIssuer,
+                ValidAudience = action.Audience
+            };
+
             // Security key
-            var securityKey = new RsaSecurityKey(crypto.RSA);
+            var keys = issuerSigningKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
+            var securityKey = string.IsNullOrEmpty(action.KeyId) ? keys.FirstOrDefault() : keys.FirstOrDefault(item => item.KeyId.Equals(action.KeyId));
 
             // Enable only with private key
-            if (securityKey.PrivateKeyStatus != PrivateKeyStatus.Exists)
+            if (securityKey == null || (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists))
             {
-                throw new InvalidOperationException("No Private Key");
+                throw new InvalidOperationException("No Security Key");
             }
 
             // Token handler
@@ -152,10 +172,10 @@ namespace com.etsoo.CoreFramework.Authentication
                 Expires = DateTime.UtcNow.AddTicks(action.LiveSpan.Ticks),
 
                 // Issuer
-                Issuer = validIssuer,
+                Issuer = validataionParameters.ValidIssuer,
 
                 // Audience
-                Audience = action.Audience,
+                Audience = validataionParameters.ValidAudience,
 
                 // JWE vs JWS
                 // https://stackoverflow.com/questions/33589353/what-are-the-pros-cons-of-using-jwe-or-jws
@@ -172,10 +192,11 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <param name="audience">Audience</param>
+        /// <param name="keyId">Key id</param>
         /// <returns>Token</returns>
-        public string CreateAccessToken(ICurrentUser user, string? audience = null)
+        public string CreateAccessToken(ICurrentUser user, string? audience = null, string keyId = "SmartERP")
         {
-            return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes)));
+            return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes), keyId));
         }
 
         private string GetRefreshTokenAudience()
@@ -191,7 +212,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Token</returns>
         public string CreateRefreshToken(IRefreshToken token)
         {
-            return CreateToken(new AuthAction(token.CreateIdentity(), GetRefreshTokenAudience(), TimeSpan.FromDays(RefreshTokenDays)));
+            return CreateToken(new AuthAction(token.CreateIdentity(), GetRefreshTokenAudience(), TimeSpan.FromDays(RefreshTokenDays), token.Sid));
         }
 
         /// <summary>
@@ -224,15 +245,16 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="token">Token</param>
         /// <param name="expired">Expired or not</param>
-        /// <returns>Claims</returns>
-        public IRefreshToken? ValidateRefreshToken(string token, out bool expired)
+        /// <param name="securityToken">Security token</param>
+        /// <returns>Claim data</returns>
+        public (IRefreshToken? token, bool expired, SecurityToken securityToken) ValidateRefreshToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             var claims = handler.ValidateToken(token, CreateValidationParameters(false, GetRefreshTokenAudience()), out var validatedToken);
 
-            expired = (validatedToken.ValidTo < DateTime.UtcNow);
+            var expired = (validatedToken.ValidTo < DateTime.UtcNow);
 
-            return RefreshToken.Create(claims);
+            return (RefreshToken.Create(claims), expired, validatedToken);
         }
 
         /// <summary>

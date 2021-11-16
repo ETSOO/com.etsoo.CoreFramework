@@ -1,7 +1,5 @@
 ﻿using com.etsoo.Utils.String;
 using System.Globalization;
-using System.Net;
-using System.Security.Claims;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -9,7 +7,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    public interface ICurrentUser
+    public interface ICurrentUser : IUserToken
     {
         /// <summary>
         /// Unique connection id
@@ -30,12 +28,6 @@ namespace com.etsoo.CoreFramework.User
         string? Avatar { get; }
 
         /// <summary>
-        /// Id, struct only, string id should be replaced by GUID to avoid sensitive data leak
-        /// 编号，结构类型，字符串类型的编号，应该替换为GUID，避免敏感信息泄露
-        /// </summary>
-        string Id { get; }
-
-        /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
@@ -48,10 +40,10 @@ namespace com.etsoo.CoreFramework.User
         short RoleValue { get; }
 
         /// <summary>
-        /// Client IP address
-        /// 客户端IP地址
+        /// Universal id
+        /// 通用编号
         /// </summary>
-        IPAddress ClientIp { get; }
+        Guid? Uid { get; }
 
         /// <summary>
         /// Language
@@ -60,30 +52,10 @@ namespace com.etsoo.CoreFramework.User
         CultureInfo Language { get; }
 
         /// <summary>
-        /// Country or region
-        /// 国家或地区
-        /// </summary>
-        string Region { get; }
-
-        /// <summary>
         /// Json data
         /// Json数据
         /// </summary>
         string? JsonData { get; set; }
-
-        /// <summary>
-        /// Create claims
-        /// 创建声明
-        /// </summary>
-        /// <returns>Claims</returns>
-        IEnumerable<Claim> CreateClaims();
-
-        /// <summary>
-        /// Create identity
-        /// 创建身份
-        /// </summary>
-        /// <returns>Identity</returns>
-        ClaimsIdentity CreateIdentity();
 
         /// <summary>
         /// Update

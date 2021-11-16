@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Image;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 
 namespace Tests.Utils
 {
@@ -18,6 +19,7 @@ namespace Tests.Utils
         }
 
         [Test, TestCaseSource(nameof(GetCodecInfoBulkTestData))]
+        [SupportedOSPlatform("windows")]
         public void GetCodecInfo_BulkTests(string path, string? mimeType)
         {
             // Arrange & act
