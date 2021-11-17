@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.User;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace com.etsoo.CoreFramework.Authentication
@@ -67,14 +68,15 @@ namespace com.etsoo.CoreFramework.Authentication
         byte[] SignData(byte[] data, HashAlgorithmName? hashAlgorithm = null);
 
         /// <summary>
-        /// Validate refresh token
-        /// 验证刷新令牌
+        /// Validate token
+        /// 验证令牌
         /// </summary>
-        /// <param name="token">Token</param>
+        /// <param name="claims">Claims</param>
         /// <param name="expired">Expired or not</param>
+        /// <param name="kid">Key id</param>
         /// <param name="securityToken">Security token</param>
         /// <returns>Claim data</returns>
-        (IRefreshToken? token, bool expired, SecurityToken securityToken) ValidateRefreshToken(string token);
+        (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token);
 
         /// <summary>
         /// Verify data

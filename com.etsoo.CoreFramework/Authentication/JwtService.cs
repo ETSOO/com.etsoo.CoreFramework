@@ -5,7 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace com.etsoo.CoreFramework.Authentication
 {
@@ -17,6 +19,8 @@ namespace com.etsoo.CoreFramework.Authentication
     /// </summary>
     public class JwtService : IAuthService
     {
+        private readonly TokenDecryptionKeyResolver tokenDecryptionKeyResolver;
+
         private readonly RSACrypto crypto;
         private readonly string securityAlgorithms;
         private readonly IssuerSigningKeyResolver issuerSigningKeyResolver;
@@ -50,7 +54,13 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
         /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
-        public JwtService(IServiceCollection services, bool sslOnly, IConfigurationSection section, Func<string, string>? secureManager = null, IssuerSigningKeyResolver? issuerSigningKeyResolver = null)
+        /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
+        public JwtService(IServiceCollection services,
+            bool sslOnly,
+            IConfigurationSection section,
+            Func<string, string>? secureManager = null,
+            IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
+            TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null)
         {
             // Jwt section is required
             if (!section.Exists())
@@ -82,6 +92,10 @@ namespace com.etsoo.CoreFramework.Authentication
             // Default 90 days
             RefreshTokenDays = section.GetValue("RefreshTokenDays", 90);
 
+            // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
+            // AES256, 256 / 8 = 32 bytes
+            var encryptionKeyPlain = CryptographyUtils.UnsealData(section.GetValue<string>("EncryptionKey"), secureManager);
+
             // RSA crypto provider
             crypto = new RSACrypto(section, secureManager);
 
@@ -91,6 +105,12 @@ namespace com.etsoo.CoreFramework.Authentication
                 return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
             };
             this.issuerSigningKeyResolver = issuerSigningKeyResolver;
+
+            tokenDecryptionKeyResolver ??= (token, securityToken, kid, validationParameters) =>
+            {
+                return new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
+            };
+            this.tokenDecryptionKeyResolver = tokenDecryptionKeyResolver;
 
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
@@ -117,6 +137,10 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 //IssuerSigningKey = new RsaSecurityKey(crypto.RSA),
                 IssuerSigningKeyResolver = issuerSigningKeyResolver,
+
+                // Token decryption
+                // TokenDecryptionKey = encryptionKey,
+                TokenDecryptionKeyResolver = tokenDecryptionKeyResolver,
 
                 // false to valid additional data
                 ValidateLifetime = validateLifetime,
@@ -151,10 +175,13 @@ namespace com.etsoo.CoreFramework.Authentication
 
             // Security key
             var keys = issuerSigningKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
-            var securityKey = string.IsNullOrEmpty(action.KeyId) ? keys.FirstOrDefault() : keys.FirstOrDefault(item => item.KeyId.Equals(action.KeyId));
+            var securityKey = string.IsNullOrEmpty(action.KeyId) ? keys.FirstOrDefault() : keys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
+
+            var encryptionKeys = tokenDecryptionKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
+            var encryptionKey = string.IsNullOrEmpty(action.KeyId) ? encryptionKeys.FirstOrDefault() : encryptionKeys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
 
             // Enable only with private key
-            if (securityKey == null || (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists))
+            if (securityKey == null || encryptionKey == null || (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists))
             {
                 throw new InvalidOperationException("No Security Key");
             }
@@ -179,7 +206,8 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // JWE vs JWS
                 // https://stackoverflow.com/questions/33589353/what-are-the-pros-cons-of-using-jwe-or-jws
-                SigningCredentials = new SigningCredentials(securityKey, securityAlgorithms)
+                SigningCredentials = new SigningCredentials(securityKey, securityAlgorithms),
+                EncryptingCredentials = new EncryptingCredentials(encryptionKey, SecurityAlgorithms.Aes256KeyWrap, SecurityAlgorithms.Aes256CbcHmacSha512)
             };
 
             // Create the token
@@ -240,21 +268,23 @@ namespace com.etsoo.CoreFramework.Authentication
         }
 
         /// <summary>
-        /// Validate refresh token
-        /// 验证刷新令牌
+        /// Validate token
+        /// 验证令牌
         /// </summary>
-        /// <param name="token">Token</param>
+        /// <param name="claims">Claims</param>
         /// <param name="expired">Expired or not</param>
         /// <param name="securityToken">Security token</param>
         /// <returns>Claim data</returns>
-        public (IRefreshToken? token, bool expired, SecurityToken securityToken) ValidateRefreshToken(string token)
+        public (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             var claims = handler.ValidateToken(token, CreateValidationParameters(false, GetRefreshTokenAudience()), out var validatedToken);
 
+            var securityToken = validatedToken as JwtSecurityToken;
             var expired = (validatedToken.ValidTo < DateTime.UtcNow);
+            var kid = validatedToken is JwtSecurityToken jk ? jk.Header.Kid : (validatedToken.SecurityKey?.KeyId);
 
-            return (RefreshToken.Create(claims), expired, validatedToken);
+            return (claims, expired, kid, securityToken);
         }
 
         /// <summary>
