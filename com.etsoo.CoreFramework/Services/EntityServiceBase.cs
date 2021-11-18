@@ -91,15 +91,29 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// View entity
+        /// 浏览实体
+        /// </summary>
+        /// <typeparam name="E">Generic entity data type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        public async Task<E> ReadAsync<E>(T id, string range = "default")
+        {
+            return await Repo.ReadAsync<E>(id, range);
+        }
+
+        /// <summary>
         /// Read
         /// 浏览
         /// </summary>
-        /// <param name="id">Id</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="id">Id</param>
+        /// <param name="range">Range</param>
         /// <returns>Task</returns>
-        public async Task ReadAsync(T id, HttpResponse response)
+        public async Task ReadAsync(HttpResponse response, T id, string range = "default")
         {
-            await Repo.ReadAsync(response, id);
+            await Repo.ReadAsync(response, id, range);
         }
 
         /// <summary>
