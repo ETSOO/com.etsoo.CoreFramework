@@ -23,6 +23,12 @@ namespace com.etsoo.CoreFramework.Repositories
         where C : DbConnection
         where T : struct
     {
+        /// <summary>
+        /// Public data view range
+        /// </summary>
+        public const string PublicRange = "public";
+
+
         protected EntityRepo(ICoreApplication<C> app, string flag, ICurrentUser? user = null) : base(app, flag, user)
         {
         }
@@ -109,7 +115,11 @@ namespace com.etsoo.CoreFramework.Repositories
             var parameters = new DynamicParameters();
             parameters.Add("id", id);
 
-            AddSystemParameters(parameters);
+            if(range != PublicRange)
+            {
+                // Deserve for public acess
+                AddSystemParameters(parameters);
+            }
 
             return CreateCommand(name, parameters);
         }
