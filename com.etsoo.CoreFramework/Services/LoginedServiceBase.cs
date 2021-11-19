@@ -20,7 +20,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected ICurrentUser? User { get; }
+        virtual protected ICurrentUser User { get; }
 
         /// <summary>
         /// Constructor
@@ -30,7 +30,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">Current user</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser? user, R repo, ILogger logger) : base(app, repo, logger)
+        public LoginedServiceBase(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, repo, logger)
         {
             User = user;
         }
