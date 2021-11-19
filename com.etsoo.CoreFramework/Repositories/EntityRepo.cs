@@ -92,14 +92,12 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Create read command
-        /// 创建读取命令
+        /// Get read command name
         /// </summary>
-        /// <param name="id">Entity id</param>
-        /// <param name="range">View range</param>
-        /// <param name="format">Date format</param>
-        /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReadCommand(T id, string range, DataFormat? format = null)
+        /// <param name="range">Range</param>
+        /// <param name="format">Format</param>
+        /// <returns>Command name</returns>
+        protected virtual string GetReadCommand(string range, DataFormat? format = null)
         {
             // Avoid possible SQL injection attack
             FilterRange(range);
@@ -110,12 +108,25 @@ namespace com.etsoo.CoreFramework.Repositories
             if (format.HasValue)
                 keys.Add(format.Value.ToString().ToLower());
 
-            var name = GetCommandNameBase(keys);
+            return GetCommandNameBase(keys);
+        }
+
+        /// <summary>
+        /// Create read command
+        /// 创建读取命令
+        /// </summary>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">View range</param>
+        /// <param name="format">Date format</param>
+        /// <returns>Command</returns>
+        protected virtual CommandDefinition NewReadCommand(T id, string range, DataFormat? format = null)
+        {
+            var name = GetReadCommand(range, format);
 
             var parameters = new DynamicParameters();
             parameters.Add("id", id);
 
-            if(range != PublicRange)
+            if (range != PublicRange)
             {
                 // Deserve for public acess
                 AddSystemParameters(parameters);
