@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">User</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public EntityServiceBase(ICoreApplication<C> app, ICurrentUser user, R repo, ILogger logger) : base(app, user, repo, logger)
+        public EntityServiceBase(ICoreApplication<C> app, ICurrentUser? user, R repo, ILogger logger) : base(app, user, repo, logger)
         {
         }
 
