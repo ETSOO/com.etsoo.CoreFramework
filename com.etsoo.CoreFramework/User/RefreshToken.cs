@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.User
         /// Service identifier
         /// 服务识别号
         /// </summary>
-        public string Sid { get; }
+        public string? Sid { get; }
 
         /// <summary>
         /// Constructor
@@ -40,7 +40,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="deviceId">Device id</param>
         /// <param name="sid">Service identifier id</param>
-        public RefreshToken(string id, IPAddress clientIp, string region, int deviceId, string sid)
+        public RefreshToken(string id, IPAddress clientIp, string region, int deviceId, string? sid = null)
             : base(id, clientIp, region, deviceId)
         {
             Sid = sid;
@@ -48,7 +48,8 @@ namespace com.etsoo.CoreFramework.User
 
         private IEnumerable<Claim> GetClaims()
         {
-            yield return new(ClaimTypes.AuthenticationInstant, DeviceId.ToString());
+            if (!string.IsNullOrEmpty(Sid))
+                yield return new(ClaimTypes.PrimarySid, Sid);
         }
 
         /// <summary>

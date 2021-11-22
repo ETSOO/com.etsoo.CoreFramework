@@ -10,6 +10,6 @@
         /// Service identifier
         /// 服务识别号
         /// </summary>
-        string Sid { get; }
+        string? Sid { get; }
     }
 }

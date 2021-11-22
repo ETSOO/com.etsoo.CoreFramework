@@ -19,6 +19,8 @@ namespace com.etsoo.CoreFramework.Authentication
     /// </summary>
     public class JwtService : IAuthService
     {
+        private const string DefaultIssuer = "SmartERP";
+
         private readonly TokenDecryptionKeyResolver tokenDecryptionKeyResolver;
 
         private readonly RSACrypto crypto;
@@ -66,7 +68,7 @@ namespace com.etsoo.CoreFramework.Authentication
             if (!section.Exists())
                 throw new ArgumentNullException(nameof(section), "No Section");
 
-            defaultIssuer = section.GetValue<string>("DefaultIssuer") ?? "SmartERP";
+            defaultIssuer = section.GetValue<string>("DefaultIssuer") ?? DefaultIssuer;
             defaultAudience = section.GetValue<string>("DefaultAudience") ?? "All";
 
             validIssuer = section.GetValue<string>("ValidIssuer");
@@ -189,10 +191,10 @@ namespace com.etsoo.CoreFramework.Authentication
 
             // Security key
             var keys = issuerSigningKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
-            var securityKey = string.IsNullOrEmpty(action.KeyId) ? keys.FirstOrDefault() : keys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
+            var securityKey = string.IsNullOrEmpty(action.KeyId) || action.KeyId == DefaultIssuer ? keys.FirstOrDefault() : keys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
 
             var encryptionKeys = tokenDecryptionKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
-            var encryptionKey = string.IsNullOrEmpty(action.KeyId) ? encryptionKeys.FirstOrDefault() : encryptionKeys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
+            var encryptionKey = string.IsNullOrEmpty(action.KeyId) || action.KeyId == DefaultIssuer ? encryptionKeys.FirstOrDefault() : encryptionKeys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
 
             // Enable only with private key
             if (securityKey == null || encryptionKey == null || (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists))
@@ -236,7 +238,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="audience">Audience</param>
         /// <param name="keyId">Key id</param>
         /// <returns>Token</returns>
-        public string CreateAccessToken(ICurrentUser user, string? audience = null, string keyId = "SmartERP")
+        public string CreateAccessToken(ICurrentUser user, string? audience = null, string? keyId = null)
         {
             return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes), keyId));
         }

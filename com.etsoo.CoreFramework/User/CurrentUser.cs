@@ -73,7 +73,7 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? Organization, string? Name, short? Role, string? Avatar, int? deviceId, string? JsonData) GetData(StringKeyDictionaryObject data)
+        private static (string? Organization, string? Name, short? Role, string? Avatar, int? deviceId, string? JsonData, Guid? Uid) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Organization"),
@@ -81,7 +81,8 @@ namespace com.etsoo.CoreFramework.User
                 data.Get<short>("Role"),
                 data.Get("Avatar"),
                 data.Get<int>("DeviceId"),
-                data.Get("JsonData")
+                data.Get("JsonData"),
+                data.Get<Guid>("Uid")
             );
         }
 
@@ -93,12 +94,13 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
+        /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, Guid? uid = null, string? connectionId = null)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
             var id = data.Get("Id");
-            var (organization, name, role, avatar, deviceId, jsonData) = GetData(data);
+            var (organization, name, role, avatar, deviceId, jsonData, uid) = GetData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
@@ -168,7 +170,7 @@ namespace com.etsoo.CoreFramework.User
         /// Universal id
         /// 全局编号
         /// </summary>
-        public Guid? Uid { get; }
+        public Guid? Uid { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -230,7 +232,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (organization, name, role, avatar, _, jsonData) = GetData(data);
+            var (organization, name, role, avatar, _, jsonData, uid) = GetData(data);
 
             // Name
             if (name != null)
@@ -241,6 +243,7 @@ namespace com.etsoo.CoreFramework.User
 
             // Organization
             Organization = organization;
+            Uid = uid;
 
             // Json data
             JsonData = jsonData;
