@@ -100,17 +100,31 @@ namespace com.etsoo.CoreFramework.Authentication
             crypto = new RSACrypto(section, secureManager);
 
             // Default signing key resolver
-            issuerSigningKeyResolver ??= (token, securityToken, kid, validationParameters) =>
+            this.issuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
             {
-                return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
-            };
-            this.issuerSigningKeyResolver = issuerSigningKeyResolver;
+                if(issuerSigningKeyResolver == null)
+                {
+                    return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
+                }
 
-            tokenDecryptionKeyResolver ??= (token, securityToken, kid, validationParameters) =>
-            {
-                return new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
+                var keys = issuerSigningKeyResolver(token, securityToken, kid, validationParameters);
+                if (!keys.Any()) keys = keys.Append(new RsaSecurityKey(crypto.RSA) { KeyId = kid });
+
+                return keys;
             };
-            this.tokenDecryptionKeyResolver = tokenDecryptionKeyResolver;
+
+            this.tokenDecryptionKeyResolver = (token, securityToken, kid, validationParameters) =>
+            {
+                if (tokenDecryptionKeyResolver == null)
+                {
+                    return new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
+                }
+
+                var keys = tokenDecryptionKeyResolver(token, securityToken, kid, validationParameters);
+                if (!keys.Any()) keys = keys.Append(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid });
+
+                return keys;
+            };
 
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
