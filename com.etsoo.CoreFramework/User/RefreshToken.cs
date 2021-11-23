@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.User
         /// Service identifier
         /// 服务识别号
         /// </summary>
-        public string? Sid { get; }
+        public string? Sid { get; set; }
 
         /// <summary>
         /// Constructor
