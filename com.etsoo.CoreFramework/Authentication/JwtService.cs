@@ -253,10 +253,12 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 创建刷新令牌
         /// </summary>
         /// <param name="token">Refresh token</param>
+        /// <param name="validMinutes">Valid minutes</param>
         /// <returns>Token</returns>
-        public string CreateRefreshToken(IRefreshToken token)
+        public string CreateRefreshToken(IRefreshToken token, int? validMinutes = null)
         {
-            return CreateToken(new AuthAction(token.CreateIdentity(), GetRefreshTokenAudience(), TimeSpan.FromDays(RefreshTokenDays), token.Sid));
+            var ts = validMinutes == null ? TimeSpan.FromDays(RefreshTokenDays) : TimeSpan.FromMinutes(validMinutes.Value);
+            return CreateToken(new AuthAction(token.CreateIdentity(), GetRefreshTokenAudience(), ts, token.Sid));
         }
 
         /// <summary>

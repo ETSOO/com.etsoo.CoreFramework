@@ -46,8 +46,9 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 创建刷新令牌
         /// </summary>
         /// <param name="token">Refresh token</param>
+        /// <param name="validMinutes">Valid minutes</param>
         /// <returns>Token</returns>
-        string CreateRefreshToken(IRefreshToken token);
+        string CreateRefreshToken(IRefreshToken token, int? validMinutes = null);
 
         /// <summary>
         /// Sign data
