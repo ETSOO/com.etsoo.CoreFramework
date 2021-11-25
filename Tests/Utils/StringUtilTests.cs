@@ -289,5 +289,27 @@ namespace Tests.Utils
         {
             Assert.AreEqual(StringUtils.RemoveNonLetters(input), result);
         }
+
+        [Test]
+        public void SplitIntGuid_TestEmptyCase()
+        {
+            // Arrange & act
+            var (id, guid) = StringUtils.SplitIntGuid(null);
+
+            // Assert
+            Assert.IsNull(id);
+            Assert.IsNull(guid);
+        }
+
+        [Test]
+        public void SplitIntGuid_TestNormalCase()
+        {
+            // Arrange & act
+            var (id, guid) = StringUtils.SplitIntGuid("5|700fc07c-ce7c-4af0-aed3-c83a9d30f23d");
+
+            // Assert
+            Assert.AreEqual(id, 5);
+            Assert.AreEqual(guid, Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"));
+        }
     }
 }

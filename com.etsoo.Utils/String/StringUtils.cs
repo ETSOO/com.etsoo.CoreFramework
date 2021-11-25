@@ -266,6 +266,29 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Split string to int and guid parts
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>Result</returns>
+        public static (int? id, Guid? guid) SplitIntGuid(string? input, char splitter = '|')
+        {
+            if (string.IsNullOrEmpty(input)) return (null, null);
+
+            var parts = input.Split(splitter);
+            if (parts.Length != 2) return (null, null);
+
+            if (int.TryParse(parts[0], out var id))
+            {
+                if (Guid.TryParse(parts[1], out var uid))
+                {
+                    return (id, uid);
+                }
+            }
+
+            return (null, null);
+        }
+
+        /// <summary>
         /// Try parse string to target type
         /// 尝试解析字符串到目标类型
         /// </summary>
