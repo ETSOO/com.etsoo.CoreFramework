@@ -12,10 +12,10 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public class RSACrypto
     {
-        private static (string publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string>? secureManager)
+        private static (string? publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string>? secureManager)
         {
             return (
-                CryptographyUtils.UnsealData(section.GetValue<string>("PublicKey"), secureManager),
+                CryptographyUtils.UnsealData(section.GetValue<string?>("PublicKey"), secureManager),
                 CryptographyUtils.UnsealData(section.GetValue<string?>("PrivateKey"), secureManager)
             );
         }
@@ -31,18 +31,24 @@ namespace com.etsoo.Utils.Crypto
         /// 构造函数
         /// </summary>
         /// <param name="keys">Keys</param>
-        public RSACrypto((string publicKey, string? privateKey) keys)
+        public RSACrypto((string? publicKey, string? privateKey) keys)
         {
             var (publicKey, privateKey) = keys;
 
-            ArgumentNullException.ThrowIfNull(publicKey);
+            var hasPublicKey = !string.IsNullOrEmpty(publicKey);
+            var hasPrivateKey = !string.IsNullOrEmpty(privateKey);
+            if (!hasPublicKey && !hasPrivateKey)
+            {
+                // ArgumentNullException.ThrowIfNull(publicKey);
+                throw new ArgumentNullException(nameof(keys));
+            }
 
             RSA = RSA.Create();
 
-            if (!string.IsNullOrEmpty(privateKey))
-                RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey), out _);
-            else
-                RSA.ImportRSAPublicKey(Convert.FromBase64String(publicKey), out _);
+            if (hasPrivateKey)
+                RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey!), out _);
+            else if (hasPublicKey)
+                RSA.ImportRSAPublicKey(Convert.FromBase64String(publicKey!), out _);
         }
 
         /// <summary>
