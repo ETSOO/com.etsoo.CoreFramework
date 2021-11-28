@@ -9,7 +9,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser : UserToken, ICurrentUser
+    public record CurrentUser : ServiceUser, IServiceUser
     {
         /// <summary>
         /// Avatar claim type
@@ -18,16 +18,10 @@ namespace com.etsoo.CoreFramework.User
         public const string AvatarClaim = "avatar";
 
         /// <summary>
-        /// Organization claim type
-        /// 机构声明类型
+        /// Is Corporate
+        /// 是否为法人
         /// </summary>
-        public const string OrganizationClaim = "organization";
-
-        /// <summary>
-        /// Role value claim type
-        /// 角色值类型
-        /// </summary>
-        public const string RoleValueClaim = "rolevalue";
+        public const string CorporateClaim = "Corporate";
 
         /// <summary>
         /// Create user
@@ -38,51 +32,49 @@ namespace com.etsoo.CoreFramework.User
         /// <returns>User</returns>
         public static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
-            var token = UserToken.Create(claims);
-            if (token == null) return null;
+            var user = ServiceUser.Create(claims);
+            if (user == null) return null;
 
             // Claims
             var name = claims.FindFirstValue(ClaimTypes.Name);
             var avatar = claims.FindFirstValue(AvatarClaim);
-            var organization = claims.FindFirstValue(OrganizationClaim);
-            var language = claims.FindFirstValue(ClaimTypes.Locality);
-            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
 
             // Universal id
             var uidText = claims.FindFirstValue(ClaimTypes.Upn);
             Guid? uid = Guid.TryParse(uidText, out var uidExact) ? uidExact : null;
 
+            // Is corporate
+            var corporate = StringUtils.TryParse<bool>(claims.FindFirstValue(CorporateClaim)).GetValueOrDefault();
+
             // Validate
-            if (string.IsNullOrEmpty(name)
-                || string.IsNullOrEmpty(language))
+            if (string.IsNullOrEmpty(name))
                 return null;
 
             // New user
             return new CurrentUser(
-                token.Id,
-                organization,
-                name, roleValue,
-                token.ClientIp,
-                token.DeviceId,
-                new CultureInfo(language),
-                token.Region,
+                user.Id,
+                user.Organization,
+                name, user.RoleValue,
+                user.ClientIp,
+                user.DeviceId,
+                user.Language,
+                user.Region,
                 uid,
+                corporate,
                 connectionId)
             {
                 Avatar = avatar
             };
         }
 
-        private static (string? Organization, string? Name, short? Role, string? Avatar, int? deviceId, string? JsonData, Guid? Uid) GetData(StringKeyDictionaryObject data)
+        private static (string? Name, string? Avatar, string? JsonData, Guid? Uid, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
         {
             return (
-                data.Get("Organization"),
                 data.Get("Name"),
-                data.Get<short>("Role"),
                 data.Get("Avatar"),
-                data.Get<int>("DeviceId"),
                 data.Get("JsonData"),
-                data.Get<Guid>("Uid")
+                data.Get<Guid>("Uid"),
+                data.Get("Corporate", false)
             );
         }
 
@@ -99,8 +91,8 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var id = data.Get("Id");
-            var (organization, name, role, avatar, deviceId, jsonData, uid) = GetData(data);
+            var (id, organization, role, deviceId) = GetData(data);
+            var (name, avatar, jsonData, uid, corporate) = GetLocalData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
@@ -117,6 +109,7 @@ namespace com.etsoo.CoreFramework.User
                 language,
                 region,
                 uid,
+                corporate,
                 connectionId)
             {
                 Avatar = avatar,
@@ -125,28 +118,10 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
-        /// Organization id, support switch
-        /// 机构编号，可切换
-        /// </summary>
-        public string? Organization { get; private set; }
-
-        /// <summary>
         /// Name
         /// 姓名
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Role value
-        /// 角色值
-        /// </summary>
-        public virtual short RoleValue { get; private set; }
-
-        /// <summary>
-        /// Language
-        /// 语言
-        /// </summary>
-        public CultureInfo Language { get; }
 
         /// <summary>
         /// Connection id
@@ -173,6 +148,12 @@ namespace com.etsoo.CoreFramework.User
         public Guid? Uid { get; private set; }
 
         /// <summary>
+        /// Is Corporate
+        /// 是否为法人
+        /// </summary>
+        public bool Corporate { get; private set; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -185,26 +166,22 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         /// <param name="uid">Universal id</param>
+        /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, Guid? uid, string? connectionId)
-            :base(id, clientIp, region, deviceId)
+        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, Guid? uid = null, bool? corporate = null, string? connectionId = null)
+            : base(id, organization, roleValue, clientIp, deviceId, language, region)
         {
-            Organization = organization;
             Name = name;
-            RoleValue = roleValue;
-            Language = language;
             Uid = uid;
+            Corporate = corporate.GetValueOrDefault();
             ConnectionId = connectionId;
         }
 
         private IEnumerable<Claim> GetClaims()
         {
             yield return new(ClaimTypes.Name, Name);
-            yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(RoleValueClaim, RoleValue.ToString());
+            yield return new(CorporateClaim, Corporate.ToJson());
 
-            if (!string.IsNullOrEmpty(Organization))
-                yield return new(OrganizationClaim, Organization);
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
             if (!string.IsNullOrEmpty(JsonData))
@@ -229,28 +206,28 @@ namespace com.etsoo.CoreFramework.User
         /// 更新
         /// </summary>
         /// <param name="data">Data collection</param>
-        public virtual void Update(StringKeyDictionaryObject data)
+        public override void Update(StringKeyDictionaryObject data)
         {
+            base.Update(data);
+
             // Editable fields
-            var (organization, name, role, avatar, _, jsonData, uid) = GetData(data);
+            var (name, avatar, jsonData, uid, corporate) = GetLocalData(data);
 
             // Name
             if (name != null)
                 Name = name;
 
+            // Corporate
+            Corporate = corporate;
+
             // Avatar
             Avatar = avatar;
 
-            // Organization
-            Organization = organization;
+            // Uid
             Uid = uid;
 
             // Json data
             JsonData = jsonData;
-
-            // Role
-            if (role != null && RoleValue != role)
-                RoleValue = role.Value;
         }
     }
 }

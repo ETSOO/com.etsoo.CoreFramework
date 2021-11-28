@@ -25,7 +25,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected ICurrentUser? User { get; }
+        virtual protected IServiceUser? User { get; }
 
         /// <summary>
         /// Application
@@ -46,7 +46,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="app">Application</param>
         /// <param name="flag">Flag</param>
         /// <param name="user">Current user</param>
-        protected RepoBase(ICoreApplication<C> app, string flag, ICurrentUser? user = null) => (App, Flag, User) = (app, flag, user);
+        protected RepoBase(ICoreApplication<C> app, string flag, IServiceUser? user = null) => (App, Flag, User) = (app, flag, user);
 
         /// <summary>
         /// Create command, default parameters added

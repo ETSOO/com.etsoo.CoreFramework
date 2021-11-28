@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.Repositories
         public const string PublicRange = "public";
 
 
-        protected EntityRepo(ICoreApplication<C> app, string flag, ICurrentUser? user = null) : base(app, flag, user)
+        protected EntityRepo(ICoreApplication<C> app, string flag, IServiceUser? user = null) : base(app, flag, user)
         {
         }
 

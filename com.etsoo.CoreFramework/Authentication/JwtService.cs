@@ -238,7 +238,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="audience">Audience</param>
         /// <param name="keyId">Key id</param>
         /// <returns>Token</returns>
-        public string CreateAccessToken(ICurrentUser user, string? audience = null, string? keyId = null)
+        public string CreateAccessToken(IServiceUser user, string? audience = null, string? keyId = null)
         {
             return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes), keyId));
         }

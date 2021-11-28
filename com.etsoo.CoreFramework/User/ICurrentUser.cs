@@ -1,13 +1,10 @@
-﻿using com.etsoo.Utils.String;
-using System.Globalization;
-
-namespace com.etsoo.CoreFramework.User
+﻿namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    public interface ICurrentUser : IUserToken
+    public interface ICurrentUser : IServiceUser
     {
         /// <summary>
         /// Unique connection id
@@ -28,28 +25,10 @@ namespace com.etsoo.CoreFramework.User
         string? Avatar { get; }
 
         /// <summary>
-        /// Organization id, support switch
-        /// 机构编号，可切换
-        /// </summary>
-        string? Organization { get; }
-
-        /// <summary>
-        /// Role value
-        /// 角色值
-        /// </summary>
-        short RoleValue { get; }
-
-        /// <summary>
         /// Universal id
         /// 通用编号
         /// </summary>
         Guid? Uid { get; }
-
-        /// <summary>
-        /// Language
-        /// 语言
-        /// </summary>
-        CultureInfo Language { get; }
 
         /// <summary>
         /// Json data
@@ -58,10 +37,9 @@ namespace com.etsoo.CoreFramework.User
         string? JsonData { get; set; }
 
         /// <summary>
-        /// Update
-        /// 更新
+        /// Is Corporate
+        /// 是否为法人
         /// </summary>
-        /// <param name="data">Data collection</param>
-        void Update(StringKeyDictionaryObject data);
+        bool Corporate { get; }
     }
 }

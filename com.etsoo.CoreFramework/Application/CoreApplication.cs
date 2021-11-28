@@ -77,7 +77,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="user">Current user</param>
         /// <param name="parameters">Parameters</param>
-        public virtual void AddSystemParameters(ICurrentUser user, DynamicParameters parameters)
+        public virtual void AddSystemParameters(IServiceUser user, DynamicParameters parameters)
         {
             // Keep blank
         }

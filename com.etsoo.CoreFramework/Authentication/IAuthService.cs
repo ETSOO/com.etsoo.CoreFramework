@@ -39,7 +39,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="audience">Audience</param>
         /// <param name="keyId">Key id</param>
         /// <returns>Token</returns>
-        string CreateAccessToken(ICurrentUser user, string? audience = null, string? keyId = null);
+        string CreateAccessToken(IServiceUser user, string? audience = null, string? keyId = null);
 
         /// <summary>
         /// Create refresh token
