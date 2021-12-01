@@ -9,7 +9,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser : ServiceUser, IServiceUser
+    public record CurrentUser : ServiceUser, ICurrentUser
     {
         /// <summary>
         /// Avatar claim type
@@ -18,10 +18,16 @@ namespace com.etsoo.CoreFramework.User
         public const string AvatarClaim = "avatar";
 
         /// <summary>
-        /// Is Corporate
-        /// 是否为法人
+        /// Is Corporate claim type
+        /// 是否为法人申明类型
         /// </summary>
         public const string CorporateClaim = "Corporate";
+
+        /// <summary>
+        /// Organization name claim type
+        /// 机构名称申明类型
+        /// </summary>
+        public const string OrganizationNameClaim = "OrgName";
 
         /// <summary>
         /// Create user
@@ -37,6 +43,7 @@ namespace com.etsoo.CoreFramework.User
 
             // Claims
             var name = claims.FindFirstValue(ClaimTypes.Name);
+            var orgName = claims.FindFirstValue(OrganizationNameClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
 
             // Universal id
@@ -63,14 +70,16 @@ namespace com.etsoo.CoreFramework.User
                 corporate,
                 connectionId)
             {
-                Avatar = avatar
+                Avatar = avatar,
+                OrganizationName = orgName
             };
         }
 
-        private static (string? Name, string? Avatar, string? JsonData, Guid? Uid, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
+        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, Guid? Uid, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Name"),
+                data.Get("OrgName"),
                 data.Get("Avatar"),
                 data.Get("JsonData"),
                 data.Get<Guid>("Uid"),
@@ -92,7 +101,7 @@ namespace com.etsoo.CoreFramework.User
         {
             // Get data
             var (id, organization, role, deviceId) = GetData(data);
-            var (name, avatar, jsonData, uid, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, uid, corporate) = GetLocalData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
@@ -113,6 +122,7 @@ namespace com.etsoo.CoreFramework.User
                 connectionId)
             {
                 Avatar = avatar,
+                OrganizationName = orgName,
                 JsonData = jsonData
             };
         }
@@ -122,6 +132,12 @@ namespace com.etsoo.CoreFramework.User
         /// 姓名
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Organization name
+        /// 机构名称
+        /// </summary>
+        public string? OrganizationName { get; set; }
 
         /// <summary>
         /// Connection id
@@ -182,6 +198,9 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Name, Name);
             yield return new(CorporateClaim, Corporate.ToJson());
 
+            if(!string.IsNullOrEmpty(OrganizationName))
+                yield return new(OrganizationNameClaim, OrganizationName);
+
             if (Avatar != null)
                 yield return new(AvatarClaim, Avatar);
             if (!string.IsNullOrEmpty(JsonData))
@@ -211,11 +230,13 @@ namespace com.etsoo.CoreFramework.User
             base.Update(data);
 
             // Editable fields
-            var (name, avatar, jsonData, uid, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, uid, corporate) = GetLocalData(data);
 
             // Name
             if (name != null)
                 Name = name;
+
+            OrganizationName = orgName;
 
             // Corporate
             Corporate = corporate;

@@ -19,6 +19,12 @@
         string Name { get; }
 
         /// <summary>
+        /// Organization name
+        /// 机构名称
+        /// </summary>
+        string? OrganizationName { get; }
+
+        /// <summary>
         /// Avatar
         /// 头像
         /// </summary>
