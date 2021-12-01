@@ -72,12 +72,10 @@ namespace com.etsoo.CoreFramework.Authentication
         /// Validate token
         /// 验证令牌
         /// </summary>
-        /// <param name="claims">Claims</param>
-        /// <param name="expired">Expired or not</param>
-        /// <param name="kid">Key id</param>
-        /// <param name="securityToken">Security token</param>
+        /// <param name="token">Token</param>
+        /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token);
+        (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token, string? audience = null);
 
         /// <summary>
         /// Verify data

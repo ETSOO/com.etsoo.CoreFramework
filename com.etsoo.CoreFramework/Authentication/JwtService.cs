@@ -289,14 +289,13 @@ namespace com.etsoo.CoreFramework.Authentication
         /// Validate token
         /// 验证令牌
         /// </summary>
-        /// <param name="claims">Claims</param>
-        /// <param name="expired">Expired or not</param>
-        /// <param name="securityToken">Security token</param>
+        /// <param name="token">Token</param>
+        /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        public (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token)
+        public (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
         {
             var handler = new JwtSecurityTokenHandler();
-            var claims = handler.ValidateToken(token, CreateValidationParameters(false, GetRefreshTokenAudience()), out var validatedToken);
+            var claims = handler.ValidateToken(token, CreateValidationParameters(false, audience ?? GetRefreshTokenAudience()), out var validatedToken);
 
             var securityToken = validatedToken as JwtSecurityToken;
             var expired = (validatedToken.ValidTo < DateTime.UtcNow);
