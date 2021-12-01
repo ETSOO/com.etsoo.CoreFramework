@@ -162,6 +162,9 @@
   <data name="InvalidMobile" xml:space="preserve">
     <value>不是有效的手机号码</value>
   </data>
+  <data name="IPAddressChanged" xml:space="preserve">
+    <value>IP地址已更改</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入机构</value>
   </data>

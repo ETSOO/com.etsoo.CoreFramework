@@ -196,6 +196,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IP address has been changed.
+        /// </summary>
+        public static string IPAddressChanged {
+            get {
+                return ResourceManager.GetString("IPAddressChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Join Organization Required.
         /// </summary>
         public static string JoinOrgRequired {

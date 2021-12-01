@@ -117,6 +117,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError InvalidMobile => new(nameof(InvalidMobile), Resources.InvalidMobile);
 
         /// <summary>
+        /// IP address has been changed
+        /// IP地址已更改
+        /// </summary>
+        public static ApplicationError IPAddressChanged => new(nameof(IPAddressChanged), Resources.IPAddressChanged);
+
+        /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>
@@ -248,6 +254,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(InvalidAction) => InvalidAction,
                 nameof(InvalidEmail) => InvalidEmail,
                 nameof(InvalidMobile) => InvalidMobile,
+                nameof(IPAddressChanged) => IPAddressChanged,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,
