@@ -31,12 +31,6 @@
         string? Avatar { get; }
 
         /// <summary>
-        /// Universal id
-        /// 通用编号
-        /// </summary>
-        Guid? Uid { get; }
-
-        /// <summary>
         /// Json data
         /// Json数据
         /// </summary>

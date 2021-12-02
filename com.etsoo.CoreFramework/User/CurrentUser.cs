@@ -46,10 +46,6 @@ namespace com.etsoo.CoreFramework.User
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
 
-            // Universal id
-            var uidText = claims.FindFirstValue(ClaimTypes.Upn);
-            Guid? uid = Guid.TryParse(uidText, out var uidExact) ? uidExact : null;
-
             // Is corporate
             var corporate = StringUtils.TryParse<bool>(claims.FindFirstValue(CorporateClaim)).GetValueOrDefault();
 
@@ -66,7 +62,6 @@ namespace com.etsoo.CoreFramework.User
                 user.DeviceId,
                 user.Language,
                 user.Region,
-                uid,
                 corporate,
                 connectionId)
             {
@@ -75,14 +70,13 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, Guid? Uid, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
+        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Name"),
                 data.Get("OrgName"),
                 data.Get("Avatar"),
                 data.Get("JsonData"),
-                data.Get<Guid>("Uid"),
                 data.Get("Corporate", false)
             );
         }
@@ -101,7 +95,7 @@ namespace com.etsoo.CoreFramework.User
         {
             // Get data
             var (id, organization, role, deviceId) = GetData(data);
-            var (name, orgName, avatar, jsonData, uid, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, corporate) = GetLocalData(data);
 
             // Validation
             if (id == null || string.IsNullOrEmpty(name))
@@ -117,7 +111,6 @@ namespace com.etsoo.CoreFramework.User
                 deviceId.GetValueOrDefault(),
                 language,
                 region,
-                uid,
                 corporate,
                 connectionId)
             {
@@ -158,12 +151,6 @@ namespace com.etsoo.CoreFramework.User
         public string? JsonData { get; set; }
 
         /// <summary>
-        /// Universal id
-        /// 全局编号
-        /// </summary>
-        public Guid? Uid { get; private set; }
-
-        /// <summary>
         /// Is Corporate
         /// 是否为法人
         /// </summary>
@@ -181,14 +168,12 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
-        /// <param name="uid">Universal id</param>
         /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, Guid? uid = null, bool? corporate = null, string? connectionId = null)
+        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
             : base(id, organization, roleValue, clientIp, deviceId, language, region)
         {
             Name = name;
-            Uid = uid;
             Corporate = corporate.GetValueOrDefault();
             ConnectionId = connectionId;
         }
@@ -205,8 +190,6 @@ namespace com.etsoo.CoreFramework.User
                 yield return new(AvatarClaim, Avatar);
             if (!string.IsNullOrEmpty(JsonData))
                 yield return new(ClaimTypes.UserData, JsonData);
-            if (Uid != null)
-                yield return new(ClaimTypes.Upn, Uid.Value.ToString());
         }
 
         /// <summary>
@@ -230,7 +213,7 @@ namespace com.etsoo.CoreFramework.User
             base.Update(data);
 
             // Editable fields
-            var (name, orgName, avatar, jsonData, uid, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, corporate) = GetLocalData(data);
 
             // Name
             if (name != null)
@@ -243,9 +226,6 @@ namespace com.etsoo.CoreFramework.User
 
             // Avatar
             Avatar = avatar;
-
-            // Uid
-            Uid = uid;
 
             // Json data
             JsonData = jsonData;
