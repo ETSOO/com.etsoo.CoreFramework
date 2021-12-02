@@ -436,6 +436,29 @@ namespace com.etsoo.SourceGenerators
         }
 
         /// <summary>
+        /// Get type reference name
+        /// 获取类型引用名称
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <param name="nullable">Nullable or not</param>
+        /// <param name="ns">Namespace</param>
+        /// <returns>Name</returns>
+        public static string GetTypeName(this ITypeSymbol typeSymbol, bool nullable, string ns)
+        {
+            var containingNS = typeSymbol.ContainingNamespace;
+            if (containingNS != null)
+            {
+                var typeNS = containingNS.ToDisplayString();
+                if (typeNS != null && !typeNS.Equals("System") && !typeNS.StartsWith("System.") && !typeNS.Equals(ns))
+                {
+                    return typeSymbol.OriginalDefinition.ToDisplayString();
+                }
+            }
+
+            return typeSymbol.Name + (nullable ? "?" : string.Empty);
+        }
+
+        /// <summary>
         /// Is Enum type
         /// 是否为枚举类型
         /// </summary>

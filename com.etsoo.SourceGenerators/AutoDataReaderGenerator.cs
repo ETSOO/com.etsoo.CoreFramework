@@ -15,7 +15,7 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class AutoDataReaderGenerator : ISourceGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime, List<string> externalInheritances)
+        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime, List<string> externalInheritances, string ns)
         {
             var body = new List<string>();
 
@@ -33,7 +33,7 @@ namespace com.etsoo.SourceGenerators
                     var fieldName = symbol.Name;
 
                     // Field type name
-                    string typeName = typeSymbol.Name + (nullable ? "?" : string.Empty);
+                    var typeName = typeSymbol.GetTypeName(nullable, ns);
 
                     // ArrayProperty attribute data
                     var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
@@ -148,7 +148,7 @@ namespace com.etsoo.SourceGenerators
             var externals = new List<string>();
 
             // Body
-            var body = GenerateBody(context, tds, utcDateTime.GetValueOrDefault(), externals);
+            var body = GenerateBody(context, tds, utcDateTime.GetValueOrDefault(), externals, ns);
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 

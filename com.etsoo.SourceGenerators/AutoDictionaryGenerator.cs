@@ -15,7 +15,7 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class AutoDictionaryGenerator : ISourceGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool snakeCase, List<string> externalInheritances)
+        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool snakeCase, List<string> externalInheritances, string ns)
         {
             var body = new List<string>();
 
@@ -36,7 +36,7 @@ namespace com.etsoo.SourceGenerators
                     var dataFieldName = snakeCase ? fieldName.ToSnakeCase() : fieldName;
 
                     // Field type name
-                    var typeName = typeSymbol.Name + (nullable ? "?" : string.Empty);
+                    var typeName = typeSymbol.GetTypeName(nullable, ns);
 
                     // ArrayProperty attribute data
                     var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
@@ -147,7 +147,7 @@ namespace com.etsoo.SourceGenerators
             var externals = new List<string>();
 
             // Body
-            var body = GenerateBody(context, tds, snakeCase.GetValueOrDefault(), externals);
+            var body = GenerateBody(context, tds, snakeCase.GetValueOrDefault(), externals, ns);
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
