@@ -85,6 +85,9 @@ namespace com.etsoo.CoreFramework.Authentication
                 validAudience = defaultAudience;
             }
 
+            // Whether validate audience
+            var validateAudience = section.GetValue<bool?>("ValidateAudience");
+
             // Hash algorithms
             securityAlgorithms = section.GetValue("SecurityAlgorithms", SecurityAlgorithms.RsaSha512Signature);
 
@@ -140,6 +143,8 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // Token validation parameters
                 options.TokenValidationParameters = CreateValidationParameters();
+                if (validateAudience != null)
+                    options.TokenValidationParameters.ValidateAudience = validateAudience.Value;
             });
         }
 
