@@ -114,12 +114,12 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
-        /// Init call
-        /// 初始化调用
+        /// Async init call
+        /// 异步初始化调用
         /// </summary>
         /// <param name="rq">Request data</param>
         /// <returns>Result</returns>
-        protected async Task<ActionResult> InitCall(InitCallRQ rq)
+        public async Task<ActionResult> InitCallAsync(InitCallRQ rq)
         {
             var clientDT = LocalizationUtils.JsMilisecondsToUTC(rq.Timestamp);
             var ts = DateTime.Now - clientDT;
