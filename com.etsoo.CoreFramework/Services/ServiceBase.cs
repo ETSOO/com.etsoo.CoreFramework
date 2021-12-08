@@ -122,7 +122,7 @@ namespace com.etsoo.CoreFramework.Services
         public async Task<ActionResult> InitCallAsync(InitCallRQ rq)
         {
             var clientDT = LocalizationUtils.JsMilisecondsToUTC(rq.Timestamp);
-            var ts = DateTime.Now - clientDT;
+            var ts = DateTime.UtcNow - clientDT;
             var validSeconds = DurationSeconds / 2;
             var seconds = Math.Abs(ts.TotalSeconds);
             if (seconds > validSeconds)
