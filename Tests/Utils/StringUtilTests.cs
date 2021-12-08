@@ -311,5 +311,14 @@ namespace Tests.Utils
             Assert.AreEqual(id, 5);
             Assert.AreEqual(guid, Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"));
         }
+
+        [Test]
+        public void NumberToCharsAndCharsToNumberTests()
+        {
+            var num = 1638777042242;
+            var chars = StringUtils.NumberToChars(num);
+            Assert.AreEqual("QmpkdVgv", chars);
+            Assert.AreEqual(num, StringUtils.CharsToNumber(chars));
+        }
     }
 }

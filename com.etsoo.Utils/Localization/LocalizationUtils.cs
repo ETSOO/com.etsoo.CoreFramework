@@ -5,6 +5,8 @@ namespace com.etsoo.Utils.Localization
 {
     public static class LocalizationUtils
     {
+        private static DateTime JsBaseDateTime => new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         /// <summary>
         /// Set culture
         /// 设置文化
@@ -64,6 +66,28 @@ namespace com.etsoo.Utils.Localization
             }
 
             return TimeZoneInfo.Local;
+        }
+
+        /// <summary>
+        /// JS date miliseconds to C# DateTime UTC
+        /// JS 日期毫秒到 C# DateTime UTC
+        /// </summary>
+        /// <param name="miliseconds">Miliseconds</param>
+        /// <returns>DateTime UTC</returns>
+        public static DateTime JsMilisecondsToUTC(long miliseconds)
+        {
+            return JsBaseDateTime.AddMilliseconds(miliseconds);
+        }
+
+        /// <summary>
+        /// DateTime UTC to JS date miliseconds
+        /// C# DateTime UTC 到JS 日期毫秒
+        /// </summary>
+        /// <param name="dt">UTC DateTime</param>
+        /// <returns>Miliseconds</returns>
+        public static long UTCToJsMiliseconds(DateTime? dt = null)
+        {
+            return (long)(dt.GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalMilliseconds;
         }
 
         /// <summary>

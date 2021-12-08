@@ -13,37 +13,50 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public static class CryptographyUtils
     {
-        private static (byte[], byte[]) AESManagedCreate(string passPhrase)
+        /// <summary>
+        /// AES (CBC) 256-bit symmetric decryption
+        /// AES (CBC) 256位对称解密
+        /// https://thehftguy.com/2020/04/20/what-aes-ciphers-to-use-between-cbc-gcm-ccm-chacha-poly/
+        /// https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb
+        /// </summary>
+        /// <param name="cipherText">Iterations + salt(Hex) + iv(Hex) + cipher(Base64)</param>
+        /// <param name="passphrase">Passphrase</param>
+        /// <returns>Result</returns>
+        public static byte[]? AESDecrypt(string cipherText, string passphrase)
         {
-            // Random byte
-            // 随机字节
-            var randByte = (byte)(passPhrase.Length % 128);
+            if (!int.TryParse(cipherText[..2], out var iterations) || cipherText.Length <= 66)
+            {
+                return null;
+            }
 
-            // Hash the user password along with the salt
-            // 由密匙创建加密的键，而不要直接使用密匙
-            // https://stackoverflow.com/questions/2659214/why-do-i-need-to-use-the-rfc2898derivebytes-class-in-net-instead-of-directly
-            using var password = new Rfc2898DeriveBytes(Encoding.UTF8.GetBytes(passPhrase), new byte[] { 0, 1, 2, randByte, 4, 5, 6, 7 }, 10000);
+            var salt = cipherText[2..34];
+            var iv = cipherText[34..66];
+            var encrypted = cipherText[66..];
+            var key = PBKDF2(Encoding.UTF8.GetBytes(passphrase), Convert.FromHexString(salt), 32, iterations * 1000);
 
-            // Key: 32 x 8 = 256 bits
-            // IV: 16 x 8 = 128 bits
-            return (password.GetBytes(32), password.GetBytes(16));
+            using var aes = Aes.Create();
+            aes.Key = key;
+            return aes.DecryptCbc(Convert.FromBase64String(encrypted), Convert.FromHexString(iv), PaddingMode.PKCS7);
         }
 
         /// <summary>
-        /// AES (CBC) 256-bit symmetric decryption
-        /// https://thehftguy.com/2020/04/20/what-aes-ciphers-to-use-between-cbc-gcm-ccm-chacha-poly/
-        /// https://stackoverflow.com/questions/1220751/how-to-choose-an-aes-encryption-mode-cbc-ecb-ctr-ocb-cfb
-        /// AES 256位对称解密
+        /// PBKDF2 key derivation
+        /// PBKDF2 密钥派生
         /// </summary>
-        /// <param name="cipherTextBytes">Cipher text bytes</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted bytes</returns>
-        public static byte[] AESDecrypt(byte[] cipherTextBytes, string passPhrase)
+        /// <param name="passphrase"></param>
+        /// <param name="salt"></param>
+        /// <param name="bytes"></param>
+        /// <param name="iterations"></param>
+        /// <returns></returns>
+        public static byte[] PBKDF2(byte[] passphrase, byte[] salt, int bytes = 32, int iterations = 10000)
         {
-            using var aes = Aes.Create();
-            var (key, iv) = AESManagedCreate(passPhrase);
-            aes.Key = key;
-            return aes.DecryptCbc(cipherTextBytes, iv);
+            // Hash the user password along with the salt
+            // 由密匙创建加密的键，而不要直接使用密匙
+            // https://stackoverflow.com/questions/2659214/why-do-i-need-to-use-the-rfc2898derivebytes-class-in-net-instead-of-directly
+            using var password = new Rfc2898DeriveBytes(passphrase, salt, iterations, HashAlgorithmName.SHA256);
+
+            // Key: 32 x 8 = 256 bits
+            return password.GetBytes(bytes);
         }
 
         /// <summary>
@@ -51,14 +64,24 @@ namespace com.etsoo.Utils.Crypto
         /// AES 256位对称加密
         /// </summary>
         /// <param name="plainText">Plain text</param>
-        /// <param name="passPhrase">Password phrase</param>
-        /// <returns>Encrypted bytes</returns>
-        public static byte[] AESEncrypt(string plainText, string passPhrase)
+        /// <param name="passphrase">Passphrase</param>
+        /// <param name="iterations">Iterations for key calculation</param>
+        /// <returns>Encrypted string, Iterations + salt(Hex) + iv(Hex) + cipher(Base64)</returns>
+        public static string AESEncrypt(string plainText, string passphrase, int iterations = 10)
         {
+            var salt = CreateRandBytes(16).ToArray();
+            var iv = CreateRandBytes(16);
+            var key = PBKDF2(Encoding.UTF8.GetBytes(passphrase), salt, 32, iterations * 1000);
+
             using var aes = Aes.Create();
-            var (key, iv) = AESManagedCreate(passPhrase);
             aes.Key = key;
-            return aes.EncryptCbc(Encoding.UTF8.GetBytes(plainText), iv);
+
+            var sb = new StringBuilder();
+            sb.Append(iterations.ToString().PadLeft(2, '0'));
+            sb.Append(Convert.ToHexString(salt));
+            sb.Append(Convert.ToHexString(iv));
+            sb.Append(Convert.ToBase64String(aes.EncryptCbc(Encoding.UTF8.GetBytes(plainText), iv)));
+            return sb.ToString();
         }
 
         /// <summary>

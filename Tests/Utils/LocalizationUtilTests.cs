@@ -46,5 +46,17 @@ namespace Tests.Utils
             tz = LocalizationUtils.GetTimeZone("China Time");
             Assert.AreEqual(TimeZoneInfo.Local, tz);
         }
+
+        [Test]
+        public void JsMilisecondsToUTCTests()
+        {
+            // Arrange & Act
+            // 2021/12/6 19:35:52 UTC, 2021/12/7 8:35:52 NZ time
+            var result = LocalizationUtils.JsMilisecondsToUTC(1638819352807);
+
+            // Assert
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
+            Assert.AreEqual(6, result.Day);
+        }
     }
 }

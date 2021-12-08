@@ -18,7 +18,7 @@ namespace Tests.Utils
         public CryptographyUtilTests()
         {
             data = "Hello, world!";
-            password = "test";
+            password = "My password";
         }
 
         /// <summary>
@@ -29,33 +29,37 @@ namespace Tests.Utils
         public void AESBase64_EncryptAndDecrypt_Test()
         {
             // Arrange
-            var bytes = CryptographyUtils.AESEncrypt(data, password);
-            var result = Convert.ToBase64String(bytes);
+            var result = CryptographyUtils.AESEncrypt(data, password);
 
             // Act
-            var decryptedData = CryptographyUtils.AESDecrypt(Convert.FromBase64String(result), password);
-            var decriptedString = Encoding.UTF8.GetString(decryptedData);
+            var decryptedData = CryptographyUtils.AESDecrypt(result, password);
+            var decriptedString = Encoding.UTF8.GetString(decryptedData!);
 
             // Assert
             Assert.AreEqual(data, decriptedString);
         }
 
         /// <summary>
-        /// AES hexadecimal encryption and decryption test
+        /// CryptoJs AES testing
+        /// https://cryptojs.gitbook.io/docs/
         /// </summary>
-        /// <returns></returns>
         [Test]
-        public void AESHex_EncryptAndDecrypt_Test()
+        public void CryptoJsAESBase64_EncryptAndDecrypt_Test()
         {
-            // Arrange
-            var result = Convert.ToHexString(CryptographyUtils.AESEncrypt(data, password));
+            // Salt: baf491fb6fd3208eb7dff8824af0f35e
+            var encrypted = "DigePVkv+01baf491fb6fd3208eb7dff8824af0f35ea61f66e2311be8b8413cf701c6a400d2DXtJlfFvecYlyNuZk5ksAA==";
+
+            var pos = encrypted.IndexOf('+');
+            var timestamp = encrypted[..pos];
+            var passphrase = password + timestamp;
+            passphrase += passphrase.Length;
+            var source = encrypted[(pos + 1)..];
 
             // Act
-            var decryptedData = CryptographyUtils.AESDecrypt(Convert.FromHexString(result), password);
-            var decriptedString = Encoding.UTF8.GetString(decryptedData);
+            var actual = Encoding.UTF8.GetString(CryptographyUtils.AESDecrypt(source, passphrase)!);
 
             // Assert
-            Assert.AreEqual(data, decriptedString);
+            Assert.AreEqual(data, actual);
         }
 
         /// <summary>
@@ -79,9 +83,10 @@ namespace Tests.Utils
         {
             // Arrange & act
             var result = await CryptographyUtils.HMACSHA512Async(data, password);
+            var base64 = Convert.ToBase64String(result);
 
             // Assert
-            Assert.AreEqual("DAggap48D+1sf4KP+SrgbWlx4mfP9zeAF//ntpqtGINAed6WKFq4KaVI8KySGF0ER4UvL6QV97uZQRLJ5ga7xw==", Convert.ToBase64String(result));
+            Assert.AreEqual("5mzh5YCWP2t2nE2dX38A9gDYApo+GHJIxG3TdqcU9dnPwd65+02igo2x4YLY4FYYJou+wNPihiaDiYSMa4eUmw==", base64);
         }
 
         /// <summary>
@@ -92,9 +97,10 @@ namespace Tests.Utils
         {
             // Arrange & act
             var result = await CryptographyUtils.HMACSHA512Async(data, password);
+            var hex = Convert.ToHexString(result);
 
             // Assert
-            Assert.AreEqual("0c08206a9e3c0fed6c7f828ff92ae06d6971e267cff7378017ffe7b69aad18834079de96285ab829a548f0ac92185d0447852f2fa415f7bb994112c9e606bbc7".ToUpper(), Convert.ToHexString(result));
+            Assert.AreEqual("E66CE1E580963F6B769C4D9D5F7F00F600D8029A3E187248C46DD376A714F5D9CFC1DEB9FB4DA2828DB1E182D8E05618268BBEC0D3E286268389848C6B87949B".ToUpper(), hex);
         }
 
         /// <summary>

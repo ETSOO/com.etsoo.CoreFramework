@@ -146,6 +146,35 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Base64 chars to number
+        /// Base64字符转换为数字
+        /// </summary>
+        /// <param name="base64Chars">Base64 chars</param>
+        /// <returns>Result</returns>
+        public static long CharsToNumber(string base64Chars)
+        {
+            return Convert.FromBase64String(base64Chars).Select((item, index) => item * (long)Math.Pow(128, index)).Sum();
+        }
+
+        /// <summary>
+        /// Number to base64 chars
+        /// 数字转换为Base64字符
+        /// </summary>
+        /// <param name="input">Input number</param>
+        /// <returns>Result</returns>
+        public static string NumberToChars(long input)
+        {
+            var bytes = new List<byte>();
+            while (input > 0)
+            {
+                var code = input % 128;
+                bytes.Add((byte)code);
+                input = (input - code) / 128;
+            }
+            return Convert.ToBase64String(bytes.ToArray());
+        }
+
+        /// <summary>
         /// Transform Pascal name to Linux style (Snake) name, like "HelloWorld" to "hello_world"
         /// Previous version: return Regex.Replace(name, "([A-Z])", m => "_" + char.ToLower(m.Value[0]), RegexOptions.Compiled).TrimStart('_');
         /// 把Pascal命名的字符串改成Linux风格，如 HelloWorld 改成 hello_world

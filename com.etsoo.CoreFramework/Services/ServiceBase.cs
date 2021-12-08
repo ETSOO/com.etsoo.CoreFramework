@@ -1,9 +1,14 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.Database;
+using com.etsoo.Utils.Localization;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
+using System.Text;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -15,6 +20,9 @@ namespace com.etsoo.CoreFramework.Services
         where C : DbConnection
         where R : IRepoBase
     {
+        // Duration seconds for time span of the server side and browser/client side
+        private const int DurationSeconds = 120;
+
         /// <summary>
         /// Application
         /// 程序对象
@@ -34,6 +42,12 @@ namespace com.etsoo.CoreFramework.Services
         protected R Repo { get; }
 
         /// <summary>
+        /// Secret passphrase
+        /// 安全密码
+        /// </summary>
+        protected string? Passphrase { get; set; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -45,6 +59,84 @@ namespace com.etsoo.CoreFramework.Services
             App = app;
             Repo = repo;
             Logger = logger;
+        }
+
+        /// <summary>
+        /// Decrypt message
+        /// 解密信息
+        /// </summary>
+        /// <param name="encyptedMessage">Encrypted message</param>
+        /// <param name="passphrase">Secret passphrase</param>
+        /// <returns>Result</returns>
+        protected virtual string? Decrypt(string encyptedMessage, string passphrase)
+        {
+            var pos = encyptedMessage.IndexOf('+');
+            if (pos == -1) return null;
+
+            var miliseconds = encyptedMessage[..pos];
+            var num = StringUtils.CharsToNumber(miliseconds);
+            var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(num);
+            if (Math.Abs(ts.TotalSeconds) > DurationSeconds) return null;
+
+            var message = encyptedMessage[(pos + 1)..];
+
+            var bytes = CryptographyUtils.AESDecrypt(message, EncryptionEnhance(passphrase, miliseconds));
+            if (bytes == null) return null;
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        /// <summary>
+        /// Encrypt message
+        /// 加密信息
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="passphrase">Secret passphrase</param>
+        /// <returns>Result</returns>
+        protected virtual string Encrypt(string message, string passphrase)
+        {
+            var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
+            var timeStamp = StringUtils.NumberToChars(miliseconds);
+            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp));
+        }
+
+        /// <summary>
+        /// Enchance secret passphrase
+        /// 加强安全密码
+        /// </summary>
+        /// <param name="passphrase">Passphrase</param>
+        /// <param name="timeStamp">timeStamp</param>
+        /// <returns>Result</returns>
+        protected virtual string EncryptionEnhance(string passphrase, string timeStamp)
+        {
+            passphrase += timeStamp;
+            passphrase += passphrase.Length.ToString();
+            return passphrase + (Passphrase ?? string.Empty);
+        }
+
+        /// <summary>
+        /// Init call
+        /// 初始化调用
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        protected async Task<ActionResult> InitCall(InitCallRQ rq)
+        {
+            var clientDT = LocalizationUtils.JsMilisecondsToUTC(rq.Timestamp);
+            var ts = DateTime.Now - clientDT;
+            var validSeconds = DurationSeconds / 2;
+            var seconds = Math.Abs(ts.TotalSeconds);
+            if (seconds > validSeconds)
+            {
+                var failure = new ActionResult { Title = "timeDifferenceInvalid" };
+                failure.Data.Add("Seconds", seconds);
+                failure.Data.Add("ValidSeconds", validSeconds);
+                return failure;
+            }
+
+            var result = ActionResult.Success;
+            result.Data.Add("Passphrase", await App.HashPasswordAsync(App.Configuration.Name));
+
+            return result;
         }
 
         /// <summary>
