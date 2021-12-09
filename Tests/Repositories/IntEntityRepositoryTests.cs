@@ -10,41 +10,41 @@ using NUnit.Framework;
 namespace Tests.Repositories
 {
     /// <summary>
+    /// Int id entity repository
+    /// </summary>
+    internal class IntEntityRepository : EntityRepo<SqlConnection, int>
+    {
+        public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag, null) { }
+
+        /// <summary>
+        /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
+        /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
+        /// </summary>
+        /// <param name="part1">Part 1</param>
+        /// <param name="part2">Part 2</param>
+        /// <returns>Command name</returns>
+        public new string GetCommandName(params string[] parts)
+        {
+            return base.GetCommandName(parts);
+        }
+
+        public override void AddSystemParameters(DynamicParameters parameters)
+        {
+            // No additional parameters will be passed
+        }
+    }
+
+    /// <summary>
     /// Int id entity repository tests
     /// </summary>
     [TestFixture]
     public class IntEntityRepositoryTests
     {
-        /// <summary>
-        /// Int id entity repository
-        /// </summary>
-        private class IntEntityRepository : EntityRepo<SqlConnection, int>
-        {
-            public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag, null) { }
-
-            /// <summary>
-            /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
-            /// 获取命令名称，附加程序编号和实体标识，一般是存储过程名称，需要防止注入攻击
-            /// </summary>
-            /// <param name="part1">Part 1</param>
-            /// <param name="part2">Part 2</param>
-            /// <returns>Command name</returns>
-            public new string GetCommandName(params string[] parts)
-            {
-                return base.GetCommandName(parts);
-            }
-
-            public override void AddSystemParameters(DynamicParameters parameters)
-            {
-                // No additional parameters will be passed
-            }
-        }
-
         readonly IntEntityRepository repo;
 
         public IntEntityRepositoryTests()
         {
-            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
+            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true", true);
 
             var config = new AppConfiguration("test");
             var app = new CoreApplication<SqlConnection>(config, db);

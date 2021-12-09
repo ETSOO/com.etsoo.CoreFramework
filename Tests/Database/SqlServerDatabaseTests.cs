@@ -16,7 +16,7 @@ namespace Tests.Utils
         {
             // Arrange
             // Create the dabase
-            db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false", true);
+            db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true", true);
         }
 
         /// <summary>

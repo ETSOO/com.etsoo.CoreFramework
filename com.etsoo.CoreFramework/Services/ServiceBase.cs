@@ -118,9 +118,11 @@ namespace com.etsoo.CoreFramework.Services
         /// 异步初始化调用
         /// </summary>
         /// <param name="rq">Request data</param>
+        /// <param name="secret">Encryption secret</param>
         /// <returns>Result</returns>
-        public async Task<ActionResult> InitCallAsync(InitCallRQ rq)
+        public async ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret)
         {
+            // Check timestamp
             var clientDT = LocalizationUtils.JsMilisecondsToUTC(rq.Timestamp);
             var ts = DateTime.UtcNow - clientDT;
             var validSeconds = DurationSeconds / 2;
@@ -133,10 +135,34 @@ namespace com.etsoo.CoreFramework.Services
                 return failure;
             }
 
-            var result = ActionResult.Success;
-            result.Data.Add("Passphrase", await App.HashPasswordAsync(App.Configuration.Name));
+            return await Task.Run(() =>
+            {
+                var result = ActionResult.Success;
 
-            return result;
+                // Check device id for encrypted passphrase
+                // secret for decryption
+                // Timestamp for client side decryption
+                if (!string.IsNullOrEmpty(rq.DeviceId))
+                {
+                    try
+                    {
+                        var previousPassphrase = CryptographyUtils.AESDecrypt(rq.DeviceId, secret);
+                        if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
+                        result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(Convert.ToBase64String(previousPassphrase), rq.Timestamp.ToString(), 1));
+                    }
+                    catch (Exception ex)
+                    {
+                        return LogException(ex);
+                    }
+                }
+
+                var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
+                var newDeviceId = CryptographyUtils.AESEncrypt(randomChars, secret);
+                result.Data.Add("DeviceId", newDeviceId);
+                result.Data.Add("Passphrase", CryptographyUtils.AESEncrypt(randomChars, rq.Timestamp.ToString(), 1));
+
+                return result;
+            });
         }
 
         /// <summary>

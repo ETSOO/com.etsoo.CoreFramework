@@ -1,7 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.CoreFramework.User;
-using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
