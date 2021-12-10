@@ -37,7 +37,7 @@ namespace Tests.Services
         public async Task InitCallTests()
         {
             // Arrange
-            var rq = new InitCallRQ { Timestamp = LocalizationUtils.UTCToJsMiliseconds(), DeviceId="107EF9F0A24AC89D816C46FF92DF80D6DDC2E2F3591AFA8BD6476DA8BFB7AFD3A1EZO3tgoSc5vx1gD4KebC0B8v4vwb64Lgg7Y5JYBd+qbT+6mZj2F/C+2c4iqJQtg0" };
+            var rq = new InitCallRQ { Timestamp = LocalizationUtils.UTCToJsMiliseconds() };
             var result = await service.InitCallAsync(rq, "My Password");
             Assert.IsTrue(result.Ok);
         }

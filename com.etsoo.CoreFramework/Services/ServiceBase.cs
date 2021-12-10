@@ -82,6 +82,7 @@ namespace com.etsoo.CoreFramework.Services
 
             var bytes = CryptographyUtils.AESDecrypt(message, EncryptionEnhance(passphrase, miliseconds));
             if (bytes == null) return null;
+
             return Encoding.UTF8.GetString(bytes);
         }
 
@@ -91,12 +92,13 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="passphrase">Secret passphrase</param>
+        /// <param name="iterations">Iterations</param>
         /// <returns>Result</returns>
-        protected virtual string Encrypt(string message, string passphrase)
+        protected virtual string Encrypt(string message, string passphrase, int iterations = 10)
         {
             var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
             var timeStamp = StringUtils.NumberToChars(miliseconds);
-            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp));
+            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
         }
 
         /// <summary>
@@ -110,7 +112,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             passphrase += timeStamp;
             passphrase += passphrase.Length.ToString();
-            return passphrase + (Passphrase ?? string.Empty);
+            return App.HashPassword("Client" + passphrase);
         }
 
         /// <summary>
@@ -138,6 +140,7 @@ namespace com.etsoo.CoreFramework.Services
             return await Task.Run(() =>
             {
                 var result = ActionResult.Success;
+                var clientPassphrase = rq.Timestamp.ToString();
 
                 // Check device id for encrypted passphrase
                 // secret for decryption
@@ -146,9 +149,9 @@ namespace com.etsoo.CoreFramework.Services
                 {
                     try
                     {
-                        var previousPassphrase = CryptographyUtils.AESDecrypt(rq.DeviceId, secret);
+                        var previousPassphrase = Decrypt(rq.DeviceId, secret);
                         if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
-                        result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(Convert.ToBase64String(previousPassphrase), rq.Timestamp.ToString(), 1));
+                        result.Data.Add("PreviousPassphrase", Encrypt(previousPassphrase, clientPassphrase, 1));
                     }
                     catch (Exception ex)
                     {
@@ -156,10 +159,15 @@ namespace com.etsoo.CoreFramework.Services
                     }
                 }
 
+                // Random bytes
                 var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
-                var newDeviceId = CryptographyUtils.AESEncrypt(randomChars, secret);
+
+                // New device id
+                var newDeviceId = Encrypt(randomChars, secret);
+
+                // Return to the client side
                 result.Data.Add("DeviceId", newDeviceId);
-                result.Data.Add("Passphrase", CryptographyUtils.AESEncrypt(randomChars, rq.Timestamp.ToString(), 1));
+                result.Data.Add("Passphrase", Encrypt(randomChars, clientPassphrase, 1));
 
                 return result;
             });

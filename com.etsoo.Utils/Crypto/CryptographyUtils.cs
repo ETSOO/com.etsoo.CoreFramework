@@ -247,6 +247,19 @@ namespace com.etsoo.Utils.Crypto
         }
 
         /// <summary>
+        /// SHA3(512) hash
+        /// SHA3哈希
+        /// </summary>
+        /// <param name="source">Source</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> SHA3Async(string source)
+        {
+            using var sha512 = SHA512.Create();
+            var ms = new MemoryStream(Encoding.UTF8.GetBytes(source));
+            return await sha512.ComputeHashAsync(ms);
+        }
+
+        /// <summary>
         /// Unseal data
         /// 解封信息
         /// Attributes for null-state static analysis

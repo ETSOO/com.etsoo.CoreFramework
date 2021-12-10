@@ -115,5 +115,15 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual("9c7ce665e6f4f4c807912a7486244c90", Convert.ToHexString(result).ToLower());
         }
+
+        [Test]
+        public async Task SHA3_Hex_Test()
+        {
+            // Arrange & act
+            var result = await CryptographyUtils.SHA3Async("test");
+
+            // Assert
+            Assert.AreEqual("EE26B0DD4AF7E749AA1A8EE3C10AE9923F618980772E473F8819A5D4940E0DB27AC185F8A0E1D5F84F88BC887FD67B143732C304CC5FA9AD8E6F57F50028A8FF", Convert.ToHexString(result));
+        }
     }
 }

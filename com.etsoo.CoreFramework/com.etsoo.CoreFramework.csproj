@@ -15,7 +15,7 @@
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageLicenseExpression></PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.1.52</Version>
+    <Version>1.1.53</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
