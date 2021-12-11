@@ -80,7 +80,7 @@ namespace com.etsoo.CoreFramework.Services
 
             var message = encyptedMessage[(pos + 1)..];
 
-            var bytes = CryptographyUtils.AESDecrypt(message, EncryptionEnhance(passphrase, miliseconds));
+            var bytes = CryptographyUtils.AESDecrypt(message, passphrase);
             if (bytes == null) return null;
 
             return Encoding.UTF8.GetString(bytes);
@@ -98,7 +98,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
             var timeStamp = StringUtils.NumberToChars(miliseconds);
-            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
+            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, passphrase, iterations);
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace com.etsoo.CoreFramework.Services
                 {
                     try
                     {
-                        var previousPassphrase = Decrypt(rq.DeviceId, secret);
+                        var previousPassphrase = Decrypt(rq.DeviceId, EncryptionEnhance(secret, clientPassphrase));
                         if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
                         result.Data.Add("PreviousPassphrase", Encrypt(previousPassphrase, clientPassphrase, 1));
                     }
@@ -163,7 +163,7 @@ namespace com.etsoo.CoreFramework.Services
                 var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
 
                 // New device id
-                var newDeviceId = Encrypt(randomChars, secret);
+                var newDeviceId = Encrypt(randomChars, EncryptionEnhance(secret, clientPassphrase));
 
                 // Return to the client side
                 result.Data.Add("DeviceId", newDeviceId);
