@@ -9,6 +9,7 @@ using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -67,28 +68,35 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="encyptedMessage">Encrypted message</param>
         /// <param name="passphrase">Secret passphrase</param>
+        /// <param name="enhanced">Enhanced</param>
         /// <returns>Result</returns>
-        protected virtual string? Decrypt(string encyptedMessage, string passphrase)
+        protected virtual string? Decrypt(string encyptedMessage, string passphrase, bool enhanced)
         {
-            var pos = encyptedMessage.IndexOf('+');
-            if (pos == -1) return null;
+            if (enhanced)
+            {
+                var pos = encyptedMessage.IndexOf('+');
 
-            var miliseconds = encyptedMessage[..pos];
-            var num = StringUtils.CharsToNumber(miliseconds);
-            var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(num);
-            if (Math.Abs(ts.TotalSeconds) > DurationSeconds) return null;
+                if (pos == -1) return null;
 
-            var message = encyptedMessage[(pos + 1)..];
+                var timestamp = encyptedMessage[..pos];
+                var miliseconds = StringUtils.CharsToNumber(timestamp);
+                var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(miliseconds);
+                if (Math.Abs(ts.TotalSeconds) > DurationSeconds) return null;
 
-            var bytes = CryptographyUtils.AESDecrypt(message, passphrase);
+                passphrase = EncryptionEnhance(passphrase, timestamp);
+
+                encyptedMessage = encyptedMessage[(pos + 1)..];
+            }
+
+            var bytes = CryptographyUtils.AESDecrypt(encyptedMessage, passphrase);
             if (bytes == null) return null;
 
             return Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
-        /// Encrypt message
-        /// 加密信息
+        /// Enhanced encrypt message
+        /// 加强的加密信息
         /// </summary>
         /// <param name="message">Message</param>
         /// <param name="passphrase">Secret passphrase</param>
@@ -98,7 +106,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
             var timeStamp = StringUtils.NumberToChars(miliseconds);
-            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, passphrase, iterations);
+            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
         }
 
         /// <summary>
@@ -149,9 +157,9 @@ namespace com.etsoo.CoreFramework.Services
                 {
                     try
                     {
-                        var previousPassphrase = Decrypt(rq.DeviceId, EncryptionEnhance(secret, clientPassphrase));
+                        var previousPassphrase = Decrypt(rq.DeviceId, secret, true);
                         if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
-                        result.Data.Add("PreviousPassphrase", Encrypt(previousPassphrase, clientPassphrase, 1));
+                        result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
                     }
                     catch (Exception ex)
                     {
@@ -163,11 +171,11 @@ namespace com.etsoo.CoreFramework.Services
                 var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
 
                 // New device id
-                var newDeviceId = Encrypt(randomChars, EncryptionEnhance(secret, clientPassphrase));
+                var newDeviceId = Encrypt(randomChars, secret);
 
                 // Return to the client side
                 result.Data.Add("DeviceId", newDeviceId);
-                result.Data.Add("Passphrase", Encrypt(randomChars, clientPassphrase, 1));
+                result.Data.Add("Passphrase", CryptographyUtils.AESEncrypt(randomChars, clientPassphrase, 1));
 
                 return result;
             });
