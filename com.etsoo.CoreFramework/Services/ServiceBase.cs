@@ -119,7 +119,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="encryptedMessage">Encrypted message</param>
         /// <param name="userAgent">User agent</param>
         /// <returns>Result</returns>
-        protected async Task<string?> DecryptDeviceDataWithUAAsync(string deviceId, string encryptedMessage, string userAgent)
+        public async Task<string?> DecryptDeviceDataWithUAAsync(string deviceId, string encryptedMessage, string userAgent)
         {
             var passphrase = await CreateHashedPassphraseAsync(userAgent);
             return DecryptDeviceData(deviceId, encryptedMessage, passphrase);
@@ -133,7 +133,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="encryptedMessage">Encrypted message</param>
         /// <param name="passphrase">Passphrase</param>
         /// <returns>Result</returns>
-        protected string? DecryptDeviceData(string deviceId, string encryptedMessage, string passphrase)
+        public string? DecryptDeviceData(string deviceId, string encryptedMessage, string passphrase)
         {
             // Device core
             var core = Decrypt(deviceId, passphrase, true);
@@ -149,7 +149,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="deviceCore">Device core passphrase</param>
         /// <param name="iterations">Encryption iterations</param>
         /// <returns>Result</returns>
-        protected string? DecryptDeviceData(string encryptedMessage, string deviceCore, int? iterations = null)
+        public string? DecryptDeviceData(string encryptedMessage, string deviceCore, int? iterations = null)
         {
             return Decrypt(encryptedMessage, deviceCore, false, iterations);
         }
