@@ -62,6 +62,18 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Async create hashed passphrase
+        /// 异步创建哈希密码
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>Result</returns>
+        protected virtual async Task<string> CreateHashedPassphraseAsync(string input)
+        {
+            var hashBytes = await CryptographyUtils.SHA3Async(input);
+            return Convert.ToHexString(hashBytes);
+        }
+
+        /// <summary>
         /// Decrypt message
         /// 解密信息
         /// </summary>
