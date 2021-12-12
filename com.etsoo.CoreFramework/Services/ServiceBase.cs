@@ -9,7 +9,6 @@ using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -69,19 +68,25 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="encyptedMessage">Encrypted message</param>
         /// <param name="passphrase">Secret passphrase</param>
         /// <param name="enhanced">Enhanced</param>
+        /// <param name="durationSeconds">Duration seconds</param>
         /// <returns>Result</returns>
-        protected virtual string? Decrypt(string encyptedMessage, string passphrase, bool enhanced)
+        protected virtual string? Decrypt(string encyptedMessage, string passphrase, bool enhanced, int? durationSeconds = null)
         {
             if (enhanced)
             {
                 var pos = encyptedMessage.IndexOf('+');
 
-                if (pos == -1) return null;
+                // Miliseconds chars are longer than 8
+                if (pos < 8) return null;
 
                 var timestamp = encyptedMessage[..pos];
-                var miliseconds = StringUtils.CharsToNumber(timestamp);
-                var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(miliseconds);
-                if (Math.Abs(ts.TotalSeconds) > DurationSeconds) return null;
+
+                if (durationSeconds.HasValue)
+                {
+                    var miliseconds = StringUtils.CharsToNumber(timestamp);
+                    var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(miliseconds);
+                    if (Math.Abs(ts.TotalSeconds) > durationSeconds.Value) return null;
+                }
 
                 passphrase = EncryptionEnhance(passphrase, timestamp);
 
