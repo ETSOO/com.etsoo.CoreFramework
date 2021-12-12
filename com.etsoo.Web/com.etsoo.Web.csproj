@@ -7,7 +7,7 @@
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>ETSOO</Company>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <Description>ETSOO SmartERP NextGen shared web components.</Description>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
@@ -33,6 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.6" />
     <PackageReference Include="RazorEngineCore" Version="2021.7.1" />
   </ItemGroup>
 

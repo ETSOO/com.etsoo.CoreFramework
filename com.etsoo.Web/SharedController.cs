@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.UserAgentParser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.Net.Mime;
@@ -25,6 +26,44 @@ namespace com.etsoo.Web
         public SharedController(ICoreApplicationBase coreApp) : base()
         {
             CoreApp = coreApp;
+        }
+
+        /// <summary>
+        /// Parse user agent
+        /// 解析用户代理信息
+        /// </summary>
+        /// <param name="userAgent">User agent</param>
+        /// <param name="identifier">Identifier</param>
+        /// <returns>Action result</returns>
+        protected IActionResult ParseUserAgent(string? userAgent, out string identifier)
+        {
+            identifier = string.Empty;
+
+            // User-Agent validatation
+            var parser = new UAParser(userAgent);
+            if (!parser.Valid || parser.IsBot)
+                return ApplicationErrors.NoUserAgent.AsResult();
+
+            identifier = parser.ToShortName();
+
+            return Utils.Actions.ActionResult.Success;
+        }
+
+        /// <summary>
+        /// Parse user agent
+        /// 解析用户代理信息
+        /// </summary>
+        /// <param name="userAgent">User agent</param>
+        /// <param name="parser">UAParser</param>
+        /// <returns>Action result</returns>
+        protected IActionResult ParseUserAgent(string? userAgent, out UAParser parser)
+        {
+            // User-Agent validatation
+            parser = new UAParser(userAgent);
+            if (!parser.Valid || parser.IsBot)
+                return ApplicationErrors.NoUserAgent.AsResult();
+
+            return Utils.Actions.ActionResult.Success;
         }
 
         /// <summary>
