@@ -112,6 +112,49 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Async decrypt device data with user agent data
+        /// 使用用户代理数据异步解密设备数据
+        /// </summary>
+        /// <param name="deviceId">Device id</param>
+        /// <param name="encryptedMessage">Encrypted message</param>
+        /// <param name="userAgent">User agent</param>
+        /// <returns>Result</returns>
+        protected async Task<string?> DecryptDeviceDataWithUAAsync(string deviceId, string encryptedMessage, string userAgent)
+        {
+            var passphrase = await CreateHashedPassphraseAsync(userAgent);
+            return DecryptDeviceData(deviceId, encryptedMessage, passphrase);
+        }
+
+        /// <summary>
+        /// Async decrypt device data with passphrase
+        /// 使用密码异步解密设备数据
+        /// </summary>
+        /// <param name="deviceId">Device id</param>
+        /// <param name="encryptedMessage">Encrypted message</param>
+        /// <param name="passphrase">Passphrase</param>
+        /// <returns>Result</returns>
+        protected string? DecryptDeviceData(string deviceId, string encryptedMessage, string passphrase)
+        {
+            // Device core
+            var core = Decrypt(deviceId, passphrase, true);
+            if (core == null) return null;
+            return DecryptDeviceData(encryptedMessage, core);
+        }
+
+        /// <summary>
+        /// Async decrypt device data with passphrase
+        /// 使用密码异步解密设备数据
+        /// </summary>
+        /// <param name="encryptedMessage">Encrypted message</param>
+        /// <param name="deviceCore">Device core passphrase</param>
+        /// <param name="iterations">Encryption iterations</param>
+        /// <returns>Result</returns>
+        protected string? DecryptDeviceData(string encryptedMessage, string deviceCore, int? iterations = null)
+        {
+            return Decrypt(encryptedMessage, deviceCore, false, iterations);
+        }
+
+        /// <summary>
         /// Enhanced encrypt message
         /// 加强的加密信息
         /// </summary>
