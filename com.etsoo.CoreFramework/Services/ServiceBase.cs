@@ -74,7 +74,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             if (enhanced)
             {
-                var pos = encyptedMessage.IndexOf('+');
+                var pos = encyptedMessage.IndexOf('!');
 
                 // Miliseconds chars are longer than 8
                 if (pos < 8) return null;
@@ -111,7 +111,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
             var timeStamp = StringUtils.NumberToChars(miliseconds);
-            return timeStamp + "+" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
+            return timeStamp + "!" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
         }
 
         /// <summary>
