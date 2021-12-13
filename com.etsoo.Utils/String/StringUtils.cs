@@ -1,4 +1,6 @@
-﻿using com.etsoo.Utils.SpanMemory;
+﻿using com.etsoo.Utils.Address;
+using com.etsoo.Utils.SpanMemory;
+using MimeKit;
 using System.Collections;
 using System.ComponentModel;
 using System.Text;
@@ -17,6 +19,44 @@ namespace com.etsoo.Utils.String
         /// 字符串类型
         /// </summary>
         public static readonly Type StringType = typeof(string);
+
+        /// <summary>
+        /// Check email or mobile id
+        /// 检查Email或手机编号
+        /// </summary>
+        /// <param name="id">Email or mobile</param>
+        /// <param name="region">Region</param>
+        /// <param name="isEmail">Is email</param>
+        /// <returns>Result, null means failure</returns>
+        public static string? CheckId(string id, string region, out bool isEmail)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                isEmail = false;
+                return null;
+            }
+
+            isEmail = id.Contains('@');
+            if (isEmail)
+            {
+                // Try parse
+                if (MailboxAddress.TryParse(id, out var emailAddress))
+                {
+                    return emailAddress.Address;
+                }
+            }
+            else
+            {
+                // Try parse and format
+                var phone = AddressRegion.CreatePhone(id, region);
+                if (phone != null)
+                {
+                    return phone.ToInternationalFormat();
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Hide normal data
