@@ -16,7 +16,7 @@ namespace com.etsoo.CoreFramework.Services
     /// Service base for business logic
     /// 业务逻辑的基础服务
     /// </summary>
-    public abstract class ServiceBase<C, R>
+    public abstract class ServiceBase<C, R> : IServiceBase
         where C : DbConnection
         where R : IRepoBase
     {
@@ -112,8 +112,8 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
-        /// Async decrypt device data with user identifier
-        /// 使用用户识别码数据异步解密设备数据
+        /// Async decrypt device data with user identifier for multiple decryption
+        /// 使用用户识别码数据异步解密设备数据以用于多次解密
         /// </summary>
         /// <param name="deviceId">Device id</param>
         /// <param name="encryptedMessage">Encrypted message</param>

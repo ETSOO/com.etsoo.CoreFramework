@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -26,6 +27,51 @@ namespace com.etsoo.Web
         public SharedController(ICoreApplicationBase coreApp) : base()
         {
             CoreApp = coreApp;
+        }
+
+        /// <summary>
+        /// Async parse device core for multiple decryption
+        /// 异步解析设备核心密码以用于多次解密
+        /// </summary>
+        /// <param name="service">Service</param>
+        /// <param name="deviceId">Device id</param>
+        /// <param name="userAgent">User agent</param>
+        /// <returns>Result</returns>
+        protected async Task<(IActionResult result, string? serviceCore)> ParseDeviceCoreAsync(IServiceBase service, string deviceId, string? userAgent)
+        {
+            var result = ParseUserAgent(userAgent, out string identifier);
+            if (!result.Ok) return (result, null);
+
+            var deviceCore = await service.DecryptDeviceCoreAsync(deviceId, identifier);
+            if (deviceCore == null)
+            {
+                return (ApplicationErrors.NoValidData.AsResult("Device"), null);
+            }
+
+            return (Utils.Actions.ActionResult.Success, deviceCore);
+        }
+
+        /// <summary>
+        /// Async parse device message
+        /// 异步解析设备信息
+        /// </summary>
+        /// <param name="service">Service</param>
+        /// <param name="deviceId">Device id</param>
+        /// <param name="encryptedMessage">Encypted message</param>
+        /// <param name="userAgent">User agent</param>
+        /// <returns>Result</returns>
+        protected async Task<(IActionResult result, string? data)> ParseDeviceMessageAsync(IServiceBase service, string deviceId, string encryptedMessage, string? userAgent)
+        {
+            var (result, deviceCore) = await ParseDeviceCoreAsync(service, deviceId, userAgent);
+            if (!result.Ok || deviceCore == null) return (result, null);
+
+            var data = service.DecryptDeviceData(encryptedMessage, deviceCore);
+            if (data == null)
+            {
+                return (ApplicationErrors.NoValidData.AsResult(), null);
+            }
+
+            return (result, data);
         }
 
         /// <summary>
