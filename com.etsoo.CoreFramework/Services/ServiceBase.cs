@@ -261,7 +261,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="ex">Exception</param>
         /// <returns>Result</returns>
-        protected ActionResult LogException(Exception ex)
+        public ActionResult LogException(Exception ex)
         {
             // Get the Db connection failure result
             var exResult = App.DB.GetExceptionResult(ex);
