@@ -47,19 +47,35 @@ namespace com.etsoo.CoreFramework.Application
         string BuildCommandName(string identifier, IEnumerable<string> parts);
 
         /// <summary>
-        /// Hash password
-        /// 哈希密码
+        /// Hash password bytes
+        /// 哈希密码字节数组
         /// </summary>
         /// <param name="password">Raw password</param>
         /// <returns>Hashed bytes</returns>
-        string HashPassword(ReadOnlySpan<char> password);
+        byte[] HashPasswordBytes(ReadOnlySpan<char> password);
+
+        /// <summary>
+        /// Async hash password bytes
+        /// 异步哈希密码字节数组
+        /// </summary>
+        /// <param name="password">Raw password</param>
+        /// <returns>Hashed bytes</returns>
+        Task<byte[]> HashPasswordBytesAsync(string password);
 
         /// <summary>
         /// Hash password
         /// 哈希密码
         /// </summary>
         /// <param name="password">Raw password</param>
-        /// <returns>Hashed password</returns>
+        /// <returns>Hashed result</returns>
+        string HashPassword(ReadOnlySpan<char> password);
+
+        /// <summary>
+        /// Async hash password
+        /// 异步哈希密码
+        /// </summary>
+        /// <param name="password">Raw password</param>
+        /// <returns>Hashed result</returns>
         Task<string> HashPasswordAsync(string password);
     }
 }

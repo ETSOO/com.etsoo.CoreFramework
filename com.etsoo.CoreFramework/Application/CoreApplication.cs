@@ -96,14 +96,36 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Hash password bytes
+        /// 哈希密码字节数组
+        /// </summary>
+        /// <param name="password">Raw password</param>
+        /// <returns>Hashed bytes</returns>
+        public byte[] HashPasswordBytes(ReadOnlySpan<char> password)
+        {
+            return CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey);
+        }
+
+        /// <summary>
+        /// Async hash password bytes
+        /// 异步哈希密码字节数组
+        /// </summary>
+        /// <param name="password">Raw password</param>
+        /// <returns>Hashed bytes</returns>
+        public async Task<byte[]> HashPasswordBytesAsync(string password)
+        {
+            return await CryptographyUtils.HMACSHA512Async(password, Configuration.PrivateKey);
+        }
+
+        /// <summary>
         /// Hash password
         /// 哈希密码
         /// </summary>
         /// <param name="password">Raw password</param>
-        /// <returns>Hashed bytes</returns>
+        /// <returns>Hashed result</returns>
         public string HashPassword(ReadOnlySpan<char> password)
         {
-            return Convert.ToBase64String(CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey));
+            return Convert.ToBase64String(HashPasswordBytes(password));
         }
 
         /// <summary>
@@ -111,10 +133,10 @@ namespace com.etsoo.CoreFramework.Application
         /// 异步哈希密码
         /// </summary>
         /// <param name="password">Raw password</param>
-        /// <returns>Hashed password</returns>
+        /// <returns>Hashed result</returns>
         public async Task<string> HashPasswordAsync(string password)
         {
-            return Convert.ToBase64String(await CryptographyUtils.HMACSHA512Async(password, Configuration.PrivateKey));
+            return Convert.ToBase64String(await HashPasswordBytesAsync(password));
         }
     }
 }
