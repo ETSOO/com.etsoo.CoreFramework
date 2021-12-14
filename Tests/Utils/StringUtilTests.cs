@@ -91,10 +91,10 @@ namespace Tests.Utils
             Assert.AreEqual("hel***rld@etsoo.com", result);
 
             // Act 3
-            result = StringUtils.HideEmail("a@etsoo.com");
+            result = StringUtils.HideEmail("xm@etsoo.com");
 
             // Assert 3
-            Assert.AreEqual("***@etsoo.com", result);
+            Assert.AreEqual("x***@etsoo.com", result);
         }
 
         [Test]

@@ -79,7 +79,7 @@ namespace com.etsoo.Utils.String
 
             var len = data.Length;
             if (len < 4)
-                return "***";
+                return data[..1] + "***";
             if (len < 6)
                 return data[..2] + "***";
             if (len < 8)
