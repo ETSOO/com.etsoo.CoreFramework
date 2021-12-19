@@ -79,18 +79,15 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="encyptedMessage">Encrypted message</param>
         /// <param name="passphrase">Secret passphrase</param>
-        /// <param name="enhanced">Enhanced</param>
         /// <param name="durationSeconds">Duration seconds</param>
+        /// <param name="isWebClient">Is web client</param>
         /// <returns>Result</returns>
-        protected virtual string? Decrypt(string encyptedMessage, string passphrase, bool enhanced, int? durationSeconds = null)
+        protected virtual string? Decrypt(string encyptedMessage, string passphrase, int? durationSeconds = null, bool? isWebClient = null)
         {
-            if (enhanced)
+            var pos = encyptedMessage.IndexOf('!');
+            if (pos >= 8)
             {
-                var pos = encyptedMessage.IndexOf('!');
-
                 // Miliseconds chars are longer than 8
-                if (pos < 8) return null;
-
                 var timestamp = encyptedMessage[..pos];
 
                 if (durationSeconds.HasValue)
@@ -100,7 +97,8 @@ namespace com.etsoo.CoreFramework.Services
                     if (Math.Abs(ts.TotalSeconds) > durationSeconds.Value) return null;
                 }
 
-                passphrase = EncryptionEnhance(passphrase, timestamp);
+                if (isWebClient.GetValueOrDefault()) passphrase = WebEncryptionEnhance(passphrase, timestamp);
+                else passphrase = EncryptionEnhance(passphrase, timestamp);
 
                 encyptedMessage = encyptedMessage[(pos + 1)..];
             }
@@ -137,7 +135,7 @@ namespace com.etsoo.CoreFramework.Services
         public async Task<string?> DecryptDeviceCoreAsync(string deviceId, string identifier)
         {
             var passphrase = await CreateHashedPassphraseAsync(identifier);
-            return Decrypt(deviceId, passphrase, true);
+            return Decrypt(deviceId, passphrase);
         }
 
         /// <summary>
@@ -151,7 +149,7 @@ namespace com.etsoo.CoreFramework.Services
         public string? DecryptDeviceData(string deviceId, string encryptedMessage, string passphrase)
         {
             // Device core
-            var core = Decrypt(deviceId, passphrase, true);
+            var core = Decrypt(deviceId, passphrase);
             if (core == null) return null;
             return DecryptDeviceData(encryptedMessage, core);
         }
@@ -165,7 +163,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Result</returns>
         public string? DecryptDeviceData(string encryptedMessage, string deviceCore)
         {
-            return Decrypt(encryptedMessage, deviceCore, false);
+            return Decrypt(encryptedMessage, deviceCore);
         }
 
         /// <summary>
@@ -175,12 +173,18 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="message">Message</param>
         /// <param name="passphrase">Secret passphrase</param>
         /// <param name="iterations">Iterations</param>
+        /// <param name="enhanced">Enhanced or not</param>
         /// <returns>Result</returns>
-        protected virtual string Encrypt(string message, string passphrase, int iterations = 10)
+        protected virtual string Encrypt(string message, string passphrase, int iterations = 10, bool? enhanced = null)
         {
-            var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
-            var timeStamp = StringUtils.NumberToChars(miliseconds);
-            return timeStamp + "!" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
+            if (enhanced.GetValueOrDefault(true))
+            {
+                var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
+                var timeStamp = StringUtils.NumberToChars(miliseconds);
+                return timeStamp + "!" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
+            }
+
+            return CryptographyUtils.AESEncrypt(message, passphrase, iterations);
         }
 
         /// <summary>
@@ -192,9 +196,21 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Result</returns>
         protected virtual string EncryptionEnhance(string passphrase, string timeStamp)
         {
+            return App.HashPassword("Client" + WebEncryptionEnhance(passphrase, timeStamp));
+        }
+
+        /// <summary>
+        /// Web client enchance secret passphrase
+        /// Web客户端加强安全密码
+        /// </summary>
+        /// <param name="passphrase">Passphrase</param>
+        /// <param name="timeStamp">timeStamp</param>
+        /// <returns>Result</returns>
+        protected virtual string WebEncryptionEnhance(string passphrase, string timeStamp)
+        {
             passphrase += timeStamp;
             passphrase += passphrase.Length.ToString();
-            return App.HashPassword("Client" + passphrase);
+            return passphrase;
         }
 
         /// <summary>
@@ -231,7 +247,7 @@ namespace com.etsoo.CoreFramework.Services
                 {
                     try
                     {
-                        var previousPassphrase = Decrypt(rq.DeviceId, secret, true);
+                        var previousPassphrase = Decrypt(rq.DeviceId, secret);
                         if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
                         result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
                     }
