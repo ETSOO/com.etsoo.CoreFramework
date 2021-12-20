@@ -42,7 +42,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 获取参数集合
         /// </summary>
         /// <returns></returns>
-        public DynamicParameters AsParameters(ICoreApplicationBase app)
+        public virtual DynamicParameters AsParameters(ICoreApplicationBase app)
         {
             var parameters = new DynamicParameters();
 
