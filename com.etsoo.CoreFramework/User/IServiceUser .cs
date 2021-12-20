@@ -10,24 +10,6 @@ namespace com.etsoo.CoreFramework.User
     public interface IServiceUser : IUserToken
     {
         /// <summary>
-        /// Organization id, support switch
-        /// 机构编号，可切换
-        /// </summary>
-        string? Organization { get; }
-
-        /// <summary>
-        /// Int id
-        /// 整数编号
-        /// </summary>
-        int IdInt { get; }
-
-        /// <summary>
-        /// Int organization id
-        /// 整数机构编号
-        /// </summary>
-        int? OrganizationInt { get; }
-
-        /// <summary>
         /// Role value
         /// 角色值
         /// </summary>

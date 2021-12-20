@@ -22,7 +22,7 @@ namespace com.etsoo.CoreFramework.User
 
             var sid = claims.FindFirstValue(ClaimTypes.PrimarySid);
 
-            return new RefreshToken(token.Id, token.ClientIp, token.Region, token.DeviceId, sid);
+            return new RefreshToken(token.Id, token.Organization, token.ClientIp, token.Region, token.DeviceId, sid);
         }
 
         /// <summary>
@@ -36,12 +36,13 @@ namespace com.etsoo.CoreFramework.User
         /// 构造函数
         /// </summary>
         /// <param name="id">User id</param>
+        /// <param name="organization">Organization id</param>
         /// <param name="clientIp"></param>
         /// <param name="region">Country or region</param>
         /// <param name="deviceId">Device id</param>
         /// <param name="sid">Service identifier id</param>
-        public RefreshToken(string id, IPAddress clientIp, string region, int deviceId, string? sid = null)
-            : base(id, clientIp, region, deviceId)
+        public RefreshToken(string id, string? organization, IPAddress clientIp, string region, int deviceId, string? sid = null)
+            : base(id, clientIp, region, deviceId, organization)
         {
             Sid = sid;
         }

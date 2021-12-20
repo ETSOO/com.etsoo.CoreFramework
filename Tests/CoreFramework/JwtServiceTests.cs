@@ -72,7 +72,7 @@ namespace Tests.CoreFramework
             var publicService = new JwtService(new ServiceCollection(), false, section, null);
 
             // Refresh token
-            var refreshToken = service.CreateRefreshToken(new RefreshToken("1", IPAddress.Parse("127.0.0.1"), "CN", 1, "service"));
+            var refreshToken = service.CreateRefreshToken(new RefreshToken("1", null, IPAddress.Parse("127.0.0.1"), "CN", 1, "service"));
 
             // Validate refresh token
             var (claimsPrincipal, expired, kid, securityToken) = publicService.ValidateToken(refreshToken);

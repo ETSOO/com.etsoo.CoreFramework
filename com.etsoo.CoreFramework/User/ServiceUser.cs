@@ -12,12 +12,6 @@ namespace com.etsoo.CoreFramework.User
     public record ServiceUser : UserToken, IServiceUser
     {
         /// <summary>
-        /// Organization claim type
-        /// 机构声明类型
-        /// </summary>
-        public const string OrganizationClaim = "organization";
-
-        /// <summary>
         /// Role value claim type
         /// 角色值类型
         /// </summary>
@@ -35,7 +29,6 @@ namespace com.etsoo.CoreFramework.User
             if (token == null) return null;
 
             // Claims
-            var organization = claims.FindFirstValue(OrganizationClaim);
             var language = claims.FindFirstValue(ClaimTypes.Locality);
             var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
 
@@ -46,7 +39,7 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new ServiceUser(
                 token.Id,
-                organization,
+                token.Organization,
                 roleValue,
                 token.ClientIp,
                 token.DeviceId,
@@ -60,7 +53,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="data">Input</param>
         /// <returns>Result</returns>
-        protected static (string? id, string? Organization, short? Role, int? deviceId) GetData(StringKeyDictionaryObject data)
+        protected static (string? id, string? organization, short? Role, int? deviceId) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -85,37 +78,19 @@ namespace com.etsoo.CoreFramework.User
             var (id, organization, role, deviceId) = GetData(data);
 
             // Validation
-            if (id == null)
+            if (id == null || role == null || deviceId == null)
                 return null;
 
             // New user
             return new ServiceUser(
                 id,
                 organization,
-                role.GetValueOrDefault(),
+                role.Value,
                 ip,
-                deviceId.GetValueOrDefault(),
+                deviceId.Value,
                 language,
                 region);
         }
-
-        /// <summary>
-        /// Organization id, support switch
-        /// 机构编号，可切换
-        /// </summary>
-        public string? Organization { get; private set; }
-
-        /// <summary>
-        /// Int id
-        /// 整数编号
-        /// </summary>
-        public int IdInt { get; }
-
-        /// <summary>
-        /// Int organization id
-        /// 整数机构编号
-        /// </summary>
-        public int? OrganizationInt { get; }
 
         /// <summary>
         /// Role value
@@ -138,33 +113,20 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="roleValue">Role value</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="deviceId">Device id</param>
+        /// <param name="organization">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         public ServiceUser(string id, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
-            :base(id, clientIp, region, deviceId)
+            :base(id, clientIp, region, deviceId, organization)
         {
-            Organization = organization;
             RoleValue = roleValue;
             Language = language;
-
-            if (int.TryParse(Id, out var idValue))
-            {
-                IdInt = idValue;
-            }
-
-            if (int.TryParse(Organization, out var organizationValue))
-            {
-                OrganizationInt = organizationValue;
-            }
         }
 
         private IEnumerable<Claim> GetClaims()
         {
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(RoleValueClaim, RoleValue.ToString());
-
-            if (!string.IsNullOrEmpty(Organization))
-                yield return new(OrganizationClaim, Organization);
         }
 
         /// <summary>
@@ -186,10 +148,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (_, organization, role, _) = GetData(data);
-
-            // Organization
-            Organization = organization;
+            var (_, _, role, _) = GetData(data);
 
             // Role
             if (role != null && RoleValue != role)
