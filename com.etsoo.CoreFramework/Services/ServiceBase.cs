@@ -24,6 +24,11 @@ namespace com.etsoo.CoreFramework.Services
         private const int DurationSeconds = 120;
 
         /// <summary>
+        /// Init call encryption identifier
+        /// </summary>
+        protected const string InitCallEncryptionIdentifier = "InitCall";
+
+        /// <summary>
         /// Application
         /// 程序对象
         /// </summary>
@@ -291,7 +296,7 @@ namespace com.etsoo.CoreFramework.Services
                     // Repo update
                     if (!string.IsNullOrEmpty(rq.Identifier))
                     {
-                        var source = await HashDecryptAsync(rq.Identifier, "InitCall");
+                        var source = await HashDecryptAsync(rq.Identifier, InitCallEncryptionIdentifier);
                         if (source != null && int.TryParse(source, out var deviceId))
                         {
                             await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId);
