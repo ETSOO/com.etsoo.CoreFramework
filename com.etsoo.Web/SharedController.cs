@@ -37,12 +37,12 @@ namespace com.etsoo.Web
         /// <param name="deviceId">Device id</param>
         /// <param name="userAgent">User agent</param>
         /// <returns>Result</returns>
-        protected async Task<(IActionResult result, string? serviceCore)> ParseDeviceCoreAsync(IServiceBase service, string deviceId, string? userAgent)
+        protected (IActionResult result, string? serviceCore) ParseDeviceCore(IServiceBase service, string deviceId, string? userAgent)
         {
             var result = ParseUserAgent(userAgent, out string identifier);
             if (!result.Ok) return (result, null);
 
-            var deviceCore = await service.DecryptDeviceCoreAsync(deviceId, identifier);
+            var deviceCore = service.DecryptDeviceCore(deviceId, identifier);
             if (deviceCore == null)
             {
                 return (ApplicationErrors.NoValidData.AsResult("Device"), null);
@@ -60,9 +60,9 @@ namespace com.etsoo.Web
         /// <param name="encryptedMessage">Encypted message</param>
         /// <param name="userAgent">User agent</param>
         /// <returns>Result</returns>
-        protected async Task<(IActionResult result, string? data)> ParseDeviceMessageAsync(IServiceBase service, string deviceId, string encryptedMessage, string? userAgent)
+        protected (IActionResult result, string? data) ParseDeviceMessage(IServiceBase service, string deviceId, string encryptedMessage, string? userAgent)
         {
-            var (result, deviceCore) = await ParseDeviceCoreAsync(service, deviceId, userAgent);
+            var (result, deviceCore) = ParseDeviceCore(service, deviceId, userAgent);
             if (!result.Ok || deviceCore == null) return (result, null);
 
             var data = service.DecryptDeviceData(encryptedMessage, deviceCore);
