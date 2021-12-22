@@ -27,16 +27,7 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            try
-            {
-                Console.WriteLine("Main starts at " + DateTime.Now.ToLongTimeString());
-                Task.Run(TestTask);
-                Console.WriteLine("Main done at " + DateTime.Now.ToLongTimeString() + ", " + Thread.CurrentThread.ManagedThreadId);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ex: " + ex.Message);
-            }
+
 
             Console.Read();
         }

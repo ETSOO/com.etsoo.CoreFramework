@@ -79,7 +79,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="encyptedMessage">Encrypted message</param>
         /// <param name="passphrase">Secret passphrase</param>
-        /// <param name="durationSeconds">Duration seconds</param>
+        /// <param name="durationSeconds">Duration seconds, <= 12 will be considered as month</param>
         /// <param name="isWebClient">Is web client</param>
         /// <returns>Result</returns>
         protected virtual string? Decrypt(string encyptedMessage, string passphrase, int? durationSeconds = null, bool? isWebClient = null)
@@ -94,7 +94,12 @@ namespace com.etsoo.CoreFramework.Services
                 {
                     var miliseconds = StringUtils.CharsToNumber(timestamp);
                     var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(miliseconds);
-                    if (Math.Abs(ts.TotalSeconds) > durationSeconds.Value) return null;
+
+                    // Month
+                    if (durationSeconds.Value <= 12 && (ts.TotalDays > 30 * durationSeconds.Value || ts.TotalDays <= 0)) return null;
+
+                    // Seconds
+                    if (durationSeconds.Value > 12 && Math.Abs(ts.TotalSeconds) > durationSeconds.Value) return null;
                 }
 
                 if (isWebClient.GetValueOrDefault()) passphrase = WebEncryptionEnhance(passphrase, timestamp);
@@ -135,7 +140,9 @@ namespace com.etsoo.CoreFramework.Services
         public async Task<string?> DecryptDeviceCoreAsync(string deviceId, string identifier)
         {
             var passphrase = await CreateHashedPassphraseAsync(identifier);
-            return Decrypt(deviceId, passphrase);
+            
+            // Valid within 30 days / one month
+            return Decrypt(deviceId, passphrase, 1);
         }
 
         /// <summary>
@@ -200,6 +207,32 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Decrypt data with application hash
+        /// 使用应用程序哈希解密数据
+        /// </summary>
+        /// <param name="encryptedData">Encypted data</param>
+        /// <param name="identifier">Hash identifier</param>
+        /// <returns>Result</returns>
+        protected virtual async Task<string?> HashDecryptAsync(string encryptedData, string identifier)
+        {
+            var phassphrase = await App.HashPasswordAsync(identifier + identifier.Length);
+            return Decrypt(encryptedData, phassphrase);
+        }
+
+        /// <summary>
+        /// Encrypt data with application hash
+        /// 使用应用程序哈希加密数据
+        /// </summary>
+        /// <param name="data">Input data</param>
+        /// <param name="identifier">Hash identifier</param>
+        /// <returns>Result</returns>
+        protected virtual async Task<string> HashEncryptAsync(string data, string identifier)
+        {
+            var phassphrase = await App.HashPasswordAsync(identifier + identifier.Length);
+            return Encrypt(data, phassphrase, 10, false);
+        }
+
+        /// <summary>
         /// Web client enchance secret passphrase
         /// Web客户端加强安全密码
         /// </summary>
@@ -235,40 +268,60 @@ namespace com.etsoo.CoreFramework.Services
                 return failure;
             }
 
-            return await Task.Run(() =>
-            {
-                var result = ActionResult.Success;
-                var clientPassphrase = rq.Timestamp.ToString();
+            var result = ActionResult.Success;
+            var clientPassphrase = rq.Timestamp.ToString();
 
-                // Check device id for encrypted passphrase
-                // secret for decryption
-                // Timestamp for client side decryption
-                if (!string.IsNullOrEmpty(rq.DeviceId))
+            // Random bytes
+            var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
+
+            // New device id
+            var newDeviceId = Encrypt(randomChars, secret);
+
+            // Check device id for encrypted passphrase
+            // secret for decryption
+            // Timestamp for client side decryption
+            if (!string.IsNullOrEmpty(rq.DeviceId))
+            {
+                try
                 {
-                    try
+                    var previousPassphrase = Decrypt(rq.DeviceId, secret);
+                    if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
+                    result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
+
+                    // Repo update
+                    if (!string.IsNullOrEmpty(rq.Identifier))
                     {
-                        var previousPassphrase = Decrypt(rq.DeviceId, secret);
-                        if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
-                        result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
-                    }
-                    catch (Exception ex)
-                    {
-                        return LogException(ex);
+                        var source = await HashDecryptAsync(rq.Identifier, "InitCall");
+                        if (source != null && int.TryParse(source, out var deviceId))
+                        {
+                            await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    return LogException(ex);
+                }
+            }
 
-                // Random bytes
-                var randomChars = Convert.ToBase64String(CryptographyUtils.CreateRandBytes(32));
+            // Return to the client side
+            result.Data.Add("DeviceId", newDeviceId);
+            result.Data.Add("Passphrase", CryptographyUtils.AESEncrypt(randomChars, clientPassphrase, 1));
 
-                // New device id
-                var newDeviceId = Encrypt(randomChars, secret);
+            return result;
+        }
 
-                // Return to the client side
-                result.Data.Add("DeviceId", newDeviceId);
-                result.Data.Add("Passphrase", CryptographyUtils.AESEncrypt(randomChars, clientPassphrase, 1));
-
-                return result;
-            });
+        /// <summary>
+        /// Async init call update
+        /// 异步初始化调用更新
+        /// </summary>
+        /// <param name="prevDeviceId">Previous client device id</param>
+        /// <param name="newDeviceId">New client device id</param>
+        /// <param name="deviceId">Serverside device id</param>
+        /// <returns>Task</returns>
+        protected virtual async Task InitCallUpdateAsync(string prevDeviceId, string newDeviceId, int deviceId)
+        {
+            await Task.CompletedTask;
         }
 
         /// <summary>
