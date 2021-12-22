@@ -67,18 +67,6 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
-        /// Async create hashed passphrase
-        /// 异步创建哈希密码
-        /// </summary>
-        /// <param name="input">Input string</param>
-        /// <returns>Result</returns>
-        protected virtual async Task<string> CreateHashedPassphraseAsync(string input)
-        {
-            var hashBytes = await App.HashPasswordBytesAsync(input);
-            return Convert.ToHexString(hashBytes);
-        }
-
-        /// <summary>
         /// Decrypt message
         /// 解密信息
         /// </summary>
@@ -120,34 +108,32 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
-        /// Async decrypt device data with user identifier for multiple decryption
-        /// 使用用户识别码数据异步解密设备数据以用于多次解密
+        /// Decrypt device data with user identifier for multiple decryption
+        /// 使用用户识别码数据解密设备数据以用于多次解密
         /// </summary>
         /// <param name="deviceId">Device id</param>
         /// <param name="encryptedMessage">Encrypted message</param>
         /// <param name="identifier">User identifier</param>
         /// <returns>Result</returns>
-        public async Task<string?> DecryptDeviceDataAsync(string deviceId, string encryptedMessage, string identifier)
+        public string? DecryptDeviceDataWithIdentifier(string deviceId, string encryptedMessage, string identifier)
         {
             // Device core
-            var core = await DecryptDeviceCoreAsync(deviceId, identifier);
+            var core = DecryptDeviceCore(deviceId, identifier);
             if (core == null) return null;
             return DecryptDeviceData(encryptedMessage, core);
         }
 
         /// <summary>
-        /// Async decrypt device core with user identifier
-        /// 使用用户识别码异步解密设备核心
+        /// Decrypt device core with user identifier
+        /// 使用用户识别码解密设备核心
         /// </summary>
         /// <param name="deviceId">Device id</param>
         /// <param name="identifier">User identifier</param>
         /// <returns>Result</returns>
-        public async Task<string?> DecryptDeviceCoreAsync(string deviceId, string identifier)
+        public string? DecryptDeviceCore(string deviceId, string identifier)
         {
-            var passphrase = await CreateHashedPassphraseAsync(identifier);
-            
             // Valid within 30 days / one month
-            return Decrypt(deviceId, passphrase, 1);
+            return Decrypt(deviceId, identifier, 1);
         }
 
         /// <summary>
