@@ -73,7 +73,7 @@ namespace com.etsoo.CoreFramework.Authentication
 
             validIssuer = section.GetValue<string>("ValidIssuer");
             validIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>>();
-            if (string.IsNullOrEmpty(validIssuer) && validIssuers == null)
+            if (string.IsNullOrEmpty(validIssuer))
             {
                 validIssuer = defaultIssuer;
             }
@@ -191,6 +191,7 @@ namespace com.etsoo.CoreFramework.Authentication
             var validataionParameters = new TokenValidationParameters
             {
                 ValidIssuer = validIssuer,
+                ValidIssuers = validIssuers,
                 ValidAudience = action.Audience
             };
 
