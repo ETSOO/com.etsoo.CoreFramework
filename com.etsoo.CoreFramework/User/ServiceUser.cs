@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.String;
+using Microsoft.AspNetCore.Http;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -90,6 +91,39 @@ namespace com.etsoo.CoreFramework.User
                 deviceId.Value,
                 language,
                 region);
+        }
+
+        /// <summary>
+        /// Create user
+        /// 创建用户
+        /// </summary>
+        /// <param name="context">Http context</param>
+        /// <returns>Erp user</returns>
+        public static IServiceUser? Create(HttpContext? context)
+        {
+            // https://stackoverflow.com/questions/32584074/whats-the-role-of-the-claimsprincipal-why-does-it-have-multiple-identities
+            // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
+            // Only concerns the main identity
+            if (context == null || context.User == null)
+                return null;
+
+            return Create(context.User);
+        }
+
+        /// <summary>
+        /// Create non nullable user
+        /// 创建非空用户
+        /// </summary>
+        /// <param name="context">Http context</param>
+        /// <returns>Erp user</returns>
+        public static IServiceUser CreateSafe(HttpContext? context)
+        {
+            var user = Create(context);
+            if (user == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+            return user;
         }
 
         /// <summary>
