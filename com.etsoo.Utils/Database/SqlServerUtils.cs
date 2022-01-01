@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
 using System.Collections;
 using System.Data;
+using static Dapper.SqlMapper;
 
 namespace com.etsoo.Utils.Database
 {
@@ -374,6 +375,43 @@ namespace com.etsoo.Utils.Database
 
             // Return
             return input;
+        }
+
+        /// <summary>
+        /// ISqlServerDataRecord array to SqlDataRecord enumerable collection
+        /// ISqlServerDataRecord数组转换为SqlDataRecord的可枚举集合
+        /// </summary>
+        /// <typeparam name="T">Generic ISqlServerDataRecord type</typeparam>
+        /// <param name="items">Items</param>
+        /// <returns>Records</returns>
+        public static IEnumerable<SqlDataRecord> ToDataRecords<T>(this T[] items) where T : ISqlServerDataRecord
+        {
+            // SqlDataRecord definition
+            var sdr = T.Create();
+
+            foreach (var item in items)
+            {
+                // Set values
+                item.SetValues(sdr);
+
+                // Yield return for the current item
+                // Memory saving
+                yield return sdr;
+            }
+        }
+
+        /// <summary>
+        /// ISqlServerDataRecord array to table value paramter
+        /// ISqlServerDataRecord数组转换为表值参数
+        /// </summary>
+        /// <typeparam name="T">Generic ISqlServerDataRecord type</typeparam>
+        /// <param name="items">Items</param>
+        /// <param name="typeName">Type name</param>
+        /// <returns>TVP</returns>
+        public static ICustomQueryParameter ToTVP<T>(this T[] items, string? typeName = null) where T : ISqlServerDataRecord
+        {
+            var records = items.ToDataRecords();
+            return records.AsTableValuedParameter(typeName ?? T.TypeName);
         }
     }
 }
