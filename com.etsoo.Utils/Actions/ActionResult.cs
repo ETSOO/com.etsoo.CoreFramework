@@ -257,6 +257,15 @@ namespace com.etsoo.Utils.Actions
                     w.WriteString(titleName, Title);
             }
 
+            if (options.IsWritable(Field == null))
+            {
+                var fieldName = options.ConvertName("Field");
+                if (Field == null)
+                    w.WriteNull(fieldName);
+                else
+                    w.WriteString(fieldName, Field);
+            }
+
             if (options.IsWritable(Detail == null))
             {
                 var detailName = options.ConvertName("Detail");
