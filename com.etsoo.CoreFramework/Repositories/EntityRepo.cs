@@ -297,7 +297,7 @@ namespace com.etsoo.CoreFramework.Repositories
         public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
         {
             var parameters = new DynamicParameters();
-            parameters.Add("Items", App.DB.DictionaryToParameter(sortData));
+            parameters.Add("Items", App.DB.DictionaryToParameter(sortData, null, null, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, App.BuildCommandName)));
 
             AddSystemParameters(parameters);
 

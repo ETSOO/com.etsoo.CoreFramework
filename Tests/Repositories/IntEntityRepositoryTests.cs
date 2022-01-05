@@ -116,5 +116,18 @@ namespace Tests.Repositories
             // Assert
             Assert.IsTrue(result.Ok);
         }
+
+        [Test]
+        public async Task SortAsync_Test()
+        {
+            // Arrange
+            var data = new Dictionary<int, short> { [1001] = 0, [1002] = 1 };
+
+            // Act
+            var result = await repo.SortAsync(data);
+
+            // Assert
+            Assert.LessOrEqual(1, result);
+        }
     }
 }
