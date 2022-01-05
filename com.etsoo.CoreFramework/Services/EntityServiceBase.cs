@@ -130,6 +130,17 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Sort data
+        /// 数据排序
+        /// </summary>
+        /// <param name="sortData">Data to sort</param>
+        /// <returns>Rows affected</returns>
+        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
+        {
+            return await Repo.SortAsync(sortData);
+        }
+
+        /// <summary>
         /// Update
         /// 更新
         /// </summary>

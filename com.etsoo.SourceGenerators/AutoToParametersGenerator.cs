@@ -164,7 +164,7 @@ namespace com.etsoo.SourceGenerators
                         if (string.IsNullOrEmpty(typeName))
                         {
                             // String
-                            valuePart = $"app.DB.DictionaryToTVP({fieldName}, {keyDbType}, {itemDbType}, null, {length.ToIntCode()}, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, app.Configuration.BuildCommandName))";
+                            valuePart = $"app.DB.DictionaryToTVP({fieldName}, {keyDbType}, {itemDbType}, null, {length.ToIntCode()}, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, app.BuildCommandName))";
                         }
                         else
                         {

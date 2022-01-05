@@ -121,6 +121,14 @@ namespace com.etsoo.CoreFramework.Repositories
         Task ReportAsync(HttpResponse response, string range, object? modal = null);
 
         /// <summary>
+        /// Sort data
+        /// 数据排序
+        /// </summary>
+        /// <param name="sortData">Data to sort</param>
+        /// <returns>Rows affected</returns>
+        Task<int> SortAsync(Dictionary<T, short> sortData);
+
+        /// <summary>
         /// Update entity
         /// 更新实体
         /// </summary>

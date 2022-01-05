@@ -289,6 +289,24 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Sort data
+        /// 数据排序
+        /// </summary>
+        /// <param name="sortData">Data to sort</param>
+        /// <returns>Rows affected</returns>
+        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("Items", App.DB.DictionaryToParameter(sortData));
+
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("update"), parameters);
+
+            return await ExecuteAsync(command);
+        }
+
+        /// <summary>
         /// Update entity
         /// 更新实体
         /// </summary>
@@ -404,7 +422,7 @@ namespace com.etsoo.CoreFramework.Repositories
             AddSystemParameters(parameters);
 
             var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
-            var records = await App.DB.NewConnection().ExecuteAsync(command);
+            var records = await ExecuteAsync(command);
 
             // Success
             return (ActionResult.Success, new UpdateResultData<T> { Id = model.Id, RowsAffected = records });
