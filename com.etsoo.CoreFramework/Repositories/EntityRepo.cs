@@ -301,7 +301,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("update"), parameters);
+            var command = CreateCommand(GetCommandName("sort"), parameters);
 
             return await ExecuteAsync(command);
         }
