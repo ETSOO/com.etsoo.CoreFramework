@@ -1,26 +1,11 @@
 ﻿namespace com.etsoo.CoreFramework.Business
 {
     /// <summary>
-    /// Product units
-    /// 产品单位
+    /// Repeat optins
+    /// 重复选项
     /// </summary>
-    public enum ProductUnit : byte
+    public enum RepeatOption : byte
     {
-        /// <summary>
-        /// Picese
-        /// 件
-        /// </summary>
-        PC = 1,
-
-        /// <summary>
-        /// Set
-        /// 套
-        /// </summary>
-        SET = 2,
-
-        /**
-         * Merge from RepeatOption
-         * **/
         /// <summary>
         /// Hour
         /// 小时
@@ -79,30 +64,6 @@
         /// Half year
         /// 半年
         /// </summary>
-        HALFYEAR = 36,
-
-        /// <summary>
-        /// Gram
-        /// 克
-        /// </summary>
-        GRAM = 40,
-
-        /// <summary>
-        /// 500G
-        /// 斤
-        /// </summary>
-        JIN = 41,
-
-        /// <summary>
-        /// Kilogram
-        /// 千克
-        /// </summary>
-        KILOGRAM = 42,
-
-        /// <summary>
-        /// Ton
-        /// 吨
-        /// </summary>
-        TON = 49
+        HALFYEAR = 36
     }
 }
