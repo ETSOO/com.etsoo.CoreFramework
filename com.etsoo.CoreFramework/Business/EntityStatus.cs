@@ -19,10 +19,28 @@
         Flaged = 9,
 
         /// <summary>
+        /// Approved
+        /// 已批准
+        /// </summary>
+        Approved = 100,
+
+        /// <summary>
+        /// Audited
+        /// 已审核
+        /// </summary>
+        Audited = 111,
+
+        /// <summary>
         /// Inactivated
         /// 已停用
         /// </summary>
         Inactivated = 200,
+
+        /// <summary>
+        /// Completed
+        /// 已完成
+        /// </summary>
+        Completed = 250,
 
         /// <summary>
         /// Archived
