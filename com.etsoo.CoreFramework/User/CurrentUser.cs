@@ -56,6 +56,7 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new CurrentUser(
                 user.Id,
+                user.Uid,
                 user.Organization,
                 name, user.RoleValue,
                 user.ClientIp,
@@ -94,7 +95,7 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, organization, role, deviceId) = GetData(data);
+            var (id, organization, role, deviceId, uid) = GetData(data);
             var (name, orgName, avatar, jsonData, corporate) = GetLocalData(data);
 
             // Validation
@@ -104,6 +105,7 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new CurrentUser(
                 id,
+                uid,
                 organization,
                 name,
                 role.GetValueOrDefault(),
@@ -161,6 +163,7 @@ namespace com.etsoo.CoreFramework.User
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
+        /// <param name="uid">Uid</param>
         /// <param name="organization">Organization</param>
         /// <param name="name">Name</param>
         /// <param name="roleValue">Role value</param>
@@ -170,8 +173,8 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
-            : base(id, organization, roleValue, clientIp, deviceId, language, region)
+        public CurrentUser(string id, Guid? uid, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
+            : base(id, uid, organization, roleValue, clientIp, deviceId, language, region)
         {
             Name = name;
             Corporate = corporate.GetValueOrDefault();

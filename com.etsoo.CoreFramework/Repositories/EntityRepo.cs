@@ -88,7 +88,12 @@ namespace com.etsoo.CoreFramework.Repositories
         public virtual async ValueTask<ActionResult> DeleteAsync(IEnumerable<T> ids)
         {
             var command = NewDeleteCommand(ids);
-            return await QueryAsResultAsync(command);
+            var result = await QueryAsResultAsync(command);
+
+            // Send back the ids
+            if (result.Ok) result.Data["Ids"] = ids;
+
+            return result;
         }
 
         /// <summary>
@@ -321,7 +326,12 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(GetCommandName("update"), parameters);
 
-            return await QueryAsResultAsync(command);
+            var result = await QueryAsResultAsync(command);
+
+            // Send back the Id
+            if (result.Ok) result.Data["Id"] = model.Id;
+
+            return result;
         }
 
         /// <summary>

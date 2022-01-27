@@ -14,7 +14,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared coding utilities.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.88</Version>
+    <Version>1.0.89</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
@@ -45,8 +45,8 @@
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="MimeKit" Version="3.1.0" />
-    <PackageReference Include="MySql.Data" Version="8.0.27" />
-    <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.8" />
+    <PackageReference Include="MySql.Data" Version="8.0.28" />
+    <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.2.2" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />

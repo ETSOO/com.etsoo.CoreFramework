@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.String;
 using Microsoft.AspNetCore.Http;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -32,14 +33,19 @@ namespace com.etsoo.CoreFramework.User
             // Claims
             var language = claims.FindFirstValue(ClaimTypes.Locality);
             var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
+            var userUidString = claims.FindFirstValue(ClaimTypes.PrimarySid);
 
             // Validate
             if (string.IsNullOrEmpty(language))
                 return null;
 
+            // User Uid
+            Guid? uid = Guid.TryParse(userUidString, out var userUidTemp) ? userUidTemp : null;
+
             // New user
             return new ServiceUser(
                 token.Id,
+                uid,
                 token.Organization,
                 roleValue,
                 token.ClientIp,
@@ -54,13 +60,14 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="data">Input</param>
         /// <returns>Result</returns>
-        protected static (string? id, string? organization, short? Role, int? deviceId) GetData(StringKeyDictionaryObject data)
+        protected static (string? id, string? organization, short? Role, int? deviceId, Guid? uid) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
                 data.Get("Organization"),
                 data.Get<short>("Role"),
-                data.Get<int>("DeviceId")
+                data.Get<int>("DeviceId"),
+                data.Get<Guid>("Uid")
             );
         }
 
@@ -76,7 +83,7 @@ namespace com.etsoo.CoreFramework.User
         public static ServiceUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
         {
             // Get data
-            var (id, organization, role, deviceId) = GetData(data);
+            var (id, organization, role, deviceId, uid) = GetData(data);
 
             // Validation
             if (id == null || role == null || deviceId == null)
@@ -85,6 +92,7 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new ServiceUser(
                 id,
+                uid,
                 organization,
                 role.Value,
                 ip,
@@ -139,10 +147,18 @@ namespace com.etsoo.CoreFramework.User
         public CultureInfo Language { get; }
 
         /// <summary>
+        /// User Uid
+        /// 用户全局编号
+        /// </summary>
+        [NotNullIfNotNull("Organization")]
+        public Guid? Uid { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
+        /// <param name="uid">Uid</param>
         /// <param name="organization">Organization</param>
         /// <param name="roleValue">Role value</param>
         /// <param name="clientIp">Client IP</param>
@@ -150,17 +166,19 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="organization">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
-        public ServiceUser(string id, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
+        public ServiceUser(string id, Guid? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
             :base(id, clientIp, region, deviceId, organization)
         {
             RoleValue = roleValue;
             Language = language;
+            Uid = uid;
         }
 
         private IEnumerable<Claim> GetClaims()
         {
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(RoleValueClaim, RoleValue.ToString());
+            if (Uid != null) yield return new(ClaimTypes.PrimarySid, Uid.Value.ToString());
         }
 
         /// <summary>
@@ -182,7 +200,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (_, _, role, _) = GetData(data);
+            var (_, _, role, _, _) = GetData(data);
 
             // Role
             if (role != null && RoleValue != role)

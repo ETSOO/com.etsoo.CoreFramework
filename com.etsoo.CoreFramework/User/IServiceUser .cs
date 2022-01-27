@@ -22,6 +22,12 @@ namespace com.etsoo.CoreFramework.User
         CultureInfo Language { get; }
 
         /// <summary>
+        /// User Uid
+        /// 用户全局编号
+        /// </summary>
+        Guid? Uid { get; }
+
+        /// <summary>
         /// Update
         /// 更新
         /// </summary>
