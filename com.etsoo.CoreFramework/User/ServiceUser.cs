@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils.String;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -141,6 +142,12 @@ namespace com.etsoo.CoreFramework.User
         public virtual short RoleValue { get; private set; }
 
         /// <summary>
+        /// Role
+        /// 角色
+        /// </summary>
+        public UserRole? Role { get; }
+
+        /// <summary>
         /// Language
         /// 语言
         /// </summary>
@@ -167,9 +174,13 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         public ServiceUser(string id, Guid? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
-            :base(id, clientIp, region, deviceId, organization)
+            : base(id, clientIp, region, deviceId, organization)
         {
             RoleValue = roleValue;
+
+            var userRole = (UserRole)roleValue;
+            Role = Enum.IsDefined(userRole) ? userRole : null;
+
             Language = language;
             Uid = uid;
         }
@@ -179,6 +190,17 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(RoleValueClaim, RoleValue.ToString());
             if (Uid != null) yield return new(ClaimTypes.PrimarySid, Uid.Value.ToString());
+
+            if(Role.HasValue)
+            {
+                var roles = Role.Value.GetRoles();
+
+                // Multiple roles
+                foreach (var role in roles)
+                {
+                    yield return new(ClaimTypes.Role, role);
+                }
+            }
         }
 
         /// <summary>

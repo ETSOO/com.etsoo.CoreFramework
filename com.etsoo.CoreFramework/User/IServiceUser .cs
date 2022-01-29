@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils.String;
 using System.Globalization;
 
 namespace com.etsoo.CoreFramework.User
@@ -14,6 +15,12 @@ namespace com.etsoo.CoreFramework.User
         /// 角色值
         /// </summary>
         short RoleValue { get; }
+
+        /// <summary>
+        /// Role
+        /// 角色
+        /// </summary>
+        UserRole? Role { get; }
 
         /// <summary>
         /// Language

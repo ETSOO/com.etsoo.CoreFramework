@@ -1,4 +1,5 @@
-﻿using com.etsoo.CoreFramework.Models;
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Properties;
 using com.etsoo.Utils.Image;
 using com.etsoo.Utils.Localization;
@@ -27,8 +28,9 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-
-
+            var id = 32768;
+            var v = (UserRole)id;
+            Console.WriteLine(Enum.IsDefined(v));
             Console.Read();
         }
 
