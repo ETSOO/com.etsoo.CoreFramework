@@ -179,7 +179,7 @@ namespace com.etsoo.CoreFramework.User
             RoleValue = roleValue;
 
             var userRole = (UserRole)roleValue;
-            Role = Enum.IsDefined(userRole) ? userRole : null;
+            Role = Utils.SharedUtils.EnumIsDefined(userRole) ? userRole : null;
 
             Language = language;
             Uid = uid;

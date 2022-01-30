@@ -30,7 +30,12 @@ namespace ConsoleApp1
         {
             var id = 32768;
             var v = (UserRole)id;
-            Console.WriteLine(Enum.IsDefined(v));
+            Console.WriteLine(string.Format("{0}, < 0 ? {1}, IsDefined: {2}", v, v < 0, Enum.GetName(v)));
+
+            id = 3;
+            v = (UserRole)id;
+            Console.WriteLine(string.Format("{0}, < 0 ? {1}, IsDefined: {2}", v, v < 0, Enum.GetName(v)));
+
             Console.Read();
         }
 
