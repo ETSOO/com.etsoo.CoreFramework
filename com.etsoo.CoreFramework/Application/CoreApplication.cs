@@ -88,8 +88,9 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="identifier">Identifier, like procedure with 'p'</param>
         /// <param name="parts">Parts</param>
+        /// <param name="isSystem">Is system command</param>
         /// <returns>Result</returns>
-        public virtual string BuildCommandName(string identifier, IEnumerable<string> parts)
+        public virtual string BuildCommandName(string identifier, IEnumerable<string> parts, bool isSystem = false)
         {
             var command = $"e{identifier}_" + string.Join("_", parts);
             return command.ToLower();

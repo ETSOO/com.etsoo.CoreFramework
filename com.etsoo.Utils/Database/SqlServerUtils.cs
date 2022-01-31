@@ -87,7 +87,7 @@ namespace com.etsoo.Utils.Database
         /// <returns>Command</returns>
         public static string GetListCommand(SqlDbType type, CommandBuilderDelegate builder)
         {
-            return builder(CommandIdentifier.Type, GetListParts(type));
+            return builder(CommandIdentifier.Type, GetListParts(type), true);
         }
 
         private static string DefaultListTvpFunc(SqlDbType type)
@@ -122,7 +122,7 @@ namespace com.etsoo.Utils.Database
         /// <returns>Command</returns>
         public static string GetDicCommand(SqlDbType keyType, SqlDbType valueType, CommandBuilderDelegate builder)
         {
-            return builder(CommandIdentifier.Type, GetDicParts(keyType, valueType));
+            return builder(CommandIdentifier.Type, GetDicParts(keyType, valueType), true);
         }
 
         private static string DefaultDicTvpFunc(SqlDbType keyType, SqlDbType valueType)

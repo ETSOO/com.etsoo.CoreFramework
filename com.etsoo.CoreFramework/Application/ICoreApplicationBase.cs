@@ -43,8 +43,9 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="identifier">Identifier, like procedure with 'p'</param>
         /// <param name="parts">Parts</param>
+        /// <param name="isSystem">Is system command</param>
         /// <returns>Result</returns>
-        string BuildCommandName(string identifier, IEnumerable<string> parts);
+        string BuildCommandName(string identifier, IEnumerable<string> parts, bool isSystem = false);
 
         /// <summary>
         /// Hash password bytes

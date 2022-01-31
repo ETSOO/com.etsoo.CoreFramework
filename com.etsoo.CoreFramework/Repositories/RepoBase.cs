@@ -179,7 +179,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new ArgumentNullException(nameof(parts));
             }
 
-            return App.BuildCommandName(CommandIdentifier.Procedure, parts.Prepend(Flag));
+            return App.BuildCommandName(CommandIdentifier.Procedure, parts.Prepend(Flag), false);
         }
 
         /// <summary>
