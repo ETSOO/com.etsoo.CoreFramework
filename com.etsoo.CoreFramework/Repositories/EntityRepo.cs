@@ -369,7 +369,7 @@ namespace com.etsoo.CoreFramework.Repositories
             var commandText = "query as json";
             if (!string.IsNullOrEmpty(queryKey) && FilterRange(queryKey, false))
             {
-                commandText = commandText.Replace("query ", $"query {queryKey} as json");
+                commandText = commandText.Replace("query as", $"query {queryKey} as");
             }
 
             var command = CreateCommand(GetCommandName(commandText), parameters);
