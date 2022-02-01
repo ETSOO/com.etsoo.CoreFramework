@@ -153,8 +153,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key word, default is empty</param>
         /// <returns>Task</returns>
-        Task QueryAsync<E, M>(M model, HttpResponse response) where E : struct where M : QueryRQ<E>;
+        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null) where E : struct where M : QueryRQ<E>;
 
         /// <summary>
         /// Quick update

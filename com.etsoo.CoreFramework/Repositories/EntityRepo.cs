@@ -358,14 +358,21 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key word, default is empty</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync<E, D>(D model, HttpResponse response) where E : struct where D : QueryRQ<E>
+        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null) where E : struct where D : QueryRQ<E>
         {
             var parameters = FormatParameters(model);
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("query as json"), parameters);
+            var commandText = "query as json";
+            if (!string.IsNullOrEmpty(queryKey) && FilterRange(queryKey, false))
+            {
+                commandText = commandText.Replace("query ", $"query {queryKey} as json");
+            }
+
+            var command = CreateCommand(GetCommandName(commandText), parameters);
 
             await ReadJsonToStreamAsync(command, response);
         }

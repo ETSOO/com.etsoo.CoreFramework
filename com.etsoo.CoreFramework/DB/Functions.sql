@@ -1,5 +1,32 @@
 IF EXISTS (SELECT *
            FROM   sys.objects
+           WHERE  object_id = OBJECT_ID(N'[dbo].[ef_get_update_json_sql]')
+                  AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
+  DROP FUNCTION [dbo].[ef_get_update_json_sql]
+
+GO
+
+-- =============================================
+-- Create date: 2022/01/31
+-- Description:	Get update fields json SQL
+-- =============================================
+CREATE FUNCTION [dbo].[ef_get_update_json_sql]
+(
+	-- Add the parameters for the function here
+	@Fields AS dbo.et_nvarchar_ids READONLY,
+	@TableName nvarchar(max),
+	@Conditions nvarchar(max) = 'Id = @Id'
+)
+RETURNS nvarchar(max)
+AS
+BEGIN
+	RETURN 'SELECT @JsonData = (SELECT ' + (SELECT STRING_AGG(QUOTENAME(Id), ', ') FROM @Fields) + ' FROM ' + @TableName + ' WHERE ' + @Conditions + ' FOR JSON PATH, WITHOUT_ARRAY_WRAPPER)'
+END
+
+GO
+
+IF EXISTS (SELECT *
+           FROM   sys.objects
            WHERE  object_id = OBJECT_ID(N'[dbo].[ef_get_update_sql]')
                   AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
   DROP FUNCTION [dbo].[ef_get_update_sql]
