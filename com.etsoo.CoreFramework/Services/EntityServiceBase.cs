@@ -84,10 +84,11 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key word, default is empty</param>
         /// <returns>Task</returns>
-        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response) where E : struct
+        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null) where E : struct
         {
-            await Repo.QueryAsync<E, QueryRQ<E>>(model, response);
+            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey);
         }
 
         /// <summary>
