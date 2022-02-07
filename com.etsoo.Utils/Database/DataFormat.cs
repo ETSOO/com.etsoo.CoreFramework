@@ -19,6 +19,12 @@
         public static readonly DataFormat Json = new JsonDataFormat();
 
         /// <summary>
+        /// Blank value
+        /// 空值
+        /// </summary>
+        public abstract string BlankValue { get; }
+
+        /// <summary>
         /// Root start content
         /// 根节点开始内容
         /// </summary>
@@ -53,6 +59,8 @@
         // XML format
         private class XmlDataFormat : DataFormat
         {
+            public override string BlankValue => "";
+
             public override string RootStart => "<root>";
 
             public override string RootEnd => "</root>";
@@ -73,6 +81,8 @@
         // JSON format
         private class JsonDataFormat : DataFormat
         {
+            public override string BlankValue => "null";
+
             public override string RootStart => "{";
 
             public override string RootEnd => "}";

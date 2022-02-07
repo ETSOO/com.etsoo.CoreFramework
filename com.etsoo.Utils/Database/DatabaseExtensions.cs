@@ -152,28 +152,34 @@ namespace com.etsoo.Utils.Database
                 
                 do
                 {
-                    if (reader.HasRows)
-                        hasContent = true;
-
                     // Collection node
                     // Names like data1, data2, ...
                     await stream.WriteAsync(Encoding.UTF8.GetBytes($"{(i > 1 ? ",\n" : "")}data{i}:"));
 
-                    // The content maybe splitted into severl rows
-                    while (await reader.ReadAsync())
+                    if (reader.HasRows)
                     {
-                        // NULL may returned
-                        if(await reader.IsDBNullAsync(0))
+                        hasContent = true;
+
+                        // The content maybe splitted into severl rows
+                        while (await reader.ReadAsync())
                         {
-                            await stream.WriteAsync(Encoding.UTF8.GetBytes("null"));
-                            break;
+                            // NULL may returned
+                            if (await reader.IsDBNullAsync(0))
+                            {
+                                await stream.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
+                                break;
+                            }
+
+                            // Get the TextReader
+                            using var textReader = reader.GetTextReader(0);
+
+                            // Write
+                            await textReader.ReadAllBytesAsyn(stream);
                         }
-
-                        // Get the TextReader
-                        using var textReader = reader.GetTextReader(0);
-
-                        // Write
-                        await textReader.ReadAllBytesAsyn(stream);
+                    }
+                    else
+                    {
+                        await stream.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
                     }
 
                     i++;
@@ -231,29 +237,35 @@ namespace com.etsoo.Utils.Database
 
                 do
                 {
-                    if (reader.HasRows)
-                        hasContent = true;
-
                     // Collection node
                     // Names like data1, data2, ...
                     var name = $"data{i}";
                     await writer.WriteAsync(Encoding.UTF8.GetBytes(format.CreateElementStart(name, i == 1)));
 
-                    // The content maybe splitted into severl rows
-                    while (await reader.ReadAsync())
+                    if(reader.HasRows)
                     {
-                        // NULL may returned
-                        if (await reader.IsDBNullAsync(0))
+                        hasContent = true;
+
+                        // The content maybe splitted into severl rows
+                        while (await reader.ReadAsync())
                         {
-                            await writer.WriteAsync(Encoding.UTF8.GetBytes("null"));
-                            break;
+                            // NULL may returned
+                            if (await reader.IsDBNullAsync(0))
+                            {
+                                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
+                                break;
+                            }
+
+                            // Get the TextReader
+                            using var textReader = reader.GetTextReader(0);
+
+                            // Write
+                            await textReader.ReadAllBytesAsyn(writer);
                         }
-
-                        // Get the TextReader
-                        using var textReader = reader.GetTextReader(0);
-
-                        // Write
-                        await textReader.ReadAllBytesAsyn(writer);
+                    }
+                    else
+                    {
+                        await writer.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
                     }
 
                     // End
