@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Database;
 using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
 
@@ -55,8 +56,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="range">View range</param>
         /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReadAsync(Stream stream, T id, string range = "default", DataFormat format = DataFormat.JSON);
+        Task ReadAsync(Stream stream, T id, string range = "default", DataFormat? format = null, bool multipleResults = false);
 
         /// <summary>
         /// View entity to PipeWriter
@@ -64,9 +66,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="writer">PipeWriter</param>
         /// <param name="id">Entity id</param>
+        /// <param name="range">View range</param>
         /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat format = DataFormat.JSON);
+        Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat? format = null, bool multipleResults = false);
 
         /// <summary>
         /// View entity JSON data HTTP Response
@@ -75,8 +79,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReadAsync(HttpResponse response, T id, string range = "default");
+        Task ReadAsync(HttpResponse response, T id, string range = "default", bool multipleResults = false);
 
         /// <summary>
         /// Entity report
@@ -96,8 +101,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat format = DataFormat.JSON);
+        Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false);
 
         /// <summary>
         /// Entity report to PipeWriter
@@ -107,8 +113,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat format = DataFormat.JSON);
+        Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false);
 
         /// <summary>
         /// Entity JSON report to HTTP Response
@@ -117,8 +124,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReportAsync(HttpResponse response, string range, object? modal = null);
+        Task ReportAsync(HttpResponse response, string range, object? modal = null, bool multipleResults = false);
 
         /// <summary>
         /// Sort data
@@ -154,8 +162,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null) where E : struct where M : QueryRQ<E>;
+        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null, bool multipleResults = false) where E : struct where M : QueryRQ<E>;
 
         /// <summary>
         /// Quick update

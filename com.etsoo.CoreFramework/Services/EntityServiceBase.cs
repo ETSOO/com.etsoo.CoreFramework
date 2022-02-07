@@ -85,10 +85,11 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null) where E : struct
+        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null, bool multipleResults = false) where E : struct
         {
-            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey);
+            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, multipleResults);
         }
 
         /// <summary>
@@ -111,10 +112,11 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        public async Task ReadAsync(HttpResponse response, T id, string range = "default")
+        public async Task ReadAsync(HttpResponse response, T id, string range = "default", bool multipleResults = false)
         {
-            await Repo.ReadAsync(response, id, range);
+            await Repo.ReadAsync(response, id, range, multipleResults);
         }
 
         /// <summary>
@@ -124,10 +126,11 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null)
+        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, bool multipleResults = false)
         {
-            await Repo.ReportAsync(response, range, modal);
+            await Repo.ReportAsync(response, range, modal, multipleResults);
         }
 
         /// <summary>

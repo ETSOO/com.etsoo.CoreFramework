@@ -255,12 +255,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="stream">Stream</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Has content or not</returns>
-        public async Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream)
+        public async Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryToStreamAsync(command, stream);
+                return connection.QueryToStreamAsync(command, stream, format, multipleResults);
             });
         }
 
@@ -270,12 +272,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="writer">PipeWriter</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Has content or not</returns>
-        public async Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer)
+        public async Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryToStreamAsync(command, writer);
+                return connection.QueryToStreamAsync(command, writer, format, multipleResults);
             });
         }
 
@@ -285,14 +289,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        public async Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response)
+        public async Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, bool multipleResults = false)
         {
             // Content type
             response.ContentType = "application/json";
 
             // Write to
-            await ReadToStreamAsync(command, response.BodyWriter);
+            await ReadToStreamAsync(command, response.BodyWriter, DataFormat.Json, multipleResults);
         }
 
         /// <summary>

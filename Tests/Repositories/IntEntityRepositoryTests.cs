@@ -61,7 +61,7 @@ namespace Tests.Repositories
         public void GetCommandName_Test()
         {
             // Arrange & Act
-            var command = repo.GetCommandName("read", DataFormat.JSON.ToString().ToLower());
+            var command = repo.GetCommandName("read", DataFormat.Json.Name.ToLower());
 
             // Assert
             Assert.AreEqual("ep_user_read_json", command);

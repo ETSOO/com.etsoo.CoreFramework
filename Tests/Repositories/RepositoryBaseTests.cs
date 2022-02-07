@@ -96,17 +96,34 @@ namespace Tests.Repositories
         public async Task ReadToStreamAsync_Test()
         {
             // Arrange
-            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001)";
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3)";
             var command = new CommandDefinition(sql);
             using var stream = new MemoryStream();
 
             // Act
-            var result = await repo.ReadToStreamAsync(command, stream);
+            var result = await repo.ReadToStreamAsync(command, stream, DataFormat.Json);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
             // Assert
             Assert.IsTrue(result);
             Assert.IsTrue(json.Contains("Admin 1"));
+        }
+
+        [Test]
+        public async Task ReadToStreamMultipleResultsAsync_Test()
+        {
+            // Arrange
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var command = new CommandDefinition(sql);
+            using var stream = new MemoryStream();
+
+            // Act
+            var result = await repo.ReadToStreamAsync(command, stream, DataFormat.Json, true);
+            var json = Encoding.UTF8.GetString(stream.ToArray());
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(json.Contains("data2:"));
         }
     }
 }

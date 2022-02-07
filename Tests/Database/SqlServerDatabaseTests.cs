@@ -138,7 +138,7 @@ namespace Tests.Utils
 
             // Act
             // {"name":"Admin 1"}
-            await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
+            await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream, DataFormat.Json);
 
             // Assert
             Assert.IsTrue(stream.Length == "{\"Name\":\"Admin 1\"}".Length);

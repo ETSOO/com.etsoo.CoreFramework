@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Database;
 using com.etsoo.Utils.Serialization;
 using Dapper;
 using Microsoft.AspNetCore.Http;
@@ -72,8 +73,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="stream">Stream</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Has content or not</returns>
-        Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream);
+        Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false);
 
         /// <summary>
         /// Async read text data (JSON/XML) to PipeWriter
@@ -81,8 +84,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="writer">PipeWriter</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Has content or not</returns>
-        Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer);
+        Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false);
 
         /// <summary>
         /// Async read JSON data to HTTP Response
@@ -90,8 +95,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response);
+        Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, bool multipleResults = false);
 
         /// <summary>
         /// Quick read data

@@ -131,7 +131,7 @@ namespace Tests.Utils
 
             // Act
             // "Admin 1"
-            await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream);
+            await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream, DataFormat.Json);
 
             // Assert
             Assert.IsTrue(stream.Length == "Admin 1".Length);

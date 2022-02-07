@@ -5,6 +5,7 @@ using Dapper;
 using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
+using System.Text;
 
 namespace com.etsoo.Utils.Database
 {
@@ -133,25 +134,76 @@ namespace com.etsoo.Utils.Database
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
         /// <param name="stream">Stream to write</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Is content wrote</returns>
-        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, Stream stream)
+        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false)
         {
-            // The content maybe splitted into severl rows
-            using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
-
-            // Has content
-            var hasContent = reader.HasRows;
-
-            while (await reader.ReadAsync())
+            if(multipleResults)
             {
-                // Get the TextReader
-                using var textReader = reader.GetTextReader(0);
+                // Multiple results
+                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
 
-                // Write
-                await textReader.ReadAllBytesAsyn(stream);
+                var i = 1;
+                var hasContent = false;
+
+                // JSON starts
+                await stream.WriteAsync(Encoding.UTF8.GetBytes("{\n"));
+                
+                do
+                {
+                    if (reader.HasRows)
+                        hasContent = true;
+
+                    // Collection node
+                    // Names like data1, data2, ...
+                    await stream.WriteAsync(Encoding.UTF8.GetBytes($"{(i > 1 ? ",\n" : "")}data{i}:"));
+
+                    // The content maybe splitted into severl rows
+                    while (await reader.ReadAsync())
+                    {
+                        // NULL may returned
+                        if(await reader.IsDBNullAsync(0))
+                        {
+                            await stream.WriteAsync(Encoding.UTF8.GetBytes("null"));
+                            break;
+                        }
+
+                        // Get the TextReader
+                        using var textReader = reader.GetTextReader(0);
+
+                        // Write
+                        await textReader.ReadAllBytesAsyn(stream);
+                    }
+
+                    i++;
+                } while (await reader.NextResultAsync());
+                
+                // JSON ends
+                await stream.WriteAsync(Encoding.UTF8.GetBytes("\n}"));
+
+                return hasContent;
             }
+            else
+            {
+                // Only one result
+                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
-            return hasContent;
+                // Has content
+                var hasContent = reader.HasRows;
+
+                // The content maybe splitted into severl rows
+                while (await reader.ReadAsync())
+                {
+                    // Get the TextReader
+                    using var textReader = reader.GetTextReader(0);
+
+                    // Write
+                    await textReader.ReadAllBytesAsyn(stream);
+                }
+
+                return hasContent;
+            }
         }
 
         /// <summary>
@@ -161,25 +213,79 @@ namespace com.etsoo.Utils.Database
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
         /// <param name="writer">Pipe writer</param>
+        /// <param name="format">Data format</param>
+        /// <param name="multipleResults">Multiple results</param>
         /// <returns>Is content wrote</returns>
-        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, PipeWriter writer)
+        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false)
         {
-            // The content maybe splitted into severl rows
-            using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
-
-            // Has content
-            var hasContent = reader.HasRows;
-
-            while (await reader.ReadAsync())
+            if(multipleResults)
             {
-                // Get the TextReader
-                using var textReader = reader.GetTextReader(0);
+                // Multiple results
+                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
 
-                // Write
-                await textReader.ReadAllBytesAsyn(writer);
+                var i = 1;
+                var hasContent = false;
+
+                // JSON/XML starts
+                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.RootStart));
+
+                do
+                {
+                    if (reader.HasRows)
+                        hasContent = true;
+
+                    // Collection node
+                    // Names like data1, data2, ...
+                    var name = $"data{i}";
+                    await writer.WriteAsync(Encoding.UTF8.GetBytes(format.CreateElementStart(name, i == 1)));
+
+                    // The content maybe splitted into severl rows
+                    while (await reader.ReadAsync())
+                    {
+                        // NULL may returned
+                        if (await reader.IsDBNullAsync(0))
+                        {
+                            await writer.WriteAsync(Encoding.UTF8.GetBytes("null"));
+                            break;
+                        }
+
+                        // Get the TextReader
+                        using var textReader = reader.GetTextReader(0);
+
+                        // Write
+                        await textReader.ReadAllBytesAsyn(writer);
+                    }
+
+                    // End
+                    await writer.WriteAsync(Encoding.UTF8.GetBytes(format.CreateElementEnd(name)));
+
+                    i++;
+                } while (await reader.NextResultAsync());
+
+                // JSON / XML ends
+                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.RootEnd));
+
+                return hasContent;
             }
+            else
+            {
+                // The content maybe splitted into severl rows
+                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
-            return hasContent;
+                // Has content
+                var hasContent = reader.HasRows;
+
+                while (await reader.ReadAsync())
+                {
+                    // Get the TextReader
+                    using var textReader = reader.GetTextReader(0);
+
+                    // Write
+                    await textReader.ReadAllBytesAsyn(writer);
+                }
+
+                return hasContent;
+            }
         }
     }
 }
