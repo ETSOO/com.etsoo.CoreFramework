@@ -1,9 +1,12 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Properties;
+using com.etsoo.Utils;
+using com.etsoo.Utils.Html;
 using com.etsoo.Utils.Image;
 using com.etsoo.Utils.Localization;
 using com.etsoo.Utils.MessageQueue;
+using com.etsoo.Utils.String;
 using RabbitMQ.Client;
 using System;
 using System.Drawing;
@@ -11,6 +14,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,21 +24,43 @@ using TableDependency.SqlClient.Base.EventArgs;
 
 namespace ConsoleApp1
 {
+    class RowData
+    {
+        public DateTime Creation { get; set; }
+        public decimal USD { get; set; }
+        public decimal EUR { get; set; }
+    }
+
     class Program
     {
         static readonly string connectionString = "Server=(local);User ID=smarterp;Password=smarterp;";
 
         static readonly ConnectionFactory factory = new ConnectionFactory { HostName = "localhost", UserName = "guest", Password = "guest", DispatchConsumersAsync = true };
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var id = 32768;
-            var v = (UserRole)id;
-            Console.WriteLine(string.Format("{0}, < 0 ? {1}, IsDefined: {2}", v, v < 0, Enum.GetName(v)));
+            /*
+            var stream = await HtmlUtils.GetStreamAsync(new Uri("https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do"));
+            var items = await HtmlUtils.ParseTable(stream, "table#InfoTable", (titles, data, index) =>
+            {
+                if (index > 10) return null;
 
-            id = 3;
-            v = (UserRole)id;
-            Console.WriteLine(string.Format("{0}, < 0 ? {1}, IsDefined: {2}", v, v < 0, Enum.GetName(v)));
+                var creation = SharedUtils.GetAccordingValue<DateTime>(titles, data, "日期", 0);
+                var usd = SharedUtils.GetAccordingValue<decimal>(titles, data, "美元", 1);
+                var eur = SharedUtils.GetAccordingValue<decimal>(titles, data, "欧元", 2);
+                if (creation == null || usd == null || eur == null) return null;
+
+                return new RowData
+                {
+                    Creation = creation.Value,
+                    USD = usd.Value,
+                    EUR = eur.Value
+                };
+            });
+            */
+
+            var stream = await HtmlUtils.GetStreamAsync(new Uri($"https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/sdds-exch-rate.json?t={LocalizationUtils.UTCToJsMiliseconds()}"));
+            var result = await JsonSerializer.DeserializeAsync<object>(stream);
 
             Console.Read();
         }

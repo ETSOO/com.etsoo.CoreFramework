@@ -1,5 +1,34 @@
 IF EXISTS (SELECT *
            FROM   sys.objects
+           WHERE  object_id = OBJECT_ID(N'[dbo].[ef_get_first_day]')
+                  AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
+  DROP FUNCTION [dbo].[ef_get_first_day]
+
+GO
+
+-- =============================================
+-- Create date: 2022/02/12
+-- Description:	Get first day of month or year
+-- =============================================
+CREATE FUNCTION [dbo].[ef_get_first_day]
+(
+	-- Add the parameters for the function here
+	@Date datetime,
+	@Interval varchar(20)
+)
+RETURNS datetime
+AS
+BEGIN
+	IF @Interval = 'y' OR @Interval = 'year'
+		RETURN DATEADD(YEAR, DATEDIFF(YEAR, 0, @Date), 0)
+
+	RETURN DATEADD(DAY, 1, EOMONTH(@Date, -1))
+END
+
+GO
+
+IF EXISTS (SELECT *
+           FROM   sys.objects
            WHERE  object_id = OBJECT_ID(N'[dbo].[ef_get_update_json_sql]')
                   AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
   DROP FUNCTION [dbo].[ef_get_update_json_sql]

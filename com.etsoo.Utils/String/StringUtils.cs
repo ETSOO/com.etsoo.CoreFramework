@@ -66,6 +66,8 @@ namespace com.etsoo.Utils.String
         /// <returns>Result</returns>
         public static string HideData(string data, char? endChar = null)
         {
+            if (data == string.Empty) return data;
+
             if (endChar != null)
             {
                 var index = data.IndexOf(endChar.Value);
