@@ -13,7 +13,7 @@
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <Company>ETSOO</Company>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
-    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
     <Version>1.1.88</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
