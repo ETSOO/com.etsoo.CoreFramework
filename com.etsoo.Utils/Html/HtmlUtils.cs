@@ -48,8 +48,8 @@ namespace com.etsoo.Utils.Html
         /// <param name="selector">Table selector</param>
         /// <param name="creator">Row data creator</param>
         /// <param name="titleRowIndex">Title row index, -1 means no titles</param>
-        /// <returns>Parsed data</returns>
-        public async static Task<List<T>> ParseTable<T>(Stream stream, string selector, Func<List<string>?, List<string>, int, T?> creator, int titleRowIndex = 0)
+        /// <returns>Parsed data and continue or not</returns>
+        public async static Task<List<T>> ParseTable<T>(Stream stream, string selector, Func<List<string>?, List<string>, int, (T?, bool)> creator, int titleRowIndex = 0)
         {
             var items = new List<T>();
 
@@ -68,13 +68,14 @@ namespace com.etsoo.Utils.Html
 
                     // Create item
                     // Also could break when pass the index
-                    var item = creator(titles, data, i - startIndex);
-
-                    // Return null will break
-                    if (item == null) break;
+                    var (item, continueProcess) = creator(titles, data, i - startIndex);
 
                     // Add to the collection
-                    items.Add(item);
+                    if (item != null)
+                        items.Add(item);
+
+                    // Break
+                    if (!continueProcess) break;
                 }
             }
 
