@@ -384,7 +384,7 @@ namespace com.etsoo.Utils.Database
         /// <typeparam name="T">Generic ISqlServerDataRecord type</typeparam>
         /// <param name="items">Items</param>
         /// <returns>Records</returns>
-        public static IEnumerable<SqlDataRecord> ToDataRecords<T>(this T[] items) where T : ISqlServerDataRecord
+        public static IEnumerable<SqlDataRecord> ToDataRecords<T>(this IEnumerable<T> items) where T : ISqlServerDataRecord
         {
             // SqlDataRecord definition
             var sdr = T.Create();
@@ -408,7 +408,7 @@ namespace com.etsoo.Utils.Database
         /// <param name="items">Items</param>
         /// <param name="typeName">Type name</param>
         /// <returns>TVP</returns>
-        public static ICustomQueryParameter ToTVP<T>(this T[] items, string? typeName = null) where T : ISqlServerDataRecord
+        public static ICustomQueryParameter ToTVP<T>(this IEnumerable<T> items, string? typeName = null) where T : ISqlServerDataRecord
         {
             var records = items.ToDataRecords();
             return records.AsTableValuedParameter(typeName ?? T.TypeName);
