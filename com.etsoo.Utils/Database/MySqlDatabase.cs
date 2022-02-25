@@ -9,6 +9,12 @@ namespace com.etsoo.Utils.Database
     public sealed class MySqlDatabase : CommonDatabase<MySqlConnection>
     {
         /// <summary>
+        /// Support stored procedure or not
+        /// 是否支持存储过程
+        /// </summary>
+        public override bool SupportStoredProcedure => true;
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>

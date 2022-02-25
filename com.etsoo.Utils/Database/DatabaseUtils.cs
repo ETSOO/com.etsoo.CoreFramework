@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using com.etsoo.Utils.Serialization;
+using Dapper;
+using System.Data;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.Utils.Database
@@ -9,6 +11,29 @@ namespace com.etsoo.Utils.Database
     /// </summary>
     public static class DatabaseUtils
     {
+        /// <summary>
+        /// Format parameters to Dapper parameters
+        /// 将参数格式化为 Dapper 参数
+        /// </summary>
+        /// <param name="parameters">Dynamic parameters</param>
+        /// <returns>Result</returns>
+        public static DynamicParameters? FormatParameters(object? parameters)
+        {
+            if (parameters == null) return null;
+
+            if (parameters is DynamicParameters dp)
+            {
+                return dp;
+            }
+
+            if (parameters is IAutoParameters ap)
+            {
+                return ap.AsParameters();
+            }
+
+            return new DynamicParameters(parameters);
+        }
+
         /// <summary>
         /// Determine whether it is a safe SQL statement in order to avoid SQL injection
         /// 判断是否为安全SQL语句，防止注水攻击

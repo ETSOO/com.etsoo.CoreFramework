@@ -79,15 +79,13 @@ namespace com.etsoo.CoreFramework.Repositories
 
         /// <summary>
         /// Execute a command asynchronously
+        /// SQL Server: SET NOCOUNT OFF, MySQL: UseAffectedRows = True
         /// </summary>
         /// <param name="command">The command to execute on this connection</param>
         /// <returns>The number of rows affected</returns>
         public async Task<int> ExecuteAsync(CommandDefinition command)
         {
-            return await App.DB.WithConnection((connection) =>
-            {
-                return connection.ExecuteAsync(command);
-            });
+            return await App.DB.ExecuteAsync(command);
         }
 
         /// <summary>
@@ -98,10 +96,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>The first cell selected as T</returns>
         public async Task<T> ExecuteScalarAsync<T>(CommandDefinition command)
         {
-            return await App.DB.WithConnection((connection) =>
-            {
-                return connection.ExecuteScalarAsync<T>(command);
-            });
+            return await App.DB.ExecuteScalarAsync<T>(command);
         }
 
         /// <summary>
@@ -131,22 +126,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Result</returns>
         virtual protected DynamicParameters FormatParameters(object parameters)
         {
-            if (parameters is DynamicParameters dp)
-            {
-                return dp;
-            }
-
-            if (parameters is IAutoParameters ap)
-            {
-                return ap.AsParameters();
-            }
-
             if (parameters is IModelParameters p)
             {
                 return p.AsParameters(App);
             }
 
-            return new DynamicParameters(parameters);
+            return DatabaseUtils.FormatParameters(parameters) ?? new DynamicParameters();
         }
 
         /// <summary>
@@ -202,21 +187,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public async IAsyncEnumerable<D> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        public IAsyncEnumerable<D> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
-            using var connection = App.DB.NewConnection();
-
-            using var reader = await connection.ExecuteReaderAsync(command);
-
-            var items = D.CreateAsync(reader);
-
-            await foreach (var item in items)
-            {
-                yield return item;
-            }
-
-            await reader.CloseAsync();
-            await connection.CloseAsync();
+            return App.DB.QuerySourceAsync<D>(command);
         }
 
         /// <summary>
@@ -227,10 +200,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Action result</returns>
         public async ValueTask<ActionResult> QueryAsResultAsync(CommandDefinition command)
         {
-            var result = await App.DB.WithValueConnection((connection) =>
-            {
-                return connection.QueryAsResultAsync(command);
-            });
+            var result = await App.DB.QueryAsResultAsync(command);
 
             if (result == null)
             {

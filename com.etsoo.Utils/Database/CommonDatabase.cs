@@ -1,4 +1,6 @@
-﻿using com.etsoo.Utils.Models;
+﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Models;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using Dapper;
 using System.Collections;
@@ -27,6 +29,12 @@ namespace com.etsoo.Utils.Database
         /// 蛇形命名，如 user_id
         /// </summary>
         public bool SnakeNaming { get; }
+
+        /// <summary>
+        /// Support stored procedure or not
+        /// 是否支持存储过程
+        /// </summary>
+        public virtual bool SupportStoredProcedure => false;
 
         /// <summary>
         /// Constructor
@@ -211,6 +219,178 @@ namespace com.etsoo.Utils.Database
             await connection.OpenAsync();
 
             return await func(connection);
+        }
+
+        /// <summary>
+        /// Execute a command asynchronously
+        /// SQL Server: SET NOCOUNT OFF, MySQL: UseAffectedRows = True
+        /// </summary>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> ExecuteAsync(CommandDefinition command)
+        {
+            return await WithConnection((connection) =>
+            {
+                return connection.ExecuteAsync(command);
+            });
+        }
+
+        /// <summary>
+        /// Execute a command asynchronously
+        /// SQL Server: SET NOCOUNT OFF, MySQL: UseAffectedRows = True
+        /// </summary>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The number of rows affected</returns>
+        public async Task<int> ExecuteAsync(string commandText, object? parameters = null, CommandType? commandType = null)
+        {
+            commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            return await ExecuteAsync(command);
+        }
+
+        /// <summary>
+        /// Execute parameterized SQL that selects a single value
+        /// </summary>
+        /// <typeparam name="T">Generic return type</typeparam>
+        /// <param name="command">The command to execute on this connection</param>
+        /// <returns>The first cell selected as T</returns>
+        public async Task<T> ExecuteScalarAsync<T>(CommandDefinition command)
+        {
+            return await WithConnection((connection) =>
+            {
+                return connection.ExecuteScalarAsync<T>(command);
+            });
+        }
+
+        /// <summary>
+        /// Execute parameterized SQL that selects a single value
+        /// </summary>
+        /// <typeparam name="T">Generic return type</typeparam>
+        /// <param name="commandText">The command to execute on this connection</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="commandType">Command type</param>
+        /// <returns>The first cell selected as T</returns>
+        public async Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        {
+            commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            return await ExecuteScalarAsync<T>(command);
+        }
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async Task<IEnumerable<T>> QueryAsync<T>(CommandDefinition command)
+        {
+            return await WithConnection((connection) =>
+            {
+                return connection.QueryAsync<T>(command);
+            });
+        }
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="commandText">The command to execute on this connection</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="commandType">Command type</param>
+        /// <returns>Result</returns>
+        public async Task<IEnumerable<T>> QueryAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        {
+            commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            return await QueryAsync<T>(command);
+        }
+
+        /// <summary>
+        /// Async query command as single object
+        /// 异步执行命令返回单个对象
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async Task<T?> QuerySingleAsync<T>(CommandDefinition command)
+        {
+            return await WithConnection((connection) =>
+            {
+                return connection.QueryFirstOrDefaultAsync<T>(command);
+            });
+        }
+
+        /// <summary>
+        /// Async query command as single object
+        /// 异步执行命令返回单个对象
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="commandText">The command to execute on this connection</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="commandType">Command type</param>
+        /// <returns>Result</returns>
+        public async Task<T?> QuerySingleAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        {
+            commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            return await QuerySingleAsync<T>(command);
+        }
+
+        /// <summary>
+        /// Async query command as source generated object list
+        /// 异步执行命令返回源生成对象列表
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async IAsyncEnumerable<D> QuerySourceAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        {
+            using var connection = NewConnection();
+
+            using var reader = await connection.ExecuteReaderAsync(command);
+
+            var items = D.CreateAsync(reader);
+
+            await foreach (var item in items)
+            {
+                yield return item;
+            }
+
+            await reader.CloseAsync();
+            await connection.CloseAsync();
+        }
+
+        /// <summary>
+        /// Async query command as source generated object list
+        /// 异步执行命令返回源生成对象列表
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="commandText">The command to execute on this connection</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="commandType">Command type</param>
+        /// <returns>Result</returns>
+        public IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null) where D : IDataReaderParser<D>
+        {
+            commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            return QuerySourceAsync<D>(command);
+        }
+
+        /// <summary>
+        /// Async query command as action result
+        /// 异步执行命令返回操作结果
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <returns>Action result</returns>
+        public async ValueTask<ActionResult?> QueryAsResultAsync(CommandDefinition command)
+        {
+            return await WithValueConnection((connection) =>
+            {
+                return connection.QueryAsResultAsync(command);
+            });
         }
     }
 }
