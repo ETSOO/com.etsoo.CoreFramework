@@ -11,6 +11,7 @@ using RabbitMQ.Client;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -59,10 +60,26 @@ namespace ConsoleApp1
             });
             */
 
-            var stream = await HtmlUtils.GetStreamAsync(new Uri($"https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/sdds-exch-rate.json?t={LocalizationUtils.UTCToJsMiliseconds()}"));
-            var result = await JsonSerializer.DeserializeAsync<object>(stream);
+            await CreateQRCode();
 
             Console.Read();
+        }
+
+        static async Task CreateQRCode()
+        {
+            var options = new BarcodeOptions
+            {
+                Type="QRCode",
+                Content="https://cn.etsoo.com/",
+                ForegroundText="#3f51b5",
+                Width = 600,
+                Height = 600
+            };
+
+            using var stream = File.Create("D:\\test.png");
+            await BarcodeUtils.CreateAsync(stream, options);
+
+            Console.Write("QRCode created");
         }
 
         static void TestTask()
