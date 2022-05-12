@@ -10,6 +10,7 @@ namespace Benchmark
             // BenchmarkRunner.Run<Utils.JsonSerializationBM>();
             // BenchmarkRunner.Run<Utils.ActionResultSerializationBM>();
             // BenchmarkRunner.Run<Utils.DictionaryDeserializationBM>();
+            BenchmarkRunner.Run<Utils.StringSpanBM>();
         }
     }
 }

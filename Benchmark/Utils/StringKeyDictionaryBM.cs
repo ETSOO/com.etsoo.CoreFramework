@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using com.etsoo.Utils.String;
-using System;
 
 namespace Benchmark.Utils
 {

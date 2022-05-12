@@ -9,6 +9,7 @@ using com.etsoo.Utils.MessageQueue;
 using com.etsoo.Utils.String;
 using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -60,9 +61,69 @@ namespace ConsoleApp1
             });
             */
 
-            await CreateQRCode();
+            //await CreateQRCode();
+
+            int[] a = { 1, 2, 3 };
+
+            var input = "ghhrkkb";
+            Console.WriteLine(string.Concat(input.Where((c, index) => index == 0 || input[index - 1] != c)));
 
             Console.Read();
+        }
+
+        public static int solution(int[] A)
+        {
+            // write your code in C# 6.0 with .NET 4.5 (Mono)
+            var total = A.Sum();
+            var list = A.Select(a => (double)a).ToList();
+
+            var target = total / 2.0;
+
+            var filters = 0;
+            var current = 0D;
+            while (current < target)
+            {
+                var max = list.Max();
+                
+                var reduced = max / 2.0;
+                var index = list.IndexOf(max);
+                list[index] = reduced;
+                
+                current += reduced;
+            }
+
+            return filters;
+        }
+
+        public static string Simplify(string input)
+        {
+            var chars = input.AsSpan();
+            char? last = null;
+            var index = 0;
+            var newIndex = 0;
+            var len = 0;
+            Span<char> newChars = new char[chars.Length];
+
+            for (var i = 0; i < chars.Length; i++)
+            {
+                var c = chars[i];
+                if (last == null || !last.Value.Equals(c))
+                {
+                    last = c;
+                    len++;
+                }
+                else
+                {
+                    chars.Slice(index, len).CopyTo(newChars.Slice(newIndex, len));
+                    newIndex += len;
+                    index = i + 1;
+                    len = 0;
+                }
+            }
+
+            chars.Slice(index, len).CopyTo(newChars.Slice(newIndex, len));
+
+            return newChars.Trim('\0').ToString();
         }
 
         static async Task CreateQRCode()
