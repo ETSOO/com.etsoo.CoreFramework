@@ -18,8 +18,8 @@ namespace com.etsoo.Utils.Image
         /// <param name="input">Input Base64 string</param>
         /// <param name="stream">Stream</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Result</returns>
-        public static async Task CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
+        /// <returns>Extension</returns>
+        public static async Task<string> CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
         {
             // Format
             IImageFormat? format = null;
@@ -53,11 +53,15 @@ namespace com.etsoo.Utils.Image
                 }
             }
 
+            format ??= PngFormat.Instance;
+
             using var ms = new MemoryStream(Convert.FromBase64String(input.Trim()));
 
             using var image = await SixLabors.ImageSharp.Image.LoadAsync(ms, token);
 
-            await image.SaveAsync(stream, format ?? PngFormat.Instance, token);
+            await image.SaveAsync(stream, format, token);
+
+            return format.FileExtensions.First();
         }
     }
 }

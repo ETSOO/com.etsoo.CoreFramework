@@ -36,9 +36,10 @@ namespace Tests.Utils
 
             // Act
             using var ms = new MemoryStream();
-            await ImageSharpUtils.CreateFromBase64StringAsync(base64, ms);
+            var ext = await ImageSharpUtils.CreateFromBase64StringAsync(base64, ms);
 
             // Assert
+            Assert.AreEqual("png", ext);
             Assert.AreEqual(1015, ms.Length);
         }
     }
