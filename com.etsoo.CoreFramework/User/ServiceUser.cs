@@ -157,7 +157,7 @@ namespace com.etsoo.CoreFramework.User
         /// User Uid
         /// 用户全局编号
         /// </summary>
-        [NotNullIfNotNull("Organization")]
+        [NotNullIfNotNull(nameof(Organization))]
         public Guid? Uid { get; }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(RoleValueClaim, RoleValue.ToString());
             if (Uid != null) yield return new(ClaimTypes.PrimarySid, Uid.Value.ToString());
 
-            if(Role.HasValue)
+            if (Role.HasValue)
             {
                 var roles = Role.Value.GetRoles();
 

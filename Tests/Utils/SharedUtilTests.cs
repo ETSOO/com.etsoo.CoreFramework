@@ -1,8 +1,22 @@
 ﻿using com.etsoo.Utils;
 using NUnit.Framework;
+using System.Text;
+using System.Text.Json;
 
 namespace Tests.Utils
 {
+    class Data
+    {
+        public int Id { get; set; }
+
+        public string Name { get; }
+
+        public Data(string name)
+        {
+            Name = name;
+        }
+    }
+
     [TestFixture]
     public class SharedUtilTests
     {
@@ -13,6 +27,39 @@ namespace Tests.Utils
             var values = new List<string> { "2022-02-24", "632.8", "715.14", "5.5079", "81.079", "856.99", "66.144", "1283.55", "457.16", "496.96", "428.31", "470.01", "689.73", "239.05", "18889.0", "58.039", "59.287", "5046.66", "64.149", "104.02", "148.4", "140.58", "218.486", "319.98", "509.91" };
             var value = SharedUtils.GetAccordingValue<decimal>(fields, values, "港元", 4);
             Assert.AreEqual(81.079, value);
+        }
+
+        [Test]
+        public async Task JsonSerializeAsyncTests()
+        {
+            // Arrange
+            var data = new Data("Etsoo");
+
+            // Act
+            using var stream = SharedUtils.GetStream();
+            await SharedUtils.JsonSerializeAsync(data, stream, new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+            var result = Encoding.UTF8.GetString(stream.GetReadOnlySequence());
+
+            // Assert
+            Assert.AreEqual("""{"id":0,"name":"Etsoo"}""", result);
+        }
+
+        [Test]
+        public async Task ObjectToDictionaryAsyncTests()
+        {
+            // Arrange
+            var data = new Data("Etsoo");
+
+            // Act
+            var dic = await SharedUtils.ObjectToDictionaryAsync(data);
+
+            // Assert
+            Assert.AreEqual(dic.Keys.Count, 2);
+            Assert.IsTrue(dic.ContainsKey("Name"));
         }
     }
 }

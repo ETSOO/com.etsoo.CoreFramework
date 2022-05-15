@@ -1,4 +1,8 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.Utils.Serialization;
+using com.etsoo.Utils.String;
+using Microsoft.IO;
+using System.Text;
+using System.Text.Json;
 
 namespace com.etsoo.Utils
 {
@@ -8,6 +12,18 @@ namespace com.etsoo.Utils
     /// </summary>
     public static class SharedUtils
     {
+        private static readonly RecyclableMemoryStreamManager manager = new();
+
+        /// <summary>
+        /// Get RecyclableMemoryStream
+        /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
+        /// </summary>
+        /// <returns>Result</returns>
+        public static RecyclableMemoryStream GetStream()
+        {
+            return (manager.GetStream() as RecyclableMemoryStream)!;
+        }
+
         /// <summary>
         /// Enum is defined
         /// 枚举是否定义
@@ -72,6 +88,67 @@ namespace com.etsoo.Utils
         public static R? GetAccordingValue<R>(IList<string>? fields, IList<string> values, string field, int defaultIndex = -1) where R : struct
         {
             return GetAccordingValue<string, string, R>(fields, values, field, defaultIndex);
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="data">Data</param>
+        /// <param name="stream">Stream to hold the result</param>
+        /// <param name="options">Options</param>
+        /// <returns>Task</returns>
+        public static async Task JsonSerializeAsync<D>(D data, RecyclableMemoryStream stream, JsonSerializerOptions? options = null)
+        {
+            options ??= new JsonSerializerOptions
+            {
+                WriteIndented = false
+            };
+
+            if (data is IJsonSerialization di)
+            {
+                await di.ToJsonAsync(stream, options);
+            }
+            else
+            {
+                await JsonSerializer.SerializeAsync(stream, data, options);
+            }
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="data">Data</param>
+        /// <param name="options">Options</param>
+        /// <returns>Task</returns>
+        public static async Task<string> JsonSerializeAsync<D>(D data, JsonSerializerOptions? options = null)
+        {
+            using var ms = GetStream();
+            await JsonSerializeAsync(data, ms, options);
+            return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
+        }
+
+        /// <summary>
+        /// Object to dictionary
+        /// 转换对象为字典数据
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="obj">Object</param>
+        /// <returns>Result</returns>
+        public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj)
+        {
+            // Stream
+            using var ms = GetStream();
+
+            // Serialize
+            await JsonSerializeAsync(obj, ms);
+
+            // Deserialize
+            ms.Position = 0;
+            return (await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(ms)) ?? new Dictionary<string, object>();
         }
     }
 }

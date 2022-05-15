@@ -241,7 +241,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 异步读取文本数据(JSON或者XML)到PipeWriter
         /// </summary>
         /// <param name="command">Command</param>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">PipeWriter or RecyclableMemoryStream</param>
         /// <param name="format">Data format</param>
         /// <param name="multipleResults">Multiple results</param>
         /// <returns>Has content or not</returns>
