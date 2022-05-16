@@ -55,7 +55,7 @@ namespace com.etsoo.Utils.Image
 
             format ??= PngFormat.Instance;
 
-            using var ms = new MemoryStream(Convert.FromBase64String(input.Trim()));
+            using var ms = SharedUtils.GetStream(Convert.FromBase64String(input.Trim()));
 
             using var image = await SixLabors.ImageSharp.Image.LoadAsync(ms, token);
 

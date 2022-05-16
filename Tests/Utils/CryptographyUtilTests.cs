@@ -1,8 +1,6 @@
 ﻿using com.etsoo.Utils.Crypto;
 using NUnit.Framework;
-using System;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Tests.Utils
 {
@@ -114,6 +112,19 @@ namespace Tests.Utils
 
             // Assert
             Assert.AreEqual("9c7ce665e6f4f4c807912a7486244c90", Convert.ToHexString(result).ToLower());
+        }
+
+        [Test]
+        public async Task SHA1Tests()
+        {
+            // Arrange
+            var input = "jsapi_ticket=sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg&noncestr=Wm3WZYTPz0wzccnW&timestamp=1414587457&url=http://mp.weixin.qq.com?params=value";
+
+            // Act
+            var result = await CryptographyUtils.SHA1Async(input);
+
+            // Assert
+            Assert.AreEqual("0f9de62fce790f9a083d5c99e95740ceb90c27ed", Convert.ToHexString(result).ToLower());
         }
 
         [Test]

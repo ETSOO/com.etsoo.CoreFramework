@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.SpanMemory;
-using Microsoft.IO;
 using Microsoft.Toolkit.HighPerformance;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
@@ -167,9 +166,9 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            var manager = new RecyclableMemoryStreamManager();
+            using var ms = SharedUtils.GetStream(message.ToEncodingBytes());
 
-            return alg.ComputeHash(manager.GetStream(message.ToEncodingBytes().ToArray()));
+            return alg.ComputeHash(ms);
         }
 
         /// <summary>
@@ -187,9 +186,9 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            var manager = new RecyclableMemoryStreamManager();
+            using var ms = SharedUtils.GetStream(message.ToEncodingBytes());
 
-            return alg.ComputeHash(manager.GetStream(message.ToEncodingBytes().ToArray()));
+            return alg.ComputeHash(ms);
         }
 
         /// <summary>
@@ -207,9 +206,9 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            var manager = new RecyclableMemoryStreamManager();
+            using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(message));
 
-            return await alg.ComputeHashAsync(manager.GetStream(Encoding.UTF8.GetBytes(message)));
+            return await alg.ComputeHashAsync(ms);
         }
 
         /// <summary>
@@ -227,9 +226,9 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            var manager = new RecyclableMemoryStreamManager();
+            using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(message));
 
-            return await alg.ComputeHashAsync(manager.GetStream(Encoding.UTF8.GetBytes(message)));
+            return await alg.ComputeHashAsync(ms);
         }
 
         /// <summary>
@@ -241,9 +240,21 @@ namespace com.etsoo.Utils.Crypto
         public static async Task<byte[]> MD5Async(string source)
         {
             using var md5 = MD5.Create();
-
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(source));
+            using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
             return await md5.ComputeHashAsync(ms);
+        }
+
+        /// <summary>
+        /// SHA1 hash
+        /// SHA1哈希
+        /// </summary>
+        /// <param name="source">Source</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> SHA1Async(string source)
+        {
+            using var sha1 = SHA1.Create();
+            using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
+            return await sha1.ComputeHashAsync(ms);
         }
 
         /// <summary>
@@ -255,7 +266,7 @@ namespace com.etsoo.Utils.Crypto
         public static async Task<byte[]> SHA3Async(string source)
         {
             using var sha512 = SHA512.Create();
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes(source));
+            using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
             return await sha512.ComputeHashAsync(ms);
         }
 
@@ -268,7 +279,7 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="input">Input data</param>
         /// <param name="secureManager">Secure manager</param>
         /// <returns>Unsealed data</returns>
-        [return:NotNullIfNotNull("input")]
+        [return: NotNullIfNotNull("input")]
         public static string? UnsealData(string? input, Func<string, string>? secureManager)
         {
             if (string.IsNullOrEmpty(input)) return input;

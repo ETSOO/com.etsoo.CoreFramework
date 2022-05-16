@@ -25,6 +25,28 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
+        /// Get RecyclableMemoryStream
+        /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
+        /// </summary>
+        /// <param name="bytes">Initial bytes</param>
+        /// <returns></returns>
+        public static RecyclableMemoryStream GetStream(byte[] bytes)
+        {
+            return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
+        }
+
+        /// <summary>
+        /// Get RecyclableMemoryStream
+        /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
+        /// </summary>
+        /// <param name="bytes">Initial bytes</param>
+        /// <returns></returns>
+        public static RecyclableMemoryStream GetStream(ReadOnlySpan<byte> bytes)
+        {
+            return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
+        }
+
+        /// <summary>
         /// Enum is defined
         /// 枚举是否定义
         /// </summary>
