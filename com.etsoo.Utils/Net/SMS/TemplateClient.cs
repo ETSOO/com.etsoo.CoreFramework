@@ -4,9 +4,18 @@
     /// Template abstract client
     /// 模板抽象客户端
     /// </summary>
-    public abstract class TemplateClient : ITemplateClient
+    public abstract class TemplateClient : HttpClientService, ITemplateClient
     {
         private readonly List<TemplateItem> allTemplates = new();
+
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="client">HTTP client</param>
+        public TemplateClient(HttpClient client) : base(client)
+        {
+        }
 
         /// <summary>
         /// Add template
