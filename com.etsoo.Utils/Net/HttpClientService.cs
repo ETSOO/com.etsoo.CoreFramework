@@ -10,7 +10,7 @@ namespace com.etsoo.Utils.Net
     /// HTTP client two cases result
     /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/attributes/nullable-analysis
     /// [MemberNotNull(nameof(field))], after call the method, the field will not be null
-    /// [NotNullIfNotNull(nameof(field)], if field is not null, the indication will not be null
+    /// [NotNullIfNotNull(nameof(field))], if field is not null, the indication will not be null
     /// HTTP客户端两种情况结果
     /// </summary>
     /// <typeparam name="D">Generic data type</typeparam>
@@ -59,6 +59,12 @@ namespace com.etsoo.Utils.Net
         protected readonly HttpClient Client;
 
         /// <summary>
+        /// Json serializer sending out options
+        /// Json 序列化程序发送选项
+        /// </summary>
+        protected readonly JsonSerializerOptions OptionsOut;
+
+        /// <summary>
         /// Json serializer options
         /// Json 序列化程序选项
         /// </summary>
@@ -72,6 +78,12 @@ namespace com.etsoo.Utils.Net
         public HttpClientService(HttpClient client)
         {
             Client = client;
+
+            OptionsOut = new JsonSerializerOptions
+            {
+                WriteIndented = false
+            };
+
             Options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -100,7 +112,7 @@ namespace com.etsoo.Utils.Net
         /// <returns>Result</returns>
         protected async Task<T?> GetAsync<T>(string requestUri)
         {
-            return await Client.GetFromJsonAsync<T>(requestUri);
+            return await Client.GetFromJsonAsync<T>(requestUri, Options);
         }
 
         /// <summary>
@@ -130,7 +142,7 @@ namespace com.etsoo.Utils.Net
         /// <returns>Result</returns>
         protected async Task<T?> PostAsync<D, T>(string requestUri, D data)
         {
-            using var response = await Client.PostAsJsonAsync(requestUri, data, Options);
+            using var response = await Client.PostAsJsonAsync(requestUri, data, OptionsOut);
             return await ResponseToAsync<T>(response);
         }
 
@@ -147,7 +159,7 @@ namespace com.etsoo.Utils.Net
         protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, D data, string dataField)
         {
             // Get response
-            using var response = await Client.PostAsJsonAsync(requestUri, data, Options);
+            using var response = await Client.PostAsJsonAsync(requestUri, data, OptionsOut);
             return await ResponseToAsync<D, E>(response, dataField);
         }
 
@@ -206,7 +218,7 @@ namespace com.etsoo.Utils.Net
         /// <returns>Result</returns>
         protected async Task<T?> PutAsync<D, T>(string requestUri, D data)
         {
-            using var response = await Client.PutAsJsonAsync(requestUri, data, Options);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, OptionsOut);
             return await ResponseToAsync<T>(response);
         }
 
@@ -223,7 +235,7 @@ namespace com.etsoo.Utils.Net
         protected async Task<HttpClientResult<D, E>> PutAsync<D, E>(string requestUri, D data, string dataField)
         {
             // Get response
-            using var response = await Client.PutAsJsonAsync(requestUri, data, Options);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, OptionsOut);
             return await ResponseToAsync<D, E>(response, dataField);
         }
 
@@ -241,10 +253,7 @@ namespace com.etsoo.Utils.Net
 
             // Deserialize
             // Ignore case
-            return await response.Content.ReadFromJsonAsync<T>(new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            return await response.Content.ReadFromJsonAsync<T>(Options);
         }
 
         /// <summary>
