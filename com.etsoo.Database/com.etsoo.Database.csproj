@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<EnablePreviewFeatures>True</EnablePreviewFeatures>
+	<GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
+	<SignAssembly>true</SignAssembly>
+	<AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
+	<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
+	<RepositoryType>GitHub</RepositoryType>
+	<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Database</RepositoryUrl>
+	<Authors>ETSOO SmartERP NextGen Team</Authors>
+	<Company>ETSOO</Company>
+	<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<Description>ETSOO SmartERP NextGen database utilities.</Description>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Version>1.0.1</Version>
+	<AssemblyVersion>1.0.1.0</AssemblyVersion>
+	<FileVersion>1.0.1.0</FileVersion>
+	<PackageIcon>logo.png</PackageIcon>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper.StrongName" Version="2.0.123" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5" />
+    <PackageReference Include="MySql.Data" Version="8.0.29" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

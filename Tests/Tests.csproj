@@ -31,7 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\com.etsoo.Address\com.etsoo.Address.csproj" />
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
+    <ProjectReference Include="..\com.etsoo.ImageUtils\com.etsoo.ImageUtils.csproj" />
+    <ProjectReference Include="..\com.etsoo.SMTP\com.etsoo.SMTP.csproj" />
     <ProjectReference Include="..\com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
     <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
     <ProjectReference Include="..\com.etsoo.Web\com.etsoo.Web.csproj" />

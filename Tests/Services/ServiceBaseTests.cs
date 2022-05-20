@@ -1,7 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
-using com.etsoo.Utils.Database;
+using com.etsoo.Database;
 using com.etsoo.Utils.Localization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -50,7 +50,7 @@ namespace Tests.Services
             // Arrange
             var input = "Hello, world!";
             var passphrase = "My password";
-            
+
             // Act
             var encrypted = service.Encrypt(input, passphrase, 1);
             var plainText = service.Decrypt(encrypted, passphrase, 120);

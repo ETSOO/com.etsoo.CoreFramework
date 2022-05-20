@@ -1,5 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.Utils.Database;
+using com.etsoo.Database;
 using Dapper;
 using System.ComponentModel.DataAnnotations;
 

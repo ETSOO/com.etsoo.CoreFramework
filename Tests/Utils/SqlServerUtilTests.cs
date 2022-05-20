@@ -1,7 +1,5 @@
-﻿using com.etsoo.Utils.Database;
+﻿using com.etsoo.Database;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Data;
 
 namespace Tests.Utils

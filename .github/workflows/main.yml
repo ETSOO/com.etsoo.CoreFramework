@@ -30,6 +30,110 @@ jobs:
           # API key to authenticate with NuGet server
           NUGET_KEY: ${{secrets.ETSOONugetKey}}
 
+      # Publish com.etsoo.Address
+      - name: Publish com.etsoo.Address on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.Address/com.etsoo.Address.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.Database
+      - name: Publish com.etsoo.Database on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.Database/com.etsoo.Database.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.HtmlUtils
+      - name: Publish com.etsoo.HtmlUtils on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.HtmlUtils/com.etsoo.HtmlUtils.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.HTTP
+      - name: Publish com.etsoo.HTTP on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.HTTP/com.etsoo.HTTP.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.ImageUtils
+      - name: Publish com.etsoo.ImageUtils on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.ImageUtils/com.etsoo.ImageUtils.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.MessageQueue
+      - name: Publish com.etsoo.MessageQueue on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.MessageQueue/com.etsoo.MessageQueue.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.SMS
+      - name: Publish com.etsoo.SMS on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.SMS/com.etsoo.SMS.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.SMTP
+      - name: Publish com.etsoo.SMTP on version change
+        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.SMTP/com.etsoo.SMTP.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
       # Publish com.etsoo.SourceGenerators
       - name: Publish com.etsoo.SourceGenerators on version change
         uses: alirezanet/publish-nuget@v3.0.4
@@ -69,8 +173,18 @@ jobs:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Web/com.etsoo.Web.csproj
 
-          # NuGet package id, used for version detection & defaults to project name
-          # PACKAGE_NAME: com.etsoo.Web
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.WebUtils
+      - name: Publish com.etsoo.WebUtils on version change
+        uses: alirezanet/publish-nuget@v3.0.4
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.WebUtils/com.etsoo.WebUtils.csproj
 
           # Flag to toggle git tagging, enabled by default
           TAG_COMMIT: false

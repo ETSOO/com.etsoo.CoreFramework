@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Database;
+﻿using com.etsoo.Database;
 using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Application

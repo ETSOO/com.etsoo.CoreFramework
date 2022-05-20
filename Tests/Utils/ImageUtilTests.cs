@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Image;
+﻿using com.etsoo.ImageUtils;
 using NUnit.Framework;
 using System.Runtime.Versioning;
 

@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<SignAssembly>true</SignAssembly>
+	<AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
+	<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
+	<RepositoryType>GitHub</RepositoryType>
+	<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SMTP</RepositoryUrl>
+	<Authors>ETSOO SmartERP NextGen Team</Authors>
+	<Company>ETSOO</Company>
+	<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<Description>ETSOO SmartERP NextGen SMTP utilities.</Description>
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<Version>1.0.1</Version>
+	<AssemblyVersion>1.0.1.0</AssemblyVersion>
+	<FileVersion>1.0.1.0</FileVersion>
+	<PackageIcon>logo.png</PackageIcon>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="3.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="MimeKit" Version="3.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

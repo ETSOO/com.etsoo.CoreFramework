@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Serialization;
+using System.Runtime.Versioning;
 
 namespace com.etsoo.Utils.String
 {
@@ -91,6 +92,7 @@ namespace com.etsoo.Utils.String
         /// <typeparam name="TSelf">Generic return type</typeparam>
         /// <param name="requiredFields">Required fields</param>
         /// <returns>Result</returns>
+        [RequiresPreviewFeatures]
         public TSelf? As<TSelf>(params string[] requiredFields) where TSelf : IDictionaryParser<TSelf>
         {
             // Check the required fields

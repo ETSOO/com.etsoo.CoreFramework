@@ -1,7 +1,5 @@
-﻿using com.etsoo.Utils.Database;
+﻿using com.etsoo.Database;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Data;
 
 namespace Tests.Utils
@@ -38,6 +36,22 @@ namespace Tests.Utils
 
             // Assert
             Assert.AreEqual(dbType, result, $"{type.Name} is not converted with {dbType}");
+        }
+
+        private static IEnumerable<TestCaseData> IsAnsiBulkTestData
+        {
+            get
+            {
+                yield return new TestCaseData("abc123", true);
+                yield return new TestCaseData("abc,;-$%", true);
+                yield return new TestCaseData("亿速ab", false);
+            }
+        }
+
+        [Test, TestCaseSource(nameof(IsAnsiBulkTestData))]
+        public void IsAnsi_Test(string input, bool isAnsi)
+        {
+            Assert.AreEqual(isAnsi, input.IsAnsi());
         }
     }
 }

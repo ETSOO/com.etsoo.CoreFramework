@@ -1,5 +1,4 @@
-﻿using Dapper;
-using System.Text;
+﻿using System.Text;
 using System.Web;
 
 namespace com.etsoo.Utils.String
@@ -10,17 +9,6 @@ namespace com.etsoo.Utils.String
     /// </summary>
     public static class StringExtensions
     {
-        /// <summary>
-        /// Is the string only ansii characters
-        /// 字符串是唯一的ASCII字符吗
-        /// </summary>
-        /// <param name="input">Input string</param>
-        /// <returns>Result</returns>
-        public static bool IsAnsi(this string input)
-        {
-            return !input.Any(c => c > 127);
-        }
-
         /// <summary>
         /// Join as string, ended with itemSplitter
         /// 链接成字符串，以 itemSplitter 结尾
@@ -119,38 +107,6 @@ namespace com.etsoo.Utils.String
                 return "null";
 
             return input.Value.ToJson();
-        }
-
-        /// <summary>
-        /// To Dapper DbString
-        /// 转化为 Dapper DbString
-        /// </summary>
-        /// <param name="input">Input string</param>
-        /// <param name="isAnsi">Is non-unicode</param>
-        /// <param name="length">Length</param>
-        /// <param name="fixedLength">Fixed length</param>
-        /// <returns>DbString</returns>
-        public static DbString? ToDbString(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
-        {
-            // Remove unnecessary empty
-            input = input.Trim();
-            if (input == string.Empty) return null;
-
-            return input.ToDbStringSafe(isAnsi, length, fixedLength);
-        }
-
-        /// <summary>
-        /// To Dapper DbString without empty by any chance.
-        /// 确保没有任何空白的转化为 Dapper DbString
-        /// </summary>
-        /// <param name="input">Input string</param>
-        /// <param name="isAnsi">Is non-unicode</param>
-        /// <param name="length">Length</param>
-        /// <param name="fixedLength">Fixed length</param>
-        /// <returns>DbString</returns>
-        public static DbString ToDbStringSafe(this string input, bool? isAnsi = null, int? length = null, bool? fixedLength = null)
-        {
-            return new DbString { IsAnsi = isAnsi ?? input.IsAnsi(), IsFixedLength = fixedLength.GetValueOrDefault(), Value = input, Length = length ?? input.Length };
         }
     }
 }

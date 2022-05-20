@@ -7,7 +7,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.CoreFramework</RepositoryUrl>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryType>GitHub</RepositoryType>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
@@ -15,13 +15,11 @@
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.1.91</Version>
+    <Version>1.1.92</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-	<EnablePreviewFeatures>true</EnablePreviewFeatures>
-	<LangVersion>preview</LangVersion>
 	<ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
@@ -50,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\com.etsoo.Database\com.etsoo.Database.csproj" />
     <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
   </ItemGroup>
 

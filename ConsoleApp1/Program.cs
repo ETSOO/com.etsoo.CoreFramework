@@ -1,22 +1,11 @@
-﻿using com.etsoo.CoreFramework.Authentication;
-using com.etsoo.CoreFramework.Models;
-using com.etsoo.CoreFramework.Properties;
-using com.etsoo.Utils;
-using com.etsoo.Utils.Html;
-using com.etsoo.Utils.Image;
-using com.etsoo.Utils.Localization;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.ImageUtils.Barcode;
 using com.etsoo.Utils.MessageQueue;
-using com.etsoo.Utils.String;
 using RabbitMQ.Client;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +28,7 @@ namespace ConsoleApp1
 
         static readonly ConnectionFactory factory = new ConnectionFactory { HostName = "localhost", UserName = "guest", Password = "guest", DispatchConsumersAsync = true };
 
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             /*
             var stream = await HtmlUtils.GetStreamAsync(new Uri("https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do"));
@@ -84,11 +73,11 @@ namespace ConsoleApp1
             while (current < target)
             {
                 var max = list.Max();
-                
+
                 var reduced = max / 2.0;
                 var index = list.IndexOf(max);
                 list[index] = reduced;
-                
+
                 current += reduced;
             }
 
@@ -188,7 +177,8 @@ namespace ConsoleApp1
 
             // RPC Server
             using var server = new RabbitMQEx(factory);
-            server.PreparePRCServer((body, routingKey, redelivered) => {
+            server.PreparePRCServer((body, routingKey, redelivered) =>
+            {
                 var message = Encoding.UTF8.GetString(body.ToArray());
                 //Console.WriteLine($"Message received at {DateTime.UtcNow:ss:fff} from {routingKey} : {message}");
 
@@ -206,7 +196,8 @@ namespace ConsoleApp1
 
             // RPC Server
             using var server = new RabbitMQEx(factory);
-            server.PreparePRCServer((body, routingKey, redelivered) => {
+            server.PreparePRCServer((body, routingKey, redelivered) =>
+            {
                 var message = Encoding.UTF8.GetString(body.ToArray());
                 // Console.WriteLine($"Message received at {DateTime.UtcNow:ss:fff} from {routingKey} : {message}");
 
@@ -238,7 +229,8 @@ namespace ConsoleApp1
             // Producer
             using var producer = new RabbitMQEx(factory);
             producer.PrepareProduce(exchange, durable: true);
-            producer.ProduceConfirm((deliveryTag, multiple, success) => {
+            producer.ProduceConfirm((deliveryTag, multiple, success) =>
+            {
                 Console.WriteLine($"Message acknowledged at {DateTime.UtcNow:ss:fff} for {deliveryTag}: {success}");
                 return Task.CompletedTask;
             });

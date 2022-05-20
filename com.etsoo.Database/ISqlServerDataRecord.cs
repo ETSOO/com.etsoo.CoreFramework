@@ -1,0 +1,33 @@
+﻿using Microsoft.Data.SqlClient.Server;
+using System.Runtime.Versioning;
+
+namespace com.etsoo.Database
+{
+    /// <summary>
+    /// Sqlserver DataRecord support interface
+    /// </summary>
+    public interface ISqlServerDataRecord
+    {
+        /// <summary>
+        /// Create SqlDataRecord
+        /// 创建 SqlDataRecord
+        /// </summary>
+        /// <returns>SqlDataRecord</returns>
+        [RequiresPreviewFeatures]
+        static abstract SqlDataRecord Create();
+
+        /// <summary>
+        /// TVP type name
+        /// 表值参数类型名称
+        /// </summary>
+        [RequiresPreviewFeatures]
+        static abstract string TypeName { get; }
+
+        /// <summary>
+        /// Set SqlDataRecord values
+        /// 设置SqlDataRecord值
+        /// </summary>
+        /// <param name="sdr">SqlDataRecord</param>
+        void SetValues(SqlDataRecord sdr);
+    }
+}

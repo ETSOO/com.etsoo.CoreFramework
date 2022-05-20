@@ -1,9 +1,9 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
-using com.etsoo.Utils.Database;
 using com.etsoo.Utils.Localization;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;

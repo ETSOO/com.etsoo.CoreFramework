@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils;
 using com.etsoo.Utils.String;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
@@ -193,7 +194,7 @@ namespace com.etsoo.CoreFramework.User
 
             if (Role.HasValue)
             {
-                var roles = Role.Value.GetRoles();
+                var roles = Role.Value.GetKeys();
 
                 // Multiple roles
                 foreach (var role in roles)

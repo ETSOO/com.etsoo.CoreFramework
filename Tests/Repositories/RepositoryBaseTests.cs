@@ -1,6 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.Utils.Database;
+using com.etsoo.Database;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
@@ -38,11 +38,13 @@ namespace Tests.Repositories
         [SetUp]
         public async Task Setup()
         {
-            await db.WithConnection((connection) => {
+            await db.WithConnection((connection) =>
+            {
                 return connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS e_user (id int, name nvarchar(128), status int)");
             });
 
-            await db.WithConnection((connection) => {
+            await db.WithConnection((connection) =>
+            {
                 return connection.ExecuteScalarAsync("INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1')");
             });
         }

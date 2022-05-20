@@ -1,8 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.Utils.Actions;
-using com.etsoo.Utils.Database;
-using com.etsoo.Utils.Models;
+using com.etsoo.Database;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;

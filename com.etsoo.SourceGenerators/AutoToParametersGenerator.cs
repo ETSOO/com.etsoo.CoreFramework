@@ -21,7 +21,7 @@ namespace com.etsoo.SourceGenerators
 
             var members = context.ParseMembers(tds, true, externalInheritances, out _);
 
-            if(!context.CancellationToken.IsCancellationRequested)
+            if (!context.CancellationToken.IsCancellationRequested)
             {
                 var propertyType = typeof(PropertyAttribute);
                 var ignoreName = nameof(PropertyAttribute.Ignore);
@@ -37,7 +37,7 @@ namespace com.etsoo.SourceGenerators
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(propertyType.FullName);
-                    
+
                     // Ignore it?
                     var ignore = attributeData?.GetValue<bool?>(ignoreName) ?? false;
                     if (ignore)
@@ -147,7 +147,7 @@ namespace com.etsoo.SourceGenerators
                             valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
-                    else if(typeSymbol.IsDictionary())
+                    else if (typeSymbol.IsDictionary())
                     {
                         var dicSymbol = (INamedTypeSymbol)typeSymbol;
 
@@ -240,7 +240,7 @@ namespace com.etsoo.SourceGenerators
             // Source code
             var source = $@"#nullable enable
                 using Dapper;
-                using com.etsoo.Utils.Database;
+                using com.etsoo.Database;
                 using com.etsoo.Utils.String;
                 using com.etsoo.CoreFramework.Application;
                 using System;

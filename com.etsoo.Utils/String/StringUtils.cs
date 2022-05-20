@@ -1,6 +1,4 @@
-﻿using com.etsoo.Utils.Address;
-using com.etsoo.Utils.SpanMemory;
-using MimeKit;
+﻿using com.etsoo.Utils.SpanMemory;
 using System.Collections;
 using System.ComponentModel;
 using System.Text;
@@ -19,44 +17,6 @@ namespace com.etsoo.Utils.String
         /// 字符串类型
         /// </summary>
         public static readonly Type StringType = typeof(string);
-
-        /// <summary>
-        /// Check email or mobile id
-        /// 检查Email或手机编号
-        /// </summary>
-        /// <param name="id">Email or mobile</param>
-        /// <param name="region">Region</param>
-        /// <param name="isEmail">Is email</param>
-        /// <returns>Result, null means failure</returns>
-        public static string? CheckId(string id, string region, out bool isEmail)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                isEmail = false;
-                return null;
-            }
-
-            isEmail = id.Contains('@');
-            if (isEmail)
-            {
-                // Try parse
-                if (MailboxAddress.TryParse(id, out var emailAddress))
-                {
-                    return emailAddress.Address;
-                }
-            }
-            else
-            {
-                // Try parse and format
-                var phone = AddressRegion.CreatePhone(id, region);
-                if (phone != null)
-                {
-                    return phone.ToInternationalFormat();
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Hide normal data
@@ -378,22 +338,22 @@ namespace com.etsoo.Utils.String
             // Switch pattern
             var parser = value switch
             {
-                Enum       => new TryParseDelegate<T>(Enum.TryParse),
-                bool       => GetBoolParser(ref s) as TryParseDelegate<T>,
-                int        => new TryParseDelegate<int>(int.TryParse) as TryParseDelegate<T>,
-                long       => new TryParseDelegate<long>(long.TryParse) as TryParseDelegate<T>,
-                DateTime   => new TryParseDelegate<DateTime>(DateTime.TryParse) as TryParseDelegate<T>,
-                decimal    => new TryParseDelegate<decimal>(decimal.TryParse) as TryParseDelegate<T>,
-                double     => new TryParseDelegate<double>(double.TryParse) as TryParseDelegate<T>,
-                float      => new TryParseDelegate<double>(double.TryParse) as TryParseDelegate<T>,
-                byte       => new TryParseDelegate<byte>(byte.TryParse) as TryParseDelegate<T>,
-                Guid       => new TryParseDelegate<Guid>(Guid.TryParse) as TryParseDelegate<T>,
-                char       => new TryParseDelegate<char>(char.TryParse) as TryParseDelegate<T>,
-                short      => new TryParseDelegate<short>(short.TryParse) as TryParseDelegate<T>,
-                ushort     => new TryParseDelegate<ushort>(ushort.TryParse) as TryParseDelegate<T>,
-                uint       => new TryParseDelegate<uint>(uint.TryParse) as TryParseDelegate<T>,
-                ulong      => new TryParseDelegate<ulong>(ulong.TryParse) as TryParseDelegate<T>,
-                _          => null
+                Enum => new TryParseDelegate<T>(Enum.TryParse),
+                bool => GetBoolParser(ref s) as TryParseDelegate<T>,
+                int => new TryParseDelegate<int>(int.TryParse) as TryParseDelegate<T>,
+                long => new TryParseDelegate<long>(long.TryParse) as TryParseDelegate<T>,
+                DateTime => new TryParseDelegate<DateTime>(DateTime.TryParse) as TryParseDelegate<T>,
+                decimal => new TryParseDelegate<decimal>(decimal.TryParse) as TryParseDelegate<T>,
+                double => new TryParseDelegate<double>(double.TryParse) as TryParseDelegate<T>,
+                float => new TryParseDelegate<double>(double.TryParse) as TryParseDelegate<T>,
+                byte => new TryParseDelegate<byte>(byte.TryParse) as TryParseDelegate<T>,
+                Guid => new TryParseDelegate<Guid>(Guid.TryParse) as TryParseDelegate<T>,
+                char => new TryParseDelegate<char>(char.TryParse) as TryParseDelegate<T>,
+                short => new TryParseDelegate<short>(short.TryParse) as TryParseDelegate<T>,
+                ushort => new TryParseDelegate<ushort>(ushort.TryParse) as TryParseDelegate<T>,
+                uint => new TryParseDelegate<uint>(uint.TryParse) as TryParseDelegate<T>,
+                ulong => new TryParseDelegate<ulong>(ulong.TryParse) as TryParseDelegate<T>,
+                _ => null
             };
 
             if (parser == null)

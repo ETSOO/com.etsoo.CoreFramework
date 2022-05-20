@@ -1,9 +1,6 @@
-﻿using com.etsoo.Utils.Database;
+﻿using com.etsoo.Database;
 using Dapper;
 using NUnit.Framework;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Tests.Utils
 {
@@ -48,30 +45,6 @@ namespace Tests.Utils
                 connection.Open();
                 connection.Close();
             });
-        }
-
-        /// <summary>
-        /// Async test Creating EF Database Context
-        /// 异步测试创建EF数据库上下文
-        /// </summary>
-        [Test]
-        public async Task CreateContextAsync_Test()
-        {
-            // Arrange
-            // Create EF database context
-            using var context = db.NewDbContext<TestUserModule>();
-
-            // User 1001
-            var user1001 = new TestUserModule { Id = 1001, Name = "Admin 1" };
-            var user1002 = new TestUserModule { Id = 1002, Name = "Admin 2" };
-
-            // Act
-            // Try to add two records
-            if (await context.Entities!.FindAsync(user1001.Id) == null)
-                await context.Entities.AddAsync(user1001);
-
-            if (await context.Entities.FindAsync(user1002.Id) == null)
-                await context.Entities.AddAsync(user1002);
         }
 
         /// <summary>

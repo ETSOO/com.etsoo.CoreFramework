@@ -152,7 +152,7 @@ namespace com.etsoo.SourceGenerators
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
-            externals.Add($"com.etsoo.Utils.Serialization.IDataReaderParser<{name}>");
+            externals.Add($"com.etsoo.Database.IDataReaderParser<{name}>");
 
             // Source code
             var source = $@"#nullable enable
@@ -161,7 +161,7 @@ namespace com.etsoo.SourceGenerators
                 using System.Data.Common;
                 using System.Linq;
                 using System.Threading.Tasks;
-                using com.etsoo.Utils.Database;
+                using com.etsoo.Database;
                 using com.etsoo.Utils.String;
                 using com.etsoo.Utils.Localization;
 

@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Address;
+﻿using com.etsoo.Address;
 using com.etsoo.Utils.String;
 using NUnit.Framework;
 

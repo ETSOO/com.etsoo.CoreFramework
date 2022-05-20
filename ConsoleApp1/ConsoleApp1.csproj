@@ -8,11 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RabbitMQ.Client" Version="6.3.0" />
     <PackageReference Include="SqlTableDependency" Version="8.5.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
+    <ProjectReference Include="..\com.etsoo.ImageUtils\com.etsoo.ImageUtils.csproj" />
+    <ProjectReference Include="..\com.etsoo.MessageQueue\com.etsoo.MessageQueue.csproj" />
     <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
   </ItemGroup>
 

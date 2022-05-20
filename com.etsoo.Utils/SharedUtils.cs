@@ -12,6 +12,18 @@ namespace com.etsoo.Utils
     /// </summary>
     public static class SharedUtils
     {
+        /// <summary>
+        /// Get enum value related keys
+        /// 获取枚举值相关键
+        /// </summary>
+        /// <typeparam name="E">Generic enum type</typeparam>
+        /// <param name="enumValue">Enum value</param>
+        /// <returns>All keys</returns>
+        public static IEnumerable<string> GetKeys<E>(this E enumValue) where E : struct, Enum
+        {
+            return Enum.GetValues<E>().Where(v => enumValue.HasFlag(v)).Select(r => r.ToString());
+        }
+
         private static readonly RecyclableMemoryStreamManager manager = new();
 
         /// <summary>
