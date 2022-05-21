@@ -1,8 +1,12 @@
 ﻿using System.Globalization;
 using TimeZoneConverter;
 
-namespace com.etsoo.Utils.Localization
+namespace com.etsoo.Localization
 {
+    /// <summary>
+    /// Localization utilities
+    /// 本地化工具
+    /// </summary>
     public static class LocalizationUtils
     {
         private static DateTime JsBaseDateTime => new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

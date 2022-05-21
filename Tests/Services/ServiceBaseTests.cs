@@ -2,7 +2,7 @@
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.Database;
-using com.etsoo.Utils.Localization;
+using com.etsoo.Localization;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;

@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.SpanMemory;
-using Microsoft.Toolkit.HighPerformance;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;

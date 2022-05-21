@@ -162,8 +162,8 @@ namespace com.etsoo.SourceGenerators
                 using System.Linq;
                 using System.Threading.Tasks;
                 using com.etsoo.Database;
+                using com.etsoo.Localization;
                 using com.etsoo.Utils.String;
-                using com.etsoo.Utils.Localization;
 
                 namespace {ns}
                 {{

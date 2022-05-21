@@ -1,5 +1,5 @@
-﻿using com.etsoo.Address;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace com.etsoo.WebUtils.Attributes
 {
@@ -24,7 +24,15 @@ namespace com.etsoo.WebUtils.Attributes
                 return false;
             }
 
-            return AddressRegion.All.Any(region => region.Id == valueAsString);
+            try
+            {
+                _=new RegionInfo(valueAsString);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>

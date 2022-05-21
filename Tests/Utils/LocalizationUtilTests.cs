@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Localization;
+﻿using com.etsoo.Localization;
 using NUnit.Framework;
 
 namespace Tests.Utils

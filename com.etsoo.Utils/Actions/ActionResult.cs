@@ -1,5 +1,4 @@
-﻿using com.etsoo.Utils.Localization;
-using com.etsoo.Utils.Serialization;
+﻿using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System.Buffers;
 using System.Data.Common;
@@ -108,9 +107,9 @@ namespace com.etsoo.Utils.Actions
 
                     // Additional data
                     var addValue = await reader.GetFieldValueAsync<object>(f);
-                    if (UtcDateTime && addValue is DateTime dt)
+                    if (UtcDateTime && addValue is DateTime dt && dt.Kind == DateTimeKind.Unspecified)
                     {
-                        addValue = LocalizationUtils.SetUtcKind(dt);
+                        addValue = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
                     }
 
                     data.Add(name, addValue);
