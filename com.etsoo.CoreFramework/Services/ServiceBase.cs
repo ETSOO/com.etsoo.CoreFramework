@@ -2,7 +2,7 @@
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Database;
-using com.etsoo.Localization;
+using com.etsoo.Utils;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
@@ -86,7 +86,7 @@ namespace com.etsoo.CoreFramework.Services
                 if (durationSeconds.HasValue)
                 {
                     var miliseconds = StringUtils.CharsToNumber(timestamp);
-                    var ts = DateTime.UtcNow - LocalizationUtils.JsMilisecondsToUTC(miliseconds);
+                    var ts = DateTime.UtcNow - SharedUtils.JsMilisecondsToUTC(miliseconds);
 
                     // Month
                     if (durationSeconds.Value <= 12 && (ts.TotalDays > 30 * durationSeconds.Value || ts.TotalDays <= 0)) return null;
@@ -177,7 +177,7 @@ namespace com.etsoo.CoreFramework.Services
         {
             if (enhanced.GetValueOrDefault(true))
             {
-                var miliseconds = LocalizationUtils.UTCToJsMiliseconds();
+                var miliseconds = SharedUtils.UTCToJsMiliseconds();
                 var timeStamp = StringUtils.NumberToChars(miliseconds);
                 return timeStamp + "!" + CryptographyUtils.AESEncrypt(message, EncryptionEnhance(passphrase, timeStamp), iterations);
             }
@@ -247,7 +247,7 @@ namespace com.etsoo.CoreFramework.Services
         public async ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret)
         {
             // Check timestamp
-            var clientDT = LocalizationUtils.JsMilisecondsToUTC(rq.Timestamp);
+            var clientDT = SharedUtils.JsMilisecondsToUTC(rq.Timestamp);
             var ts = DateTime.UtcNow - clientDT;
             var validSeconds = DurationSeconds / 2;
             var seconds = Math.Abs(ts.TotalSeconds);

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Localization;
+using com.etsoo.Utils;
 using NUnit.Framework;
 
 namespace Tests.Utils
@@ -13,7 +14,7 @@ namespace Tests.Utils
             var dt = new DateTime(DateTime.Now.Ticks, DateTimeKind.Unspecified);
 
             // Act
-            var result = LocalizationUtils.SetUtcKind(dt);
+            var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
             Assert.AreEqual(DateTimeKind.Utc, result.Kind);
@@ -26,7 +27,7 @@ namespace Tests.Utils
             var dt = DateTime.Now;
 
             // Act
-            var result = LocalizationUtils.SetUtcKind(dt);
+            var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
             Assert.AreEqual(DateTimeKind.Local, result.Kind);
@@ -52,7 +53,7 @@ namespace Tests.Utils
         {
             // Arrange & Act
             // 2021/12/6 19:35:52 UTC, 2021/12/7 8:35:52 NZ time
-            var result = LocalizationUtils.JsMilisecondsToUTC(1638819352807);
+            var result = SharedUtils.JsMilisecondsToUTC(1638819352807);
 
             // Assert
             Assert.AreEqual(DateTimeKind.Utc, result.Kind);

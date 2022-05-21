@@ -160,15 +160,6 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; contains an invalid email address.
-        /// </summary>
-        public static string EmailListAttributeError {
-            get {
-                return ResourceManager.GetString("EmailListAttributeError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
         public static string InvalidAction {
@@ -210,15 +201,6 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string JoinOrgRequired {
             get {
                 return ResourceManager.GetString("JoinOrgRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Language code error.
-        /// </summary>
-        public static string LanguageCodeAttributeError {
-            get {
-                return ResourceManager.GetString("LanguageCodeAttributeError", resourceCulture);
             }
         }
         
@@ -349,15 +331,6 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Wrong or unsupported country/region code.
-        /// </summary>
-        public static string RegionIdAttributeError {
-            get {
-                return ResourceManager.GetString("RegionIdAttributeError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Your token has expired.
         /// </summary>
         public static string TokenExpired {
@@ -372,15 +345,6 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string UserFrozen {
             get {
                 return ResourceManager.GetString("UserFrozen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid username.
-        /// </summary>
-        public static string UserIdAttributeError {
-            get {
-                return ResourceManager.GetString("UserIdAttributeError", resourceCulture);
             }
         }
         

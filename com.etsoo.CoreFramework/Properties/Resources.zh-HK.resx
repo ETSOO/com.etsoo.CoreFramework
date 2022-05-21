@@ -150,9 +150,6 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>該設備已被暫時禁止使用至 {0}</value>
   </data>
-  <data name="EmailListAttributeError" xml:space="preserve">
-    <value>'{0}'包含無效的電子郵件地址</value>
-  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>無效的操作</value>
   </data>
@@ -167,9 +164,6 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入機構</value>
-  </data>
-  <data name="LanguageCodeAttributeError" xml:space="preserve">
-    <value>語言代碼錯誤</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>沒有返回操作結果</value>
@@ -213,17 +207,11 @@
   <data name="OutOfMemory" xml:space="preserve">
     <value>內存不足</value>
   </data>
-  <data name="RegionIdAttributeError" xml:space="preserve">
-    <value>國家或地區編號錯誤或不受支持</value>
-  </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>您的令牌已過期</value>
   </data>
   <data name="UserFrozen" xml:space="preserve">
     <value>您的帳戶已被暫時禁止使用至 {0}</value>
-  </data>
-  <data name="UserIdAttributeError" xml:space="preserve">
-    <value>'{0}'不是有效的用戶名</value>
   </data>
   <data name="UserRegistered" xml:space="preserve">
     <value>用戶名已註冊</value>

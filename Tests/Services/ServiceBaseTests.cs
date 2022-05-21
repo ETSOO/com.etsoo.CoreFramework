@@ -2,7 +2,7 @@
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.Database;
-using com.etsoo.Localization;
+using com.etsoo.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
@@ -80,14 +80,14 @@ namespace Tests.Services
         public async Task InitCallTests()
         {
             // Arrange
-            var rq = new InitCallRQ { Timestamp = LocalizationUtils.UTCToJsMiliseconds() };
+            var rq = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds() };
             var result = await service.InitCallAsync(rq, "My Password");
             Assert.IsTrue(result.Ok);
 
             var deviceId = result.Data.Get("DeviceId");
             Assert.IsNotNull(deviceId);
 
-            var rqNew = new InitCallRQ { Timestamp = LocalizationUtils.UTCToJsMiliseconds(), DeviceId = deviceId };
+            var rqNew = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds(), DeviceId = deviceId };
             var resultNew = await service.InitCallAsync(rqNew, "My Password");
             Assert.IsTrue(resultNew.Ok);
         }

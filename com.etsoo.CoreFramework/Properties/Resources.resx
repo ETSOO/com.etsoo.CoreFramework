@@ -150,9 +150,6 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>The device has been temporarily blocked until {0}</value>
   </data>
-  <data name="EmailListAttributeError" xml:space="preserve">
-    <value>'{0}' contains an invalid email address</value>
-  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>Invalid Action</value>
   </data>
@@ -167,9 +164,6 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
-  </data>
-  <data name="LanguageCodeAttributeError" xml:space="preserve">
-    <value>Language code error</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>No Action Result</value>
@@ -213,17 +207,11 @@
   <data name="OutOfMemory" xml:space="preserve">
     <value>Out Of Memory</value>
   </data>
-  <data name="RegionIdAttributeError" xml:space="preserve">
-    <value>Wrong or unsupported country/region code</value>
-  </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>Your token has expired</value>
   </data>
   <data name="UserFrozen" xml:space="preserve">
     <value>Your account has been temporarily blocked until {0}</value>
-  </data>
-  <data name="UserIdAttributeError" xml:space="preserve">
-    <value>'{0}' is not a valid username</value>
   </data>
   <data name="UserRegistered" xml:space="preserve">
     <value>Username is already registered</value>

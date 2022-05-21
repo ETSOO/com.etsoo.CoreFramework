@@ -47,7 +47,7 @@ namespace com.etsoo.SourceGenerators
 
                         if (utcDateTime && typeSymbol.Name == "DateTime")
                         {
-                            valuePart = $"LocalizationUtils.SetUtcKind{valuePart}";
+                            valuePart = $"SharedUtils.SetUtcKind{valuePart}";
                         }
                         else if (typeSymbol.Name == "String" && !nullable)
                         {
@@ -162,7 +162,7 @@ namespace com.etsoo.SourceGenerators
                 using System.Linq;
                 using System.Threading.Tasks;
                 using com.etsoo.Database;
-                using com.etsoo.Localization;
+                using com.etsoo.Utils;
                 using com.etsoo.Utils.String;
 
                 namespace {ns}

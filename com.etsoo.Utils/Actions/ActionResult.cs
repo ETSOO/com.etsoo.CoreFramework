@@ -107,9 +107,9 @@ namespace com.etsoo.Utils.Actions
 
                     // Additional data
                     var addValue = await reader.GetFieldValueAsync<object>(f);
-                    if (UtcDateTime && addValue is DateTime dt && dt.Kind == DateTimeKind.Unspecified)
+                    if (UtcDateTime && addValue is DateTime dt)
                     {
-                        addValue = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+                        addValue = SharedUtils.SetUtcKind(dt);
                     }
 
                     data.Add(name, addValue);

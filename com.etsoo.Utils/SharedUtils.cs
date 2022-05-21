@@ -24,6 +24,7 @@ namespace com.etsoo.Utils
             return Enum.GetValues<E>().Where(v => enumValue.HasFlag(v)).Select(r => r.ToString());
         }
 
+        private static readonly DateTime JsBaseDateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly RecyclableMemoryStreamManager manager = new();
 
         /// <summary>
@@ -183,6 +184,52 @@ namespace com.etsoo.Utils
             // Deserialize
             ms.Position = 0;
             return (await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(ms)) ?? new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Set datatime's Utc kind
+        /// 设置日期时间的类型为Utc
+        /// </summary>
+        /// <param name="input">Input datetime</param>
+        /// <returns>Utc datetime</returns>
+        public static DateTime? SetUtcKind(DateTime? input)
+        {
+            if (input == null)
+                return input;
+            return SetUtcKind(input.Value);
+        }
+
+        /// <summary>
+        /// Set datatime's Utc kind
+        /// 设置日期时间的类型为Utc
+        /// </summary>
+        /// <param name="input">Input datetime</param>
+        /// <returns>Utc datetime</returns>
+        public static DateTime SetUtcKind(DateTime input)
+        {
+            return input.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(input, DateTimeKind.Utc) : input;
+        }
+
+        /// <summary>
+        /// JS date miliseconds to C# DateTime UTC
+        /// JS 日期毫秒到 C# DateTime UTC
+        /// </summary>
+        /// <param name="miliseconds">Miliseconds</param>
+        /// <returns>DateTime UTC</returns>
+        public static DateTime JsMilisecondsToUTC(long miliseconds)
+        {
+            return JsBaseDateTime.AddMilliseconds(miliseconds);
+        }
+
+        /// <summary>
+        /// DateTime UTC to JS date miliseconds
+        /// C# DateTime UTC 到JS 日期毫秒
+        /// </summary>
+        /// <param name="dt">UTC DateTime</param>
+        /// <returns>Miliseconds</returns>
+        public static long UTCToJsMiliseconds(DateTime? dt = null)
+        {
+            return (long)(SetUtcKind(dt).GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalMilliseconds;
         }
     }
 }
