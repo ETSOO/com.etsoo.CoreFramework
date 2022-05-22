@@ -3,7 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 
-namespace com.etsoo.Utils.Net.SMTP
+namespace com.etsoo.SMTP
 {
     /// <summary>
     /// SMTP client
