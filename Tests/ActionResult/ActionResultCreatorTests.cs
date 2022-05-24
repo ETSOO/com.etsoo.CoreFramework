@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.SourceGenerators.Attributes;
 using NUnit.Framework;
+using System.Runtime.Versioning;
 
 namespace Tests.ActionResult
 {
@@ -55,6 +56,7 @@ namespace Tests.ActionResult
         }
 
         [Test]
+        [RequiresPreviewFeatures]
         public async Task Create_SuccessData_Test()
         {
             // Arrange

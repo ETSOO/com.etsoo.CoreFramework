@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Database;
 using Dapper;
 using NUnit.Framework;
+using System.Runtime.Versioning;
 
 namespace Tests.Utils
 {
@@ -63,6 +64,7 @@ namespace Tests.Utils
         }
 
         [Test]
+        [RequiresPreviewFeatures]
         public async Task ExecuteReader_Test()
         {
             // Arrange

@@ -2,21 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
-
     <IsPackable>false</IsPackable>
-
     <Nullable>enable</Nullable>
-
     <SignAssembly>true</SignAssembly>
-
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
-
-	<EnablePreviewFeatures>true</EnablePreviewFeatures>
-	<LangVersion>preview</LangVersion>
 	<ImplicitUsings>true</ImplicitUsings>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
