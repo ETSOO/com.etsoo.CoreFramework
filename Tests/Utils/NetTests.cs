@@ -1,4 +1,4 @@
-﻿using com.etsoo.Utils.Net.SMTP;
+﻿using com.etsoo.SMTP;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;

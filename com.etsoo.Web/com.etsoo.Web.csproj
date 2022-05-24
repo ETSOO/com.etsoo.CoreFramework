@@ -7,7 +7,7 @@
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>ETSOO</Company>
-    <Version>1.0.15</Version>
+    <Version>1.0.17</Version>
     <Description>ETSOO SmartERP NextGen shared web components.</Description>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
@@ -17,8 +17,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
 	<ImplicitUsings>true</ImplicitUsings>
-	<EnablePreviewFeatures>true</EnablePreviewFeatures>
-	<LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.6" />
+    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.7" />
     <PackageReference Include="RazorEngineCore" Version="2022.1.2" />
   </ItemGroup>
 
