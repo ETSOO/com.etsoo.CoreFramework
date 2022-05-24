@@ -22,7 +22,7 @@ namespace Tests.Utils
         public void GetCodecInfo_BulkTests(string path, string? mimeType)
         {
             // Arrange & act
-            var result = ImageUtils.GetCodecInfo(path);
+            var result = ImageWinUtils.GetCodecInfo(path);
 
             // Assert
             Assert.AreEqual(result?.MimeType, mimeType);

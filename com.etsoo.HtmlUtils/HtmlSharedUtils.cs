@@ -5,10 +5,10 @@ using AngleSharp.Html.Parser;
 namespace com.etsoo.HtmlUtils
 {
     /// <summary>
-    /// HTML utils
-    /// HTML工具
+    /// HTML shared utils
+    /// HTML共享的工具
     /// </summary>
-    public static class HtmlUtils
+    public static class HtmlSharedUtils
     {
         /// <summary>
         /// HTTP client

@@ -6,11 +6,11 @@ using System.Runtime.Versioning;
 namespace com.etsoo.ImageUtils
 {
     /// <summary>
-    /// Image related utilites
-    /// 图片相关工具
+    /// Windows image shared utilites
+    /// Windows下图片共享工具
     /// </summary>
     [SupportedOSPlatform("windows")]
-    public static class ImageUtils
+    public static class ImageWinUtils
     {
         /// <summary>
         /// Get Codec info
@@ -108,7 +108,7 @@ namespace com.etsoo.ImageUtils
         public static Bitmap? Resize(Stream source, Size targetSize, bool cropSource)
         {
             // Parse as image first
-            using var image = System.Drawing.Image.FromStream(source, false, false);
+            using var image = Image.FromStream(source, false, false);
 
             // Ignore small size
             if (image.Width <= targetSize.Width && image.Height <= targetSize.Height)
