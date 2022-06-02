@@ -222,6 +222,17 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
+        /// Unix seconds from 1970 to UTC datetime
+        /// Unix 秒数转换为 UTC时间
+        /// </summary>
+        /// <param name="seconds">Unix seconds</param>
+        /// <returns>UTC datetime</returns>
+        public static DateTime UnixSecondsToUTC(long seconds)
+        {
+            return JsBaseDateTime.AddSeconds(seconds);
+        }
+
+        /// <summary>
         /// DateTime UTC to JS date miliseconds
         /// C# DateTime UTC 到JS 日期毫秒
         /// </summary>
@@ -230,6 +241,17 @@ namespace com.etsoo.Utils
         public static long UTCToJsMiliseconds(DateTime? dt = null)
         {
             return (long)(SetUtcKind(dt).GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// DateTime UTC to Unix seconds
+        /// C# DateTime UTC 到 Unix 秒数
+        /// </summary>
+        /// <param name="dt">UTC Datetime</param>
+        /// <returns>Seconds</returns>
+        public static long UTCToUnixSeconds(DateTime? dt = null)
+        {
+            return (long)(SetUtcKind(dt).GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalSeconds;
         }
     }
 }
