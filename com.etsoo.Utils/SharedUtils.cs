@@ -229,7 +229,25 @@ namespace com.etsoo.Utils
         /// </summary>
         /// <param name="stream">Input stream</param>
         /// <returns>Bytes</returns>
-        public static async Task<ReadOnlyMemory<byte>> StreamToBytes(Stream stream)
+        public static ReadOnlySpan<byte> StreamToBytes(Stream stream)
+        {
+            var writer = new ArrayBufferWriter<byte>(defaultBufferSize);
+            int bytesRead;
+            while ((bytesRead = stream.Read(writer.GetSpan(defaultBufferSize))) > 0)
+            {
+                writer.Advance(bytesRead);
+            }
+
+            return writer.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Async stream to bytes
+        /// 异步流到字节
+        /// </summary>
+        /// <param name="stream">Input stream</param>
+        /// <returns>Bytes</returns>
+        public static async Task<ReadOnlyMemory<byte>> StreamToBytesAsync(Stream stream)
         {
             var writer = new ArrayBufferWriter<byte>(defaultBufferSize);
             int bytesRead;
