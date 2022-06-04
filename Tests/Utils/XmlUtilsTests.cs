@@ -30,5 +30,31 @@ namespace Tests.Utils
             Assert.AreEqual("scancode_push", dic["Event"]);
             Assert.AreEqual("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[1]]></ScanResult>", dic["ScanCodeInfo"]);
         }
+
+        [Test]
+        public void GetValueTests()
+        {
+            var dic = new Dictionary<string, string>
+            {
+                ["boolean"] = "true",
+                ["int"] = "123",
+                ["int1"] = ""
+            };
+
+            var v1 = XmlUtils.GetValue<bool>(dic, "boolean");
+            Assert.AreEqual(true, v1);
+
+            var v2 = XmlUtils.GetValue<int>(dic, "int");
+            Assert.AreEqual(123, v2);
+
+            var v3 = XmlUtils.GetValue<DateTime>(dic, "int1");
+            Assert.IsNull(v3);
+
+            var v4 = XmlUtils.GetValue<DateTime>(dic, "nofield");
+            Assert.IsNull(v4);
+
+            var v5 = XmlUtils.GetValue(dic, "boolean");
+            Assert.AreEqual("true", v5);
+        }
     }
 }

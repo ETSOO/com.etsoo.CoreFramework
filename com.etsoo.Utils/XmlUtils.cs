@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using com.etsoo.Utils.String;
+using System.Xml;
 
 namespace com.etsoo.Utils
 {
@@ -8,6 +9,39 @@ namespace com.etsoo.Utils
     /// </summary>
     public static class XmlUtils
     {
+        /// <summary>
+        /// Get field value
+        /// 获取字段值
+        /// </summary>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="field">Field</param>
+        /// <returns>Value</returns>
+        public static string? GetValue(Dictionary<string, string> dic, string field)
+        {
+            if (dic.TryGetValue(field, out var value))
+            {
+                return value;
+            }
+            return default;
+        }
+
+        /// <summary>
+        /// Get field value
+        /// 获取字段值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="field">Field</param>
+        /// <returns>Value</returns>
+        public static T? GetValue<T>(Dictionary<string, string> dic, string field) where T : struct
+        {
+            if (dic.TryGetValue(field, out var value))
+            {
+                return StringUtils.TryParse<T>(value);
+            }
+            return default;
+        }
+
         /// <summary>
         /// Parse XML specific depth data
         /// 解析XML特定层数据
