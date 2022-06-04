@@ -14,7 +14,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared coding utilities.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.16</Version>
+    <Version>1.1.17</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>

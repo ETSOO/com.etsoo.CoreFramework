@@ -51,5 +51,20 @@ namespace com.etsoo.Utils
 
             return dic;
         }
+
+        /// <summary>
+        /// Write CData element
+        /// 写入 CData 对象
+        /// </summary>
+        /// <param name="writer">Xml writer</param>
+        /// <param name="localName">Element local name</param>
+        /// <param name="text">CData text</param>
+        /// <returns>Task</returns>
+        public static async Task WriteCDataAsync(XmlWriter writer, string localName, string text)
+        {
+            await writer.WriteStartElementAsync(null, localName, null);
+            await writer.WriteCDataAsync(text);
+            await writer.WriteEndElementAsync();
+        }
     }
 }
