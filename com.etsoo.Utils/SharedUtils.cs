@@ -260,6 +260,30 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
+        /// Stream to UTF8 string
+        /// 流到UTF8字符串
+        /// </summary>
+        /// <param name="stream">Input stream</param>
+        /// <returns>String</returns>
+        public static string StreamToString(Stream stream)
+        {
+            var bytes = StreamToBytes(stream);
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        /// <summary>
+        /// Async stream to UTF8 string
+        /// 异步流到UTF8字符串
+        /// </summary>
+        /// <param name="stream">Input stream</param>
+        /// <returns>String</returns>
+        public static async Task<string> StreamToStringAsync(Stream stream)
+        {
+            var bytes = await StreamToBytesAsync(stream);
+            return Encoding.UTF8.GetString(bytes.Span);
+        }
+
+        /// <summary>
         /// JS date miliseconds to C# DateTime UTC
         /// JS 日期毫秒到 C# DateTime UTC
         /// </summary>
