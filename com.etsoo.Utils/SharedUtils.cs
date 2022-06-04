@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using Microsoft.IO;
+using System.Buffers;
 using System.Text;
 using System.Text.Json;
 
@@ -26,12 +27,13 @@ namespace com.etsoo.Utils
 
         private static readonly DateTime JsBaseDateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly RecyclableMemoryStreamManager manager = new();
+        private const int defaultBufferSize = 1024;
 
         /// <summary>
         /// Get RecyclableMemoryStream
         /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
         /// </summary>
-        /// <returns>Result</returns>
+        /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream()
         {
             return (manager.GetStream() as RecyclableMemoryStream)!;
@@ -42,7 +44,7 @@ namespace com.etsoo.Utils
         /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
         /// </summary>
         /// <param name="bytes">Initial bytes</param>
-        /// <returns></returns>
+        /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream(byte[] bytes)
         {
             return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
@@ -52,8 +54,19 @@ namespace com.etsoo.Utils
         /// Get RecyclableMemoryStream
         /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
         /// </summary>
+        /// <param name="input">Input UTF8 string</param>
+        /// <returns>Stream</returns>
+        public static RecyclableMemoryStream GetStream(string input)
+        {
+            return GetStream(Encoding.UTF8.GetBytes(input));
+        }
+
+        /// <summary>
+        /// Get RecyclableMemoryStream
+        /// https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream
+        /// </summary>
         /// <param name="bytes">Initial bytes</param>
-        /// <returns></returns>
+        /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream(ReadOnlySpan<byte> bytes)
         {
             return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
@@ -208,6 +221,24 @@ namespace com.etsoo.Utils
         public static DateTime SetUtcKind(DateTime input)
         {
             return input.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(input, DateTimeKind.Utc) : input;
+        }
+
+        /// <summary>
+        /// Stream to bytes
+        /// 流到字节
+        /// </summary>
+        /// <param name="stream">Input stream</param>
+        /// <returns>Bytes</returns>
+        public static async Task<ReadOnlyMemory<byte>> StreamToBytes(Stream stream)
+        {
+            var writer = new ArrayBufferWriter<byte>(defaultBufferSize);
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(writer.GetMemory(defaultBufferSize))) > 0)
+            {
+                writer.Advance(bytesRead);
+            }
+
+            return writer.WrittenMemory;
         }
 
         /// <summary>

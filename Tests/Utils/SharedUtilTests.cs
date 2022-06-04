@@ -61,5 +61,17 @@ namespace Tests.Utils
             Assert.AreEqual(dic.Keys.Count, 2);
             Assert.IsTrue(dic.ContainsKey("Name"));
         }
+
+        [Test]
+        public async Task StreamToSequenceAsyncTests()
+        {
+            // Arrange
+            var source = "MIIEpAIBAAKCAQEAvJdWUjJubQxN0LGiaaSlxfhHnecAN2yQphCt5HYW3T5m6fSaQVIJ57eFqxw4+D5CTdmLcCVHpghNKa7/FF+NH85a4i30+EMXjlJbRzwd5Tz4RXeiixDexRG9LOx1q31jFuKfo9/9L94rvQvUphHEomqk6zVjak0wVmwUu/WQbAR16Aa62pXibBZVQoQ8z4gz/gUm7aABf7nXmmH2Wm9cLSBo5nfe01qcRKUY8rTpVJeLUzYpsbddyHcJogj2RnuaS1H+KfKkhX0re0i/NFdwQBhyTPxdXWoMOO+L3unOK9eJLcp36GEL4vsA4C4FFYwhhtbTEqOHKAqSbRGDQCGViQIDAQABAoIBADm4L8k0eiuR6ncHBuhCZiIzHOgs/Rn5dkP9MtuLcPAB20mbfWKkkzeCKbz3BFCl7XEaNdz66/Ta8ZLiZlt76xti8tnqquEY16rNdfZVZej1Qh8wwGTDowq5pSaMsG7uD1e/wJBNS5ZM7yIK7uhs47u53API8UZlnXe12Jq2S59jLwnkgeStZT0yatWvblpeMBtiitW6W/SuULZuWjZL0TLGLoxsXFUUBwgCi28gdYP2ra0mlcUN7WBy0+ug/TZ8YOXiZZX8SQN8mSUK+KV5uOghri37Nxoyx3aQOwUxFZqdCPbdhFFhUlvJsRNJu/QQq3p5FT6VMJ26yA0ArNT9o2kCgYEAyHC43XvlDXWINVieCGyxucCwAvklWPLL7eJLqsnmj5YNpheP/xausTSbLQIIeAlcfpVTcJMTiodhoBoBi2e+yLNyLOZCKSLFsJLxUO83S/C7wWdajpDXybaNG7MvWugaPAA7RvywhHtZLOutDwqJTre1UfNbHQ2bdJn5Wl1gSMMCgYEA8N3L9zz0WWJhm2Gp6Ws6nB41R/6FaKvWfORwCUp3FzHr+FqfkyQFidv4n0Oo7/LH2wt7NBvCZlsKe37uHEhEZSFKI89/LbaGALGcw2S41VWiS96YOMPRQyFdPHZqfiR8zX+RcqN7LtdOwWKcy0og+bi8yFGDL3vf143o40FSo8MCgYAt9LpN/cQMi/AI2yKQp+svvaAdbmZDuJdNGV9j7xqvvSWv+SMIx3iSJI+XiCnM68iLNU2GOBJ45oVZodzMy6KQfaQl6z0sFU7iJy6w8cfp324M79dxbIAtPW+o9DJdU24AZ8Uvh2wpU+akR/zLwAyvQauO+I7hYGdOGqdzMomK5QKBgQCaNBURyudQlkiQ9pyWAH08V6aa2drFIUYnHQSRHihSJDbDABmrVONq1/Y62FE+lPrYRGhy+tahOuXiHGgKmUWYTRCvDneIZ5MwvIT1HvWqNrG5yt8/cDX3uVN8kv8olOmFkocmkn0ZhuQ3sI9bIrErztallHHdI3wx/vs7CqYCiwKBgQCsjt2JsC9ceqjcMoj+oBztH4axMMUgOK6vDC3tPaAyznoYLUlMeWFfvVZn7CK6GP6Rcns6jouPSqQEHEv+w4RNOeA7cF0EJ2i+h8jzLZpItBwTTU4a8bFxNpyFu2Hq7lXzzWMAb5z6giecM4kM4hdvQ4CzAgL9JsHGK5vet0KFfA==";
+            var stream = SharedUtils.GetStream(source);
+            var bytes = await SharedUtils.StreamToBytes(stream);
+            var result = Encoding.UTF8.GetString(bytes.Span);
+
+            Assert.AreEqual(source, result);
+        }
     }
 }
