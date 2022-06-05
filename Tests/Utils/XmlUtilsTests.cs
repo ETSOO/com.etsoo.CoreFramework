@@ -56,5 +56,16 @@ namespace Tests.Utils
             var v5 = XmlUtils.GetValue(dic, "boolean");
             Assert.AreEqual("true", v5);
         }
+
+        [Test]
+        public void GetListTests()
+        {
+            // Arrage & act
+            var items = XmlUtils.GetList("<item><field1>1</field1><field2><![CDATA[a1]]></field2></item><item><field1>2</field1><field2><![CDATA[b2]]></field2></item>");
+
+            // Assert
+            Assert.AreEqual(2, items.Count());
+            Assert.IsTrue(items.Any(item => item.ContainsKey("field2") && item["field2"] == "b2"));
+        }
     }
 }

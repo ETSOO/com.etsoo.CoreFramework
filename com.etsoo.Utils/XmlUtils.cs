@@ -10,6 +10,26 @@ namespace com.etsoo.Utils
     public static class XmlUtils
     {
         /// <summary>
+        /// Get list value items <item><field1>...</field1><field2>...</field2></item><item><field1>...</field1><field2>...</field2></item>
+        /// 获取列表值的子对象
+        /// </summary>
+        /// <param name="value">List value</param>
+        /// <returns>List items</returns>
+        public static IEnumerable<Dictionary<string, string>> GetList(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) yield break;
+
+            using var reader = XmlReader.Create(SharedUtils.GetStream(value), new XmlReaderSettings { Async = false, ConformanceLevel = ConformanceLevel.Fragment });
+            while (reader.Read())
+            {
+                if (reader.IsStartElement() && reader.Depth == 0)
+                {
+                    yield return ParseReader(reader.ReadSubtree(), 1);
+                }
+            }
+        }
+
+        /// <summary>
         /// Get field value
         /// 获取字段值
         /// </summary>
@@ -43,19 +63,18 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
-        /// Parse XML specific depth data
-        /// 解析XML特定层数据
+        /// Parse XML reader depth data
+        /// 解析XML读写器特定层数据
         /// </summary>
-        /// <param name="input">Input stream</param>
+        /// <param name="reader">XML reader</param>
         /// <param name="depth">Depth</param>
         /// <returns>Result</returns>
-        public static Dictionary<string, string> ParseXml(Stream input, int depth = 1)
+        public static Dictionary<string, string> ParseReader(XmlReader reader, int depth = 1)
         {
             var dic = new Dictionary<string, string>();
 
             var nextDepth = depth + 1;
 
-            using var reader = XmlReader.Create(input, new XmlReaderSettings { Async = false });
             while (reader.Read())
             {
                 if (reader.IsStartElement() && reader.Depth == depth)
@@ -87,19 +106,31 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
-        /// Async parse XML specific depth data
-        /// 异步解析XML特定层数据
+        /// Parse XML specific depth data
+        /// 解析XML特定层数据
         /// </summary>
         /// <param name="input">Input stream</param>
         /// <param name="depth">Depth</param>
         /// <returns>Result</returns>
-        public static async Task<Dictionary<string, string>> ParseXmlAsync(Stream input, int depth = 1)
+        public static Dictionary<string, string> ParseXml(Stream input, int depth = 1)
+        {
+            using var reader = XmlReader.Create(input, new XmlReaderSettings { Async = false });
+            return ParseReader(reader, depth);
+        }
+
+        /// <summary>
+        /// Async parse XML reader depth data
+        /// 异步解析XML读写器特定层数据
+        /// </summary>
+        /// <param name="reader">XML reader</param>
+        /// <param name="depth">Depth</param>
+        /// <returns>Result</returns>
+        public static async Task<Dictionary<string, string>> ParseReaderAsync(XmlReader reader, int depth = 1)
         {
             var dic = new Dictionary<string, string>();
 
             var nextDepth = depth + 1;
 
-            using var reader = XmlReader.Create(input, new XmlReaderSettings { Async = true });
             while (await reader.ReadAsync())
             {
                 if (reader.IsStartElement() && reader.Depth == depth)
@@ -128,6 +159,19 @@ namespace com.etsoo.Utils
             }
 
             return dic;
+        }
+
+        /// <summary>
+        /// Async parse XML specific depth data
+        /// 异步解析XML特定层数据
+        /// </summary>
+        /// <param name="input">Input stream</param>
+        /// <param name="depth">Depth</param>
+        /// <returns>Result</returns>
+        public static async Task<Dictionary<string, string>> ParseXmlAsync(Stream input, int depth = 1)
+        {
+            using var reader = XmlReader.Create(input, new XmlReaderSettings { Async = true });
+            return await ParseReaderAsync(reader, depth);
         }
 
         /// <summary>
