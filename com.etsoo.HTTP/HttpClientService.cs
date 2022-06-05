@@ -105,6 +105,20 @@ namespace com.etsoo.HTTP
         }
 
         /// <summary>
+        /// Download to save stream
+        /// 下载到保存的流
+        /// </summary>
+        /// <param name="requestUri">Request uri</param>
+        /// <param name="saveStream">Save stream</param>
+        /// <returns>Task</returns>
+        protected async Task DownloadAsync(string requestUri, Stream saveStream)
+        {
+            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
+            await using var stream = await response.Content.ReadAsStreamAsync();
+            await stream.CopyToAsync(saveStream);
+        }
+
+        /// <summary>
         /// Get data
         /// 获取数据
         /// </summary>
