@@ -49,6 +49,50 @@ namespace com.etsoo.Utils
         /// <param name="input">Input stream</param>
         /// <param name="depth">Depth</param>
         /// <returns>Result</returns>
+        public static Dictionary<string, string> ParseXml(Stream input, int depth = 1)
+        {
+            var dic = new Dictionary<string, string>();
+
+            var nextDepth = depth + 1;
+
+            using var reader = XmlReader.Create(input, new XmlReaderSettings { Async = false });
+            while (reader.Read())
+            {
+                if (reader.IsStartElement() && reader.Depth == depth)
+                {
+                    var name = reader.Name;
+                    var values = new List<string>();
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.EndElement) break;
+
+                        if (reader.Depth == nextDepth)
+                        {
+                            if (reader.HasValue)
+                            {
+                                values.Add(reader.Value);
+                            }
+                            else
+                            {
+                                values.Add(reader.ReadOuterXml());
+                            }
+                        }
+                    }
+
+                    dic[name] = string.Join(string.Empty, values);
+                }
+            }
+
+            return dic;
+        }
+
+        /// <summary>
+        /// Async parse XML specific depth data
+        /// 异步解析XML特定层数据
+        /// </summary>
+        /// <param name="input">Input stream</param>
+        /// <param name="depth">Depth</param>
+        /// <returns>Result</returns>
         public static async Task<Dictionary<string, string>> ParseXmlAsync(Stream input, int depth = 1)
         {
             var dic = new Dictionary<string, string>();
