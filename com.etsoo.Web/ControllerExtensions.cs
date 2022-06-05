@@ -31,7 +31,7 @@ namespace com.etsoo.Web
 
             controller.ViewData.Model = model;
 
-            using var writer = new StringWriter();
+            await using var writer = new StringWriter();
 
             if (controller.HttpContext.RequestServices.GetService(typeof(ICompositeViewEngine)) is not ICompositeViewEngine viewEngine)
             {

@@ -90,7 +90,7 @@ namespace Benchmark.Utils
         {
             public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
             {
-                using var w = options.CreateJsonWriter(writer);
+                await using var w = options.CreateJsonWriter(writer);
 
                 w.WriteStartObject();
 
@@ -164,7 +164,7 @@ namespace Benchmark.Utils
                 Flags = new[] { 1, 1093, 2, -1 }
             };
 
-            if(person is IJsonSerialization jl)
+            if (person is IJsonSerialization jl)
             {
                 var writer = new ArrayBufferWriter<byte>();
                 await jl.ToJsonAsync(writer, new JsonSerializerOptions(JsonSerializerDefaults.Web)

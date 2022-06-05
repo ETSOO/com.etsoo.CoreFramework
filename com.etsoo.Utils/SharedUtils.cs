@@ -174,7 +174,7 @@ namespace com.etsoo.Utils
         /// <returns>Task</returns>
         public static async Task<string> JsonSerializeAsync<D>(D data, JsonSerializerOptions? options = null)
         {
-            using var ms = GetStream();
+            await using var ms = GetStream();
             await JsonSerializeAsync(data, ms, options);
             return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
         }
@@ -189,7 +189,7 @@ namespace com.etsoo.Utils
         public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj)
         {
             // Stream
-            using var ms = GetStream();
+            await using var ms = GetStream();
 
             // Serialize
             await JsonSerializeAsync(obj, ms);

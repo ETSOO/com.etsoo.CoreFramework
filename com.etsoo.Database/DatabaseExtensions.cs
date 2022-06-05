@@ -123,7 +123,7 @@ namespace com.etsoo.Database
         /// <returns>Action result</returns>
         public static async ValueTask<ActionResult?> QueryAsResultAsync(this DbConnection connection, CommandDefinition command)
         {
-            using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult & CommandBehavior.SingleRow);
+            await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult & CommandBehavior.SingleRow);
             return await ActionResult.CreateAsync(reader);
         }
 
@@ -142,7 +142,7 @@ namespace com.etsoo.Database
             if (multipleResults)
             {
                 // Multiple results
-                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
+                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
 
                 var i = 1;
                 var hasContent = false;
@@ -193,7 +193,7 @@ namespace com.etsoo.Database
             else
             {
                 // Only one result
-                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
+                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
                 // Has content
                 var hasContent = reader.HasRows;
@@ -227,7 +227,7 @@ namespace com.etsoo.Database
             if (multipleResults)
             {
                 // Multiple results
-                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
+                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
 
                 var i = 1;
                 var hasContent = false;
@@ -282,7 +282,7 @@ namespace com.etsoo.Database
             else
             {
                 // The content maybe splitted into severl rows
-                using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
+                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
                 // Has content
                 var hasContent = reader.HasRows;

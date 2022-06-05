@@ -192,7 +192,7 @@ namespace com.etsoo.Utils.Storage
             }
 
             // Current file stream
-            using var fileStream = fi.Exists ? fi.OpenWrite() : fi.Create();
+            await using var fileStream = fi.Exists ? fi.OpenWrite() : fi.Create();
 
             // Reset stream current position
             if (stream.CanSeek)

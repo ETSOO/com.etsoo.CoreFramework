@@ -271,7 +271,7 @@ namespace com.etsoo.HTTP
             response.EnsureSuccessStatusCode();
 
             // Get stream
-            using var stream = await response.Content.ReadAsStreamAsync();
+            await using var stream = await response.Content.ReadAsStreamAsync();
 
             // Test first 128-byte characters only
             Memory<byte> bytes = new byte[128];

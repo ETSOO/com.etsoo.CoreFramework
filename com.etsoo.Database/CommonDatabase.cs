@@ -52,7 +52,7 @@ namespace com.etsoo.Database
             // Database snake naming
             if (snakeNaming)
             {
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+                DefaultTypeMap.MatchNamesWithUnderscores = true;
             }
         }
 
@@ -171,7 +171,7 @@ namespace com.etsoo.Database
         /// <returns>Task</returns>
         public async Task WithConnection(Func<C, Task> func)
         {
-            using var connection = NewConnection();
+            await using var connection = NewConnection();
 
             await connection.OpenAsync();
 
@@ -189,7 +189,7 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public async Task<T> WithConnection<T>(Func<C, Task<T>> func)
         {
-            using var connection = NewConnection();
+            await using var connection = NewConnection();
 
             await connection.OpenAsync();
 
@@ -205,7 +205,7 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public async ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func)
         {
-            using var connection = NewConnection();
+            await using var connection = NewConnection();
 
             await connection.OpenAsync();
 
@@ -340,9 +340,9 @@ namespace com.etsoo.Database
         [RequiresPreviewFeatures]
         public async IAsyncEnumerable<D> QuerySourceAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
-            using var connection = NewConnection();
+            await using var connection = NewConnection();
 
-            using var reader = await connection.ExecuteReaderAsync(command);
+            await using var reader = await connection.ExecuteReaderAsync(command);
 
             var items = D.CreateAsync(reader);
 
