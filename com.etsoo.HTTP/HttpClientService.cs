@@ -55,6 +55,21 @@ namespace com.etsoo.HTTP
     public abstract class HttpClientService
     {
         /// <summary>
+        /// Create Json StringContent
+        /// PostAsJson / PostAsJsonAsync has no Content-Length header, may cause 412 (Precondition Failed)
+        /// 创建Json字符串内容
+        /// </summary>
+        /// <typeparam name="T">Generic input type</typeparam>
+        /// <param name="input">Input</param>
+        /// <param name="serializerOptions">Options</param>
+        /// <returns>Result</returns>
+        public static StringContent CreateJsonStringContent<T>(T input, JsonSerializerOptions? serializerOptions = null)
+        {
+            var json = JsonSerializer.Serialize(input, serializerOptions);
+            return new StringContent(json, Encoding.UTF8, "application/json");
+        }
+
+        /// <summary>
         /// Http client
         /// HTTP客户端
         /// </summary>
@@ -168,10 +183,13 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
         /// <param name="serializerOptions">Serializer options</param>
+        /// <param name="contentLengthRequird">Content-Length required</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null)
+        protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null, bool contentLengthRequird = false)
         {
-            using var response = await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
+            using var response = contentLengthRequird
+                ? await Client.PostAsync(requestUri, CreateJsonStringContent(data, serializerOptions))
+                : await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<T>(response);
         }
 
