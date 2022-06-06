@@ -110,12 +110,22 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <param name="requestUri">Request uri</param>
         /// <param name="saveStream">Save stream</param>
-        /// <returns>Task</returns>
-        protected async Task DownloadAsync(string requestUri, Stream saveStream)
+        /// <returns>Filename</returns>
+        protected async Task<string?> DownloadAsync(string requestUri, Stream saveStream)
         {
+            // Get response
             using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
+
+            // Ensure success
+            response.EnsureSuccessStatusCode();
+
+            // Download stream
             await using var stream = await response.Content.ReadAsStreamAsync();
             await stream.CopyToAsync(saveStream);
+
+            // https://stackoverflow.com/questions/12145390/how-to-set-downloading-file-name-in-asp-net-web-api
+            // Filename
+            return response.Content.Headers.ContentDisposition?.FileName;
         }
 
         /// <summary>
