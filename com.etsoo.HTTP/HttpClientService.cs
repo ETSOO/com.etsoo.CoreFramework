@@ -159,6 +159,19 @@ namespace com.etsoo.HTTP
         }
 
         /// <summary>
+        /// Get data to target stream
+        /// 获取数据到目标流
+        /// </summary>
+        /// <param name="requestUri">Request uri</param>
+        /// <param name="stream">Target stream</param>
+        /// <returns>Task</returns>
+        protected async Task GetAsync(string requestUri, Stream stream)
+        {
+            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
+            await ResponseToAsync(response, stream);
+        }
+
+        /// <summary>
         /// Get data/error two conditions data
         /// 获取成功/失败两种情况的数据
         /// </summary>
@@ -202,11 +215,12 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
         /// <param name="dataField">Data unique field</param>
+        /// <param name="serializerOptions">Serializer options</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, D data, string dataField)
+        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null)
         {
             // Get response
-            using var response = await Client.PostAsJsonAsync(requestUri, data, OptionsOut);
+            using var response = await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<D, E>(response, dataField);
         }
 
@@ -289,6 +303,22 @@ namespace com.etsoo.HTTP
         }
 
         /// <summary>
+        /// Http Response to stream
+        /// HTTP回应到流
+        /// </summary>
+        /// <param name="response">Http response</param>
+        /// <param name="stream">Target stream</param>
+        /// <returns>Result</returns>
+        protected async Task ResponseToAsync(HttpResponseMessage response, Stream stream)
+        {
+            // Ensure success
+            response.EnsureSuccessStatusCode();
+
+            // Copy to stream
+            await response.Content.CopyToAsync(stream);
+        }
+
+        /// <summary>
         /// Http Response to object
         /// HTTP回应转换为对象
         /// </summary>
@@ -338,6 +368,24 @@ namespace com.etsoo.HTTP
                 var error = await JsonSerializer.DeserializeAsync<E>(stream, Options);
                 return new HttpClientResult<D, E>(default, error);
             }
+        }
+
+        /// <summary>
+        /// Send request
+        /// 发送请求
+        /// </summary>
+        /// <param name="requestUri">Request uri</param>
+        /// <param name="content">Content</param>
+        /// <param name="stream">Target stream</param>
+        /// <param name="method">Method</param>
+        /// <returns>Task</returns>
+        protected async Task SendAsync(string requestUri, HttpContent content, Stream stream, HttpMethod? method = null)
+        {
+            var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri);
+            request.Content = content;
+
+            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            await ResponseToAsync(response, stream);
         }
     }
 }
