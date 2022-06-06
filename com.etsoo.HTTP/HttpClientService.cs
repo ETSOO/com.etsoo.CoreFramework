@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.HTTP
@@ -82,7 +83,8 @@ namespace com.etsoo.HTTP
 
             OptionsOut = new JsonSerializerOptions
             {
-                WriteIndented = false
+                WriteIndented = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             Options = new JsonSerializerOptions
@@ -134,10 +136,11 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request uri</param>
+        /// <param name="serializerOptions">Serializer options</param>
         /// <returns>Result</returns>
-        protected async Task<T?> GetAsync<T>(string requestUri)
+        protected async Task<T?> GetAsync<T>(string requestUri, JsonSerializerOptions? serializerOptions = null)
         {
-            return await Client.GetFromJsonAsync<T>(requestUri, Options);
+            return await Client.GetFromJsonAsync<T>(requestUri, serializerOptions ?? Options);
         }
 
         /// <summary>
@@ -164,10 +167,11 @@ namespace com.etsoo.HTTP
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
+        /// <param name="serializerOptions">Serializer options</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PostAsync<D, T>(string requestUri, D data)
+        protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null)
         {
-            using var response = await Client.PostAsJsonAsync(requestUri, data, OptionsOut);
+            using var response = await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<T>(response);
         }
 
@@ -240,10 +244,11 @@ namespace com.etsoo.HTTP
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
+        /// <param name="serializerOptions">Serializer options</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PutAsync<D, T>(string requestUri, D data)
+        protected async Task<T?> PutAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null)
         {
-            using var response = await Client.PutAsJsonAsync(requestUri, data, OptionsOut);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<T>(response);
         }
 
@@ -256,11 +261,12 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
         /// <param name="dataField">Data unique field</param>
+        /// <param name="serializerOptions">Serializer options</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> PutAsync<D, E>(string requestUri, D data, string dataField)
+        protected async Task<HttpClientResult<D, E>> PutAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null)
         {
             // Get response
-            using var response = await Client.PutAsJsonAsync(requestUri, data, OptionsOut);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<D, E>(response, dataField);
         }
 
