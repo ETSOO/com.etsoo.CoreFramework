@@ -407,6 +407,25 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <param name="requestUri">Request uri</param>
         /// <param name="content">Content</param>
+        /// <param name="method">Method</param>
+        /// <returns>Json result</returns>
+        protected async Task<T?> SendAsync<T>(string requestUri, HttpContent content, HttpMethod? method = null)
+        {
+            var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri)
+            {
+                Content = content
+            };
+
+            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            return await ResponseToAsync<T>(response);
+        }
+
+        /// <summary>
+        /// Send request
+        /// 发送请求
+        /// </summary>
+        /// <param name="requestUri">Request uri</param>
+        /// <param name="content">Content</param>
         /// <param name="stream">Target stream</param>
         /// <param name="method">Method</param>
         /// <returns>Task</returns>
