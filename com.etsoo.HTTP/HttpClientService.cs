@@ -66,6 +66,17 @@ namespace com.etsoo.HTTP
         public static StringContent CreateJsonStringContent<T>(T input, JsonSerializerOptions? serializerOptions = null)
         {
             var json = JsonSerializer.Serialize(input, serializerOptions);
+            return CreateJsonStringContent(json);
+        }
+
+        /// <summary>
+        /// Create Json StringContent
+        /// 创建Json字符串内容
+        /// </summary>
+        /// <param name="json">Json string</param>
+        /// <returns>String content</returns>
+        public static StringContent CreateJsonStringContent(string json)
+        {
             return new StringContent(json, Encoding.UTF8, "application/json");
         }
 
