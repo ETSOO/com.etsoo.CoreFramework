@@ -267,7 +267,20 @@ namespace com.etsoo.HTTP
         /// <returns>Result</returns>
         protected async Task<T?> PostFormAsync<T>(string requestUri, IEnumerable<KeyValuePair<string, string>> data)
         {
-            using var response = await Client.PostAsync(requestUri, new FormUrlEncodedContent(data));
+            return await PostFormAsync<T>(requestUri, new FormUrlEncodedContent(data));
+        }
+
+        /// <summary>
+        /// Post form data
+        /// Post 表单数据
+        /// </summary>
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="requestUri">Request Uri</param>
+        /// <param name="content">Post content</param>
+        /// <returns>Result</returns>
+        protected async Task<T?> PostFormAsync<T>(string requestUri, HttpContent content)
+        {
+            using var response = await Client.PostAsync(requestUri, content);
             return await ResponseToAsync<T>(response);
         }
 
