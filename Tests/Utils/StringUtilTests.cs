@@ -309,11 +309,11 @@ namespace Tests.Utils
             {
                 writer.WritePropertyName("test");
                 writer.WriteStartObject();
-                writer.WriteString("Brand", "Etsoo");
+                writer.WriteString("Brand", "亿速");
                 writer.WriteEndObject();
             });
 
-            Assert.AreEqual("""{"test":{"Brand":"Etsoo"}}""", json);
+            Assert.AreEqual("""{"test":{"Brand":"亿速"}}""", json);
         }
     }
 }

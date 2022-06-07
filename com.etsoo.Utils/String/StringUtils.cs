@@ -3,8 +3,10 @@ using System.Buffers;
 using System.Collections;
 using System.ComponentModel;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Text.Unicode;
 
 namespace com.etsoo.Utils.String
 {
@@ -442,7 +444,8 @@ namespace com.etsoo.Utils.String
         {
             options ??= new JsonWriterOptions
             {
-                Indented = false
+                Indented = false,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
             };
 
             var container = new ArrayBufferWriter<byte>();
