@@ -1,7 +1,9 @@
 ﻿using com.etsoo.Utils.SpanMemory;
+using System.Buffers;
 using System.Collections;
 using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.Utils.String
@@ -427,6 +429,42 @@ namespace com.etsoo.Utils.String
             }
 
             return default;
+        }
+
+        /// <summary>
+        /// Write Json bytes
+        /// 写Json字节
+        /// </summary>
+        /// <param name="fun">Callback function</param>
+        /// <param name="options">Options</param>
+        /// <returns>Json string</returns>
+        public static ReadOnlySpan<byte> WriteJsonBytes(Action<Utf8JsonWriter> fun, JsonWriterOptions? options = null)
+        {
+            options ??= new JsonWriterOptions
+            {
+                Indented = false
+            };
+
+            var container = new ArrayBufferWriter<byte>();
+            using var writer = new Utf8JsonWriter(container, options.Value);
+
+            writer.WriteStartObject();
+            fun(writer);
+            writer.WriteEndObject();
+
+            return container.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Write Json string
+        /// 写Json字符串
+        /// </summary>
+        /// <param name="fun">Callback function</param>
+        /// <param name="options">Options</param>
+        /// <returns>Json string</returns>
+        public static string WriteJson(Action<Utf8JsonWriter> fun, JsonWriterOptions? options = null)
+        {
+            return Encoding.UTF8.GetString(WriteJsonBytes(fun, options));
         }
     }
 }
