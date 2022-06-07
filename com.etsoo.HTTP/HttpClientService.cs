@@ -99,11 +99,13 @@ namespace com.etsoo.HTTP
             OptionsOut = new JsonSerializerOptions
             {
                 WriteIndented = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
 
             Options = new JsonSerializerOptions
             {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 PropertyNameCaseInsensitive = true
             };
         }
@@ -128,7 +130,7 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="saveStream">Save stream</param>
         /// <returns>Filename</returns>
-        protected async Task<string?> DownloadAsync(string requestUri, Stream saveStream)
+        protected async Task<string> DownloadAsync(string requestUri, Stream saveStream)
         {
             // Get response
             using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
@@ -142,7 +144,8 @@ namespace com.etsoo.HTTP
 
             // https://stackoverflow.com/questions/12145390/how-to-set-downloading-file-name-in-asp-net-web-api
             // Filename
-            return response.Content.Headers.ContentDisposition?.FileName;
+            var headers = response.Content.Headers;
+            return headers.ContentDisposition?.FileName ?? Path.GetFileNameWithoutExtension(requestUri) + MimeTypeMap.TryGetExtension(headers.ContentType?.MediaType) ?? string.Empty;
         }
 
         /// <summary>
@@ -201,7 +204,7 @@ namespace com.etsoo.HTTP
         protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null, bool contentLengthRequird = false)
         {
             using var response = contentLengthRequird
-                ? await Client.PostAsync(requestUri, CreateJsonStringContent(data, serializerOptions))
+                ? await Client.PostAsync(requestUri, CreateJsonStringContent(data, serializerOptions ?? OptionsOut))
                 : await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
             return await ResponseToAsync<T>(response);
         }
