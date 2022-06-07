@@ -228,6 +228,23 @@ namespace com.etsoo.HTTP
         }
 
         /// <summary>
+        /// Post data, data/error two conditions data
+        /// Post 数据，成功/失败两种情况的数据
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <typeparam name="E">Generic error type</typeparam>
+        /// <param name="requestUri">Request uri</param>
+        /// <param name="content">Content</param>
+        /// <param name="dataField">Data unique field</param>
+        /// <returns>Result</returns>
+        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, HttpContent content, string dataField)
+        {
+            // Get response
+            using var response = await Client.PostAsync(requestUri, content);
+            return await ResponseToAsync<D, E>(response, dataField);
+        }
+
+        /// <summary>
         /// Post form data
         /// Post 表单数据
         /// </summary>
@@ -267,20 +284,7 @@ namespace com.etsoo.HTTP
         /// <returns>Result</returns>
         protected async Task<T?> PostFormAsync<T>(string requestUri, IEnumerable<KeyValuePair<string, string>> data)
         {
-            return await PostFormAsync<T>(requestUri, new FormUrlEncodedContent(data));
-        }
-
-        /// <summary>
-        /// Post form data
-        /// Post 表单数据
-        /// </summary>
-        /// <typeparam name="T">Generic result type</typeparam>
-        /// <param name="requestUri">Request Uri</param>
-        /// <param name="content">Post content</param>
-        /// <returns>Result</returns>
-        protected async Task<T?> PostFormAsync<T>(string requestUri, HttpContent content)
-        {
-            using var response = await Client.PostAsync(requestUri, content);
+            using var response = await Client.PostAsync(requestUri, new FormUrlEncodedContent(data));
             return await ResponseToAsync<T>(response);
         }
 
