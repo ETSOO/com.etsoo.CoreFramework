@@ -451,6 +451,7 @@ namespace com.etsoo.Utils.String
             writer.WriteStartObject();
             fun(writer);
             writer.WriteEndObject();
+            writer.Flush();
 
             return container.WrittenSpan;
         }

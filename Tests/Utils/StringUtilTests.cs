@@ -301,5 +301,19 @@ namespace Tests.Utils
             Assert.AreEqual("QmpkdVgv", chars);
             Assert.AreEqual(num, StringUtils.CharsToNumber(chars));
         }
+
+        [Test]
+        public void WriteJsonTests()
+        {
+            var json = StringUtils.WriteJson((writer) =>
+            {
+                writer.WritePropertyName("test");
+                writer.WriteStartObject();
+                writer.WriteString("Brand", "Etsoo");
+                writer.WriteEndObject();
+            });
+
+            Assert.AreEqual("""{"test":{"Brand":"Etsoo"}}""", json);
+        }
     }
 }
