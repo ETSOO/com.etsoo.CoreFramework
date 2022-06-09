@@ -7,7 +7,7 @@ namespace com.etsoo.DI
     /// Fire and forget service
     /// 异步环境的非等待执行服务
     /// </summary>
-    public class FireAndForgetService
+    public class FireAndForgetService : IFireAndForgetService
     {
         private readonly ILogger<FireAndForgetService> logger;
         private readonly IServiceScopeFactory scopeFactory;
