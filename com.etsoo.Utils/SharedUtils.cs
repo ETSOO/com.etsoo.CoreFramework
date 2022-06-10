@@ -3,7 +3,10 @@ using com.etsoo.Utils.String;
 using Microsoft.IO;
 using System.Buffers;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 namespace com.etsoo.Utils
 {
@@ -13,6 +16,18 @@ namespace com.etsoo.Utils
     /// </summary>
     public static class SharedUtils
     {
+        /// <summary>
+        /// Json default serializer options
+        /// Json 默认序列化选项
+        /// </summary>
+        public static JsonSerializerOptions JsonDefaultSerializerOptions = new()
+        {
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+
         /// <summary>
         /// Get enum value related keys
         /// 获取枚举值相关键

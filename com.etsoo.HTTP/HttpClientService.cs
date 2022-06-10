@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.HTTP
@@ -107,12 +106,7 @@ namespace com.etsoo.HTTP
         {
             Client = client;
 
-            OptionsOut = new JsonSerializerOptions
-            {
-                WriteIndented = false,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
+            OptionsOut = SharedUtils.JsonDefaultSerializerOptions;
 
             Options = new JsonSerializerOptions
             {

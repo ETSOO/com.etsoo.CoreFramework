@@ -18,7 +18,7 @@ namespace Tests.Utils
                 <Event><![CDATA[scancode_push]]></Event>
                 <EventKey><![CDATA[6]]></EventKey>
                 <ScanCodeInfo><ScanType><![CDATA[qrcode]]></ScanType>
-                <ScanResult><![CDATA[1]]></ScanResult>
+                <ScanResult><![CDATA[条形码1]]></ScanResult>
                 </ScanCodeInfo>
                 </xml>"));
 
@@ -28,7 +28,7 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual(7, dic.Count);
             Assert.AreEqual("scancode_push", dic["Event"]);
-            Assert.AreEqual("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[1]]></ScanResult>", dic["ScanCodeInfo"]);
+            Assert.AreEqual("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[条形码1]]></ScanResult>", dic["ScanCodeInfo"]);
         }
 
         [Test]
@@ -61,11 +61,11 @@ namespace Tests.Utils
         public void GetListTests()
         {
             // Arrage & act
-            var items = XmlUtils.GetList("<item><field1>1</field1><field2><![CDATA[a1]]></field2></item><item><field1>2</field1><field2><![CDATA[b2]]></field2></item>");
+            var items = XmlUtils.GetList("<item><field1>1</field1><field2><![CDATA[a1]]></field2></item><item><field1>2</field1><field2><![CDATA[亿速]]></field2></item>");
 
             // Assert
             Assert.AreEqual(2, items.Count());
-            Assert.IsTrue(items.Any(item => item.ContainsKey("field2") && item["field2"] == "b2"));
+            Assert.IsTrue(items.Any(item => item.ContainsKey("field2") && item["field2"] == "亿速"));
         }
     }
 }
