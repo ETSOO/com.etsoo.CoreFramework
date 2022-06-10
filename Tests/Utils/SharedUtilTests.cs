@@ -72,5 +72,18 @@ namespace Tests.Utils
 
             Assert.AreEqual(source, result);
         }
+
+        [Test]
+        public void TruncateDateTimeTests()
+        {
+            var now = DateTime.Now;
+            var now1 = SharedUtils.TruncateDateTime(now);
+            Assert.AreEqual(0, now1.Millisecond);
+
+            var utc = DateTime.UtcNow;
+            var utc1 = SharedUtils.TruncateDateTime(utc);
+            Assert.AreEqual(0, utc1.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, utc1.Kind);
+        }
     }
 }

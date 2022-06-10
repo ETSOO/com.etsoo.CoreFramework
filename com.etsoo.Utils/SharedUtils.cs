@@ -310,6 +310,17 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
+        /// Tuncate miliseconds off a datetime
+        /// https://stackoverflow.com/questions/1004698/how-to-truncate-milliseconds-off-of-a-net-datetime
+        /// </summary>
+        /// <param name="input">Input datetime</param>
+        /// <returns>Result</returns>
+        public static DateTime TruncateDateTime(DateTime input)
+        {
+            return input.AddTicks(-(input.Ticks % TimeSpan.TicksPerSecond));
+        }
+
+        /// <summary>
         /// Unix seconds from 1970 to UTC datetime
         /// Unix 秒数转换为 UTC时间
         /// </summary>
