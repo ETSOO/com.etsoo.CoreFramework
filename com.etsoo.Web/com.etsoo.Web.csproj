@@ -5,7 +5,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <Nullable>enable</Nullable>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Company>ETSOO</Company>
     <Version>1.0.18</Version>
     <Description>ETSOO SmartERP NextGen shared web components.</Description>

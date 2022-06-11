@@ -14,7 +14,7 @@
 	<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<Description>ETSOO SmartERP NextGen SMTP utilities.</Description>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 	<Version>1.0.3</Version>
 	<AssemblyVersion>1.0.1.0</AssemblyVersion>
 	<FileVersion>1.0.1.0</FileVersion>
