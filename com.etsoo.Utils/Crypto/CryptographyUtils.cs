@@ -205,7 +205,7 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            await using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(message));
+            await using var ms = SharedUtils.GetStream(message);
 
             return await alg.ComputeHashAsync(ms);
         }
@@ -225,7 +225,7 @@ namespace com.etsoo.Utils.Crypto
 
             alg.Initialize();
 
-            await using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(message));
+            await using var ms = SharedUtils.GetStream(message);
 
             return await alg.ComputeHashAsync(ms);
         }
@@ -238,8 +238,19 @@ namespace com.etsoo.Utils.Crypto
         /// <returns>Bytes</returns>
         public static async Task<byte[]> MD5Async(string source)
         {
+            return await MD5Async(Encoding.UTF8.GetBytes(source));
+        }
+
+        /// <summary>
+        /// MD5 hash
+        /// MD5哈希
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> MD5Async(byte[] bytes)
+        {
             using var md5 = MD5.Create();
-            await using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
+            await using var ms = SharedUtils.GetStream(bytes);
             return await md5.ComputeHashAsync(ms);
         }
 
@@ -251,8 +262,19 @@ namespace com.etsoo.Utils.Crypto
         /// <returns>Bytes</returns>
         public static async Task<byte[]> SHA1Async(string source)
         {
+            return await SHA1Async(Encoding.UTF8.GetBytes(source));
+        }
+
+        /// <summary>
+        /// SHA1 hash
+        /// SHA1哈希
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> SHA1Async(byte[] bytes)
+        {
             using var sha1 = SHA1.Create();
-            await using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
+            await using var ms = SharedUtils.GetStream(bytes);
             return await sha1.ComputeHashAsync(ms);
         }
 
@@ -264,8 +286,19 @@ namespace com.etsoo.Utils.Crypto
         /// <returns>Bytes</returns>
         public static async Task<byte[]> SHA3Async(string source)
         {
+            return await SHA3Async(Encoding.UTF8.GetBytes(source));
+        }
+
+        /// <summary>
+        /// SHA3(512) hash
+        /// SHA3哈希
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <returns>Bytes</returns>
+        public static async Task<byte[]> SHA3Async(byte[] bytes)
+        {
             using var sha512 = SHA512.Create();
-            await using var ms = SharedUtils.GetStream(Encoding.UTF8.GetBytes(source));
+            await using var ms = SharedUtils.GetStream(bytes);
             return await sha512.ComputeHashAsync(ms);
         }
 
