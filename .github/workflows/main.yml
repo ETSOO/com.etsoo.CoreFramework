@@ -217,3 +217,16 @@ jobs:
 
           # API key to authenticate with NuGet server
           NUGET_KEY: ${{secrets.ETSOONugetKey}}
+
+      # Publish com.etsoo.PureIO
+      - name: Publish com.etsoo.PureIO on version change
+        uses: alirezanet/publish-nuget@v3.0.4
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: com.etsoo.PureIO/com.etsoo.PureIO.csproj
+
+          # Flag to toggle git tagging, enabled by default
+          TAG_COMMIT: false
+
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.ETSOONugetKey}}

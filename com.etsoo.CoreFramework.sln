@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.HTTP", "com.etsoo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Localization", "com.etsoo.Localization\com.etsoo.Localization.csproj", "{8407B547-9361-4687-BE84-1BE0BC93E331}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.DI", "com.etsoo.DI\com.etsoo.DI.csproj", "{FD61FA05-6745-4DAC-8DBB-FC6682B61CBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.DI", "com.etsoo.DI\com.etsoo.DI.csproj", "{FD61FA05-6745-4DAC-8DBB-FC6682B61CBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.PureIO", "com.etsoo.PureIO\com.etsoo.PureIO.csproj", "{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,6 +119,10 @@ Global
 		{FD61FA05-6745-4DAC-8DBB-FC6682B61CBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD61FA05-6745-4DAC-8DBB-FC6682B61CBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD61FA05-6745-4DAC-8DBB-FC6682B61CBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
