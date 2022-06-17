@@ -141,6 +141,7 @@ namespace Tests.Web
             Assert.AreEqual((byte)'e', c);
         }
 
+        [Test]
         public void ReadToWithinTest()
         {
             // Arrange
@@ -155,6 +156,7 @@ namespace Tests.Web
             Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
         }
 
+        [Test]
         public void ReadToWithoutTest()
         {
             // Arrange
@@ -169,6 +171,7 @@ namespace Tests.Web
             Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
         }
 
+        [Test]
         public void ReadToMoveToNextTest()
         {
             // Arrange
@@ -184,21 +187,48 @@ namespace Tests.Web
             Assert.AreEqual((byte)'0', reader.Peek());
         }
 
+        [Test]
         public void ReadToTargetsTest()
         {
             // Arrange
             using var stream = SharedUtils.GetStream("[<<Hello, 亿速>>]a");
             using var reader = new PureStreamReader(stream, 8);
 
-            // Case 1
             var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, false);
             Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
             Assert.AreEqual((byte)'>', reader.Peek());
+        }
 
-            // Case 2
-            bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, true);
+        [Test]
+        public void ReadToTargetsIgnoreTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("[<<Hello, 亿速>>]a");
+            using var reader = new PureStreamReader(stream, 8);
+
+            var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, true);
             Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
             Assert.AreEqual((byte)'a', reader.Peek());
+        }
+
+        [Test]
+        public void ReadToTargetsEmptyTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("true false");
+            using var reader = new PureStreamReader(stream);
+
+            var first = reader.ReadByte();
+            Assert.AreEqual((byte)'t', first);
+
+            var bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
+            Assert.AreEqual("rue", Encoding.UTF8.GetString(bytes));
+
+            first = reader.ReadByte();
+            Assert.AreEqual((byte)'f', first);
+
+            bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
+            Assert.AreEqual("alse", Encoding.UTF8.GetString(bytes));
         }
     }
 }

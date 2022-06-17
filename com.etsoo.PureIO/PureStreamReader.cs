@@ -31,6 +31,7 @@ namespace com.etsoo.PureIO
 
         private readonly bool leaveOpen;
         private readonly Memory<byte> bufferBytes;
+        private int lastCount = 0;
         private int lastPos = -1;
 
         /// <summary>
@@ -50,26 +51,27 @@ namespace com.etsoo.PureIO
             this.leaveOpen = leaveOpen;
         }
 
-        private ReadOnlySpan<byte> ReadBuffer()
+        private ReadOnlySpan<byte> ReadBuffer(bool singleByte = false)
         {
             var span = bufferBytes.Span;
 
-            if (lastPos == -1)
+            // No reading or at the ending
+            if (lastPos == -1 || lastPos == span.Length)
             {
-                var count = BaseStream.Read(span);
-                if (count == 0)
+                lastCount = BaseStream.Read(span);
+                if (lastCount == 0)
                 {
+                    // Reading completed
                     EndOfStream = true;
                     return Array.Empty<byte>();
                 }
 
+                // Locate to the start
                 lastPos = 0;
-                return count < span.Length ? span[..count] : span;
             }
-            else
-            {
-                return span[lastPos..];
-            }
+
+            // Avoid zero bytes
+            return singleByte ? span[lastPos..(lastPos + 1)] : span[lastPos..lastCount];
         }
 
         private ReadOnlySpan<byte> ReadBufferLine(out bool success)
@@ -83,48 +85,51 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            lastPos = span.IndexOfAny(LineFeedByte, CarriageReturnByte);
-            if (lastPos > -1)
+            var pos = span.IndexOfAny(LineFeedByte, CarriageReturnByte);
+            if (pos > -1)
             {
-                var result = span[..lastPos];
+                var result = span[..pos];
 
-                // Is return?
-                var isReturn = span[lastPos] == CarriageReturnByte;
+                // Is return byte?
+                var isReturn = span[pos] == CarriageReturnByte;
 
                 // Move forward
-                lastPos++;
+                pos++;
 
                 // r, n or rn, consider rn case
                 if (isReturn)
                 {
-                    if (lastPos < span.Length)
+                    if (pos < span.Length)
                     {
-                        if (span[lastPos] == LineFeedByte)
+                        if (span[pos] == LineFeedByte)
                         {
-                            lastPos++;
+                            pos++;
                         }
+                        lastPos += pos;
                     }
                     else
                     {
                         // Continue reading buffer
                         lastPos = -1;
-                        span = ReadBuffer();
-                        if (span[0] == LineFeedByte)
+                        var nextSpan = ReadBuffer();
+                        if (nextSpan[0] == LineFeedByte)
                         {
                             // Jump to next byte
-                            lastPos = 1;
+                            lastPos++;
                         }
                     }
                 }
-
-                if (lastPos == span.Length)
+                else
                 {
-                    // Reset when now is in the end
-                    lastPos = -1;
+                    lastPos += pos;
                 }
 
                 success = true;
                 return result;
+            }
+            else
+            {
+                lastPos = -1;
             }
 
             success = false;
@@ -142,22 +147,23 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            lastPos = span.IndexOf(target);
-            if (lastPos > -1)
+            var pos = span.IndexOf(target);
+            if (pos > -1)
             {
-                var result = span[..lastPos];
+                var result = span[..pos];
 
                 // Move forward
-                lastPos++;
+                pos++;
 
-                if (lastPos == span.Length)
-                {
-                    // Reset when now is in the end
-                    lastPos = -1;
-                }
+                // Update global pos
+                lastPos += pos;
 
                 success = true;
                 return result;
+            }
+            else
+            {
+                lastPos = -1;
             }
 
             success = false;
@@ -175,13 +181,13 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            lastPos = span.IndexOfAny(targets);
-            if (lastPos > -1)
+            var pos = span.IndexOfAny(targets);
+            if (pos > -1)
             {
-                var result = span[..lastPos];
+                var result = span[..pos];
 
                 // Move forward
-                lastPos++;
+                pos++;
 
                 // Ignore all consecutive targets
                 // 忽略所有连续目标
@@ -189,21 +195,17 @@ namespace com.etsoo.PureIO
                 {
                     while (!EndOfStream)
                     {
-                        if (lastPos >= span.Length)
-                        {
-                            lastPos = -1;
-                        }
-
-                        if (lastPos == -1)
+                        if (pos == span.Length)
                         {
                             span = ReadBuffer();
                             if (EndOfStream) break;
+                            pos = 0;
                         }
 
-                        var b = span[lastPos];
+                        var b = span[pos];
                         if (targets.Contains(b))
                         {
-                            lastPos++;
+                            pos++;
                         }
                         else
                         {
@@ -212,14 +214,15 @@ namespace com.etsoo.PureIO
                     }
                 }
 
-                if (lastPos == span.Length)
-                {
-                    // Reset when now is in the end
-                    lastPos = -1;
-                }
+                // Update global pos
+                lastPos += pos;
 
                 success = true;
                 return result;
+            }
+            else
+            {
+                lastPos = -1;
             }
 
             success = false;
@@ -227,16 +230,13 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Returns the next available byte but does not pop it
-        /// 返回下一个可用字节但不使用它
+        /// Returns the next available byte but does not move the index
+        /// 返回下一个可用字节但不移动索引
         /// </summary>
         /// <returns>Result</returns>
         public byte? Peek()
         {
-            // Read buffer
-            var span = ReadBuffer();
-            if (span.Length == 0) return null;
-            return span[0];
+            return ReadByteBase(false);
         }
 
         /// <summary>
@@ -246,11 +246,19 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public byte? ReadByte()
         {
-            // Read buffer
-            var span = ReadBuffer();
+            return ReadByteBase(true);
+        }
 
+        private byte? ReadByteBase(bool moveIndex)
+        {
+            // Read buffer
+            var span = ReadBuffer(true);
+
+            // No reading
             if (span.Length == 0) return null;
-            lastPos++;
+
+            if (moveIndex) lastPos++;
+
             return span[0];
         }
 
