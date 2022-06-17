@@ -206,8 +206,11 @@ namespace Tests.Web
             using var stream = SharedUtils.GetStream("[<<Hello, 亿速>>]a");
             using var reader = new PureStreamReader(stream, 8);
 
+            // Discard bytes
+            reader.Discard(3);
+
             var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, true);
-            Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
+            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
             Assert.AreEqual((byte)'a', reader.Peek());
         }
 
@@ -218,17 +221,29 @@ namespace Tests.Web
             using var stream = SharedUtils.GetStream("true false");
             using var reader = new PureStreamReader(stream);
 
-            var first = reader.ReadByte();
+            var first = reader.Peek();
             Assert.AreEqual((byte)'t', first);
 
             var bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
-            Assert.AreEqual("rue", Encoding.UTF8.GetString(bytes));
+            Assert.AreEqual("true", Encoding.UTF8.GetString(bytes));
 
-            first = reader.ReadByte();
+            first = reader.Peek();
             Assert.AreEqual((byte)'f', first);
 
             bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
-            Assert.AreEqual("alse", Encoding.UTF8.GetString(bytes));
+            Assert.AreEqual("false", Encoding.UTF8.GetString(bytes));
+        }
+
+        [Test]
+        public void DiscardMoreReadTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("1234567890");
+            using var reader = new PureStreamReader(stream, 8);
+
+            reader.Discard(9);
+
+            Assert.AreEqual((byte)'0', reader.Peek());
         }
     }
 }

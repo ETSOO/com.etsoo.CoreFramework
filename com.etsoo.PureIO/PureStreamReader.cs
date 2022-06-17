@@ -249,6 +249,50 @@ namespace com.etsoo.PureIO
             return ReadByteBase(true);
         }
 
+        /// <summary>
+        /// Discard coming bytes
+        /// 丢弃将读取的字节
+        /// </summary>
+        /// <param name="count">Bytes count</param>
+        public void Discard(int count)
+        {
+            var span = ReadBuffer();
+            if (EndOfStream) return;
+
+            if (count <= span.Length)
+            {
+                // Within the buffer range
+                lastPos += count;
+            }
+            else
+            {
+                count -= span.Length;
+
+                // If the base stream can seek
+                if (BaseStream.CanSeek)
+                {
+                    if (BaseStream.Position + count < BaseStream.Length)
+                        BaseStream.Position += count;
+                    else
+                        BaseStream.Seek(0, SeekOrigin.End);
+                }
+                else
+                {
+                    do
+                    {
+                        var buffer = new byte[Math.Min(count, DefaultBufferSize)];
+                        var bytesRead = BaseStream.Read(buffer);
+                        if (bytesRead == 0) break;
+                        count -= bytesRead;
+                    }
+                    while (count > 0);
+                }
+
+                // Back to ready reading status
+                lastPos = -1;
+            }
+        }
+
         private byte? ReadByteBase(bool moveIndex)
         {
             // Read buffer
