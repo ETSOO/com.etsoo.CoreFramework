@@ -164,6 +164,68 @@ namespace com.etsoo.PureIO
             return span;
         }
 
+        private ReadOnlySpan<byte> ReadBufferTo(ReadOnlySpan<byte> targets, out bool success, bool ignoreConsecutives = true)
+        {
+            // Read buffer, make sure one byte at least is ready
+            var span = ReadBuffer();
+            if (EndOfStream)
+            {
+                success = false;
+                return span;
+            }
+
+            // Search directly
+            lastPos = span.IndexOfAny(targets);
+            if (lastPos > -1)
+            {
+                var result = span[..lastPos];
+
+                // Move forward
+                lastPos++;
+
+                // Ignore all consecutive targets
+                // 忽略所有连续目标
+                if (ignoreConsecutives)
+                {
+                    while (!EndOfStream)
+                    {
+                        if (lastPos >= span.Length)
+                        {
+                            lastPos = -1;
+                        }
+
+                        if (lastPos == -1)
+                        {
+                            span = ReadBuffer();
+                            if (EndOfStream) break;
+                        }
+
+                        var b = span[lastPos];
+                        if (targets.Contains(b))
+                        {
+                            lastPos++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (lastPos == span.Length)
+                {
+                    // Reset when now is in the end
+                    lastPos = -1;
+                }
+
+                success = true;
+                return result;
+            }
+
+            success = false;
+            return span;
+        }
+
         /// <summary>
         /// Returns the next available byte but does not pop it
         /// 返回下一个可用字节但不使用它
@@ -247,6 +309,38 @@ namespace com.etsoo.PureIO
 
                 // Continue reading
                 span = ReadBufferTo(target, out var moreTry);
+                if (moreTry)
+                {
+                    writer.Write(span);
+                    break;
+                }
+            }
+            while (!EndOfStream);
+
+            return writer.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Read all bytes until to the target bytes, after reading will move over the target bytes.
+        /// 读取所有字节直到目标字节，读取后将移过目标字节
+        /// </summary>
+        /// <param name="targets">Target bytes</param>
+        /// <param name="ignoreConsecutives">Ignore all consecutive targets</param>
+        /// <returns>Result</returns>
+        public ReadOnlySpan<byte> ReadTo(ReadOnlySpan<byte> targets, bool ignoreConsecutives = true)
+        {
+            // First try with reading from buffer success
+            var span = ReadBufferTo(targets, out var success, ignoreConsecutives);
+            if (success) return span;
+
+            var writer = new ArrayBufferWriter<byte>();
+            do
+            {
+                // Write current content
+                writer.Write(span);
+
+                // Continue reading
+                span = ReadBufferTo(targets, out var moreTry, ignoreConsecutives);
                 if (moreTry)
                 {
                     writer.Write(span);

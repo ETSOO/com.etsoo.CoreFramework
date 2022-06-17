@@ -183,5 +183,22 @@ namespace Tests.Web
             Assert.AreEqual("Hello-", Encoding.UTF8.GetString(bytes));
             Assert.AreEqual((byte)'0', reader.Peek());
         }
+
+        public void ReadToTargetsTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("[<<Hello, 亿速>>]a");
+            using var reader = new PureStreamReader(stream, 8);
+
+            // Case 1
+            var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, false);
+            Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
+            Assert.AreEqual((byte)'>', reader.Peek());
+
+            // Case 2
+            bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, true);
+            Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
+            Assert.AreEqual((byte)'a', reader.Peek());
+        }
     }
 }
