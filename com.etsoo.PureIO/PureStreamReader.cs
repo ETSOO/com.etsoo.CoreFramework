@@ -9,9 +9,17 @@ namespace com.etsoo.PureIO
     public class PureStreamReader : IDisposable, IAsyncDisposable
     {
         public const char CarriageReturn = '\r';
+
+        /// <summary>
+        /// '\r'
+        /// </summary>
         public const byte CarriageReturnByte = 13;
 
         public const char LineFeed = '\n';
+
+        /// <summary>
+        /// '\n'
+        /// </summary>
         public const byte LineFeedByte = 10;
 
         private const int DefaultBufferSize = 1024;
@@ -31,7 +39,7 @@ namespace com.etsoo.PureIO
 
         private readonly bool leaveOpen;
         private readonly Memory<byte> bufferBytes;
-        private int lastCount = 0;
+        private int lastCount = -1;
         private int lastPos = -1;
 
         /// <summary>
@@ -56,8 +64,11 @@ namespace com.etsoo.PureIO
             var span = bufferBytes.Span;
 
             // No reading or at the ending
-            if (lastPos == -1 || lastPos == span.Length)
+            if (lastPos == -1 || lastPos == lastCount)
             {
+                // Locate to the start
+                lastPos = 0;
+
                 lastCount = BaseStream.Read(span);
                 if (lastCount == 0)
                 {
@@ -65,9 +76,6 @@ namespace com.etsoo.PureIO
                     EndOfStream = true;
                     return Array.Empty<byte>();
                 }
-
-                // Locate to the start
-                lastPos = 0;
             }
 
             // Avoid zero bytes
@@ -402,6 +410,24 @@ namespace com.etsoo.PureIO
             while (!EndOfStream);
 
             return writer.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Read with callback
+        /// 用回调读取
+        /// </summary>
+        /// <param name="callback">Callback</param>
+        public void ReadWhile(Func<byte, bool> callback)
+        {
+            do
+            {
+                var span = ReadBuffer();
+                for (var i = 0; i < span.Length; i++)
+                {
+                    lastPos++;
+                    if (callback(span[i])) return;
+                }
+            } while (!EndOfStream);
         }
 
         public async ValueTask DisposeAsync()

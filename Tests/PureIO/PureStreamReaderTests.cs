@@ -245,5 +245,33 @@ namespace Tests.Web
 
             Assert.AreEqual((byte)'0', reader.Peek());
         }
+
+        [Test]
+        public void ReadWhileTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("1234567890+abc");
+            using var reader = new PureStreamReader(stream, 8);
+            reader.ReadWhile((one) =>
+            {
+                if (one == (byte)'+') return true;
+                return false;
+            });
+            Assert.AreEqual((byte)'a', reader.Peek());
+        }
+
+        [Test]
+        public void ReadWhileFailedTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("1234567890+abc");
+            using var reader = new PureStreamReader(stream, 8);
+            reader.ReadWhile((one) =>
+            {
+                if (one == (byte)'-') return true;
+                return false;
+            });
+            Assert.IsNull(reader.Peek());
+        }
     }
 }
