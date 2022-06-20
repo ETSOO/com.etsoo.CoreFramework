@@ -247,6 +247,19 @@ namespace Tests.Web
         }
 
         [Test]
+        public void DiscardBytesTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("1234567  \n\ra");
+            using var reader = new PureStreamReader(stream, 8);
+
+            reader.Discard(7);
+            reader.Discard(new byte[] { 32, PureStreamReader.LineFeedByte, PureStreamReader.CarriageReturnByte });
+
+            Assert.AreEqual((byte)'a', reader.Peek());
+        }
+
+        [Test]
         public void ReadWhileTest()
         {
             // Arrange

@@ -301,6 +301,27 @@ namespace com.etsoo.PureIO
             }
         }
 
+        /// <summary>
+        /// Discard consecutive bytes
+        /// 丢弃连续的字节
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        public void Discard(ReadOnlySpan<byte> bytes)
+        {
+            byte? peek;
+            while ((peek = Peek()) is not null)
+            {
+                if (bytes.Contains(peek.Value))
+                {
+                    Discard(1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+
         private byte? ReadByteBase(bool moveIndex)
         {
             // Read buffer
