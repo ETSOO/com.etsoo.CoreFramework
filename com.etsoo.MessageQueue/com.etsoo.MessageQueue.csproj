@@ -15,7 +15,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<Description>ETSOO SmartERP NextGen messge queue utilities.</Description>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Version>1.0.3</Version>
+	<Version>1.0.4</Version>
 	<AssemblyVersion>1.0.1.0</AssemblyVersion>
 	<FileVersion>1.0.1.0</FileVersion>
 	<PackageIcon>logo.png</PackageIcon>
@@ -31,7 +31,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.3.1" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
