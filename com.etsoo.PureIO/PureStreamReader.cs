@@ -258,6 +258,80 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
+        /// Read bytes
+        /// 读取多个字节
+        /// </summary>
+        /// <param name="count">Bytes count</param>
+        /// <returns>Result</returns>
+        public ReadOnlySpan<byte> ReadBytes(int count)
+        {
+            var w = new ArrayBufferWriter<byte>(count);
+
+            while (count > 0)
+            {
+                // Read buffer, make sure one byte at least is ready
+                var span = ReadBuffer();
+                if (EndOfStream)
+                {
+                    break;
+                }
+
+                if (count <= span.Length)
+                {
+                    lastPos += count;
+                    w.Write(span[..count]);
+                    break;
+                }
+
+                // Reset to another round of reading
+                lastPos = -1;
+                count -= span.Length;
+                w.Write(span);
+            }
+
+            return w.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Read bytes from range
+        /// 从指定区域读取多个字节
+        /// </summary>
+        /// <param name="range">Bytes range</param>
+        /// <returns>Result</returns>
+        public ReadOnlySpan<byte> ReadBytes(ReadOnlySpan<byte> range)
+        {
+            var w = new ArrayBufferWriter<byte>();
+
+            do
+            {
+                var span = ReadBuffer();
+                if (EndOfStream) break;
+
+                for (var i = 0; i < span.Length; i++)
+                {
+                    if (!range.Contains(span[i]))
+                    {
+                        if (i > 0)
+                        {
+                            w.Write(span[..i]);
+                            lastPos += i;
+
+                            // Exit directly
+                            return w.WrittenSpan;
+                        }
+                        break;
+                    }
+                }
+
+                // Reset for another round of reading
+                w.Write(span);
+                lastPos = -1;
+            } while (true);
+
+            return w.WrittenSpan;
+        }
+
+        /// <summary>
         /// Discard coming bytes
         /// 丢弃将读取的字节
         /// </summary>

@@ -125,6 +125,44 @@ namespace Tests.Web
         }
 
         [Test]
+        public void ReadBytesWithCount()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("true false");
+            using var reader = new PureStreamReader(stream);
+
+            var bytes = reader.ReadBytes(4);
+            Assert.AreEqual("true", Encoding.ASCII.GetString(bytes));
+            Assert.AreEqual((byte)' ', reader.Peek());
+        }
+
+        [Test]
+        public void ReadBytesWithRange()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("34.>");
+            using var reader = new PureStreamReader(stream);
+
+            var bytes = reader.ReadBytes(new byte[] { 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 });
+            Assert.AreEqual("34.", Encoding.ASCII.GetString(bytes));
+            Assert.AreEqual((byte)'>', reader.Peek());
+        }
+
+        [Test]
+        public void ReadBytesWithRangeMultiple()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream("123456734.>");
+            using var reader = new PureStreamReader(stream, 8);
+
+            reader.Discard(6);
+
+            var bytes = reader.ReadBytes(new byte[] { 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 });
+            Assert.AreEqual("734.", Encoding.ASCII.GetString(bytes));
+            Assert.AreEqual((byte)'>', reader.Peek());
+        }
+
+        [Test]
         public void ReadLine_PeekTest()
         {
             // Arrange
