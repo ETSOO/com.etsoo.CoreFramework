@@ -38,6 +38,7 @@ namespace com.etsoo.PureIO
         public bool EndOfStream { get; private set; }
 
         private readonly bool leaveOpen;
+        private readonly int bufferSize;
         private readonly Memory<byte> bufferBytes;
         private int lastCount = -1;
         private int lastPos = -1;
@@ -54,6 +55,7 @@ namespace com.etsoo.PureIO
             BaseStream = stream;
 
             if (bufferSize < MinimumBufferSize) bufferSize = MinimumBufferSize;
+            this.bufferSize = bufferSize;
             bufferBytes = new byte[bufferSize];
 
             this.leaveOpen = leaveOpen;
@@ -82,13 +84,78 @@ namespace com.etsoo.PureIO
             return singleByte ? span[lastPos..(lastPos + 1)] : span[lastPos..lastCount];
         }
 
+        private async ValueTask<ReadOnlyMemory<byte>> ReadBufferAsync()
+        {
+            // No reading or at the ending
+            if (lastPos == -1 || lastPos == lastCount)
+            {
+                // Locate to the start
+                lastPos = 0;
+
+                lastCount = await BaseStream.ReadAsync(bufferBytes);
+                if (lastCount == 0)
+                {
+                    // Reading completed
+                    EndOfStream = true;
+                    return Array.Empty<byte>();
+                }
+            }
+
+            // Avoid zero bytes
+            return bufferBytes[lastPos..lastCount];
+        }
+
+        private async ValueTask<ReadOnlyMemory<byte>> BackwardReadBufferAsync()
+        {
+            // No reading or at the beginning
+            if (lastPos == -1 || lastPos == 0)
+            {
+                var streamPos = BaseStream.Position;
+                if (streamPos == 0)
+                {
+                    return Array.Empty<byte>();
+                }
+
+                var offset = Math.Min(bufferSize, streamPos);
+
+                // Backward
+                BaseStream.Seek(-offset, SeekOrigin.Current);
+
+                // Read forward
+                lastCount = await BaseStream.ReadAsync(bufferBytes);
+
+                if (lastCount == 0)
+                {
+                    // Reading completed
+                    EndOfStream = true;
+                    return Array.Empty<byte>();
+                }
+                else if (lastCount < offset)
+                {
+                    // May not possible to happen, retry
+                    BaseStream.Position = streamPos;
+                    lastPos = -1;
+                    return await BackwardReadBufferAsync();
+                }
+
+                // Backward
+                BaseStream.Seek(-offset, SeekOrigin.Current);
+
+                // Locate to the end
+                lastPos = lastCount;
+            }
+
+            // Avoid zero bytes
+            return bufferBytes[..lastPos];
+        }
+
         private ReadOnlySpan<byte> ReadBufferLine(out bool success)
         {
             // Read buffer, make sure one byte at least is ready
             var span = ReadBuffer();
             if (EndOfStream)
             {
-                success = false;
+                success = true;
                 return span;
             }
 
@@ -98,39 +165,11 @@ namespace com.etsoo.PureIO
             {
                 var result = span[..pos];
 
-                // Is return byte?
-                var isReturn = span[pos] == CarriageReturnByte;
-
                 // Move forward
                 pos++;
 
-                // r, n or rn, consider rn case
-                if (isReturn)
-                {
-                    if (pos < span.Length)
-                    {
-                        if (span[pos] == LineFeedByte)
-                        {
-                            pos++;
-                        }
-                        lastPos += pos;
-                    }
-                    else
-                    {
-                        // Continue reading buffer
-                        lastPos = -1;
-                        var nextSpan = ReadBuffer();
-                        if (nextSpan[0] == LineFeedByte)
-                        {
-                            // Jump to next byte
-                            lastPos++;
-                        }
-                    }
-                }
-                else
-                {
-                    lastPos += pos;
-                }
+                // Only support /r or /n, not /r/n
+                lastPos += pos;
 
                 success = true;
                 return result;
@@ -142,6 +181,68 @@ namespace com.etsoo.PureIO
 
             success = false;
             return span;
+        }
+
+        private async ValueTask<(bool, ReadOnlyMemory<byte>)> ReadBufferLineAsync()
+        {
+            // Read buffer, make sure one byte at least is ready
+            var memory = await ReadBufferAsync();
+            if (EndOfStream)
+            {
+                return (true, memory);
+            }
+
+            // Search directly
+            var pos = memory.Span.IndexOfAny(LineFeedByte, CarriageReturnByte);
+            if (pos > -1)
+            {
+                var result = memory[..pos];
+
+                // Move forward
+                pos++;
+
+                // Only support /r or /n, not /r/n
+                lastPos += pos;
+
+                return (true, result);
+            }
+            else
+            {
+                lastPos = -1;
+            }
+
+            return (false, memory);
+        }
+
+        private async ValueTask<(bool, ReadOnlyMemory<byte>)> BackwardReadBufferLineAsync()
+        {
+            // Read buffer, make sure one byte at least is ready
+            var memory = await BackwardReadBufferAsync();
+            if (memory.IsEmpty)
+            {
+                return (true, memory);
+            }
+
+            // Search directly
+            var pos = memory.Span.LastIndexOfAny(LineFeedByte, CarriageReturnByte);
+            if (pos > -1)
+            {
+                var result = memory[(pos + 1)..];
+
+                // Move backward
+                // pos--;
+
+                // Only support /r or /n, not /r/n
+                lastPos = pos;
+
+                return (true, result);
+            }
+            else
+            {
+                lastPos = -1;
+            }
+
+            return (false, memory);
         }
 
         private ReadOnlySpan<byte> ReadBufferTo(byte target, out bool success)
@@ -413,9 +514,8 @@ namespace com.etsoo.PureIO
         /// Read line
         /// 读取行
         /// </summary>
-        /// <param name="maxReading">Max reading bytes, default is 100K</param>
         /// <returns>Bytes</returns>
-        public ReadOnlySpan<byte> ReadLine(int maxReading = DefaultBufferSize * 100)
+        public ReadOnlySpan<byte> ReadLine()
         {
             // First try with reading from buffer success
             var span = ReadBufferLine(out var success);
@@ -424,16 +524,12 @@ namespace com.etsoo.PureIO
             var writer = new ArrayBufferWriter<byte>();
             do
             {
-                // Accumulate reading
-                maxReading -= span.Length;
-                if (maxReading <= 0) break;
-
                 // Write current content
                 writer.Write(span);
 
                 // Continue reading
-                span = ReadBufferLine(out var moreTry);
-                if (moreTry)
+                span = ReadBufferLine(out var newSuccess);
+                if (newSuccess)
                 {
                     writer.Write(span);
                     break;
@@ -442,6 +538,75 @@ namespace com.etsoo.PureIO
             while (!EndOfStream);
 
             return writer.WrittenSpan;
+        }
+
+        /// <summary>
+        /// Async read line
+        /// 异步读取行
+        /// </summary>
+        /// <returns>Bytes</returns>
+        public async Task<ReadOnlyMemory<byte>> ReadLineAsync()
+        {
+            // First try with reading from buffer success
+            var (success, memory) = await ReadBufferLineAsync();
+            if (success) return memory;
+
+            var writer = new ArrayBufferWriter<byte>();
+            do
+            {
+                // Write current content
+                writer.Write(memory.Span);
+
+                // Continue reading
+                var (newSuccess, newMemory) = await ReadBufferLineAsync();
+                if (newSuccess)
+                {
+                    writer.Write(newMemory.Span);
+                    break;
+                }
+                else
+                {
+                    memory = newMemory;
+                }
+            }
+            while (!EndOfStream);
+
+            return writer.WrittenMemory;
+        }
+
+        /// <summary>
+        /// Async backward read line
+        /// 异步反向读取行
+        /// </summary>
+        /// <returns>Bytes</returns>
+        public async Task<ReadOnlyMemory<byte>> BackwardReadLineAsync()
+        {
+            // First try with reading from buffer success
+            var (success, memory) = await BackwardReadBufferLineAsync();
+            if (success) return memory;
+
+            var bytes = new List<byte>();
+
+            do
+            {
+                // Write current content
+                bytes.InsertRange(0, memory.ToArray());
+
+                // Continue reading
+                var (newSuccess, newMemory) = await BackwardReadBufferLineAsync();
+                if (newSuccess)
+                {
+                    bytes.InsertRange(0, newMemory.ToArray());
+                    break;
+                }
+                else
+                {
+                    memory = newMemory;
+                }
+            }
+            while (true);
+
+            return bytes.ToArray().AsMemory();
         }
 
         /// <summary>
@@ -523,6 +688,15 @@ namespace com.etsoo.PureIO
                     if (callback(span[i])) return;
                 }
             } while (!EndOfStream);
+        }
+
+        /// <summary>
+        /// To stream end
+        /// 到流尾端
+        /// </summary>
+        public void ToStreamEnd()
+        {
+            BaseStream.Seek(0, SeekOrigin.End);
         }
 
         public async ValueTask DisposeAsync()

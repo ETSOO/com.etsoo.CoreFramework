@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.ImageUtils.Barcode;
+using com.etsoo.Utils;
 using com.etsoo.Utils.MessageQueue;
 using RabbitMQ.Client;
 using System;
@@ -52,10 +53,17 @@ namespace ConsoleApp1
 
             //await CreateQRCode();
 
-            int[] a = { 1, 2, 3 };
+            using var stream = SharedUtils.GetStream("Hello，亿速 \r\n下一行数据\n");
+            var bytes = new byte[8];
+            var l1 = stream.Seek(-8, SeekOrigin.End);
+            stream.Read(bytes);
+            var s1 = Encoding.UTF8.GetString(bytes);
+            var l2 = stream.Seek(-8, SeekOrigin.End);
+            stream.Read(bytes);
+            var s2 = Encoding.UTF8.GetString(bytes);
 
-            var input = "ghhrkkb";
-            Console.WriteLine(string.Concat(input.Where((c, index) => index == 0 || input[index - 1] != c)));
+            Console.WriteLine(s1);
+            Console.WriteLine(s2);
 
             Console.Read();
         }
