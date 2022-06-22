@@ -339,6 +339,16 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
+        /// Clear buffer
+        /// 清除缓存
+        /// </summary>
+        public void ClearBuffer()
+        {
+            lastPos = -1;
+            bufferBytes.Span.Clear();
+        }
+
+        /// <summary>
         /// Returns the next available byte but does not move the index
         /// 返回下一个可用字节但不移动索引
         /// </summary>
@@ -696,6 +706,7 @@ namespace com.etsoo.PureIO
         /// </summary>
         public void ToStreamEnd()
         {
+            ClearBuffer();
             BaseStream.Seek(0, SeekOrigin.End);
         }
 
