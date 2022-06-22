@@ -149,7 +149,7 @@ namespace com.etsoo.PureIO
             return bufferBytes[..lastPos];
         }
 
-        private ReadOnlySpan<byte> ReadBufferLine(out bool success)
+        private ReadOnlySpan<byte> ReadBufferLine(out bool success, bool lineFeedOnly = false)
         {
             // Read buffer, make sure one byte at least is ready
             var span = ReadBuffer();
@@ -160,16 +160,34 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            var pos = span.IndexOfAny(LineFeedByte, CarriageReturnByte);
+            var pos = lineFeedOnly ? span.IndexOf(LineFeedByte) : span.IndexOfAny(LineFeedByte, CarriageReturnByte);
             if (pos > -1)
             {
                 var result = span[..pos];
 
+                // Is return byte?
+                var isReturn = span[pos] == CarriageReturnByte;
+
                 // Move forward
                 pos++;
-
-                // Only support /r or /n, not /r/n
                 lastPos += pos;
+
+                // r, n or rn, consider rn case
+                if (isReturn)
+                {
+                    if (lastPos == lastCount)
+                    {
+                        // Need new reading
+                        Span<byte> newResult = new byte[result.Length];
+                        result.CopyTo(newResult);
+                        result = newResult;
+                    }
+
+                    if (Peek() == LineFeedByte)
+                    {
+                        lastPos++;
+                    }
+                }
 
                 success = true;
                 return result;
@@ -183,7 +201,7 @@ namespace com.etsoo.PureIO
             return span;
         }
 
-        private async ValueTask<(bool, ReadOnlyMemory<byte>)> ReadBufferLineAsync()
+        private async ValueTask<(bool, ReadOnlyMemory<byte>)> ReadBufferLineAsync(bool lineFeedOnly = false)
         {
             // Read buffer, make sure one byte at least is ready
             var memory = await ReadBufferAsync();
@@ -193,16 +211,34 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            var pos = memory.Span.IndexOfAny(LineFeedByte, CarriageReturnByte);
+            var pos = lineFeedOnly ? memory.Span.IndexOf(LineFeedByte) : memory.Span.IndexOfAny(LineFeedByte, CarriageReturnByte);
             if (pos > -1)
             {
                 var result = memory[..pos];
 
+                // Is return byte?
+                var isReturn = memory.Span[pos] == CarriageReturnByte;
+
                 // Move forward
                 pos++;
-
-                // Only support /r or /n, not /r/n
                 lastPos += pos;
+
+                // r, n or rn, consider rn case
+                if (isReturn)
+                {
+                    if (lastPos == lastCount)
+                    {
+                        // Need new reading
+                        Memory<byte> newResult = new byte[result.Length];
+                        result.CopyTo(newResult);
+                        result = newResult;
+                    }
+
+                    if (Peek() == LineFeedByte)
+                    {
+                        lastPos++;
+                    }
+                }
 
                 return (true, result);
             }
@@ -214,7 +250,7 @@ namespace com.etsoo.PureIO
             return (false, memory);
         }
 
-        private async ValueTask<(bool, ReadOnlyMemory<byte>)> BackwardReadBufferLineAsync()
+        private async ValueTask<(bool, ReadOnlyMemory<byte>)> BackwardReadBufferLineAsync(bool lineFeedOnly = false)
         {
             // Read buffer, make sure one byte at least is ready
             var memory = await BackwardReadBufferAsync();
@@ -224,16 +260,41 @@ namespace com.etsoo.PureIO
             }
 
             // Search directly
-            var pos = memory.Span.LastIndexOfAny(LineFeedByte, CarriageReturnByte);
+            var pos = lineFeedOnly ? memory.Span.LastIndexOf(LineFeedByte) : memory.Span.LastIndexOfAny(LineFeedByte, CarriageReturnByte);
             if (pos > -1)
             {
+                // Is line feed byte?
+                var isLineFeed = memory.Span[pos] == LineFeedByte;
+
                 var result = memory[(pos + 1)..];
 
                 // Move backward
-                // pos--;
-
-                // Only support /r or /n, not /r/n
                 lastPos = pos;
+
+                // r, n, rn, consider rn case
+                if (isLineFeed)
+                {
+                    if (pos > 0)
+                    {
+                        if (memory.Span[pos] == CarriageReturnByte)
+                        {
+                            lastPos--;
+                        }
+                    }
+                    else
+                    {
+                        // Need new reading
+                        Memory<byte> newResult = new byte[result.Length];
+                        result.CopyTo(newResult);
+                        result = newResult;
+
+                        var newMemory = await BackwardReadBufferAsync();
+                        if (!newMemory.IsEmpty && newMemory.Span[lastPos - 1] == CarriageReturnByte)
+                        {
+                            lastPos--;
+                        }
+                    }
+                }
 
                 return (true, result);
             }
@@ -524,11 +585,12 @@ namespace com.etsoo.PureIO
         /// Read line
         /// 读取行
         /// </summary>
+        /// <param name="lineFeedOnly">Linefeed(\n) only</param>
         /// <returns>Bytes</returns>
-        public ReadOnlySpan<byte> ReadLine()
+        public ReadOnlySpan<byte> ReadLine(bool lineFeedOnly = false)
         {
             // First try with reading from buffer success
-            var span = ReadBufferLine(out var success);
+            var span = ReadBufferLine(out var success, lineFeedOnly);
             if (success) return span;
 
             var writer = new ArrayBufferWriter<byte>();
@@ -538,7 +600,7 @@ namespace com.etsoo.PureIO
                 writer.Write(span);
 
                 // Continue reading
-                span = ReadBufferLine(out var newSuccess);
+                span = ReadBufferLine(out var newSuccess, lineFeedOnly);
                 if (newSuccess)
                 {
                     writer.Write(span);
@@ -554,11 +616,12 @@ namespace com.etsoo.PureIO
         /// Async read line
         /// 异步读取行
         /// </summary>
+        /// <param name="lineFeedOnly">Linefeed(\n) only</param>
         /// <returns>Bytes</returns>
-        public async Task<ReadOnlyMemory<byte>> ReadLineAsync()
+        public async Task<ReadOnlyMemory<byte>> ReadLineAsync(bool lineFeedOnly = false)
         {
             // First try with reading from buffer success
-            var (success, memory) = await ReadBufferLineAsync();
+            var (success, memory) = await ReadBufferLineAsync(lineFeedOnly);
             if (success) return memory;
 
             var writer = new ArrayBufferWriter<byte>();
@@ -568,7 +631,7 @@ namespace com.etsoo.PureIO
                 writer.Write(memory.Span);
 
                 // Continue reading
-                var (newSuccess, newMemory) = await ReadBufferLineAsync();
+                var (newSuccess, newMemory) = await ReadBufferLineAsync(lineFeedOnly);
                 if (newSuccess)
                 {
                     writer.Write(newMemory.Span);
@@ -588,11 +651,12 @@ namespace com.etsoo.PureIO
         /// Async backward read line
         /// 异步反向读取行
         /// </summary>
+        /// <param name="lineFeedOnly">Linefeed(\n) only</param>
         /// <returns>Bytes</returns>
-        public async Task<ReadOnlyMemory<byte>> BackwardReadLineAsync()
+        public async Task<ReadOnlyMemory<byte>> BackwardReadLineAsync(bool lineFeedOnly = false)
         {
             // First try with reading from buffer success
-            var (success, memory) = await BackwardReadBufferLineAsync();
+            var (success, memory) = await BackwardReadBufferLineAsync(lineFeedOnly);
             if (success) return memory;
 
             var bytes = new List<byte>();
@@ -603,7 +667,7 @@ namespace com.etsoo.PureIO
                 bytes.InsertRange(0, memory.ToArray());
 
                 // Continue reading
-                var (newSuccess, newMemory) = await BackwardReadBufferLineAsync();
+                var (newSuccess, newMemory) = await BackwardReadBufferLineAsync(lineFeedOnly);
                 if (newSuccess)
                 {
                     bytes.InsertRange(0, newMemory.ToArray());
