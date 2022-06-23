@@ -37,9 +37,15 @@ namespace com.etsoo.PureIO
         /// </summary>
         public bool EndOfStream { get; private set; }
 
+        /// <summary>
+        /// Current reading position (from 0)
+        /// </summary>
+        public long CurrentPosition => backward ? BaseStream.Position + lastPos : BaseStream.Position - lastCount + lastPos;
+
         private readonly bool leaveOpen;
         private readonly int bufferSize;
         private readonly Memory<byte> bufferBytes;
+        private bool backward = false;
         private int lastCount = -1;
         private int lastPos = -1;
 
@@ -78,6 +84,8 @@ namespace com.etsoo.PureIO
                     EndOfStream = true;
                     return Array.Empty<byte>();
                 }
+
+                backward = false;
             }
 
             // Avoid zero bytes
@@ -99,6 +107,8 @@ namespace com.etsoo.PureIO
                     EndOfStream = true;
                     return Array.Empty<byte>();
                 }
+
+                backward = false;
             }
 
             // Avoid zero bytes
@@ -140,6 +150,7 @@ namespace com.etsoo.PureIO
 
                 // Backward
                 BaseStream.Seek(-offset, SeekOrigin.Current);
+                backward = true;
 
                 // Locate to the end
                 lastPos = lastCount;

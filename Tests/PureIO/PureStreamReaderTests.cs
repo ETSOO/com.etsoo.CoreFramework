@@ -73,6 +73,7 @@ namespace Tests.Web
 
             // Act
             reader.ReadLine();
+            Assert.AreEqual(16, reader.CurrentPosition);
             var bytes = reader.ReadLine();
 
             // Assert
@@ -109,6 +110,7 @@ namespace Tests.Web
             // Act
             reader.ToStreamEnd();
             var l1 = await reader.BackwardReadLineAsync();
+            Assert.AreEqual(15, reader.CurrentPosition);
             var l2 = await reader.BackwardReadLineAsync();
 
             // Assert
