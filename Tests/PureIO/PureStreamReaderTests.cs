@@ -119,6 +119,29 @@ namespace Tests.Web
         }
 
         [Test]
+        public async Task BackwardReadLineWithEndsAsync_TwoLinesTest()
+        {
+            // Arrange
+            await using var stream = SharedUtils.GetStream("Hello，亿速 \r\n下一行数据");
+            await using var reader = new PureStreamReader(stream, 8);
+
+            // Read
+            var r = await reader.ReadLineAsync(PureStreamReadWay.ReturnAll);
+            Assert.AreEqual("Hello，亿速 \r\n", Encoding.UTF8.GetString(r.Span));
+
+            // Act
+            reader.ToStreamEnd();
+            var l1 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
+            Assert.AreEqual(15, reader.CurrentPosition);
+            var l2 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
+
+            // Assert
+            var bytes = Encoding.UTF8.GetBytes("\r\n下一行数据");
+            Assert.IsTrue(l1.Span.SequenceEqual(bytes));
+            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l2.Span));
+        }
+
+        [Test]
         public void ReadLine_StartEOLTest()
         {
             // Arrange
