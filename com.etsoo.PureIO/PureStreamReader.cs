@@ -34,14 +34,10 @@ namespace com.etsoo.PureIO
     /// </summary>
     public class PureStreamReader : IDisposable, IAsyncDisposable
     {
-        public const char CarriageReturn = '\r';
-
         /// <summary>
         /// '\r'
         /// </summary>
         public const byte CarriageReturnByte = 13;
-
-        public const char LineFeed = '\n';
 
         /// <summary>
         /// '\n'
