@@ -17,7 +17,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<Description>ETSOO SmartERP NextGen web utilities.</Description>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Version>1.0.5</Version>
+	<Version>1.0.6</Version>
 	<AssemblyVersion>1.0.1.0</AssemblyVersion>
 	<FileVersion>1.0.1.0</FileVersion>
 	<PackageIcon>logo.png</PackageIcon>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
   </ItemGroup>
 
