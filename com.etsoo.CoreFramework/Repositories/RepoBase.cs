@@ -55,8 +55,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType type = CommandType.StoredProcedure)
+        protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType? type = null)
         {
+            type ??=  App.DB.SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+
             return new CommandDefinition(name, parameters, commandType: type);
         }
 
