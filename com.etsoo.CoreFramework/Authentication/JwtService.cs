@@ -52,13 +52,11 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 构造函数
         /// </summary>
         /// <param name="services">Dependency injection services</param>
-        /// <param name="sslOnly">SSL only?</param>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
         /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
         /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
         public JwtService(IServiceCollection services,
-            bool sslOnly,
             IConfigurationSection section,
             Func<string, string>? secureManager = null,
             IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
@@ -107,7 +105,7 @@ namespace com.etsoo.CoreFramework.Authentication
             // Default signing key resolver
             this.issuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
             {
-                if(issuerSigningKeyResolver == null)
+                if (issuerSigningKeyResolver == null)
                 {
                     return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
                 }
@@ -134,9 +132,6 @@ namespace com.etsoo.CoreFramework.Authentication
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                // Is SSL only
-                options.RequireHttpsMetadata = sslOnly;
-
                 // Useful forwarding the JWT in an outgoing request
                 // https://stackoverflow.com/questions/57057749/what-is-the-purpose-of-jwtbeareroptions-savetoken-property-in-asp-net-core-2-0
                 options.SaveToken = false;
