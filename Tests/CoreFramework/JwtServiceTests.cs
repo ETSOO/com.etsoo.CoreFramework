@@ -40,7 +40,7 @@ namespace Tests.CoreFramework
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtTextPrivate));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
 
-            service = new JwtService(new ServiceCollection(), false, section, null);
+            service = new JwtService(new ServiceCollection(), section, null);
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace Tests.CoreFramework
                 return new List<RsaSecurityKey> { };
             }
              */
-            var publicService = new JwtService(new ServiceCollection(), false, section, null);
+            var publicService = new JwtService(new ServiceCollection(), section, null);
 
             // Refresh token
             var refreshToken = service.CreateRefreshToken(new RefreshToken("1", null, IPAddress.Parse("127.0.0.1"), "CN", 1, "service"));
@@ -91,7 +91,7 @@ namespace Tests.CoreFramework
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
 
-            var publicService = new JwtService(new ServiceCollection(), false, section);
+            var publicService = new JwtService(new ServiceCollection(), section);
 
             var rawData = "In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.";
             var signResult = service.SignData(rawData);

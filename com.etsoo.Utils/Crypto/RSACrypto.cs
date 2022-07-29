@@ -30,7 +30,7 @@ namespace com.etsoo.Utils.Crypto
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="keys">Keys</param>
+        /// <param name="keys">RAS public & private Keys</param>
         public RSACrypto((string? publicKey, string? privateKey) keys)
         {
             var (publicKey, privateKey) = keys;

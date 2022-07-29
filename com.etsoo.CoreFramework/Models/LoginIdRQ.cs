@@ -1,0 +1,36 @@
+﻿using com.etsoo.WebUtils.Attributes;
+using System.ComponentModel.DataAnnotations;
+
+namespace com.etsoo.CoreFramework.Models
+{
+    /// <summary>
+    /// Login id request data
+    /// 登录编号请求数据
+    /// </summary>
+    public record LoginIdRQ
+    {
+        /// <summary>
+        /// Device id
+        /// 设备编号
+        /// </summary>
+        [Required]
+        [StringLength(512, MinimumLength = 32)]
+        public string DeviceId { get; init; } = null!;
+
+        /// <summary>
+        /// Encrypted user's email or mobile
+        /// 加密的用户邮箱或者手机号码
+        /// </summary>
+        [Required]
+        [StringLength(256, MinimumLength = 32)]
+        public string Id { get; init; } = null!;
+
+        /// <summary>
+        /// Country code, like CN = China
+        /// 国家编号，如 CN = 中国
+        /// </summary>
+        [Required]
+        [RegionId]
+        public string Region { get; init; } = null!;
+    }
+}

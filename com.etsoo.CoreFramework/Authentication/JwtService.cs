@@ -66,18 +66,18 @@ namespace com.etsoo.CoreFramework.Authentication
             if (!section.Exists())
                 throw new ArgumentNullException(nameof(section), "No Section");
 
-            defaultIssuer = section.GetValue<string>("DefaultIssuer") ?? DefaultIssuer;
-            defaultAudience = section.GetValue<string>("DefaultAudience") ?? "All";
+            defaultIssuer = section.GetValue<string?>("DefaultIssuer") ?? DefaultIssuer;
+            defaultAudience = section.GetValue<string?>("DefaultAudience") ?? "All";
 
-            validIssuer = section.GetValue<string>("ValidIssuer");
-            validIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>>();
+            validIssuer = section.GetValue<string?>("ValidIssuer");
+            validIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>?>();
             if (string.IsNullOrEmpty(validIssuer))
             {
                 validIssuer = defaultIssuer;
             }
 
-            validAudience = section.GetValue<string>("ValidAudience");
-            validAudiences = section.GetSection("ValidAudiences").Get<IEnumerable<string>>();
+            validAudience = section.GetValue<string?>("ValidAudience");
+            validAudiences = section.GetSection("ValidAudiences").Get<IEnumerable<string>?>();
             if (string.IsNullOrEmpty(validAudience) && validAudiences == null)
             {
                 validAudience = defaultAudience;
