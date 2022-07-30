@@ -57,6 +57,18 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
+        /// Get role from value
+        /// 从值获取角色
+        /// </summary>
+        /// <param name="roleValue">Role value</param>
+        /// <returns>User role</returns>
+        public static UserRole? GetRole(short roleValue)
+        {
+            var userRole = (UserRole)roleValue;
+            return SharedUtils.EnumIsDefined(userRole) ? userRole : null;
+        }
+
+        /// <summary>
         /// Get dictionary data
         /// 获取字典数据
         /// </summary>
@@ -146,7 +158,7 @@ namespace com.etsoo.CoreFramework.User
         /// Role
         /// 角色
         /// </summary>
-        public UserRole? Role { get; }
+        public UserRole? Role { get; private set; }
 
         /// <summary>
         /// Language
@@ -166,24 +178,38 @@ namespace com.etsoo.CoreFramework.User
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
-        /// <param name="uid">Uid</param>
-        /// <param name="organization">Organization</param>
+        /// <param name="uid">Uid, shared between multiple applications</param>
+        /// <param name="organization">Organization identifying units in SaSS</param>
         /// <param name="roleValue">Role value</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="deviceId">Device id</param>
-        /// <param name="organization">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         public ServiceUser(string id, Guid? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
             : base(id, clientIp, region, deviceId, organization)
         {
             RoleValue = roleValue;
-
-            var userRole = (UserRole)roleValue;
-            Role = Utils.SharedUtils.EnumIsDefined(userRole) ? userRole : null;
+            Role = GetRole(roleValue);
 
             Language = language;
             Uid = uid;
+        }
+
+        /// <summary>
+        /// Constructor, for simple case
+        /// 构造函数，适应于简单情形
+        /// </summary>
+        /// <param name="role">User role</param>
+        /// <param name="id">Username</param>
+        /// <param name="clientIp">Client IP</param>
+        /// <param name="language">Language</param>
+        /// <param name="region">Country or region</param>
+        /// <param name="organization">Organization</param>
+        /// <param name="uid">Uid, shared between multiple applications</param>
+        /// <param name="deviceId">Device id</param>
+        public ServiceUser(UserRole role, string id, IPAddress clientIp, CultureInfo language, string region, string? organization = null, Guid? uid = null, int deviceId = 0)
+            : this(id, uid, organization, (short)role, clientIp, deviceId, language, region)
+        {
         }
 
         private IEnumerable<Claim> GetClaims()
@@ -213,6 +239,20 @@ namespace com.etsoo.CoreFramework.User
         {
             var claims = GetClaims();
             return base.CreateClaims().Concat(claims);
+        }
+
+        /// <summary>
+        /// Update
+        /// 更新
+        /// </summary>
+        /// <param name="newRole">New role</param>
+        public void Update(UserRole newRole)
+        {
+            if (!Role.Equals(newRole))
+            {
+                Role = newRole;
+                RoleValue = (short)newRole;
+            }
         }
 
         /// <summary>
