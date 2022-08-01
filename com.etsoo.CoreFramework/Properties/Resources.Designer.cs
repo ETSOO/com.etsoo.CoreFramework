@@ -22,7 +22,7 @@ namespace com.etsoo.CoreFramework.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace com.etsoo.CoreFramework.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("com.etsoo.CoreFramework.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace com.etsoo.CoreFramework.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Access Denied.
         /// </summary>
-        internal static string AccessDenied {
+        public static string AccessDenied {
             get {
                 return ResourceManager.GetString("AccessDenied", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Your account has been disabled.
         /// </summary>
-        internal static string AccountDisabled {
+        public static string AccountDisabled {
             get {
                 return ResourceManager.GetString("AccountDisabled", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Account expired on {0}.
         /// </summary>
-        internal static string AccountExpired {
+        public static string AccountExpired {
             get {
                 return ResourceManager.GetString("AccountExpired", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Code Expired.
         /// </summary>
-        internal static string CodeExpired {
+        public static string CodeExpired {
             get {
                 return ResourceManager.GetString("CodeExpired", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Code function has been temporarily disabled.
         /// </summary>
-        internal static string CodeFrozen {
+        public static string CodeFrozen {
             get {
                 return ResourceManager.GetString("CodeFrozen", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Failed to send the code.
         /// </summary>
-        internal static string CodeSendingFailed {
+        public static string CodeSendingFailed {
             get {
                 return ResourceManager.GetString("CodeSendingFailed", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Codes do not match.
         /// </summary>
-        internal static string CodesNoMatch {
+        public static string CodesNoMatch {
             get {
                 return ResourceManager.GetString("CodesNoMatch", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
-        internal static string DataProcessingFailed {
+        public static string DataProcessingFailed {
             get {
                 return ResourceManager.GetString("DataProcessingFailed", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Database Connection Failed.
         /// </summary>
-        internal static string DbConnectionFailed {
+        public static string DbConnectionFailed {
             get {
                 return ResourceManager.GetString("DbConnectionFailed", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Device Disabled.
         /// </summary>
-        internal static string DeviceDisabled {
+        public static string DeviceDisabled {
             get {
                 return ResourceManager.GetString("DeviceDisabled", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The device has been temporarily blocked until {0}.
         /// </summary>
-        internal static string DeviceFrozen {
+        public static string DeviceFrozen {
             get {
                 return ResourceManager.GetString("DeviceFrozen", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
-        internal static string InvalidAction {
+        public static string InvalidAction {
             get {
                 return ResourceManager.GetString("InvalidAction", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to It is not a valid Email address.
         /// </summary>
-        internal static string InvalidEmail {
+        public static string InvalidEmail {
             get {
                 return ResourceManager.GetString("InvalidEmail", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to It is not a valid mobile phone number.
         /// </summary>
-        internal static string InvalidMobile {
+        public static string InvalidMobile {
             get {
                 return ResourceManager.GetString("InvalidMobile", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to IP address has been changed.
         /// </summary>
-        internal static string IPAddressChanged {
+        public static string IPAddressChanged {
             get {
                 return ResourceManager.GetString("IPAddressChanged", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Join Organization Required.
         /// </summary>
-        internal static string JoinOrgRequired {
+        public static string JoinOrgRequired {
             get {
                 return ResourceManager.GetString("JoinOrgRequired", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No Action Result.
         /// </summary>
-        internal static string NoActionResult {
+        public static string NoActionResult {
             get {
                 return ResourceManager.GetString("NoActionResult", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No Data Returned.
         /// </summary>
-        internal static string NoDataReturned {
+        public static string NoDataReturned {
             get {
                 return ResourceManager.GetString("NoDataReturned", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No Device Matched.
         /// </summary>
-        internal static string NoDeviceMatch {
+        public static string NoDeviceMatch {
             get {
                 return ResourceManager.GetString("NoDeviceMatch", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The passed ID does not exist.
         /// </summary>
-        internal static string NoId {
+        public static string NoId {
             get {
                 return ResourceManager.GetString("NoId", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No Organization Joined.
         /// </summary>
-        internal static string NoOrgJoined {
+        public static string NoOrgJoined {
             get {
                 return ResourceManager.GetString("NoOrgJoined", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No Password Match.
         /// </summary>
-        internal static string NoPasswordMatch {
+        public static string NoPasswordMatch {
             get {
                 return ResourceManager.GetString("NoPasswordMatch", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No User Agent.
         /// </summary>
-        internal static string NoUserAgent {
+        public static string NoUserAgent {
             get {
                 return ResourceManager.GetString("NoUserAgent", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No User Found.
         /// </summary>
-        internal static string NoUserFound {
+        public static string NoUserFound {
             get {
                 return ResourceManager.GetString("NoUserFound", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to User name and password do not match.
         /// </summary>
-        internal static string NoUserMatch {
+        public static string NoUserMatch {
             get {
                 return ResourceManager.GetString("NoUserMatch", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to No valid data is passed.
         /// </summary>
-        internal static string NoValidData {
+        public static string NoValidData {
             get {
                 return ResourceManager.GetString("NoValidData", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The organization has been disabled.
         /// </summary>
-        internal static string OrgDisabled {
+        public static string OrgDisabled {
             get {
                 return ResourceManager.GetString("OrgDisabled", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The organization already exists.
         /// </summary>
-        internal static string OrgExists {
+        public static string OrgExists {
             get {
                 return ResourceManager.GetString("OrgExists", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Organization service expired on {0}.
         /// </summary>
-        internal static string OrgExpired {
+        public static string OrgExpired {
             get {
                 return ResourceManager.GetString("OrgExpired", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Out Of Memory.
         /// </summary>
-        internal static string OutOfMemory {
+        public static string OutOfMemory {
             get {
                 return ResourceManager.GetString("OutOfMemory", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Your token has expired.
         /// </summary>
-        internal static string TokenExpired {
+        public static string TokenExpired {
             get {
                 return ResourceManager.GetString("TokenExpired", resourceCulture);
             }
@@ -342,7 +342,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Your account has been temporarily blocked until {0}.
         /// </summary>
-        internal static string UserFrozen {
+        public static string UserFrozen {
             get {
                 return ResourceManager.GetString("UserFrozen", resourceCulture);
             }
@@ -351,7 +351,7 @@ namespace com.etsoo.CoreFramework.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Username is already registered.
         /// </summary>
-        internal static string UserRegistered {
+        public static string UserRegistered {
             get {
                 return ResourceManager.GetString("UserRegistered", resourceCulture);
             }
