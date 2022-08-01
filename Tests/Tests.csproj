@@ -28,6 +28,7 @@
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
     <ProjectReference Include="..\com.etsoo.HTTP\com.etsoo.HTTP.csproj" />
     <ProjectReference Include="..\com.etsoo.ImageUtils\com.etsoo.ImageUtils.csproj" />
+    <ProjectReference Include="..\com.etsoo.Localization\com.etsoo.Localization.csproj" />
     <ProjectReference Include="..\com.etsoo.PureIO\com.etsoo.PureIO.csproj" />
     <ProjectReference Include="..\com.etsoo.SMTP\com.etsoo.SMTP.csproj" />
     <ProjectReference Include="..\com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
