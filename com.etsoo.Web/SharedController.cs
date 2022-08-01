@@ -1,8 +1,12 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Net.Mime;
 using IActionResult = com.etsoo.Utils.Actions.IActionResult;
 
@@ -21,95 +25,69 @@ namespace com.etsoo.Web
         protected readonly ICoreApplicationBase CoreApp;
 
         /// <summary>
+        /// IP address
+        /// IP地址
+        /// </summary>
+        protected readonly IPAddress? Ip;
+
+        /// <summary>
+        /// User agent
+        /// 用户代理信息
+        /// </summary>
+        protected readonly string? UserAgent;
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        public SharedController(ICoreApplicationBase coreApp) : base()
+        /// <param name="coreApp">Core app</param>
+        /// <param name="context">Http context accessor</param>
+        public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor? context = null) : base()
         {
             CoreApp = coreApp;
+            Ip = context?.HttpContext?.Connection.RemoteIpAddress;
+            UserAgent = context?.HttpContext?.Request.Headers[HeaderNames.UserAgent];
         }
 
         /// <summary>
-        /// Async parse device core for multiple decryption
-        /// 异步解析设备核心密码以用于多次解密
+        /// Check device data
+        /// 检查设备信息
         /// </summary>
         /// <param name="service">Service</param>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="userAgent">User agent</param>
-        /// <returns>Result</returns>
-        protected (IActionResult result, string? serviceCore) ParseDeviceCore(IServiceBase service, string deviceId, string? userAgent)
+        /// <param name="deviceId">Device id from client</param>
+        /// <param name="result">Action result</param>
+        /// <param name="data">Result data</param>
+        /// <returns>Valid or not</returns>
+        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser parser)? data)
         {
-            var result = ParseUserAgent(userAgent, out string identifier);
-            if (!result.Ok) return (result, null);
+            data = null;
 
-            var deviceCore = service.DecryptDeviceCore(deviceId, identifier);
-            if (deviceCore == null)
+            // IP validation
+            if (Ip == null)
             {
-                return (ApplicationErrors.NoValidData.AsResult("Device"), null);
+                result = ApplicationErrors.NoValidData.AsResult("IP");
+                return false;
             }
 
-            return (Utils.Actions.ActionResult.Success, deviceCore);
-        }
-
-        /// <summary>
-        /// Async parse device message
-        /// 异步解析设备信息
-        /// </summary>
-        /// <param name="service">Service</param>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="encryptedMessage">Encypted message</param>
-        /// <param name="userAgent">User agent</param>
-        /// <returns>Result</returns>
-        protected (IActionResult result, string? data) ParseDeviceMessage(IServiceBase service, string deviceId, string encryptedMessage, string? userAgent)
-        {
-            var (result, deviceCore) = ParseDeviceCore(service, deviceId, userAgent);
-            if (!result.Ok || deviceCore == null) return (result, null);
-
-            var data = service.DecryptDeviceData(encryptedMessage, deviceCore);
-            if (data == null)
+            // User-Agent validatation
+            var parser = new UAParser(UserAgent);
+            if (!parser.Valid || parser.IsBot)
             {
-                return (ApplicationErrors.NoValidData.AsResult(), null);
+                result = ApplicationErrors.NoUserAgent.AsResult();
+                return false;
             }
 
-            return (result, data);
-        }
+            var deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+            if (string.IsNullOrEmpty(deviceCore))
+            {
+                result = ApplicationErrors.NoValidData.AsResult("Device");
+                return false;
+            }
 
-        /// <summary>
-        /// Parse user agent
-        /// 解析用户代理信息
-        /// </summary>
-        /// <param name="userAgent">User agent</param>
-        /// <param name="identifier">Identifier</param>
-        /// <returns>Action result</returns>
-        protected IActionResult ParseUserAgent(string? userAgent, out string identifier)
-        {
-            identifier = string.Empty;
+            result = null;
+            data = (Ip, deviceCore, parser);
 
-            // User-Agent validatation
-            var parser = new UAParser(userAgent);
-            if (!parser.Valid || parser.IsBot)
-                return ApplicationErrors.NoUserAgent.AsResult();
-
-            identifier = parser.ToShortName();
-
-            return Utils.Actions.ActionResult.Success;
-        }
-
-        /// <summary>
-        /// Parse user agent
-        /// 解析用户代理信息
-        /// </summary>
-        /// <param name="userAgent">User agent</param>
-        /// <param name="parser">UAParser</param>
-        /// <returns>Action result</returns>
-        protected IActionResult ParseUserAgent(string? userAgent, out UAParser parser)
-        {
-            // User-Agent validatation
-            parser = new UAParser(userAgent);
-            if (!parser.Valid || parser.IsBot)
-                return ApplicationErrors.NoUserAgent.AsResult();
-
-            return Utils.Actions.ActionResult.Success;
+            return true;
         }
 
         /// <summary>

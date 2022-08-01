@@ -9,16 +9,6 @@ namespace com.etsoo.CoreFramework.Services
     public interface IServiceBase
     {
         /// <summary>
-        /// Decrypt device data with user identifier
-        /// 使用用户识别码数据解密设备数据
-        /// </summary>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="encryptedMessage">Encrypted message</param>
-        /// <param name="identifier">User identifier</param>
-        /// <returns>Result</returns>
-        string? DecryptDeviceDataWithIdentifier(string deviceId, string encryptedMessage, string identifier);
-
-        /// <summary>
         /// Decrypt device core with user identifier for multiple decryption
         /// 使用用户识别码解密设备核心以用于多次解密
         /// </summary>
@@ -26,16 +16,6 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="identifier">User identifier</param>
         /// <returns>Result</returns>
         string? DecryptDeviceCore(string deviceId, string identifier);
-
-        /// <summary>
-        /// Async decrypt device data with passphrase
-        /// 使用密码异步解密设备数据
-        /// </summary>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="encryptedMessage">Encrypted message</param>
-        /// <param name="passphrase">Passphrase</param>
-        /// <returns>Result</returns>
-        string? DecryptDeviceData(string deviceId, string encryptedMessage, string passphrase);
 
         /// <summary>
         /// Async decrypt device data with passphrase
