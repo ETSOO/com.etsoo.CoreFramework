@@ -90,7 +90,7 @@ namespace com.etsoo.Web
         /// <param name="result">Action result</param>
         /// <param name="data">Result data</param>
         /// <returns>Valid or not</returns>
-        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser parser)? data)
+        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser Parser)? data)
         {
             data = null;
 
