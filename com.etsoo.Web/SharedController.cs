@@ -53,12 +53,10 @@ namespace com.etsoo.Web
         /// Check device data
         /// 检查设备信息
         /// </summary>
-        /// <param name="service">Service</param>
-        /// <param name="deviceId">Device id from client</param>
         /// <param name="result">Action result</param>
         /// <param name="data">Result data</param>
         /// <returns>Valid or not</returns>
-        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser parser)? data)
+        protected bool CheckDevice([NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, UAParser Parser)? data)
         {
             data = null;
 
@@ -77,6 +75,31 @@ namespace com.etsoo.Web
                 return false;
             }
 
+            result = null;
+            data = (Ip, parser);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check device data
+        /// 检查设备信息
+        /// </summary>
+        /// <param name="service">Service</param>
+        /// <param name="deviceId">Device id from client</param>
+        /// <param name="result">Action result</param>
+        /// <param name="data">Result data</param>
+        /// <returns>Valid or not</returns>
+        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser parser)? data)
+        {
+            data = null;
+
+            if (!CheckDevice(out result, out var cd))
+            {
+                return false;
+            }
+
+            var parser = cd.Value.Parser;
             var deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
             if (string.IsNullOrEmpty(deviceCore))
             {
@@ -85,7 +108,7 @@ namespace com.etsoo.Web
             }
 
             result = null;
-            data = (Ip, deviceCore, parser);
+            data = (cd.Value.Ip, deviceCore, parser);
 
             return true;
         }
