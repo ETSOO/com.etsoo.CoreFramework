@@ -15,7 +15,7 @@
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.2.11</Version>
+    <Version>1.2.12</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
@@ -68,13 +68,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.zh-CN.resx">
+    <EmbeddedResource Update="Properties\Resources.zh-Hans.resx">
       <DependentUpon>Properties\Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.zh-HK.resx">
+    <EmbeddedResource Update="Properties\Resources.zh-Hant.resx">
       <DependentUpon>Properties\Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
