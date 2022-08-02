@@ -100,7 +100,19 @@ namespace com.etsoo.Web
             }
 
             var parser = cd.Value.Parser;
-            var deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+
+            string? deviceCore;
+            try
+            {
+                deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+            }
+            catch
+            {
+                // Exception happened when device upgraded or changed view model (windows to mobile)
+                // Client should response to it to clear cached device id
+                deviceCore = null;
+            }
+
             if (string.IsNullOrEmpty(deviceCore))
             {
                 result = ApplicationErrors.NoValidData.AsResult("Device");
