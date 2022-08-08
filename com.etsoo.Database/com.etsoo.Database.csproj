@@ -17,7 +17,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<Description>ETSOO SmartERP NextGen database utilities.</Description>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Version>1.0.7</Version>
+	<Version>1.0.8</Version>
 	<AssemblyVersion>1.0.1.0</AssemblyVersion>
 	<FileVersion>1.0.1.0</FileVersion>
 	<PackageIcon>logo.png</PackageIcon>
@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Dapper.StrongName" Version="2.0.123" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.7" />
     <PackageReference Include="MySql.Data" Version="8.0.30" />
