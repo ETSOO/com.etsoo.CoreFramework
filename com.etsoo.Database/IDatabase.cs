@@ -105,6 +105,15 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         object ListToParameter(IEnumerable list, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null);
+
+        /// <summary>
+        /// Get query limit command
+        /// 获取查询限制命令
+        /// </summary>
+        /// <param name="size">Lines to read</param>
+        /// <param name="page">Current page</param>
+        /// <returns>Query command</returns>
+        string QueryLimit(int size, int page = 0);
     }
 
     /// <summary>

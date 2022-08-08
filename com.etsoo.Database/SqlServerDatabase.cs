@@ -117,5 +117,18 @@ namespace com.etsoo.Database
         {
             return new(ConnectionString);
         }
+
+        /// <summary>
+        /// Get query limit command
+        /// 获取查询限制命令
+        /// </summary>
+        /// <param name="size">Lines to read</param>
+        /// <param name="page">Current page</param>
+        /// <returns>Query command</returns>
+        public override string QueryLimit(int size, int page = 0)
+        {
+            var offset = (page - 1) * size;
+            return $" OFFSET {offset} ROWS FETCH NEXT {size} ROWS ONLY";
+        }
     }
 }
