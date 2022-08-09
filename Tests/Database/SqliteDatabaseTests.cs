@@ -109,5 +109,19 @@ namespace Tests.Utils
             // Assert
             Assert.IsTrue(stream.Length == "Admin 1".Length);
         }
+
+        [Test]
+        public void SqliteUtilsToJsonCommandTest()
+        {
+            var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage");
+            Assert.AreEqual("json_group_array(json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12)))", command);
+        }
+
+        [Test]
+        public void SqliteUtilsToJsonCommandWithoutArrayTest()
+        {
+            var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage", true);
+            Assert.AreEqual("json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12))", command);
+        }
     }
 }
