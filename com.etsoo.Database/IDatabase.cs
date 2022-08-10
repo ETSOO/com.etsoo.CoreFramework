@@ -107,6 +107,14 @@ namespace com.etsoo.Database
         object ListToParameter(IEnumerable list, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null);
 
         /// <summary>
+        /// Join conditions
+        /// 组合条件
+        /// </summary>
+        /// <param name="items">Condition items</param>
+        /// <returns>Result</returns>
+        string JoinConditions(IEnumerable<string> items);
+
+        /// <summary>
         /// Get query limit command
         /// 获取查询限制命令
         /// </summary>

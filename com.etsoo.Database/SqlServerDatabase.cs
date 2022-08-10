@@ -127,7 +127,7 @@ namespace com.etsoo.Database
         /// <returns>Query command</returns>
         public override string QueryLimit(int size, int page = 0)
         {
-            var offset = (page - 1) * size;
+            var offset = page <= 1 ? 0 : (page - 1) * size;
             return $" OFFSET {offset} ROWS FETCH NEXT {size} ROWS ONLY";
         }
     }

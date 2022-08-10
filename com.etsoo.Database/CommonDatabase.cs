@@ -387,6 +387,19 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Join conditions
+        /// 组合条件
+        /// </summary>
+        /// <param name="items">Condition items</param>
+        /// <returns>Result</returns>
+        public virtual string JoinConditions(IEnumerable<string> items)
+        {
+            var conditions = string.Join(" AND ", items);
+            if (string.IsNullOrEmpty(conditions)) return string.Empty;
+            return $"WHERE {conditions}";
+        }
+
+        /// <summary>
         /// Get query limit command
         /// 获取查询限制命令
         /// </summary>
@@ -395,8 +408,15 @@ namespace com.etsoo.Database
         /// <returns>Query command</returns>
         public virtual string QueryLimit(int size, int page = 0)
         {
-            var offset = (page - 1) * size;
-            return $" LIMIT {size} OFFSET {offset}";
+            if (page <= 1)
+            {
+                return $"LIMIT {size}";
+            }
+            else
+            {
+                var offset = (page - 1) * size;
+                return $"LIMIT {size} OFFSET {offset}";
+            }
         }
     }
 }

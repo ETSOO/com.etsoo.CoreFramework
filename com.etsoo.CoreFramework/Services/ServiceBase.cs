@@ -154,6 +154,18 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Encrypt message to be decrpted on web side with app.decrypt(messageEncrypted), passphrase passed with web's deviceId
+        /// 加密用于Web端解密的信息
+        /// </summary>
+        /// <param name="message">Message</param>
+        /// <param name="passphrase">Secret passphrase</param>
+        /// <returns>Result</returns>
+        protected string EncryptWeb(string message, string passphrase)
+        {
+            return Encrypt(message, passphrase, 1, false);
+        }
+
+        /// <summary>
         /// Enchance secret passphrase
         /// 加强安全密码
         /// </summary>
