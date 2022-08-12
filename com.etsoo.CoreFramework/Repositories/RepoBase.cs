@@ -369,21 +369,32 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Update fields
             var updateFields = configs.UpdatableFields
-                .Where(field => model.ChangedFields.Contains(field.Split('=')[0], StringComparer.OrdinalIgnoreCase))
                 .Select(field =>
                 {
                     var index = field.IndexOf('=');
+                    string matchField, value;
                     if (index == -1)
                     {
-                        return $"{App.DB.EscapeIdentifier(field)} = @{field}";
+                        matchField = field;
+                        value = field;
                     }
                     else
                     {
-                        var pField = field[..index];
-                        var pValue = field[(index+ 1)..];
-                        return $"{App.DB.EscapeIdentifier(pField)} = {pValue}";
+                        matchField = field[..index];
+                        value = field[(index + 1)..];
                     }
-                });
+                    var matchParts = matchField.Split(" AS ", StringSplitOptions.RemoveEmptyEntries);
+                    string? alias = null;
+                    if (matchParts.Length > 1)
+                    {
+                        matchField = matchParts[0];
+                        alias = matchParts[1];
+                    }
+                    return (matchField, alias, value);
+                })
+                .Where(field => model.ChangedFields.Contains(field.matchField, StringComparer.OrdinalIgnoreCase)
+                    || (field.alias != null && model.ChangedFields.Contains(field.alias, StringComparer.OrdinalIgnoreCase)))
+                .Select(field => $"{App.DB.EscapeIdentifier(field.matchField)} = {field.value}");
 
             if (!updateFields.Any())
             {

@@ -97,7 +97,7 @@ namespace Tests.Repositories
             };
 
             // Act
-            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name=IIF(@Id = 1001, '', @Name)" }));
+            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Id = 1001, '', @Name)" }));
 
             // Assert
             Assert.IsTrue(result.Ok);
