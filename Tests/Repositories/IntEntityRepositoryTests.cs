@@ -93,11 +93,11 @@ namespace Tests.Repositories
             {
                 Id = 1021,
                 Name = "Admin 21",
-                ChangedFields = new[] { "name" }
+                ChangedFields = new[] { "Name" }
             };
 
             // Act
-            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name" }));
+            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name=IIF(@Id = 1001, '', @Name)" }));
 
             // Assert
             Assert.IsTrue(result.Ok);

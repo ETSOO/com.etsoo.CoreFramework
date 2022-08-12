@@ -369,8 +369,21 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Update fields
             var updateFields = configs.UpdatableFields
-                .Where(field => model.ChangedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
-                .Select(field => $"{App.DB.EscapeIdentifier(field)} = @{field}");
+                .Where(field => model.ChangedFields.Contains(field.Split('=')[0], StringComparer.OrdinalIgnoreCase))
+                .Select(field =>
+                {
+                    var index = field.IndexOf('=');
+                    if (index == -1)
+                    {
+                        return $"{App.DB.EscapeIdentifier(field)} = @{field}";
+                    }
+                    else
+                    {
+                        var pField = field[..index];
+                        var pValue = field[(index+ 1)..];
+                        return $"{App.DB.EscapeIdentifier(pField)} = {pValue}";
+                    }
+                });
 
             if (!updateFields.Any())
             {

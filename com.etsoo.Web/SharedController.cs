@@ -28,7 +28,7 @@ namespace com.etsoo.Web
         /// IP address
         /// IP地址
         /// </summary>
-        protected readonly IPAddress? Ip;
+        protected readonly IPAddress Ip;
 
         /// <summary>
         /// User agent
@@ -44,8 +44,14 @@ namespace com.etsoo.Web
         /// <param name="context">Http context accessor</param>
         public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor? context = null) : base()
         {
+            var ip = context?.HttpContext?.Connection.RemoteIpAddress;
+            if (ip == null)
+            {
+                throw new NullReferenceException(nameof(ip));
+            }
+            Ip = ip;
+
             CoreApp = coreApp;
-            Ip = context?.HttpContext?.Connection.RemoteIpAddress;
             UserAgent = context?.HttpContext?.Request.Headers[HeaderNames.UserAgent];
         }
 
@@ -54,30 +60,20 @@ namespace com.etsoo.Web
         /// 检查设备信息
         /// </summary>
         /// <param name="result">Action result</param>
-        /// <param name="data">Result data</param>
+        /// <param name="parser">Parser</param>
         /// <returns>Valid or not</returns>
-        protected bool CheckDevice([NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, UAParser Parser)? data)
+        protected bool CheckDevice([NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out UAParser? parser)
         {
-            data = null;
-
-            // IP validation
-            if (Ip == null)
-            {
-                result = ApplicationErrors.NoValidData.AsResult("IP");
-                return false;
-            }
-
             // User-Agent validatation
-            var parser = new UAParser(UserAgent);
+            parser = new UAParser(UserAgent);
             if (!parser.Valid || parser.IsBot)
             {
                 result = ApplicationErrors.NoUserAgent.AsResult();
+                parser = null;
                 return false;
             }
 
             result = null;
-            data = (Ip, parser);
-
             return true;
         }
 
@@ -90,16 +86,14 @@ namespace com.etsoo.Web
         /// <param name="result">Action result</param>
         /// <param name="data">Result data</param>
         /// <returns>Valid or not</returns>
-        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (IPAddress Ip, string DeviceCore, UAParser Parser)? data)
+        protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
         {
             data = null;
 
-            if (!CheckDevice(out result, out var cd))
+            if (!CheckDevice(out result, out var parser))
             {
                 return false;
             }
-
-            var parser = cd.Value.Parser;
 
             string? deviceCore;
             try
@@ -120,7 +114,7 @@ namespace com.etsoo.Web
             }
 
             result = null;
-            data = (cd.Value.Ip, deviceCore, parser);
+            data = (deviceCore, parser);
 
             return true;
         }
