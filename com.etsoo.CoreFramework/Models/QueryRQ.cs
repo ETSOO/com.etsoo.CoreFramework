@@ -13,7 +13,7 @@ namespace com.etsoo.CoreFramework.Models
         /// Id
         /// 编号
         /// </summary>
-        public T? Id { get; init;}
+        public T? Id { get; init; }
 
         /// <summary>
         /// Current page
@@ -41,5 +41,18 @@ namespace com.etsoo.CoreFramework.Models
         /// 升序或降序排列
         /// </summary>
         public bool? OrderByAsc { get; init; }
+    }
+
+    /// <summary>
+    /// Search request data with string id
+    /// 查询请求数据
+    /// </summary>
+    public record QueryRQ : QueryRQ<int>
+    {
+        /// <summary>
+        /// String id
+        /// 字符串编号
+        /// </summary>
+        public string? Sid { get; init; }
     }
 }

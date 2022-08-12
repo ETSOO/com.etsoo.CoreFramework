@@ -13,4 +13,17 @@
         /// </summary>
         public T Id { get; init; }
     }
+
+    /// <summary>
+    /// Item with id
+    /// 带编号的项目
+    /// </summary>
+    public record IdItem
+    {
+        /// <summary>
+        /// Id
+        /// 编号
+        /// </summary>
+        public string Id { get; init; } = default!;
+    }
 }

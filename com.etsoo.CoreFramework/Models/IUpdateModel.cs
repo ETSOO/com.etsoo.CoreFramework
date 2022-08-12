@@ -1,13 +1,11 @@
 ﻿namespace com.etsoo.CoreFramework.Models
 {
-    public interface IUpdateModel<T> where T : struct
+    /// <summary>
+    /// Update model interface
+    /// 更新模型接口
+    /// </summary>
+    public interface IUpdateModel
     {
-        /// <summary>
-        /// Id
-        /// 编号
-        /// </summary>
-        T Id { get; init; }
-
         /// <summary>
         /// Changed fields
         /// 改变的字段

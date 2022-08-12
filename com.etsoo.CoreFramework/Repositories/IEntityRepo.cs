@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
 
@@ -142,7 +143,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>;
+        ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel;
 
         /// <summary>
         /// Data list
@@ -174,6 +175,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult, UpdateResultData<T>?)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>;
+        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IdItem<T>, IUpdateModel;
     }
 }

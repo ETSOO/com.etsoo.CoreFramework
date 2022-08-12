@@ -13,4 +13,17 @@
         /// </summary>
         public string Label { get; set; } = null!;
     }
+
+    /// <summary>
+    /// Item with id and label
+    /// 带编号和标签的项目
+    /// </summary>
+    public record IdLabelItem : IdItem
+    {
+        /// <summary>
+        /// Label
+        /// 标签
+        /// </summary>
+        public string Label { get; set; } = null!;
+    }
 }

@@ -4,7 +4,7 @@
     /// Update action result data
     /// 更新操作结果数据
     /// </summary>
-    public record UpdateResultData<T> where T : struct
+    public record UpdateResultData
     {
         /// <summary>
         /// ChangedFields data invalid
@@ -26,6 +26,25 @@
         /// </summary>
         public const string UpdateFields = "UpdateFields";
 
+        /// <summary>
+        /// Updated id
+        /// 更新的编号
+        /// </summary>
+        public string Id { get; init; } = default!;
+
+        /// <summary>
+        /// Rows affected
+        /// 影响的行数
+        /// </summary>
+        public int RowsAffected { get; init; }
+    }
+
+    /// <summary>
+    /// Update action result data
+    /// 更新操作结果数据
+    /// </summary>
+    public record UpdateResultData<T> where T : struct
+    {
         /// <summary>
         /// Updated id
         /// 更新的编号

@@ -3,13 +3,11 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
-using com.etsoo.Utils.String;
+using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
-using System.Text;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -325,7 +323,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IUpdateModel<T>
+        public virtual async ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel
         {
             var parameters = FormatParameters(model);
 
@@ -393,64 +391,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult, UpdateResultData<T>?)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IUpdateModel<T>
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs)
+            where M : IdItem<T>, IUpdateModel
         {
-            // Validate
-            if (model.ChangedFields == null || !model.ChangedFields.Any())
-            {
-                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.ChangedFields), null);
-            }
-
-            if (!configs.UpdatableFields.Any())
-            {
-                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdatableFields), null);
-            }
-
-            if (!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
-            {
-                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.Conditions), null);
-            }
-
-            // Update fields
-            var updateFields = configs.UpdatableFields
-                .Where(field => model.ChangedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
-                .Select(field => $"{App.DB.EscapeIdentifier(field)} = @{field}");
-
-            if (!updateFields.Any())
-            {
-                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData<T>.UpdateFields), null);
-            }
-
-            // Default table name
-            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
-            var tableName = App.DB.EscapeIdentifier(configs.TableName);
-
-            // SQL
-            var sql = new StringBuilder("UPDATE ");
-            sql.Append(tableName);
-            sql.Append(" SET ");
-            sql.Append(string.Join(", ", updateFields));
-            sql.Append(" FROM ");
-            sql.Append(tableName);
-            sql.Append(" u WHERE u.");
-            sql.Append(App.DB.EscapeIdentifier(configs.IdField));
-            sql.Append(" = @Id");
-
-            if (!string.IsNullOrEmpty(configs.Conditions))
-            {
-                sql.Append(" AND ");
-                sql.Append(configs.Conditions);
-            }
-
-            // Parameters
-            var parameters = FormatParameters(model);
-            AddSystemParameters(parameters);
-
-            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
-            var records = await ExecuteAsync(command);
-
-            // Success
-            return (ActionResult.Success, new UpdateResultData<T> { Id = model.Id, RowsAffected = records });
+            return await InlineUpdateAsync<T, M>(model, configs);
         }
     }
 }

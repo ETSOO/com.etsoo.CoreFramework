@@ -1,5 +1,7 @@
-﻿using com.etsoo.Database;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
@@ -105,5 +107,28 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic return type</typeparam>
         /// <returns>Result</returns>
         Task<E> QuickReadAsync<E>(string sql, DynamicParameters? parameters = null);
+
+        /// <summary>
+        /// Inline SQL command update
+        /// 内联 SQL 命令更新
+        /// </summary>
+        /// <typeparam name="M">Generic model type</typeparam>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs)
+            where T : struct
+            where M : IdItem<T>, IUpdateModel;
+
+        /// <summary>
+        /// Inline SQL command update
+        /// 内联 SQL 命令更新
+        /// </summary>
+        /// <typeparam name="M">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IdItem, IUpdateModel;
     }
 }

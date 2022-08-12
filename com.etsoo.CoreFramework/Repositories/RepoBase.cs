@@ -3,12 +3,15 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Models;
 using com.etsoo.Utils.SpanMemory;
+using com.etsoo.Utils.String;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
+using System.Text;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -285,6 +288,125 @@ namespace com.etsoo.CoreFramework.Repositories
             {
                 return connection.QueryFirstAsync<E>(command);
             });
+        }
+
+        /// <summary>
+        /// Inline SQL command update
+        /// 内联 SQL 命令更新
+        /// </summary>
+        /// <typeparam name="M">Generic model type</typeparam>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs)
+            where T : struct
+            where M : IdItem<T>, IUpdateModel
+        {
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs);
+
+            if (result.Ok)
+            {
+                // Success
+                return (result, new UpdateResultData<T> { Id = model.Id, RowsAffected = rows });
+            }
+            else
+            {
+                return (result, null);
+            }
+        }
+
+        /// <summary>
+        /// Inline SQL command update
+        /// 内联 SQL 命令更新
+        /// </summary>
+        /// <typeparam name="M">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs)
+            where M : IdItem, IUpdateModel
+        {
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs);
+
+            if (result.Ok)
+            {
+                // Success
+                return (result, new UpdateResultData { Id = model.Id, RowsAffected = rows });
+            }
+            else
+            {
+                return (result, null);
+            }
+        }
+
+        /// <summary>
+        /// Inline SQL command update
+        /// 内联 SQL 命令更新
+        /// </summary>
+        /// <typeparam name="M">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="configs">Configs</param>
+        /// <returns>Result</returns>
+        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs)
+            where M : IUpdateModel
+        {
+            // Validate
+            if (model.ChangedFields == null || !model.ChangedFields.Any())
+            {
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData.ChangedFields), 0);
+            }
+
+            if (!configs.UpdatableFields.Any())
+            {
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData.UpdatableFields), 0);
+            }
+
+            if (!string.IsNullOrEmpty(configs.Conditions) && !DatabaseUtils.IsSafeSQLPart(configs.Conditions))
+            {
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData.Conditions), 0);
+            }
+
+            // Update fields
+            var updateFields = configs.UpdatableFields
+                .Where(field => model.ChangedFields.Contains(field, StringComparer.OrdinalIgnoreCase))
+                .Select(field => $"{App.DB.EscapeIdentifier(field)} = @{field}");
+
+            if (!updateFields.Any())
+            {
+                return (ApplicationErrors.NoValidData.AsResult(UpdateResultData.UpdateFields), 0);
+            }
+
+            // Default table name
+            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
+            var tableName = App.DB.EscapeIdentifier(configs.TableName);
+
+            // SQL
+            var sql = new StringBuilder("UPDATE ");
+            sql.Append(tableName);
+            sql.Append(" SET ");
+            sql.Append(string.Join(", ", updateFields));
+            sql.Append(" FROM ");
+            sql.Append(tableName);
+            sql.Append(" u WHERE u.");
+            sql.Append(App.DB.EscapeIdentifier(configs.IdField));
+            sql.Append(" = @Id");
+
+            if (!string.IsNullOrEmpty(configs.Conditions))
+            {
+                sql.Append(" AND ");
+                sql.Append(configs.Conditions);
+            }
+
+            // Parameters
+            var parameters = FormatParameters(model);
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
+            var records = await ExecuteAsync(command);
+
+            // Success
+            return (ActionResult.Success, records);
         }
     }
 }
