@@ -12,6 +12,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -376,19 +377,23 @@ namespace com.etsoo.CoreFramework.Repositories
                     if (index == -1)
                     {
                         matchField = field;
-                        value = field;
+                        value = $"@{field}";
                     }
                     else
                     {
-                        matchField = field[..index];
-                        value = field[(index + 1)..];
+                        matchField = field[..index].Trim();
+                        value = field[(index + 1)..].Trim();
+                        if (Regex.IsMatch(value, "^[0-9a-zA-Z_]+$"))
+                        {
+                            value = $"@{value}";
+                        }
                     }
                     var matchParts = matchField.Split(" AS ", StringSplitOptions.RemoveEmptyEntries);
                     string? alias = null;
                     if (matchParts.Length > 1)
                     {
-                        matchField = matchParts[0];
-                        alias = matchParts[1];
+                        matchField = matchParts[0].Trim();
+                        alias = matchParts[1].Trim();
                     }
                     return (matchField, alias, value);
                 })
@@ -412,7 +417,7 @@ namespace com.etsoo.CoreFramework.Repositories
             sql.Append(string.Join(", ", updateFields));
             sql.Append(" FROM ");
             sql.Append(tableName);
-            sql.Append(" u WHERE u.");
+            sql.Append(" AS t WHERE t.");
             sql.Append(App.DB.EscapeIdentifier(configs.IdField));
             sql.Append(" = @Id");
 
@@ -427,10 +432,18 @@ namespace com.etsoo.CoreFramework.Repositories
             AddSystemParameters(parameters);
 
             var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
-            var records = await ExecuteAsync(command);
 
-            // Success
-            return (ActionResult.Success, records);
+            try
+            {
+                var records = await ExecuteAsync(command);
+
+                // Success
+                return (ActionResult.Success, records);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Command: " + sql, ex);
+            }
         }
     }
 }
