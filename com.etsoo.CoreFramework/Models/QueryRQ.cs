@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -41,6 +42,22 @@ namespace com.etsoo.CoreFramework.Models
         /// 升序或降序排列
         /// </summary>
         public bool? OrderByAsc { get; init; }
+
+        /// <summary>
+        /// Get order command
+        /// 获取排序命令
+        /// </summary>
+        /// <returns>Command</returns>
+        public string? GetOrderCommand()
+        {
+            if (string.IsNullOrEmpty(OrderBy)) return null;
+            if (Regex.IsMatch(OrderBy, "^[0-9a-zA-Z_]+$"))
+            {
+                var byText = OrderByAsc.GetValueOrDefault(true) ? "ASC" : "DESC";
+                return $"ORDER BY {OrderBy} {byText}";
+            }
+            return null;
+        }
     }
 
     /// <summary>

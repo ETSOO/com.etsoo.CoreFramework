@@ -9,13 +9,24 @@ namespace com.etsoo.Database
     public static class SqliteUtils
     {
         /// <summary>
+        /// To JSON bool command
+        /// 转换为JSON逻辑值命令
+        /// </summary>
+        /// <param name="boolCondition">Bool condition</param>
+        /// <returns>Command</returns>
+        public static string ToJsonBool(this string boolCondition)
+        {
+            return $"json(IIF({boolCondition}, 'true', 'false')";
+        }
+
+        /// <summary>
         /// To JSON command
         /// 转换为JSON命令
         /// </summary>
         /// <param name="fields">Fields</param>
         /// <param name="withoutArrayWrapper">Without array wrapper, like SQL Server 'FOR JSON PATH, WITHOUT_ARRAY_WRAPPER'</param>
         /// <returns>Command</returns>
-        public static string ToJsonCommand(string fields, bool withoutArrayWrapper = false)
+        public static string ToJsonCommand(this string fields, bool withoutArrayWrapper = false)
         {
             // (?<!) = Negative lookbehind, no '(' found before ')'
             var regex = new Regex(@"(?<!\([^\)]+)\s*,\s*", RegexOptions.Compiled | RegexOptions.Multiline);
