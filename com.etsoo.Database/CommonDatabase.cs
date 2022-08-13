@@ -5,6 +5,7 @@ using System.Collections;
 using System.Data;
 using System.Data.Common;
 using System.Runtime.Versioning;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -417,6 +418,26 @@ namespace com.etsoo.Database
                 var offset = (page - 1) * size;
                 return $"LIMIT {size} OFFSET {offset}";
             }
+        }
+
+        /// <summary>
+        /// Get update command
+        /// 获取更新命令
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="alias">Alias</param>
+        /// <param name="fields">Update fields</param>
+        /// <returns>Command</returns>
+        public virtual StringBuilder GetUpdateCommand(string tableName, string alias, string fields)
+        {
+            tableName = EscapeIdentifier(tableName);
+
+            var sql = new StringBuilder("UPDATE ");
+            sql.Append(tableName);
+            sql.Append($" AS {alias} SET ");
+            sql.Append(fields);
+
+            return sql;
         }
     }
 }

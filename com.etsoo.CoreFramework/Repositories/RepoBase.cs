@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using System.Data;
 using System.Data.Common;
 using System.IO.Pipelines;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Repositories
@@ -408,16 +407,10 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Default table name
             configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
-            var tableName = App.DB.EscapeIdentifier(configs.TableName);
 
             // SQL
-            var sql = new StringBuilder("UPDATE ");
-            sql.Append(tableName);
-            sql.Append(" SET ");
-            sql.Append(string.Join(", ", updateFields));
-            sql.Append(" FROM ");
-            sql.Append(tableName);
-            sql.Append(" AS t WHERE t.");
+            var sql = App.DB.GetUpdateCommand(configs.TableName, "t", string.Join(", ", updateFields));
+            sql.Append(" WHERE t.");
             sql.Append(App.DB.EscapeIdentifier(configs.IdField));
             sql.Append(" = @Id");
 
@@ -429,7 +422,10 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Parameters
             var parameters = FormatParameters(model);
-            AddSystemParameters(parameters);
+
+            // When user authorized
+            if (User != null)
+                AddSystemParameters(parameters);
 
             var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
 

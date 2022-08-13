@@ -8,8 +8,8 @@
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
-	<ImplicitUsings>true</ImplicitUsings>
-	<LangVersion>preview</LangVersion>
+	  <ImplicitUsings>true</ImplicitUsings>
+	  <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -4,6 +4,7 @@ using Dapper;
 using System.Collections;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 
 namespace com.etsoo.Database
 {
@@ -122,6 +123,16 @@ namespace com.etsoo.Database
         /// <param name="page">Current page</param>
         /// <returns>Query command</returns>
         string QueryLimit(int size, int page = 0);
+
+        /// <summary>
+        /// Get update command
+        /// 获取更新命令
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="alias">Alias</param>
+        /// <param name="fields">Update fields</param>
+        /// <returns>Command</returns>
+        StringBuilder GetUpdateCommand(string tableName, string alias, string fields);
     }
 
     /// <summary>

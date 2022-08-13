@@ -4,6 +4,7 @@ using com.etsoo.Database;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
+using System.Data;
 
 namespace Tests.Repositories
 {
@@ -48,6 +49,9 @@ namespace Tests.Repositories
             var app = new CoreApplication<SqlConnection>(config, db);
 
             repo = new IntEntityRepository(app, "user");
+
+            using var conn = db.NewConnection();
+            conn.Execute("IF NOT EXISTS (SELECT * FROM [User] WHERE Id = 1001) BEGIN INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1') END", commandType: CommandType.Text);
         }
 
         [SetUp]

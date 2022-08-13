@@ -27,6 +27,7 @@ namespace Tests.Repositories
 
         public RepositoryBaseTests()
         {
+            // :memory: would be better for case by case
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
             var config = new AppConfiguration("test");
@@ -40,13 +41,37 @@ namespace Tests.Repositories
         {
             await db.WithConnection((connection) =>
             {
-                return connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS e_user (id int, name nvarchar(128), status int)");
+                var sql = @"
+                    CREATE TABLE IF NOT EXISTS e_user (id int PRIMARY KEY, name nvarchar(128), status int);
+                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1002, 'Admin 2');
+                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1');
+                ";
+                return connection.ExecuteAsync(sql);
+            });
+        }
+
+        [Test]
+        public async Task InlineUpdateAsync_Test()
+        {
+            // Arrange
+            var user = new UserUpdateModule
+            {
+                Id = 1001,
+                Name = "Admin 21",
+                ChangedFields = new[] { "Name" }
+            };
+
+            // Act
+            var (result, data) = await repo.InlineUpdateAsync<int, UserUpdateModule>(user, new(new[] { "name = IIF(@Id = 1001, t.'name', @Name)" })
+            {
+                IdField = "id",
+                TableName = "e_user"
             });
 
-            await db.WithConnection((connection) =>
-            {
-                return connection.ExecuteScalarAsync("INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1')");
-            });
+            // Assert
+            Assert.IsTrue(result.Ok);
+            Assert.IsNotNull(data);
+            Assert.AreEqual(1, data?.RowsAffected);
         }
 
         [Test]
