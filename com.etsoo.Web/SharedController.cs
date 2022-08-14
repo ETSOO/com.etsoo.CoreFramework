@@ -42,9 +42,9 @@ namespace com.etsoo.Web
         /// </summary>
         /// <param name="coreApp">Core app</param>
         /// <param name="context">Http context accessor</param>
-        public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor? context = null) : base()
+        public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor context) : base()
         {
-            var ip = context?.HttpContext?.Connection.RemoteIpAddress;
+            var ip = context.HttpContext?.Connection.RemoteIpAddress;
             if (ip == null)
             {
                 throw new NullReferenceException(nameof(ip));
@@ -52,7 +52,9 @@ namespace com.etsoo.Web
             Ip = ip;
 
             CoreApp = coreApp;
-            UserAgent = context?.HttpContext?.Request.Headers[HeaderNames.UserAgent];
+
+            // IHeaderDictionary will return StringValues.Empty for missing entries
+            UserAgent = context.HttpContext?.Request.Headers[HeaderNames.UserAgent];
         }
 
         /// <summary>

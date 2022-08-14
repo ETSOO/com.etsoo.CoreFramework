@@ -21,6 +21,7 @@ namespace com.etsoo.Database
 
         /// <summary>
         /// To JSON command
+        /// json_group_array is an aggregate function (聚合函数), please uses sub-select for sorting
         /// 转换为JSON命令
         /// </summary>
         /// <param name="fields">Fields</param>

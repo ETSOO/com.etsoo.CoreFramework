@@ -423,6 +423,7 @@ namespace com.etsoo.Database
         /// <summary>
         /// Get update command
         /// 获取更新命令
+        /// https://www.sqlite.org/lang_update.html
         /// </summary>
         /// <param name="tableName">Table name</param>
         /// <param name="alias">Alias</param>
