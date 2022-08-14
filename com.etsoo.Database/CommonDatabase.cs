@@ -405,17 +405,17 @@ namespace com.etsoo.Database
         /// 获取查询限制命令
         /// </summary>
         /// <param name="size">Lines to read</param>
-        /// <param name="page">Current page</param>
+        /// <param name="page">Current page, start from 0, means first page is 0</param>
         /// <returns>Query command</returns>
-        public virtual string QueryLimit(int size, int page = 0)
+        public virtual string QueryLimit(uint size, uint page = 0)
         {
-            if (page <= 1)
+            if (page < 1)
             {
                 return $"LIMIT {size}";
             }
             else
             {
-                var offset = (page - 1) * size;
+                var offset = page * size;
                 return $"LIMIT {size} OFFSET {offset}";
             }
         }

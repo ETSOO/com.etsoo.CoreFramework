@@ -126,9 +126,9 @@ namespace com.etsoo.Database
         /// <param name="size">Lines to read</param>
         /// <param name="page">Current page</param>
         /// <returns>Query command</returns>
-        public override string QueryLimit(int size, int page = 0)
+        public override string QueryLimit(uint size, uint page = 0)
         {
-            var offset = page <= 1 ? 0 : (page - 1) * size;
+            var offset = page * size;
             return $" OFFSET {offset} ROWS FETCH NEXT {size} ROWS ONLY";
         }
 

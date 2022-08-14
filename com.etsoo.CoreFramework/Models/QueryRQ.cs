@@ -21,7 +21,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 当前页码
         /// </summary>
         [Required]
-        public int CurrentPage { get; init; }
+        public uint CurrentPage { get; init; }
 
         /// <summary>
         /// Batch size
@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.Models
         /// </summary>
         [Required]
         [Range(1, 1000)]
-        public int BatchSize { get; init; }
+        public uint BatchSize { get; init; }
 
         /// <summary>
         /// Order by field

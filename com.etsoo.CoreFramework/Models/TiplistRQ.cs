@@ -35,7 +35,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 最大项目数
         /// </summary>
         [Range(1, 1000)]
-        public int? Items { get; init; }
+        public uint? Items { get; init; }
 
         /// <summary>
         /// Get parameters

@@ -122,7 +122,7 @@ namespace com.etsoo.Database
         /// <param name="size">Lines to read</param>
         /// <param name="page">Current page</param>
         /// <returns>Query command</returns>
-        string QueryLimit(int size, int page = 0);
+        string QueryLimit(uint size, uint page = 0);
 
         /// <summary>
         /// Get update command
