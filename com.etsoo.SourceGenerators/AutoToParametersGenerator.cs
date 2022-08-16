@@ -188,7 +188,7 @@ namespace com.etsoo.SourceGenerators
                     if (isDbString)
                         itemCode.Append($"parameters.Add(\"{name}\", {valuePart})");
                     else
-                        itemCode.Append($"parameters.Add(\"{name}\", {valuePart}, {typeName.ToDbType()})");
+                        itemCode.Append($"app.DB.AddParameter(parameters, \"{name}\", {valuePart}, {typeName.ToDbType()})");
 
                     body.Add(itemCode.ToString());
                 }

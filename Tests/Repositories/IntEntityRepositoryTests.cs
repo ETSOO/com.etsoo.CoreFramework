@@ -1,6 +1,8 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Database;
+using com.etsoo.Utils;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using NUnit.Framework;
@@ -39,6 +41,7 @@ namespace Tests.Repositories
     [TestFixture]
     public class IntEntityRepositoryTests
     {
+        readonly CoreApplication<SqlConnection> app;
         readonly IntEntityRepository repo;
 
         public IntEntityRepositoryTests()
@@ -46,7 +49,7 @@ namespace Tests.Repositories
             var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true", true);
 
             var config = new AppConfiguration("test");
-            var app = new CoreApplication<SqlConnection>(config, db);
+            app = new CoreApplication<SqlConnection>(config, db);
 
             repo = new IntEntityRepository(app, "user");
 
@@ -130,6 +133,27 @@ namespace Tests.Repositories
 
             // Assert
             Assert.LessOrEqual(1, result);
+        }
+
+        [Test]
+        public async Task ListAsyn_ModelTest()
+        {
+            // Arrange
+            var rq = new TiplistRQ<int>() { Items = 2 };
+            var parameters = rq.AsParameters(app);
+            var command = new CommandDefinition("ep_user_list_as_json", parameters, commandType: CommandType.StoredProcedure);
+
+            using var stream = new MemoryStream();
+            var result = await app.DB.WithConnection((connection) =>
+            {
+                return connection.QueryToStreamAsync(command, stream, DataFormat.Json);
+            });
+
+            Assert.IsTrue(result);
+
+            stream.Position = 0;
+            var content = SharedUtils.StreamToString(stream);
+            Assert.IsTrue(content.Contains("Admin 2"));
         }
     }
 }

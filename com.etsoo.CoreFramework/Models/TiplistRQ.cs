@@ -2,6 +2,7 @@
 using com.etsoo.Database;
 using Dapper;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -35,7 +36,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 最大项目数
         /// </summary>
         [Range(1, 1000)]
-        public uint? Items { get; init; }
+        public ushort? Items { get; init; }
 
         /// <summary>
         /// Get parameters
@@ -46,7 +47,8 @@ namespace com.etsoo.CoreFramework.Models
         {
             var parameters = new DynamicParameters();
 
-            parameters.Add("Id", Id);
+            if (Id != null)
+                app.DB.AddParameter(parameters, nameof(Id), Id, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
 
             if (ExcludedIds != null)
             {
@@ -56,7 +58,8 @@ namespace com.etsoo.CoreFramework.Models
 
             if (!string.IsNullOrEmpty(Keyword))
                 parameters.Add("Keyword", new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
-            parameters.Add("Items", Items);
+
+            app.DB.AddParameter(parameters, nameof(Items), Items, DbType.UInt16);
 
             return parameters;
         }

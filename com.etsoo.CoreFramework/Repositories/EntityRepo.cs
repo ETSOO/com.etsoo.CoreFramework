@@ -26,7 +26,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         public const string PublicRange = "public";
 
-
         protected EntityRepo(ICoreApplication<C> app, string flag, IServiceUser? user = null) : base(app, flag, user)
         {
         }
@@ -127,7 +126,7 @@ namespace com.etsoo.CoreFramework.Repositories
             var name = GetReadCommand(range, format);
 
             var parameters = new DynamicParameters();
-            parameters.Add("id", id);
+            App.DB.AddParameter(parameters, "id", id, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
 
             if (range != PublicRange)
             {

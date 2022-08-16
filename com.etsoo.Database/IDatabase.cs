@@ -27,6 +27,17 @@ namespace com.etsoo.Database
         bool SupportStoredProcedure { get; }
 
         /// <summary>
+        /// Add Dapper parameter
+        /// https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/types
+        /// 添加 Dapper 参数
+        /// </summary>
+        /// <param name="parameters">Parameter collection</param>
+        /// <param name="name">Name</param>
+        /// <param name="value">Value</param>
+        /// <param name="type">Value type</param>
+        void AddParameter(DynamicParameters parameters, string name, object? value, DbType type);
+
+        /// <summary>
         /// Escape identifier
         /// 转义标识符
         /// </summary>

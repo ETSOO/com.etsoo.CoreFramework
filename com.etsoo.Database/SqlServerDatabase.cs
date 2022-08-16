@@ -1,4 +1,6 @@
 ﻿using com.etsoo.Utils.Models;
+using com.etsoo.Utils.String;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Collections;
 using System.Data;
@@ -154,6 +156,40 @@ namespace com.etsoo.Database
             sql.Append(alias);
 
             return sql;
+        }
+
+        /// <summary>
+        /// Add Dapper parameter
+        /// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/configuring-parameters-and-parameter-data-types?redirectedfrom=MSDN
+        /// 添加 Dapper 参数
+        /// </summary>
+        /// <param name="parameters">Parameter collection</param>
+        /// <param name="name">Name</param>
+        /// <param name="value">Value</param>
+        /// <param name="type">Value type</param>
+        public override void AddParameter(DynamicParameters parameters, string name, object? value, DbType type)
+        {
+            if (value == null) return;
+
+            switch (type)
+            {
+                case DbType.VarNumeric:
+                    parameters.Add(name, StringUtils.TryParseObject<decimal>(value), DbType.Decimal);
+                    break;
+                case DbType.SByte:
+                    parameters.Add(name, StringUtils.TryParseObject<short>(value), DbType.Int16);
+                    break;
+                case DbType.UInt16:
+                    parameters.Add(name, StringUtils.TryParseObject<int>(value), DbType.Int32);
+                    break;
+                case DbType.UInt32:
+                case DbType.UInt64:
+                    parameters.Add(name, StringUtils.TryParseObject<long>(value), DbType.Int64);
+                    break;
+                default:
+                    parameters.Add(name, value, type);
+                    break;
+            }
         }
     }
 }

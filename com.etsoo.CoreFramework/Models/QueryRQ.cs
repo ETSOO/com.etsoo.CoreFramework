@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.Models
         /// </summary>
         [Required]
         [Range(1, 1000)]
-        public uint BatchSize { get; init; }
+        public ushort BatchSize { get; init; }
 
         /// <summary>
         /// Order by field

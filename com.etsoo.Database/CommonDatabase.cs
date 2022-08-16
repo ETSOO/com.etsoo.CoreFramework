@@ -74,6 +74,21 @@ namespace com.etsoo.Database
         public abstract IDbExceptionResult GetExceptionResult(Exception ex);
 
         /// <summary>
+        /// Add Dapper parameter
+        /// https://docs.microsoft.com/en-us/dotnet/standard/data/sqlite/types
+        /// 添加 Dapper 参数
+        /// </summary>
+        /// <param name="parameters">Parameter collection</param>
+        /// <param name="name">Name</param>
+        /// <param name="value">Value</param>
+        /// <param name="type">Value type</param>
+        public virtual void AddParameter(DynamicParameters parameters, string name, object? value, DbType type)
+        {
+            if (value == null) return;
+            parameters.Add(name, value, type);
+        }
+
+        /// <summary>
         /// New database connection
         /// 新数据库链接对象
         /// </summary>
