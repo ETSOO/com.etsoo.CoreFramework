@@ -35,7 +35,7 @@ namespace com.etsoo.Database
         /// <param name="name">Name</param>
         /// <param name="value">Value</param>
         /// <param name="type">Value type</param>
-        void AddParameter(DynamicParameters parameters, string name, object? value, DbType type);
+        void AddParameter(IDbParameters parameters, string name, object? value, DbType type);
 
         /// <summary>
         /// Escape identifier

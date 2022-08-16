@@ -25,7 +25,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 添加系统参数
         /// </summary>
         /// <param name="parameters">Parameters</param>
-        void AddSystemParameters(DynamicParameters parameters);
+        void AddSystemParameters(IDbParameters parameters);
 
         /// <summary>
         /// Execute a command asynchronously
@@ -106,7 +106,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <typeparam name="E">Generic return type</typeparam>
         /// <returns>Result</returns>
-        Task<E> QuickReadAsync<E>(string sql, DynamicParameters? parameters = null);
+        Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null);
 
         /// <summary>
         /// Inline SQL command update

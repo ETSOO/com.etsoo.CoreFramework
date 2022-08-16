@@ -48,7 +48,7 @@ namespace com.etsoo.Database
             SnakeNaming = snakeNaming;
 
             // Default settings
-            Dapper.SqlMapper.Settings.UseSingleResultOptimization = true;
+            SqlMapper.Settings.UseSingleResultOptimization = true;
 
             // Database snake naming
             if (snakeNaming)
@@ -82,9 +82,9 @@ namespace com.etsoo.Database
         /// <param name="name">Name</param>
         /// <param name="value">Value</param>
         /// <param name="type">Value type</param>
-        public virtual void AddParameter(DynamicParameters parameters, string name, object? value, DbType type)
+        public virtual void AddParameter(IDbParameters parameters, string name, object? value, DbType type)
         {
-            if (value == null) return;
+            // When value is null, still need to keep the parameter
             parameters.Add(name, value, type);
         }
 

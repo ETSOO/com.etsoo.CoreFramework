@@ -58,9 +58,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, DynamicParameters? parameters = null, CommandType? type = null)
+        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null)
         {
             type ??=  App.DB.SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+
+            // For stored procedure, remove null value parameters
+            if (type == CommandType.StoredProcedure) parameters?.ClearNulls();
 
             return new CommandDefinition(name, parameters, commandType: type);
         }
@@ -70,7 +73,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 添加系统参数
         /// </summary>
         /// <param name="parameters">Parameters</param>
-        public virtual void AddSystemParameters(DynamicParameters parameters)
+        public virtual void AddSystemParameters(IDbParameters parameters)
         {
             if (User == null)
             {
@@ -128,14 +131,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="parameters">Parameters</param>
         /// <returns>Result</returns>
-        virtual protected DynamicParameters FormatParameters(object parameters)
+        virtual protected IDbParameters FormatParameters(object parameters)
         {
             if (parameters is IModelParameters p)
             {
                 return p.AsParameters(App);
             }
 
-            return DatabaseUtils.FormatParameters(parameters) ?? new DynamicParameters();
+            return DatabaseUtils.FormatParameters(parameters) ?? new DbParameters();
         }
 
         /// <summary>
@@ -280,7 +283,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <typeparam name="E">Generic return type</typeparam>
         /// <returns>Result</returns>
-        public async Task<E> QuickReadAsync<E>(string sql, DynamicParameters? parameters = null)
+        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null)
         {
             var command = CreateCommand(sql, parameters, CommandType.Text);
 

@@ -1,6 +1,4 @@
-﻿using Dapper;
-
-namespace com.etsoo.Database
+﻿namespace com.etsoo.Database
 {
     /// <summary>
     /// Auto created export parameters
@@ -13,6 +11,6 @@ namespace com.etsoo.Database
         /// 导出参数
         /// </summary>
         /// <returns>Parameters</returns>
-        DynamicParameters AsParameters();
+        IDbParameters AsParameters();
     }
 }

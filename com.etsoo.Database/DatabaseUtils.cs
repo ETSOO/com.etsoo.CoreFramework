@@ -59,11 +59,11 @@ namespace com.etsoo.Database
         /// </summary>
         /// <param name="parameters">Dynamic parameters</param>
         /// <returns>Result</returns>
-        public static DynamicParameters? FormatParameters(object? parameters)
+        public static IDbParameters? FormatParameters(object? parameters)
         {
             if (parameters == null) return null;
 
-            if (parameters is DynamicParameters dp)
+            if (parameters is IDbParameters dp)
             {
                 return dp;
             }
@@ -73,7 +73,7 @@ namespace com.etsoo.Database
                 return ap.AsParameters();
             }
 
-            return new DynamicParameters(parameters);
+            return new DbParameters(parameters);
         }
 
         /// <summary>

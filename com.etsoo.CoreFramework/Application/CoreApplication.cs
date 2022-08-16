@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Crypto;
-using Dapper;
 using System.Data.Common;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -77,7 +76,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="user">Current user</param>
         /// <param name="parameters">Parameters</param>
-        public virtual void AddSystemParameters(IServiceUser user, DynamicParameters parameters)
+        public virtual void AddSystemParameters(IServiceUser user, IDbParameters parameters)
         {
             // Keep blank
         }

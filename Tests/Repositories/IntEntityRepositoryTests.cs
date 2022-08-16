@@ -29,7 +29,7 @@ namespace Tests.Repositories
             return base.GetCommandName(parts);
         }
 
-        public override void AddSystemParameters(DynamicParameters parameters)
+        public override void AddSystemParameters(IDbParameters parameters)
         {
             // No additional parameters will be passed
         }
@@ -141,6 +141,7 @@ namespace Tests.Repositories
             // Arrange
             var rq = new TiplistRQ<int>() { Items = 2 };
             var parameters = rq.AsParameters(app);
+            parameters.ClearNulls();
             var command = new CommandDefinition("ep_user_list_as_json", parameters, commandType: CommandType.StoredProcedure);
 
             using var stream = new MemoryStream();

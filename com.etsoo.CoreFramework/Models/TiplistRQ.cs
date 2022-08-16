@@ -43,21 +43,26 @@ namespace com.etsoo.CoreFramework.Models
         /// 获取参数集合
         /// </summary>
         /// <returns></returns>
-        public virtual DynamicParameters AsParameters(ICoreApplicationBase app)
+        public virtual IDbParameters AsParameters(ICoreApplicationBase app)
         {
-            var parameters = new DynamicParameters();
+            var parameters = new DbParameters();
 
-            if (Id != null)
-                app.DB.AddParameter(parameters, nameof(Id), Id, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
+            app.DB.AddParameter(parameters, nameof(Id), Id, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
 
             if (ExcludedIds != null)
             {
                 var idParameter = app.DB.ListToParameter(ExcludedIds, null, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName));
                 parameters.Add("ExcludedIds", idParameter);
             }
+            else
+            {
+                parameters.Add("ExcludedIds", null);
+            }
 
             if (!string.IsNullOrEmpty(Keyword))
                 parameters.Add("Keyword", new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
+            else
+                parameters.Add("Keyword", null);
 
             app.DB.AddParameter(parameters, nameof(Items), Items, DbType.UInt16);
 

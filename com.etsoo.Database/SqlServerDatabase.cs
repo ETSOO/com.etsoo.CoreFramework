@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.Models;
 using com.etsoo.Utils.String;
-using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Collections;
 using System.Data;
@@ -167,9 +166,13 @@ namespace com.etsoo.Database
         /// <param name="name">Name</param>
         /// <param name="value">Value</param>
         /// <param name="type">Value type</param>
-        public override void AddParameter(DynamicParameters parameters, string name, object? value, DbType type)
+        public override void AddParameter(IDbParameters parameters, string name, object? value, DbType type)
         {
-            if (value == null) return;
+            if (value == null)
+            {
+                parameters.Add(name, value);
+                return;
+            }
 
             switch (type)
             {

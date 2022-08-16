@@ -182,7 +182,7 @@ namespace com.etsoo.SourceGenerators
                     if (ignoreNull && (nullable || typeSymbol.IsReferenceType))
                     {
                         // Ignore null field
-                        itemCode.AppendLine($"if({fieldName} != null)");
+                        itemCode.AppendLine($"if({fieldName} == null) {{ parameters.Add(\"{name}\", null); }} else ");
                     }
 
                     if (isDbString)
@@ -256,9 +256,9 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <param name=""app"">Application</param>
                         /// <returns>Dynamic parameters</returns>
-                        public DynamicParameters AsParameters(ICoreApplicationBase app)
+                        public IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
-                            var parameters = new DynamicParameters();
+                            var parameters = new DbParameters();
 
                             {string.Join(";\n", body)};
 

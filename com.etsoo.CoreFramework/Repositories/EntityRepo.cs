@@ -55,7 +55,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Command</returns>
         protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids)
         {
-            var parameters = new DynamicParameters();
+            var parameters = new DbParameters();
 
             var idParameter = App.DB.ListToParameter(ids, null, (type) => SqlServerUtils.GetListCommand(type, App.BuildCommandName));
             parameters.Add("ids", idParameter);
@@ -125,7 +125,7 @@ namespace com.etsoo.CoreFramework.Repositories
         {
             var name = GetReadCommand(range, format);
 
-            var parameters = new DynamicParameters();
+            var parameters = new DbParameters();
             App.DB.AddParameter(parameters, "id", id, DatabaseUtils.TypeToDbType(typeof(T)).GetValueOrDefault());
 
             if (range != PublicRange)
@@ -305,7 +305,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Rows affected</returns>
         public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
         {
-            var parameters = new DynamicParameters();
+            var parameters = new DbParameters();
             parameters.Add("Items", App.DB.DictionaryToParameter(sortData, null, null, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, App.BuildCommandName)));
 
             AddSystemParameters(parameters);

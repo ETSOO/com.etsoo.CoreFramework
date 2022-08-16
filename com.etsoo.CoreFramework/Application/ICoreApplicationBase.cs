@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
-using Dapper;
 using System.Text.Json;
 
 namespace com.etsoo.CoreFramework.Application
@@ -35,7 +34,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="user">Current user</param>
         /// <param name="parameters">Parameters</param>
-        void AddSystemParameters(IServiceUser user, DynamicParameters parameters);
+        void AddSystemParameters(IServiceUser user, IDbParameters parameters);
 
         /// <summary>
         /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)

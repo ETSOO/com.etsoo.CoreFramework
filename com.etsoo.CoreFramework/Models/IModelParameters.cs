@@ -1,5 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using Dapper;
+using com.etsoo.Database;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -15,6 +15,6 @@ namespace com.etsoo.CoreFramework.Models
         /// </summary>
         /// <param name="app">Application</param>
         /// <returns>Parameters</returns>
-        DynamicParameters AsParameters(ICoreApplicationBase app);
+        IDbParameters AsParameters(ICoreApplicationBase app);
     }
 }
