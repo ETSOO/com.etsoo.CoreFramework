@@ -14,14 +14,14 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO SmartERP NextGen shared coding utilities.</Description>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Version>1.1.32</Version>
+    <Version>1.1.33</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-	<ImplicitUsings>true</ImplicitUsings>
-	<EnablePreviewFeatures>True</EnablePreviewFeatures>
-	<GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
+	  <ImplicitUsings>true</ImplicitUsings>
+	  <EnablePreviewFeatures>True</EnablePreviewFeatures>
+	  <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -4,24 +4,24 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<EnablePreviewFeatures>True</EnablePreviewFeatures>
-	<GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
-	<SignAssembly>true</SignAssembly>
-	<AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
-	<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-	<RepositoryType>GitHub</RepositoryType>
-	<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.WebUtils</RepositoryUrl>
-	<Authors>ETSOO SmartERP NextGen Team</Authors>
-	<Company>ETSOO</Company>
-	<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<Description>ETSOO SmartERP NextGen web utilities.</Description>
-	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Version>1.0.7</Version>
-	<AssemblyVersion>1.0.1.0</AssemblyVersion>
-	<FileVersion>1.0.1.0</FileVersion>
-	<PackageIcon>logo.png</PackageIcon>
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	  <EnablePreviewFeatures>True</EnablePreviewFeatures>
+	  <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
+	  <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
+	  <RepositoryType>GitHub</RepositoryType>
+	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.WebUtils</RepositoryUrl>
+	  <Authors>ETSOO SmartERP NextGen Team</Authors>
+	  <Company>ETSOO</Company>
+	  <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Description>ETSOO SmartERP NextGen web utilities.</Description>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Version>1.0.8</Version>
+	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
+	  <FileVersion>1.0.1.0</FileVersion>
+	  <PackageIcon>logo.png</PackageIcon>
+	  <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
