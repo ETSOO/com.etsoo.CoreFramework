@@ -20,11 +20,12 @@ namespace com.etsoo.Utils
         /// Json default serializer options
         /// Json 默认序列化选项
         /// </summary>
-        public static JsonSerializerOptions JsonDefaultSerializerOptions = new()
+        public static JsonSerializerOptions JsonDefaultSerializerOptions => new()
         {
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
             WriteIndented = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
@@ -216,6 +217,63 @@ namespace com.etsoo.Utils
         {
             await using var ms = GetStream();
             await JsonSerializeAsync(data, ms, options, fields);
+            return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
+        }
+
+        /// <summary>
+        /// Join two data as audit Json string
+        /// 合并两个数据作为审计的Json字符串
+        /// </summary>
+        /// <param name="oldData">Old data, object or json</param>
+        /// <param name="newData">New data, object or json</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <param name="options">Json options</param>
+        /// <param name="oldDataName">Old data Json node name</param>
+        /// <param name="newDataName">New data Json node name</param>
+        /// <returns>Json string</returns>
+        public static async Task<string> JoinAsAuditJsonAsync(object oldData, object newData, IEnumerable<string> fields, JsonSerializerOptions? options = null, string? oldDataName = null, string? newDataName = null)
+        {
+            // Default options
+            options ??= JsonDefaultSerializerOptions;
+            oldDataName = nameof(oldData);
+            newDataName = nameof(newData);
+
+            // Stream
+            await using var ms = GetStream();
+
+            // Object start {
+            ms.WriteByte(123);
+
+            // Old data
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"{oldDataName}:"));
+
+            if (oldData is string oldJson)
+            {
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(oldJson));
+            }
+            else
+            {
+                await JsonSerializeAsync(oldData, ms, options, fields);
+            }
+
+            // ,
+            ms.WriteByte(44);
+
+            // New data
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"{newDataName}:"));
+
+            if (newData is string newJson)
+            {
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(newJson));
+            }
+            else
+            {
+                await JsonSerializeAsync(newData, ms, options, fields);
+            }
+
+            // Object end }
+            ms.WriteByte(125);
+
             return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
         }
 

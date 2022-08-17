@@ -114,5 +114,27 @@ namespace Tests.Utils
             var json = await SharedUtils.JsonSerializeAsync(model, null, new[] { "Id" });
             Assert.IsFalse(json.Contains("Name"));
         }
+
+        [Test]
+        public async Task JoinAsAuditJsonTests()
+        {
+            var oldData = new UserModel
+            {
+                Id = 1001,
+                Name = "Admin 1", // Name is a field, not a property, so should be ignored
+                Valid = true,
+                DecimalValue = 3.14M,
+                Date = DateTime.UtcNow
+            };
+
+            var newData = new UserUpdateModule
+            {
+                Id = 1001,
+                Name = "Admin 2"
+            };
+
+            var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, new[] { "Id", "Name" });
+            Assert.AreEqual("{oldData:{\"id\":1001},newData:{\"name\":\"Admin 2\",\"id\":1001}}", json);
+        }
     }
 }
