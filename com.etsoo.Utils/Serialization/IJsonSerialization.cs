@@ -15,6 +15,7 @@ namespace com.etsoo.Utils.Serialization
         /// </summary>
         /// <param name="writer">Writer</param>
         /// <param name="options">Options</param>
-        Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options);
+        /// <param name="fields">Fields allowed</param>
+        Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null);
     }
 }

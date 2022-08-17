@@ -224,7 +224,8 @@ namespace com.etsoo.Utils.Actions
         /// </summary>
         /// <param name="writer">Writer</param>
         /// <param name="options">Options</param>
-        public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
+        /// <param name="fields">Fields allowed</param>
+        public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
         {
             // Utf8JsonWriter
             await using var w = options.CreateJsonWriter(writer);
@@ -234,70 +235,71 @@ namespace com.etsoo.Utils.Actions
 
             if (options.IsWritable(false))
             {
-                var okName = options.ConvertName("Ok");
-                w.WriteBoolean(okName, Ok);
+                var okName = options.ConvertName(nameof(Ok));
+                if (fields == null || fields.Contains(nameof(Ok)) || fields.Contains(okName))
+                    w.WriteBoolean(okName, Ok);
             }
 
             if (options.IsWritable(Type == null))
             {
-                var typeName = options.ConvertName("Type");
+                var typeName = options.ConvertName(nameof(Type));
                 if (Type == null)
                     w.WriteNull(typeName);
-                else
+                else if (fields == null || fields.Contains(nameof(Type)) || fields.Contains(typeName))
                     w.WriteString(typeName, Type);
             }
 
             if (options.IsWritable(Title == null))
             {
-                var titleName = options.ConvertName("Title");
+                var titleName = options.ConvertName(nameof(Title));
                 if (Title == null)
                     w.WriteNull(titleName);
-                else
+                else if (fields == null || fields.Contains(nameof(Title)) || fields.Contains(titleName))
                     w.WriteString(titleName, Title);
             }
 
             if (options.IsWritable(Field == null))
             {
-                var fieldName = options.ConvertName("Field");
+                var fieldName = options.ConvertName(nameof(Field));
                 if (Field == null)
                     w.WriteNull(fieldName);
-                else
+                else if (fields == null || fields.Contains(nameof(Field)) || fields.Contains(fieldName))
                     w.WriteString(fieldName, Field);
             }
 
             if (options.IsWritable(Detail == null))
             {
-                var detailName = options.ConvertName("Detail");
+                var detailName = options.ConvertName(nameof(Detail));
                 if (Detail == null)
                     w.WriteNull(detailName);
-                else
+                else if (fields == null || fields.Contains(nameof(Detail)) || fields.Contains(detailName))
                     w.WriteString(detailName, Detail);
             }
 
             if (options.IsWritable(Status == null))
             {
-                var statusName = options.ConvertName("Status");
+                var statusName = options.ConvertName(nameof(Status));
                 if (Status == null)
                     w.WriteNull(statusName);
-                else
+                else if (fields == null || fields.Contains(nameof(Status)) || fields.Contains(statusName))
                     w.WriteNumber(statusName, Status.Value);
             }
 
             if (options.IsWritable(TraceId == null))
             {
-                var traceIdName = options.ConvertName("TraceId");
+                var traceIdName = options.ConvertName(nameof(TraceId));
                 if (TraceId == null)
                     w.WriteNull(traceIdName);
-                else
+                else if (fields == null || fields.Contains(nameof(TraceId)) || fields.Contains(traceIdName))
                     w.WriteString(traceIdName, TraceId);
             }
 
             if (options.IsWritable(Data == null))
             {
-                var dataName = options.ConvertName("Data");
+                var dataName = options.ConvertName(nameof(Data));
                 if (Data == null)
                     w.WriteNull(dataName);
-                else
+                else if (fields == null || fields.Contains(nameof(Data)) || fields.Contains(dataName))
                 {
                     w.WritePropertyName(dataName);
 

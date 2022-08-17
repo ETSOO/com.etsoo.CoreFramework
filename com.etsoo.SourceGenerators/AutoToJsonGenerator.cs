@@ -30,7 +30,7 @@ namespace com.etsoo.SourceGenerators
 
             var members = context.ParseMembers(tds, true, externalInheritances, out _);
 
-            if(!context.CancellationToken.IsCancellationRequested)
+            if (!context.CancellationToken.IsCancellationRequested)
             {
                 foreach (var member in members)
                 {
@@ -108,7 +108,7 @@ namespace com.etsoo.SourceGenerators
                         item.AppendLine($@"JsonSerializer.Serialize(w, {fieldName}, options);");
                     }
 
-                    if(nullable)
+                    if (nullable)
                     {
                         item.AppendLine("}");
                     }
@@ -118,7 +118,10 @@ namespace com.etsoo.SourceGenerators
                         if (options.IsWritable({isNullable}, {isField}, {isReadonly}))
                         {{
                             var {pName} = options.ConvertName(""{fieldName}"");
-                            {item}
+                            if (fields == null || fields.Any(field => field.Equals(""{fieldName}"") || field.Equals({pName})))
+                            {{
+                                {item}
+                            }}
                         }}
                     ");
                 }
@@ -154,7 +157,7 @@ namespace com.etsoo.SourceGenerators
             externals.Add("com.etsoo.Utils.Serialization.IJsonSerialization");
 
             // Source code
-            var source = $@"
+            var source = $@"#nullable enable
                 using com.etsoo.Utils.Serialization;
                 using System;
                 using System.Text.Json;
@@ -170,8 +173,9 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <param name=""writer"">Writer</param>
                         /// <param name=""options"">Options</param>
+                        /// <param name=""fields"">Fields allowed</param>
                         /// <returns>Task</returns>
-                        public async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options)
+                        public async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
                         {{
                             // Utf8JsonWriter
                             using var w = options.CreateJsonWriter(writer);

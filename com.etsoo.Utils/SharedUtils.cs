@@ -161,8 +161,9 @@ namespace com.etsoo.Utils
         /// <param name="data">Data</param>
         /// <param name="stream">Stream to hold the result</param>
         /// <param name="options">Options</param>
+        /// <param name="fields">Fields allowed</param>
         /// <returns>Task</returns>
-        public static async Task JsonSerializeAsync<D>(D data, RecyclableMemoryStream stream, JsonSerializerOptions? options = null)
+        public static async Task JsonSerializeAsync<D>(D data, RecyclableMemoryStream stream, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
         {
             options ??= new JsonSerializerOptions
             {
@@ -171,11 +172,34 @@ namespace com.etsoo.Utils
 
             if (data is IJsonSerialization di)
             {
-                await di.ToJsonAsync(stream, options);
+                await di.ToJsonAsync(stream, options, fields);
+            }
+            else if (fields == null)
+            {
+                await JsonSerializer.SerializeAsync(stream, data, options);
             }
             else
             {
-                await JsonSerializer.SerializeAsync(stream, data, options);
+                // Currently no way to filter Json property by name
+                // Convert to dictionary first
+                IDictionary<string, object> dic;
+                if (data is IDictionary<string, object> dicOne)
+                {
+                    dic = dicOne;
+                }
+                else
+                {
+                    dic = await ObjectToDictionaryAsync(data);
+                }
+                foreach (var key in dic.Keys)
+                {
+                    var keyName = options.ConvertName(key);
+                    if (!fields.Any(field => field.Equals(key) || field.Equals(keyName)))
+                    {
+                        dic.Remove(key);
+                    }
+                }
+                await JsonSerializer.SerializeAsync(stream, dic, options);
             }
         }
 
@@ -186,11 +210,12 @@ namespace com.etsoo.Utils
         /// <typeparam name="D">Generic data type</typeparam>
         /// <param name="data">Data</param>
         /// <param name="options">Options</param>
+        /// <param name="fields">Fields allowed</param>
         /// <returns>Task</returns>
-        public static async Task<string> JsonSerializeAsync<D>(D data, JsonSerializerOptions? options = null)
+        public static async Task<string> JsonSerializeAsync<D>(D data, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
         {
             await using var ms = GetStream();
-            await JsonSerializeAsync(data, ms, options);
+            await JsonSerializeAsync(data, ms, options, fields);
             return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
         }
 

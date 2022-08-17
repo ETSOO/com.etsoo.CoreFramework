@@ -85,5 +85,34 @@ namespace Tests.Utils
             Assert.AreEqual(0, utc1.Millisecond);
             Assert.AreEqual(DateTimeKind.Utc, utc1.Kind);
         }
+
+        [Test]
+        public async Task JsonSerializeAsync_SourceGeneratorTests()
+        {
+            var model = new UserModel
+            {
+                Id = 1001,
+                Name = "Admin 1",
+                Valid = true,
+                DecimalValue = 3.14M,
+                Date = DateTime.UtcNow
+            };
+
+            var json = await SharedUtils.JsonSerializeAsync(model, null, new[] { "Id", "name", "Valid", "Date" });
+            Assert.IsFalse(json.Contains("DecimalValue"));
+        }
+
+        [Test]
+        public async Task JsonSerializeAsync_TextJsonTests()
+        {
+            var model = new UserUpdateModule
+            {
+                Id = 1001,
+                Name = "Admin 1"
+            };
+
+            var json = await SharedUtils.JsonSerializeAsync(model, null, new[] { "Id" });
+            Assert.IsFalse(json.Contains("Name"));
+        }
     }
 }

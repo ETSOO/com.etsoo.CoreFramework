@@ -61,45 +61,45 @@ namespace com.etsoo.Database
         /// Append a whole object full of params to the dynamic
         /// EG: AddDynamicParams(new {A = 1, B = 2}) // will add property A and B to the dynamic
         /// </summary>
-        /// <param name="param"></param>
-        public void AddDynamicParams(object param)
+        /// <param name="obj">Params</param>
+        public void AddDynamicParams(object obj)
         {
-            var obj = param;
-            if (obj != null)
+            if (obj is DbParameters subDynamic)
             {
-                if (obj is DbParameters subDynamic)
+                if (subDynamic.parameters != null)
                 {
-                    if (subDynamic.parameters != null)
+                    foreach (var kvp in subDynamic.parameters)
                     {
-                        foreach (var kvp in subDynamic.parameters)
-                        {
-                            parameters.Add(kvp.Key, kvp.Value);
-                        }
+                        parameters.Add(kvp.Key, kvp.Value);
                     }
+                }
 
-                    if (subDynamic.templates != null)
+                if (subDynamic.templates != null)
+                {
+                    templates ??= new List<object>();
+                    foreach (var t in subDynamic.templates)
                     {
-                        templates ??= new List<object>();
-                        foreach (var t in subDynamic.templates)
-                        {
-                            templates.Add(t);
-                        }
+                        templates.Add(t);
                     }
+                }
+            }
+            else
+            {
+                if (obj is IEnumerable<KeyValuePair<string, object>> dictionary)
+                {
+                    foreach (var kvp in dictionary)
+                    {
+                        Add(kvp.Key, kvp.Value, null, null, null);
+                    }
+                }
+                else if (obj is DynamicParameters)
+                {
+                    throw new Exception("Please use DbParameters instead of DynamicParameters");
                 }
                 else
                 {
-                    if (obj is IEnumerable<KeyValuePair<string, object>> dictionary)
-                    {
-                        foreach (var kvp in dictionary)
-                        {
-                            Add(kvp.Key, kvp.Value, null, null, null);
-                        }
-                    }
-                    else
-                    {
-                        templates ??= new List<object>();
-                        templates.Add(obj);
-                    }
+                    templates ??= new List<object>();
+                    templates.Add(obj);
                 }
             }
         }
