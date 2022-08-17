@@ -41,16 +41,17 @@ namespace com.etsoo.Database
         public bool RemoveUnused { get; set; } = true;
 
         /// <summary>
-        /// construct a dynamic parameter bag
+        /// Construct a dynamic parameter bag
         /// </summary>
         public DbParameters()
         {
         }
 
         /// <summary>
-        /// construct a dynamic parameter bag
+        /// Construct a dynamic parameter bag
+        /// Performance lost because of reflection needs to be considered
         /// </summary>
-        /// <param name="template">can be an anonymous type or a DynamicParameters bag</param>
+        /// <param name="template">Can be an anonymous type or a DynamicParameters bag</param>
         public DbParameters(object template)
         {
             AddDynamicParams(template);
@@ -148,7 +149,8 @@ namespace com.etsoo.Database
         {
             foreach (var key in parameters.Keys)
             {
-                if (parameters[key].Value == null)
+                var p = parameters[key];
+                if (p.Value == null && p.ParameterDirection == ParameterDirection.Input)
                 {
                     // Remove null value item but keep DbNull.Value item
                     parameters.Remove(key);

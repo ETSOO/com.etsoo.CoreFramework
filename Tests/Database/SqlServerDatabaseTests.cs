@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Database;
 using Dapper;
 using NUnit.Framework;
+using System.Data;
 using System.Runtime.Versioning;
 
 namespace Tests.Utils
@@ -64,6 +65,33 @@ namespace Tests.Utils
         }
 
         [Test]
+        public async Task ExecuteAsync_ReturnAndOutputTest()
+        {
+            // Arrange
+            using var connection = db.NewConnection();
+
+            var value = 12;
+            var parameters = new DbParameters();
+            parameters.Add("Value", value);
+
+            // Return value parameter
+            const string name = "ReturnValue";
+            const string output = "OutputValue";
+            parameters.Add(name, dbType: DbType.Byte, direction: ParameterDirection.ReturnValue);
+            parameters.Add(output, dbType: DbType.Int16, direction: ParameterDirection.Output);
+
+            parameters.ClearNulls();
+
+            await connection.ExecuteAsync("ep_user_return", parameters, commandType: CommandType.StoredProcedure);
+
+            var result = parameters.Get<int>(name);
+            Assert.AreEqual(value, result);
+
+            var outputValue = parameters.Get<short>(output);
+            Assert.AreEqual(outputValue, 2 * result);
+        }
+
+        [Test]
         [RequiresPreviewFeatures]
         public async Task ExecuteReader_Test()
         {
@@ -98,6 +126,22 @@ namespace Tests.Utils
 
             // Assert
             Assert.AreEqual("Admin 1", result);
+        }
+
+        [Test]
+        public async Task ExecuteScalarAsync_DynamicTest()
+        {
+            // Arrange
+            using var connection = db.NewConnection();
+
+            // Performance lost because of reflection needs to be considered
+            var parameters = new DbParameters(new { Id = 1001, Prefix = "Dynamic" });
+
+            // Act
+            var result = await connection.ExecuteScalarAsync("SELECT @Prefix + Name FROM [User] WHERE Id = @Id", parameters);
+
+            // Assert
+            Assert.AreEqual("DynamicAdmin 1", result);
         }
 
         /// <summary>
