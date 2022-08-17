@@ -136,6 +136,18 @@ namespace Tests.Repositories
         }
 
         [Test]
+        public void ReportAsyc_Test()
+        {
+            using var stream = new MemoryStream();
+            var result = Assert.ThrowsAsync<SqlException>(async () =>
+            {
+                await repo.ReportAsync(stream, "default");
+            });
+
+            Assert.AreEqual("ep_user_report_for_default_as_json", result?.Procedure);
+        }
+
+        [Test]
         public async Task ListAsyn_ModelTest()
         {
             // Arrange

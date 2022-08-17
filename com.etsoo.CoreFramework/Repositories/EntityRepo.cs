@@ -216,7 +216,7 @@ namespace com.etsoo.CoreFramework.Repositories
             // Avoid possible SQL injection attack
             FilterRange(range);
 
-            var parameters = FormatParameters(model ?? new DynamicParameters());
+            var parameters = model == null ? new DbParameters() : FormatParameters(model);
 
             AddSystemParameters(parameters);
 
