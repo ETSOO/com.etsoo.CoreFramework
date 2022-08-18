@@ -6,16 +6,17 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SourceGenerators</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
-    <Company>ETSOO</Company>
+    <RepositoryType></RepositoryType>
+    <Company>ETSOO / 亿速思维</Company>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>ETSOO SmartERP NextGen shared source generators for Json, DataReader, Dictionary seriliazation and deserialization.</Description>
+    <Description>ETSOO Shared Source Generators
+亿速思维共享代码生成器</Description>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.52</Version>
+    <Version>1.0.53</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

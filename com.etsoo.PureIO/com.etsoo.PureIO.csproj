@@ -7,15 +7,16 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
 		<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-		<RepositoryType>GitHub</RepositoryType>
+		<RepositoryType></RepositoryType>
 		<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.PureIO</RepositoryUrl>
 		<Authors>ETSOO SmartERP NextGen Team</Authors>
-		<Company>ETSOO</Company>
+		<Company>ETSOO / 亿速思维</Company>
 		<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Description>ETSOO SmartERP NextGen Pure IO.</Description>
+		<Description>ETSOO Pure IO Utilities
+亿速思维底层输入输出工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.14</Version>
+		<Version>1.0.15</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>

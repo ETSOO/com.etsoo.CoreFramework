@@ -9,18 +9,19 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryType></RepositoryType>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
-    <Company>ETSOO</Company>
+    <Company>ETSOO / 亿速思维</Company>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>ETSOO SmartERP NextGen shared core framework.</Description>
-    <Version>1.2.29</Version>
+    <Description>ETSOO Shared Core Framework
+亿速思维共享核心框架</Description>
+    <Version>1.2.30</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-	<ImplicitUsings>true</ImplicitUsings>
+	  <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -42,7 +43,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

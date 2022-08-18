@@ -7,15 +7,16 @@
 	  <SignAssembly>true</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
 	  <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-	  <RepositoryType>GitHub</RepositoryType>
+	  <RepositoryType></RepositoryType>
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SMS</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
-	  <Company>ETSOO</Company>
+	  <Company>ETSOO / 亿速思维</Company>
 	  <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	  <Description>ETSOO SmartERP NextGen SMS utilities.</Description>
+	  <Description>ETSOO SMS Utilities
+亿速思维短信工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.3</Version>
+	  <Version>1.0.4</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -32,7 +33,6 @@
   <ItemGroup>
     <ProjectReference Include="..\com.etsoo.Address\com.etsoo.Address.csproj" />
     <ProjectReference Include="..\com.etsoo.HTTP\com.etsoo.HTTP.csproj" />
-    <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
   </ItemGroup>
 
 </Project>

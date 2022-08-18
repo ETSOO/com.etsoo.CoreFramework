@@ -134,7 +134,7 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, new[] { "Id", "Name" });
-            Assert.AreEqual("{oldData:{\"id\":1001},newData:{\"name\":\"Admin 2\",\"id\":1001}}", json);
+            Assert.AreEqual("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}", json);
         }
     }
 }

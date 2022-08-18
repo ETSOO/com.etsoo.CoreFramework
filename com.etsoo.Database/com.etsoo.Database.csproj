@@ -4,24 +4,25 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<EnablePreviewFeatures>True</EnablePreviewFeatures>
-	<GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
-	<SignAssembly>true</SignAssembly>
-	<AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
-	<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-	<RepositoryType>GitHub</RepositoryType>
-	<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Database</RepositoryUrl>
-	<Authors>ETSOO SmartERP NextGen Team</Authors>
-	<Company>ETSOO</Company>
-	<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<Description>ETSOO SmartERP NextGen database utilities.</Description>
-	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Version>1.0.20</Version>
-	<AssemblyVersion>1.0.1.0</AssemblyVersion>
-	<FileVersion>1.0.1.0</FileVersion>
-	<PackageIcon>logo.png</PackageIcon>
-	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	  <EnablePreviewFeatures>True</EnablePreviewFeatures>
+	  <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
+	  <SignAssembly>true</SignAssembly>
+	  <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
+	  <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
+	  <RepositoryType></RepositoryType>
+	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Database</RepositoryUrl>
+	  <Authors>ETSOO SmartERP NextGen Team</Authors>
+	  <Company>ETSOO / 亿速思维</Company>
+	  <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <Description>ETSOO Database Utilities
+亿速思维数据库工具</Description>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Version>1.0.21</Version>
+	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
+	  <FileVersion>1.0.1.0</FileVersion>
+	  <PackageIcon>logo.png</PackageIcon>
+	  <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>

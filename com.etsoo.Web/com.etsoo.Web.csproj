@@ -6,14 +6,15 @@
     <Nullable>enable</Nullable>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <Company>ETSOO</Company>
-    <Version>1.0.27</Version>
-    <Description>ETSOO SmartERP NextGen shared web components.</Description>
+    <Company>ETSOO / 亿速思维</Company>
+    <Version>1.0.28</Version>
+    <Description>ETSOO Shared Web Components
+亿速思维共享 Web 组件</Description>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Web</RepositoryUrl>
-    <RepositoryType>GitHub</RepositoryType>
+    <RepositoryType></RepositoryType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
 	  <ImplicitUsings>true</ImplicitUsings>
@@ -37,7 +38,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
-    <ProjectReference Include="..\com.etsoo.Utils\com.etsoo.Utils.csproj" />
   </ItemGroup>
   
 

@@ -245,7 +245,7 @@ namespace com.etsoo.Utils
             ms.WriteByte(123);
 
             // Old data
-            await ms.WriteAsync(Encoding.UTF8.GetBytes($"{oldDataName}:"));
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{oldDataName}\":"));
 
             if (oldData is string oldJson)
             {
@@ -260,7 +260,7 @@ namespace com.etsoo.Utils
             ms.WriteByte(44);
 
             // New data
-            await ms.WriteAsync(Encoding.UTF8.GetBytes($"{newDataName}:"));
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{newDataName}\":"));
 
             if (newData is string newJson)
             {
