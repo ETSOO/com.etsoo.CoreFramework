@@ -301,13 +301,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic id type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where T : struct
             where M : IdItem<T>, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalParams);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams);
 
             if (result.Ok)
             {
@@ -327,12 +328,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
+        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where M : IdItem, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalParams);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams);
 
             if (result.Ok)
             {
@@ -352,9 +354,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
+        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where M : IUpdateModel
         {
             // Validate
@@ -415,7 +418,19 @@ namespace com.etsoo.CoreFramework.Repositories
             configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
 
             // SQL
-            var sql = App.DB.GetUpdateCommand(configs.TableName, "t", string.Join(", ", updateFields));
+            var fieldsSql = string.Join(", ", updateFields);
+            if (!string.IsNullOrEmpty(additionalPart))
+            {
+                // Keep '='
+                additionalPart = additionalPart.Replace('=', '`');
+                if (DatabaseUtils.IsSafeSQLPart(additionalPart))
+                {
+                    additionalPart = additionalPart.Replace('`', '=');
+                    fieldsSql += ", " + additionalPart;
+                }
+            }
+
+            var sql = App.DB.GetUpdateCommand(configs.TableName, "t", fieldsSql);
             sql.Append(" WHERE t.");
             sql.Append(App.DB.EscapeIdentifier(configs.IdField));
             sql.Append(" = @Id");
@@ -432,9 +447,9 @@ namespace com.etsoo.CoreFramework.Repositories
             // Additional parameters
             if (additionalParams != null)
             {
-                foreach (var item in additionalParams)
+                foreach (var (Key, Value) in additionalParams)
                 {
-                    parameters.Add(item.Key, item.Value);
+                    parameters.Add(Key, Value);
                 }
             }
 

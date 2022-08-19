@@ -116,9 +116,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic id type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
+        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where T : struct
             where M : IdItem<T>, IUpdateModel;
 
@@ -129,8 +130,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null) where M : IdItem, IUpdateModel;
+        ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null) where M : IdItem, IUpdateModel;
     }
 }
