@@ -88,7 +88,7 @@ namespace Benchmark.Utils
 
         public class PersonLocal : Person, IJsonSerialization
         {
-            public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options)
+            public async Task ToJsonAsync(IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
             {
                 await using var w = options.CreateJsonWriter(writer);
 
@@ -96,53 +96,68 @@ namespace Benchmark.Utils
 
                 if (options.IsWritable(!Id.HasValue))
                 {
-                    var idName = options.ConvertName("Id");
-                    if (!Id.HasValue)
-                        w.WriteNull(idName);
-                    else
-                        w.WriteNumber(idName, Id.Value);
+                    var idName = options.ConvertName(nameof(Id));
+                    if (fields == null || fields.Any(f => f.Equals(idName) || f.Equals(nameof(Id))))
+                    {
+                        if (!Id.HasValue)
+                            w.WriteNull(idName);
+                        else
+                            w.WriteNumber(idName, Id.Value);
+                    }
                 }
 
                 if (options.IsWritable(Name == null))
                 {
-                    var nameName = options.ConvertName("Name");
-                    if (Name == null)
-                        w.WriteNull(nameName);
-                    else
-                        w.WriteString(nameName, Name);
+                    var nameName = options.ConvertName(nameof(Name));
+                    if (fields == null || fields.Any(f => f.Equals(nameName) || f.Equals(nameof(Name))))
+                    {
+                        if (Name == null)
+                            w.WriteNull(nameName);
+                        else
+                            w.WriteString(nameName, Name);
+                    }
                 }
 
                 if (options.IsWritable(!Birthday.HasValue))
                 {
-                    var birthdayName = options.ConvertName("Birthday");
-                    if (!Birthday.HasValue)
-                        w.WriteNull(birthdayName);
-                    else
-                        w.WriteString(birthdayName, Birthday.Value);
+                    var birthdayName = options.ConvertName(nameof(Birthday));
+                    if (fields == null || fields.Any(f => f.Equals(birthdayName) || f.Equals(nameof(Birthday))))
+                    {
+                        if (!Birthday.HasValue)
+                            w.WriteNull(birthdayName);
+                        else
+                            w.WriteString(birthdayName, Birthday.Value);
+                    }
                 }
 
                 if (options.IsWritable(!Valid.HasValue))
                 {
-                    var validName = options.ConvertName("Valid");
-                    if (!Valid.HasValue)
-                        w.WriteNull(validName);
-                    else
-                        w.WriteBoolean(validName, Valid.Value);
+                    var validName = options.ConvertName(nameof(Valid));
+                    if (fields == null || fields.Any(f => f.Equals(validName) || f.Equals(nameof(Valid))))
+                    {
+                        if (!Valid.HasValue)
+                            w.WriteNull(validName);
+                        else
+                            w.WriteBoolean(validName, Valid.Value);
+                    }
                 }
 
                 if (options.IsWritable(Flags == null))
                 {
-                    var flagsName = options.ConvertName("Flags");
-                    if (Flags == null)
-                        w.WriteNull(flagsName);
-                    else
+                    var flagsName = options.ConvertName(nameof(Flags));
+                    if (fields == null || fields.Any(f => f.Equals(flagsName) || f.Equals(nameof(Flags))))
                     {
-                        w.WriteStartArray(flagsName);
-                        foreach (var f in Flags)
+                        if (Flags == null)
+                            w.WriteNull(flagsName);
+                        else
                         {
-                            w.WriteNumberValue(f);
+                            w.WriteStartArray(flagsName);
+                            foreach (var f in Flags)
+                            {
+                                w.WriteNumberValue(f);
+                            }
+                            w.WriteEndArray();
                         }
-                        w.WriteEndArray();
                     }
                 }
 

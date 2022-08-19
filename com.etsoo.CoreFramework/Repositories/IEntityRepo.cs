@@ -174,7 +174,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs) where M : IdItem<T>, IUpdateModel;
+        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null) where M : IdItem<T>, IUpdateModel;
     }
 }

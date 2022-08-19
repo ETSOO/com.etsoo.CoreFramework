@@ -103,8 +103,10 @@ namespace Tests.Repositories
                 ChangedFields = new[] { "Name" }
             };
 
+            var parameters = new Dictionary<string, object> { ["Flag"] = true };
+
             // Act
-            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Id = 1001, '', @Name)" }));
+            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Flag = 1, @Name + ' Flaged', @Name)" }), parameters);
 
             // Assert
             Assert.IsTrue(result.Ok);

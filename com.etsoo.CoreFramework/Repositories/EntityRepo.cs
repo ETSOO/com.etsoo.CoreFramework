@@ -389,11 +389,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs)
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
             where M : IdItem<T>, IUpdateModel
         {
-            return await InlineUpdateAsync<T, M>(model, configs);
+            return await InlineUpdateAsync<T, M>(model, configs, additionalParams);
         }
     }
 }

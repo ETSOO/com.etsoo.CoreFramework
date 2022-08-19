@@ -301,12 +301,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic id type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs)
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
             where T : struct
             where M : IdItem<T>, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalParams);
 
             if (result.Ok)
             {
@@ -326,11 +327,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs)
+        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
             where M : IdItem, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalParams);
 
             if (result.Ok)
             {
@@ -350,8 +352,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic model type</typeparam>
         /// <param name="model">Model</param>
         /// <param name="configs">Configs</param>
+        /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs)
+        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, Dictionary<string, object>? additionalParams = null)
             where M : IUpdateModel
         {
             // Validate
@@ -425,6 +428,15 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Parameters
             var parameters = FormatParameters(model);
+
+            // Additional parameters
+            if (additionalParams != null)
+            {
+                foreach (var item in additionalParams)
+                {
+                    parameters.Add(item.Key, item.Value);
+                }
+            }
 
             // When user authorized
             if (User != null)
