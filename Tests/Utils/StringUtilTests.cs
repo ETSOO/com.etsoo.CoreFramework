@@ -189,6 +189,17 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void LinuxStyleToPascalCase_Cameral_Test()
+        {
+            // Arrange & act
+            var input = "yourName";
+            var result = StringUtils.LinuxStyleToPascalCase(input).ToString();
+
+            // Assert
+            Assert.AreEqual("YourName", result);
+        }
+
+        [Test]
         public void IEnumerableToString_Int_Test()
         {
             // Arrange

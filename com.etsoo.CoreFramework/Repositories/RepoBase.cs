@@ -380,12 +380,15 @@ namespace com.etsoo.CoreFramework.Repositories
             var updateFields = configs.UpdatableFields
                 .Select(field =>
                 {
-                    var index = field.IndexOf('=');
                     string matchField, value;
+                    var index = field.IndexOf('=');
                     if (index == -1)
                     {
                         matchField = field;
-                        value = $"@{field}";
+
+                        // Database side always 3 common cases: FieldName, field_name, or fieldName
+                        // Code side, parameter name is always FieldName
+                        value = $"@{field.ToPascalCase()}";
                     }
                     else
                     {
