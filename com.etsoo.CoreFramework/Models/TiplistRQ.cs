@@ -74,7 +74,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Tiplist Request data with string id
     /// 动态列表请求数据
     /// </summary>
-    public record TiplistStrRQ : TiplistRQ<int>
+    public record TiplistRQ : TiplistRQ<int>
     {
         /// <summary>
         /// String id
