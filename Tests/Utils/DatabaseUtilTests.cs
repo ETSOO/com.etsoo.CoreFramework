@@ -9,7 +9,9 @@ namespace Tests.Utils
     {
         private enum TestEnum
         {
-            Monday
+            Monday,
+            Tuesday,
+            Sunday
         }
 
         private static IEnumerable<TestCaseData> TypeToDbTypeBulkTestData
@@ -52,6 +54,13 @@ namespace Tests.Utils
         public void IsAnsi_Test(string input, bool isAnsi)
         {
             Assert.AreEqual(isAnsi, input.IsAnsi());
+        }
+
+        [Test]
+        public void JoinParametersTests()
+        {
+            var result = DatabaseUtils.JoinParameters(nameof(TestEnum.Monday), nameof(TestEnum.Tuesday), nameof(TestEnum.Sunday));
+            Assert.AreEqual("@Monday, @Tuesday, @Sunday", result);
         }
     }
 }
