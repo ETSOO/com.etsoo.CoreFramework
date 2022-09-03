@@ -16,7 +16,7 @@ namespace com.etsoo.Database
         /// <returns>Command</returns>
         public static string ToJsonBool(this string boolCondition)
         {
-            return $"json(IIF({boolCondition}, 'true', 'false')";
+            return $"json(IIF({boolCondition}, 'true', 'false'))";
         }
 
         /// <summary>

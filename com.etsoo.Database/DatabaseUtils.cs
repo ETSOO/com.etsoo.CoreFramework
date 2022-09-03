@@ -137,16 +137,5 @@ namespace com.etsoo.Database
             // Default
             return null;
         }
-
-        /// <summary>
-        /// Join as parameters
-        /// 链接成参数
-        /// </summary>
-        /// <param name="items">Parameter items</param>
-        /// <returns>String</returns>
-        public static string JoinParameters(params string[] items)
-        {
-            return string.Join(", ", items.Select(item => $"@{item}"));
-        }
     }
 }

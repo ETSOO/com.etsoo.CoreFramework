@@ -55,12 +55,5 @@ namespace Tests.Utils
         {
             Assert.AreEqual(isAnsi, input.IsAnsi());
         }
-
-        [Test]
-        public void JoinParametersTests()
-        {
-            var result = DatabaseUtils.JoinParameters(nameof(TestEnum.Monday), nameof(TestEnum.Tuesday), nameof(TestEnum.Sunday));
-            Assert.AreEqual("@Monday, @Tuesday, @Sunday", result);
-        }
     }
 }

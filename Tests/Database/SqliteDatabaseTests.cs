@@ -111,6 +111,13 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void SqliteUtilsToJsonBool()
+        {
+            var command = "@a = 1".ToJsonBool();
+            Assert.AreEqual("json(IIF(@a = 1, 'true', 'false'))", command);
+        }
+
+        [Test]
         public void SqliteUtilsToJsonCommandTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage");
