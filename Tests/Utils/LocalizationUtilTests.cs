@@ -41,7 +41,7 @@ namespace Tests.Utils
             // Correct
             var tz = LocalizationUtils.GetTimeZone("新西兰标准时间");
 
-            Assert.AreEqual("New Zealand Standard Time", tz.StandardName);
+            Assert.AreEqual("New Zealand Standard Time", tz.Id);
 
             // Wrong
             tz = LocalizationUtils.GetTimeZone("China Time");

@@ -111,6 +111,16 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void ListToParameterTests()
+        {
+            var json = db.ListToParameter(new int[] { 1, 3, 5 });
+            if (json is DbString ds)
+            {
+                Assert.AreEqual("[1,3,5]", ds.Value);
+            }
+        }
+
+        [Test]
         public void SqliteUtilsToJsonBool()
         {
             var command = "@a = 1".ToJsonBool();

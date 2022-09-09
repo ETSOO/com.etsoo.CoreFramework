@@ -52,17 +52,17 @@ namespace com.etsoo.CoreFramework.Models
             if (ExcludedIds != null)
             {
                 var idParameter = app.DB.ListToParameter(ExcludedIds, null, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName));
-                parameters.Add("ExcludedIds", idParameter);
+                parameters.Add(nameof(ExcludedIds), idParameter);
             }
             else
             {
-                parameters.Add("ExcludedIds", null);
+                parameters.Add(nameof(ExcludedIds), null);
             }
 
             if (!string.IsNullOrEmpty(Keyword))
-                parameters.Add("Keyword", new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
+                parameters.Add(nameof(Keyword), new DbString { IsAnsi = false, IsFixedLength = false, Length = 50, Value = Keyword });
             else
-                parameters.Add("Keyword", null);
+                parameters.Add(nameof(Keyword), null);
 
             app.DB.AddParameter(parameters, nameof(Items), Items, DbType.UInt16);
 
@@ -81,5 +81,21 @@ namespace com.etsoo.CoreFramework.Models
         /// 字符串编号
         /// </summary>
         public string? Sid { get; init; }
+
+        public override IDbParameters AsParameters(ICoreApplicationBase app)
+        {
+            var parameters = base.AsParameters(app);
+
+            if (string.IsNullOrEmpty(Sid))
+            {
+                parameters.Add(nameof(Sid), null);
+            }
+            else
+            {
+                parameters.Add(nameof(Sid), new DbString { IsAnsi = true, IsFixedLength = false, Length = 255, Value = Sid });
+            }
+
+            return parameters;
+        }
     }
 }

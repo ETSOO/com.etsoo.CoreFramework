@@ -176,7 +176,8 @@ namespace com.etsoo.Database
         public virtual object ListToParameter(IEnumerable list, DbType type, long? maxLength = null, Func<SqlDbType, string>? tvpFunc = null)
         {
             // Default to be ANSI
-            return string.Join(';', list).ToDbStringSafe(true);
+            // return string.Join(';', list).ToDbStringSafe(true);
+            return JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
         }
 
         /// <summary>
