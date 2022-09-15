@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.IO.Pipelines;
 using System.Text;
 
 namespace com.etsoo.Utils.SpanMemory
@@ -53,10 +52,10 @@ namespace com.etsoo.Utils.SpanMemory
         /// 读取所有字节到写入器
         /// </summary>
         /// <param name="reader">Reader</param>
-        /// <param name="writer">Pipe writer</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="encoding">Encoding</param>
         /// <returns>Task</returns>
-        public static async Task ReadAllBytesAsyn(this TextReader reader, PipeWriter writer, Encoding? encoding = null)
+        public static async Task ReadAllBytesAsyn(this TextReader reader, IBufferWriter<byte> writer, Encoding? encoding = null)
         {
             // Default encoding
             encoding ??= Encoding.UTF8;
@@ -68,10 +67,7 @@ namespace com.etsoo.Utils.SpanMemory
             while ((read = await reader.ReadBlockAsync(memory)) > 0)
             {
                 // Write the chars to writer
-                encoding.GetBytes(memory.Span.Slice(0, read), writer);
-
-                // Make bytes written available
-                await writer.FlushAsync();
+                encoding.GetBytes(memory.Span[..read], writer);
             }
         }
 

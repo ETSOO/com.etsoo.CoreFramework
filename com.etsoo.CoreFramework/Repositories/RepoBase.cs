@@ -8,9 +8,9 @@ using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using System.Buffers;
 using System.Data;
 using System.Data.Common;
-using System.IO.Pipelines;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Repositories
@@ -227,19 +227,17 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Async read text data (JSON/XML) to stream
-        /// 异步读取文本数据(JSON或者XML)到流
+        /// Async read text data (JSON/XML) to PipeWriter
+        /// 异步读取文本数据(JSON或者XML)到PipeWriter
         /// </summary>
         /// <param name="command">Command</param>
-        /// <param name="stream">Stream</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <returns>Has content or not</returns>
-        public async Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false)
+        public async Task<bool> ReadToStreamAsync(CommandDefinition command, IBufferWriter<byte> writer)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryToStreamAsync(command, stream, format, multipleResults);
+                return connection.QueryToStreamAsync(command, writer);
             });
         }
 
@@ -248,15 +246,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 异步读取文本数据(JSON或者XML)到PipeWriter
         /// </summary>
         /// <param name="command">Command</param>
-        /// <param name="writer">PipeWriter or RecyclableMemoryStream</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Has content or not</returns>
-        public async Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false)
+        public async Task<bool> ReadToStreamAsync(CommandDefinition command, IBufferWriter<byte> writer, DataFormat format, IEnumerable<string>? collectionNames = null)
         {
             return await App.DB.WithConnection((connection) =>
             {
-                return connection.QueryToStreamAsync(command, writer, format, multipleResults);
+                return connection.QueryToStreamAsync(command, writer, format, collectionNames);
             });
         }
 
@@ -266,15 +264,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="response">HTTP Response</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public async Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, bool multipleResults = false)
+        public async Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
             // Content type
             response.ContentType = "application/json";
 
             // Write to
-            await ReadToStreamAsync(command, response.BodyWriter, DataFormat.Json, multipleResults);
+            if (collectionNames == null)
+                await ReadToStreamAsync(command, response.BodyWriter);
+            else
+                await ReadToStreamAsync(command, response.BodyWriter, DataFormat.Json, collectionNames);
         }
 
         /// <summary>

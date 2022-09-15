@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Database;
+using com.etsoo.Utils;
 using Dapper;
 using NUnit.Framework;
 using System.Data;
@@ -152,12 +153,12 @@ namespace Tests.Utils
         public async Task ExecuteToStreamAsync_Test()
         {
             // Arrange
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
             using var connection = db.NewConnection();
 
             // Act
             // {"name":"Admin 1"}
-            await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream, DataFormat.Json);
+            await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
 
             // Assert
             Assert.IsTrue(stream.Length == "{\"Name\":\"Admin 1\"}".Length);

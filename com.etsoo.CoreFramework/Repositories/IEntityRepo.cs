@@ -3,7 +3,7 @@ using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
 using Microsoft.AspNetCore.Http;
-using System.IO.Pipelines;
+using System.Buffers;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -50,28 +50,16 @@ namespace com.etsoo.CoreFramework.Repositories
         Task<E> ReadAsync<E>(T id, string range = "default");
 
         /// <summary>
-        /// View entity to stream
-        /// 浏览实体数据到流
-        /// </summary>
-        /// <param name="stream">Stream</param>
-        /// <param name="id">Entity id</param>
-        /// <param name="range">View range</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
-        /// <returns>Task</returns>
-        Task ReadAsync(Stream stream, T id, string range = "default", DataFormat? format = null, bool multipleResults = false);
-
-        /// <summary>
         /// View entity to PipeWriter
         /// 浏览实体数据到PipeWriter
         /// </summary>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="id">Entity id</param>
         /// <param name="range">View range</param>
         /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat? format = null, bool multipleResults = false);
+        Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// View entity JSON data HTTP Response
@@ -80,9 +68,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        Task ReadAsync(HttpResponse response, T id, string range = "default", bool multipleResults = false);
+        Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Entity report
@@ -95,28 +83,16 @@ namespace com.etsoo.CoreFramework.Repositories
         Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null);
 
         /// <summary>
-        /// Entity report to stream
-        /// 实体报告数据到流
-        /// </summary>
-        /// <param name="stream">Stream</param>
-        /// <param name="range">View range</param>
-        /// <param name="modal">Condition modal</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
-        /// <returns>Task</returns>
-        Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false);
-
-        /// <summary>
         /// Entity report to PipeWriter
         /// 实体报告数据到PipeWriter
         /// </summary>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false);
+        Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Entity JSON report to HTTP Response
@@ -125,9 +101,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        Task ReportAsync(HttpResponse response, string range, object? modal = null, bool multipleResults = false);
+        Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Sort data
@@ -163,9 +139,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null, bool multipleResults = false) where E : struct where M : QueryRQ<E>;
+        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where M : QueryRQ<E>;
 
         /// <summary>
         /// Quick update

@@ -4,7 +4,7 @@ using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
-using System.IO.Pipelines;
+using System.Buffers;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -69,26 +69,24 @@ namespace com.etsoo.CoreFramework.Repositories
         ValueTask<ActionResult> QueryAsResultAsync(CommandDefinition command);
 
         /// <summary>
-        /// Async read text data (JSON/XML) to stream
-        /// 异步读取文本数据(JSON或者XML)到流
+        /// Async read text data (JSON/XML) to PipeWriter
+        /// 异步读取文本数据(JSON或者XML)到PipeWriter
         /// </summary>
         /// <param name="command">Command</param>
-        /// <param name="stream">Stream</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <returns>Has content or not</returns>
-        Task<bool> ReadToStreamAsync(CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false);
+        Task<bool> ReadToStreamAsync(CommandDefinition command, IBufferWriter<byte> writer);
 
         /// <summary>
         /// Async read text data (JSON/XML) to PipeWriter
         /// 异步读取文本数据(JSON或者XML)到PipeWriter
         /// </summary>
         /// <param name="command">Command</param>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Has content or not</returns>
-        Task<bool> ReadToStreamAsync(CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false);
+        Task<bool> ReadToStreamAsync(CommandDefinition command, IBufferWriter<byte> writer, DataFormat format, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Async read JSON data to HTTP Response
@@ -96,9 +94,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <param name="response">HTTP Response</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, bool multipleResults = false);
+        Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Quick read data

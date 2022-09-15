@@ -2,9 +2,9 @@
 using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
+using System.Buffers;
 using System.Data;
 using System.Data.Common;
-using System.IO.Pipelines;
 using System.Text;
 
 namespace com.etsoo.Database
@@ -133,171 +133,93 @@ namespace com.etsoo.Database
         /// </summary>
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
-        /// <param name="stream">Stream to write</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <returns>Is content wrote</returns>
-        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, Stream stream, DataFormat format, bool multipleResults = false)
+        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, IBufferWriter<byte> writer)
         {
-            if (multipleResults)
+            // The content maybe splitted into severl rows
+            await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
+
+            // Has content
+            var hasContent = reader.HasRows;
+
+            while (await reader.ReadAsync())
             {
-                // Multiple results
-                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
+                // Get the TextReader
+                using var textReader = reader.GetTextReader(0);
 
-                var i = 1;
-                var hasContent = false;
-
-                // JSON starts
-                await stream.WriteAsync(Encoding.UTF8.GetBytes("{\n"));
-
-                do
-                {
-                    // Collection node
-                    // Names like data1, data2, ...
-                    await stream.WriteAsync(Encoding.UTF8.GetBytes($"{(i > 1 ? ",\n" : "")}data{i}:"));
-
-                    if (reader.HasRows)
-                    {
-                        hasContent = true;
-
-                        // The content maybe splitted into severl rows
-                        while (await reader.ReadAsync())
-                        {
-                            // NULL may returned
-                            if (await reader.IsDBNullAsync(0))
-                            {
-                                await stream.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
-                                break;
-                            }
-
-                            // Get the TextReader
-                            using var textReader = reader.GetTextReader(0);
-
-                            // Write
-                            await textReader.ReadAllBytesAsyn(stream);
-                        }
-                    }
-                    else
-                    {
-                        await stream.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
-                    }
-
-                    i++;
-                } while (await reader.NextResultAsync());
-
-                // JSON ends
-                await stream.WriteAsync(Encoding.UTF8.GetBytes("\n}"));
-
-                return hasContent;
+                // Write
+                await textReader.ReadAllBytesAsyn(writer);
             }
-            else
-            {
-                // Only one result
-                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
-                // Has content
-                var hasContent = reader.HasRows;
-
-                // The content maybe splitted into severl rows
-                while (await reader.ReadAsync())
-                {
-                    // Get the TextReader
-                    using var textReader = reader.GetTextReader(0);
-
-                    // Write
-                    await textReader.ReadAllBytesAsyn(stream);
-                }
-
-                return hasContent;
-            }
+            return hasContent;
         }
 
         /// <summary>
-        /// Async execute SQL Command, write to stream of the first row first column value, used to read huge text data like json/xml
-        /// 异步执行SQL命令，读取第一行第一列的数据到流，用于读取大文本字段，比如返回的JSON/XML数据
+        /// Async execute SQL Command with multiple collections, write to stream of the first row first column value, used to read huge text data like json/xml
+        /// 异步执行SQL命令，读取多个数据集第一行第一列的数据到流，用于读取大文本字段，比如返回的JSON/XML数据
         /// </summary>
         /// <param name="connection">Connection</param>
         /// <param name="command">Command</param>
-        /// <param name="writer">Pipe writer</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Is content wrote</returns>
-        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, PipeWriter writer, DataFormat format, bool multipleResults = false)
+        public static async Task<bool> QueryToStreamAsync(this DbConnection connection, CommandDefinition command, IBufferWriter<byte> writer, DataFormat format, IEnumerable<string>? collectionNames = null)
         {
-            if (multipleResults)
+            // Multiple results
+            await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
+
+            var i = 1;
+            var hasContent = false;
+            var count = collectionNames?.Count();
+
+            // JSON/XML starts
+            Encoding.UTF8.GetBytes(format.RootStart, writer);
+
+            do
             {
-                // Multiple results
-                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.Default);
+                // Collection node
+                // Names like data1, data2, ...
+                var name = collectionNames == null || i > count ? $"data{i}" : collectionNames.ElementAt(i - 1);
+                Encoding.UTF8.GetBytes(format.CreateElementStart(name, i == 1), writer);
 
-                var i = 1;
-                var hasContent = false;
-
-                // JSON/XML starts
-                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.RootStart));
-
-                do
+                if (reader.HasRows)
                 {
-                    // Collection node
-                    // Names like data1, data2, ...
-                    var name = $"data{i}";
-                    await writer.WriteAsync(Encoding.UTF8.GetBytes(format.CreateElementStart(name, i == 1)));
+                    hasContent = true;
 
-                    if (reader.HasRows)
+                    // The content maybe splitted into severl rows
+                    while (await reader.ReadAsync())
                     {
-                        hasContent = true;
-
-                        // The content maybe splitted into severl rows
-                        while (await reader.ReadAsync())
+                        // NULL may returned
+                        if (await reader.IsDBNullAsync(0))
                         {
-                            // NULL may returned
-                            if (await reader.IsDBNullAsync(0))
-                            {
-                                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
-                                break;
-                            }
-
-                            // Get the TextReader
-                            using var textReader = reader.GetTextReader(0);
-
-                            // Write
-                            await textReader.ReadAllBytesAsyn(writer);
+                            Encoding.UTF8.GetBytes(format.BlankValue, writer);
+                            break;
                         }
+
+                        // Get the TextReader
+                        using var textReader = reader.GetTextReader(0);
+
+                        // Write
+                        await textReader.ReadAllBytesAsyn(writer);
                     }
-                    else
-                    {
-                        await writer.WriteAsync(Encoding.UTF8.GetBytes(format.BlankValue));
-                    }
-
-                    // End
-                    await writer.WriteAsync(Encoding.UTF8.GetBytes(format.CreateElementEnd(name)));
-
-                    i++;
-                } while (await reader.NextResultAsync());
-
-                // JSON / XML ends
-                await writer.WriteAsync(Encoding.UTF8.GetBytes(format.RootEnd));
-
-                return hasContent;
-            }
-            else
-            {
-                // The content maybe splitted into severl rows
-                await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
-
-                // Has content
-                var hasContent = reader.HasRows;
-
-                while (await reader.ReadAsync())
+                }
+                else
                 {
-                    // Get the TextReader
-                    using var textReader = reader.GetTextReader(0);
-
-                    // Write
-                    await textReader.ReadAllBytesAsyn(writer);
+                    Encoding.UTF8.GetBytes(format.BlankValue, writer);
                 }
 
-                return hasContent;
-            }
+                // End
+                Encoding.UTF8.GetBytes(format.CreateElementEnd(name), writer);
+
+                i++;
+            } while (await reader.NextResultAsync());
+
+            // JSON / XML ends
+            Encoding.UTF8.GetBytes(format.RootEnd, writer);
+
+            return hasContent;
         }
     }
 }

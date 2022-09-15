@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Database;
+using com.etsoo.Utils;
 using Dapper;
 using NUnit.Framework;
 
@@ -96,7 +97,7 @@ namespace Tests.Utils
         public async Task ExecuteToStreamAsync_Test()
         {
             // Arrange
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
             using var connection = db.NewConnection();
 
             // Create table and add a record for test
@@ -104,7 +105,7 @@ namespace Tests.Utils
 
             // Act
             // "Admin 1"
-            await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream, DataFormat.Json);
+            await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream);
 
             // Assert
             Assert.IsTrue(stream.Length == "Admin 1".Length);

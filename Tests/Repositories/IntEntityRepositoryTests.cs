@@ -140,7 +140,7 @@ namespace Tests.Repositories
         [Test]
         public void ReportAsyc_Test()
         {
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
             var result = Assert.ThrowsAsync<SqlException>(async () =>
             {
                 await repo.ReportAsync(stream, "default");
@@ -158,10 +158,10 @@ namespace Tests.Repositories
             parameters.ClearNulls();
             var command = new CommandDefinition("ep_user_list_as_json", parameters, commandType: CommandType.StoredProcedure);
 
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
             var result = await app.DB.WithConnection((connection) =>
             {
-                return connection.QueryToStreamAsync(command, stream, DataFormat.Json);
+                return connection.QueryToStreamAsync(command, stream);
             });
 
             Assert.IsTrue(result);

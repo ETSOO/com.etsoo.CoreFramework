@@ -6,8 +6,8 @@ using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using System.Buffers;
 using System.Data.Common;
-using System.IO.Pipelines;
 
 namespace com.etsoo.CoreFramework.Repositories
 {
@@ -156,36 +156,23 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// View entity to stream
-        /// 浏览实体数据到流
-        /// </summary>
-        /// <param name="stream">Stream</param>
-        /// <param name="id">Entity id</param>
-        /// <param name="range">View range</param>
-        /// <param name="format">Data format</param>
-        /// <param name="multipleResults">Multiple results</param>
-        /// <returns>Task</returns>
-        public virtual async Task ReadAsync(Stream stream, T id, string range = "default", DataFormat? format = null, bool multipleResults = false)
-        {
-            format ??= DataFormat.Json;
-            var command = NewReadCommand(id, range, format);
-            await ReadToStreamAsync(command, stream, format, multipleResults);
-        }
-
-        /// <summary>
         /// View entity to PipeWriter
         /// 浏览实体数据到PipeWriter
         /// </summary>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="id">Entity id</param>
         /// <param name="format">Data format</param>
         /// <param name="multipleResults">Multiple results</param>
         /// <returns>Task</returns>
-        public virtual async Task ReadAsync(PipeWriter writer, T id, string range = "default", DataFormat? format = null, bool multipleResults = false)
+        public virtual async Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null)
         {
             format ??= DataFormat.Json;
             var command = NewReadCommand(id, range, format);
-            await ReadToStreamAsync(command, writer, format, multipleResults);
+
+            if (collectionNames == null)
+                await ReadToStreamAsync(command, writer);
+            else
+                await ReadToStreamAsync(command, writer, format, collectionNames);
         }
 
         /// <summary>
@@ -195,12 +182,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", bool multipleResults = false)
+        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
             var command = NewReadCommand(id, range, DataFormat.Json);
-            await ReadJsonToStreamAsync(command, response, multipleResults);
+            await ReadJsonToStreamAsync(command, response, collectionNames);
         }
 
         /// <summary>
@@ -252,35 +239,24 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
-        /// Entity report to stream
-        /// 实体报告数据到流
-        /// </summary>
-        /// <param name="stream">Stream</param>
-        /// <param name="range">View range</param>
-        /// <param name="modal">Condition modal</param>
-        /// <param name="format">Data format</param>
-        /// <returns>Task</returns>
-        public virtual async Task ReportAsync(Stream stream, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false)
-        {
-            format ??= DataFormat.Json;
-            var command = NewReportCommand(range, modal, format);
-            await ReadToStreamAsync(command, stream, format, multipleResults);
-        }
-
-        /// <summary>
         /// Entity report to PipeWriter
         /// 实体报告数据到PipeWriter
         /// </summary>
-        /// <param name="writer">PipeWriter</param>
+        /// <param name="writer">Buffer writer, like SharedUtils.GetStream() or PipeWriter</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(PipeWriter writer, string range, object? modal = null, DataFormat? format = null, bool multipleResults = false)
+        public virtual async Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null)
         {
             format ??= DataFormat.Json;
             var command = NewReportCommand(range, modal, format);
-            await ReadToStreamAsync(command, writer, format, multipleResults);
+
+            if (collectionNames == null)
+                await ReadToStreamAsync(command, writer);
+            else
+                await ReadToStreamAsync(command, writer, format, collectionNames);
         }
 
         /// <summary>
@@ -290,11 +266,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, bool multipleResults = false)
+        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
         {
             var command = NewReportCommand(range, modal, DataFormat.Json);
-            await ReadJsonToStreamAsync(command, response, multipleResults);
+            await ReadJsonToStreamAsync(command, response, collectionNames);
         }
 
         /// <summary>
@@ -363,9 +340,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
-        /// <param name="multipleResults">Multiple results</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, bool multipleResults = false) where E : struct where D : QueryRQ<E>
+        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where D : QueryRQ<E>
         {
             var parameters = FormatParameters(model);
 
@@ -379,7 +356,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             var command = CreateCommand(GetCommandName(commandText), parameters);
 
-            await ReadJsonToStreamAsync(command, response, multipleResults);
+            await ReadJsonToStreamAsync(command, response, collectionNames);
         }
 
         /// <summary>

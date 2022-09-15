@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Database;
+using com.etsoo.Utils;
 using Dapper;
 using Microsoft.Data.Sqlite;
 using NUnit.Framework;
@@ -125,10 +126,10 @@ namespace Tests.Repositories
             // Arrange
             var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3)";
             var command = new CommandDefinition(sql);
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
 
             // Act
-            var result = await repo.ReadToStreamAsync(command, stream, DataFormat.Json);
+            var result = await repo.ReadToStreamAsync(command, stream);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
             // Assert
@@ -142,15 +143,16 @@ namespace Tests.Repositories
             // Arrange
             var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
             var command = new CommandDefinition(sql);
-            using var stream = new MemoryStream();
+            using var stream = SharedUtils.GetStream();
 
             // Act
-            var result = await repo.ReadToStreamAsync(command, stream, DataFormat.Json, true);
+            var result = await repo.ReadToStreamAsync(command, stream, DataFormat.Json, new[] { "users" });
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
             // Assert
             Assert.IsTrue(result);
-            Assert.IsTrue(json.Contains("data2:"));
+            Assert.IsTrue(json.Contains("\"users\":"));
+            Assert.IsTrue(json.Contains("\"data2\":"));
         }
     }
 }
