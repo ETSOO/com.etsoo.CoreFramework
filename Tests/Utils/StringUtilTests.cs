@@ -254,6 +254,16 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void IsJsonTests()
+        {
+            Assert.IsFalse("1".IsJson());
+            Assert.IsFalse("false".IsJson());
+            Assert.IsTrue("{}".IsJson());
+            Assert.IsTrue("{ \"bool\": true }".IsJson());
+            Assert.IsTrue("[]".IsJson());
+        }
+
+        [Test]
         public void ToPascalWord_Test()
         {
             // Arrange

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Web;
 
 namespace com.etsoo.Utils.String
@@ -35,6 +36,31 @@ namespace com.etsoo.Utils.String
         public static string JoinAsQuery<T>(this IEnumerable<KeyValuePair<string, T>> items, string valueSplitter = "=", string itemSplitter = "&")
         {
             return items.Aggregate(new StringBuilder(), (s, x) => s.Append(HttpUtility.UrlEncode(x.Key) + valueSplitter + (x.Value == null ? string.Empty : HttpUtility.UrlEncode(x.Value.ToString())) + itemSplitter), s => s.ToString());
+        }
+
+        /// <summary>
+        /// Check string is Json data
+        /// 检查字符串是否为 JSON 数据
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static bool IsJson(this string? input)
+        {
+            if (string.IsNullOrEmpty(input)) return false;
+
+            if ((input.StartsWith('{') && input.EndsWith('}')) || (input.StartsWith('[') && input.EndsWith(']')))
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(input);
+                    return true;
+                }
+                catch
+                {
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
