@@ -162,6 +162,9 @@
   <data name="IPAddressChanged" xml:space="preserve">
     <value>IP address has been changed</value>
   </data>
+  <data name="ItemExists" xml:space="preserve">
+    <value>Item already exists</value>
+  </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
   </data>

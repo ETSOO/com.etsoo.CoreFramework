@@ -161,10 +161,11 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="id">Id</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public async Task UpdateReadAsync(T id, HttpResponse response)
+        public async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, "update");
+            await Repo.ReadAsync(response, id, "update", collectionNames);
         }
     }
 }

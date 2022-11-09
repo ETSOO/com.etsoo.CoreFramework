@@ -123,6 +123,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError IPAddressChanged => new(nameof(IPAddressChanged), Resources.IPAddressChanged);
 
         /// <summary>
+        /// Item already exists
+        /// 项目已存在
+        /// </summary>
+        public static ApplicationError ItemExists => new(nameof(ItemExists), Resources.ItemExists);
+
+        /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>
@@ -255,6 +261,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(InvalidEmail) => InvalidEmail,
                 nameof(InvalidMobile) => InvalidMobile,
                 nameof(IPAddressChanged) => IPAddressChanged,
+                nameof(ItemExists) => ItemExists,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,

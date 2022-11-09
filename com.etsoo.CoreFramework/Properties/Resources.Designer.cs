@@ -196,6 +196,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Item already exists.
+        /// </summary>
+        public static string ItemExists {
+            get {
+                return ResourceManager.GetString("ItemExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Join Organization Required.
         /// </summary>
         public static string JoinOrgRequired {
