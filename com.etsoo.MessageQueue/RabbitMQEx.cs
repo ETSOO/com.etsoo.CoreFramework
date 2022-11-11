@@ -21,13 +21,15 @@ namespace com.etsoo.Utils.MessageQueue
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
         /// <returns>Connection factory</returns>
-        public static ConnectionFactory CreateFactory(IConfigurationSection section, Func<string, string>? secureManager)
+        public static ConnectionFactory CreateFactory(IConfigurationSection section, Func<string, string, string>? secureManager)
         {
+            var userNameField = "UserName";
+            var passwordField = "Password";
             var factory = new ConnectionFactory
             {
                 HostName = section.GetValue<string>("HostName"),
-                UserName = CryptographyUtils.UnsealData(section.GetValue<string>("UserName"), secureManager),
-                Password = CryptographyUtils.UnsealData(section.GetValue<string>("Password"), secureManager),
+                UserName = CryptographyUtils.UnsealData(userNameField, section.GetValue<string>(userNameField), secureManager),
+                Password = CryptographyUtils.UnsealData(passwordField, section.GetValue<string>(passwordField), secureManager),
                 ClientProvidedName = section.GetValue<string>("ClientProvidedName"),
                 AutomaticRecoveryEnabled = section.GetValue("AutomaticRecoveryEnabled", true),
                 DispatchConsumersAsync = section.GetValue("DispatchConsumersAsync", false),
@@ -110,7 +112,7 @@ namespace com.etsoo.Utils.MessageQueue
         /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
-        public RabbitMQEx(IConfigurationSection section, Func<string, string>? secureManager = null) : this(CreateFactory(section, secureManager), section.GetValue<string>("ClientName"))
+        public RabbitMQEx(IConfigurationSection section, Func<string, string, string>? secureManager = null) : this(CreateFactory(section, secureManager), section.GetValue<string>("ClientName"))
         {
 
         }

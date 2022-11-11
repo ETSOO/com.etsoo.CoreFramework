@@ -13,6 +13,20 @@ namespace Tests.Utils
         private readonly string data;
         private readonly string password;
 
+        private static string DoSecretData(string input)
+        {
+            input = input.Replace("-", "");
+            input = (char)((input[0] + input.Last()) / 2) + input[2..];
+            return input;
+        }
+
+        private static string UnsealData(string field, string input)
+        {
+            var bytes = CryptographyUtils.AESDecrypt(input, DoSecretData("30ebc559-4d78-4a27-915b-927107e52fa7"));
+            if (bytes == null) throw new ApplicationException(field);
+            return Encoding.UTF8.GetString(bytes);
+        }
+
         public CryptographyUtilTests()
         {
             data = "Hello, world!";
@@ -135,6 +149,34 @@ namespace Tests.Utils
 
             // Assert
             Assert.AreEqual("EE26B0DD4AF7E749AA1A8EE3C10AE9923F618980772E473F8819A5D4940E0DB27AC185F8A0E1D5F84F88BC887FD67B143732C304CC5FA9AD8E6F57F50028A8FF", Convert.ToHexString(result));
+        }
+
+        [Test]
+        public void UnsealData_EmptyTest()
+        {
+            var result1 = CryptographyUtils.UnsealData("ConnectionString", null, UnsealData);
+            Assert.AreEqual(null, result1);
+
+            var result2 = CryptographyUtils.UnsealData("ConnectionString", string.Empty, UnsealData);
+            Assert.AreEqual(string.Empty, result2);
+        }
+
+        [Test]
+        public void UnsealData_SuccessTest()
+        {
+            var result = CryptographyUtils.UnsealData("ConnectionString", "10DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
+            Assert.AreEqual("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false;Min Pool Size=5;TrustServerCertificate=true", result);
+        }
+
+        [Test]
+        public void UnsealData_ExceptionTest()
+        {
+            var field = "ConnectionString";
+            var exception = Assert.Catch<ApplicationException>(() =>
+            {
+                CryptographyUtils.UnsealData(field, "DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
+            });
+            Assert.AreEqual(field, exception?.Message);
         }
     }
 }

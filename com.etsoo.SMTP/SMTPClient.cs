@@ -11,15 +11,17 @@ namespace com.etsoo.SMTP
     /// </summary>
     public class SMTPClient : ISMTPClient
     {
-        private static SMTPClientSettings Parse(IConfigurationSection section, Func<string, string>? secureManager)
+        private static SMTPClientSettings Parse(IConfigurationSection section, Func<string, string, string>? secureManager)
         {
+            var userNameField = "UserName";
+            var passwordField = "Password";
             return new SMTPClientSettings(
                 section.GetValue<string>("Host"),
                 section.GetValue("Port", 0),
                 section.GetValue("UseSsl", false),
                 section.GetValue<string?>("Sender"),
-                CryptographyUtils.UnsealData(section.GetValue<string?>("UserName"), secureManager),
-                CryptographyUtils.UnsealData(section.GetValue<string?>("Password"), secureManager)
+                CryptographyUtils.UnsealData(userNameField, section.GetValue<string?>(userNameField), secureManager),
+                CryptographyUtils.UnsealData(passwordField, section.GetValue<string?>(passwordField), secureManager)
             );
         }
 
@@ -45,7 +47,7 @@ namespace com.etsoo.SMTP
         /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
-        public SMTPClient(IConfigurationSection section, Func<string, string>? secureManager = null) : this(Parse(section, secureManager))
+        public SMTPClient(IConfigurationSection section, Func<string, string, string>? secureManager = null) : this(Parse(section, secureManager))
         {
 
         }

@@ -308,15 +308,16 @@ namespace com.etsoo.Utils.Crypto
         /// Attributes for null-state static analysis
         /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/attributes/nullable-analysis
         /// </summary>
+        /// <param name="field">Field name</param>
         /// <param name="input">Input data</param>
         /// <param name="secureManager">Secure manager</param>
         /// <returns>Unsealed data</returns>
         [return: NotNullIfNotNull("input")]
-        public static string? UnsealData(string? input, Func<string, string>? secureManager)
+        public static string? UnsealData(string field, string? input, Func<string, string, string>? secureManager)
         {
             if (string.IsNullOrEmpty(input)) return input;
 
-            return secureManager == null ? input : secureManager(input);
+            return secureManager == null ? input : secureManager(field, input);
         }
     }
 }

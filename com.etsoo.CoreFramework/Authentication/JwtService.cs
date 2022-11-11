@@ -58,7 +58,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
         public JwtService(IServiceCollection services,
             IConfigurationSection section,
-            Func<string, string>? secureManager = null,
+            Func<string, string, string>? secureManager = null,
             IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
             TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null)
         {
@@ -97,7 +97,8 @@ namespace com.etsoo.CoreFramework.Authentication
 
             // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
             // AES256, 256 / 8 = 32 bytes
-            var encryptionKeyPlain = CryptographyUtils.UnsealData(section.GetValue<string>("EncryptionKey"), secureManager);
+            var field = "EncryptionKey";
+            var encryptionKeyPlain = CryptographyUtils.UnsealData(field, section.GetValue<string>(field), secureManager);
 
             // RSA crypto provider
             crypto = new RSACrypto(section, secureManager);

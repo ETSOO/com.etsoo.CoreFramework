@@ -12,11 +12,13 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public class RSACrypto
     {
-        private static (string? publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string>? secureManager)
+        private static (string? publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string, string>? secureManager)
         {
+            var publicField = "PublicKey";
+            var privateField = "PrivateKey";
             return (
-                CryptographyUtils.UnsealData(section.GetValue<string?>("PublicKey"), secureManager),
-                CryptographyUtils.UnsealData(section.GetValue<string?>("PrivateKey"), secureManager)
+                CryptographyUtils.UnsealData(publicField, section.GetValue<string?>(publicField), secureManager),
+                CryptographyUtils.UnsealData(privateField, section.GetValue<string?>(privateField), secureManager)
             );
         }
 
@@ -57,7 +59,7 @@ namespace com.etsoo.Utils.Crypto
         /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
-        public RSACrypto(IConfigurationSection section, Func<string, string>? secureManager = null)
+        public RSACrypto(IConfigurationSection section, Func<string, string, string>? secureManager = null)
             : this(Parse(section, secureManager))
         {
         }
