@@ -144,6 +144,9 @@
   <data name="DbConnectionFailed" xml:space="preserve">
     <value>數據庫連接失敗</value>
   </data>
+  <data name="DeleteReferencedData" xml:space="preserve">
+    <value>由於引用數據的存在，無法刪除該記錄</value>
+  </data>
   <data name="DeviceDisabled" xml:space="preserve">
     <value>設備已禁用</value>
   </data>

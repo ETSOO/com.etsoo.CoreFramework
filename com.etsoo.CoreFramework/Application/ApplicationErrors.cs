@@ -87,6 +87,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError DbConnectionFailed => new(nameof(DbConnectionFailed), Resources.DbConnectionFailed);
 
         /// <summary>
+        /// The record cannot be deleted due to the existence of referenced data
+        /// 由于引用数据的存在，无法删除该记录
+        /// </summary>
+        public static ApplicationError DeleteReferencedData => new(nameof(DeleteReferencedData), Resources.DeleteReferencedData);
+
+        /// <summary>
         /// Device Disabled
         /// 设备已禁用
         /// </summary>
@@ -255,6 +261,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(CodeSendingFailed) => CodeSendingFailed,
                 nameof(DataProcessingFailed) => DataProcessingFailed,
                 nameof(DbConnectionFailed) => DbConnectionFailed,
+                nameof(DeleteReferencedData) => DeleteReferencedData,
                 nameof(DeviceDisabled) => DeviceDisabled,
                 nameof(DeviceFrozen) => DeviceFrozen,
                 nameof(InvalidAction) => InvalidAction,

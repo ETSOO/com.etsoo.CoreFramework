@@ -144,6 +144,9 @@
   <data name="DbConnectionFailed" xml:space="preserve">
     <value>Database Connection Failed</value>
   </data>
+  <data name="DeleteReferencedData" xml:space="preserve">
+    <value>The record cannot be deleted due to the existence of referenced data</value>
+  </data>
   <data name="DeviceDisabled" xml:space="preserve">
     <value>Device Disabled</value>
   </data>

@@ -142,6 +142,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The record cannot be deleted due to the existence of referenced data.
+        /// </summary>
+        public static string DeleteReferencedData {
+            get {
+                return ResourceManager.GetString("DeleteReferencedData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device Disabled.
         /// </summary>
         public static string DeviceDisabled {
