@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.SpanMemory;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -312,10 +311,9 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="input">Input data</param>
         /// <param name="secureManager">Secure manager</param>
         /// <returns>Unsealed data</returns>
-        [return: NotNullIfNotNull("input")]
         public static string UnsealData(string field, string? input, Func<string, string, string>? secureManager)
         {
-            input??= string.Empty;
+            if (string.IsNullOrEmpty(input)) return string.Empty;
             return secureManager == null ? input : secureManager(field, input);
         }
     }
