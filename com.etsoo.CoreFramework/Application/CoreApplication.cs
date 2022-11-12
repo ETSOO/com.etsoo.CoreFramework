@@ -17,23 +17,22 @@ namespace com.etsoo.CoreFramework.Application
     public record CoreApplication<C> : ICoreApplication<C> where C : DbConnection
     {
         /// <summary>
-        /// Application name
-        /// 程序名称
-        /// </summary>
-        public static string AppName => "SmartERP";
-
-        /// <summary>
         /// Get secret data
-        /// 获取私密数据
+        /// 获取秘密数据
         /// </summary>
+        /// <param name="appName">Application name</param>
         /// <returns>Result</returns>
         /// <exception cref="ApplicationException"></exception>
-        protected static string GetSecretData()
+        protected static string GetSecretData(string appName)
         {
-            var guid = Environment.GetEnvironmentVariable(AppName, EnvironmentVariableTarget.Machine);
-            if (string.IsNullOrEmpty(guid)) throw new ApplicationException($"Secret data for {AppName} is not defined");
+            var guid = Environment.GetEnvironmentVariable(appName, EnvironmentVariableTarget.Machine);
+            if (string.IsNullOrEmpty(guid)) throw new ApplicationException($"Secret data for {appName} is not defined");
+
             guid = guid.Replace("-", "");
             guid = (char)((guid[0] + guid.Last()) / 2) + guid[2..];
+
+            if (appName != "SmartERP") guid += appName;
+
             return guid;
         }
 
@@ -41,13 +40,15 @@ namespace com.etsoo.CoreFramework.Application
         /// Unseal data
         /// 解密信息
         /// </summary>
-        /// <param name="input">Base64 input data</param>
+        /// <param name="secretData">Secret data</param>
+        /// <param name="field">Field name</param>
+        /// <param name="input">Input data</param>
         /// <returns>Unsealed data</returns>
-        public static string UnsealData(string field, string? input)
+        protected static string UnsealData(string secretData, string field, string? input)
         {
             if (string.IsNullOrEmpty(input)) throw new ApplicationException($"Empty input for {field}");
 
-            var bytes = CryptographyUtils.AESDecrypt(input, GetSecretData());
+            var bytes = CryptographyUtils.AESDecrypt(input, secretData);
 
             if (bytes == null) throw new ApplicationException($"Unseal input {StringUtils.HideData(input)} for {field} failed");
 
