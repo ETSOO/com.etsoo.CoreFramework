@@ -43,7 +43,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="input">Base64 input data</param>
         /// <returns>Unsealed data</returns>
-        protected static string UnsealData(string field, string? input)
+        public static string UnsealData(string field, string? input)
         {
             if (string.IsNullOrEmpty(input)) throw new ApplicationException($"Empty input for {field}");
 
