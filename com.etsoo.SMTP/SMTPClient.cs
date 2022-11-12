@@ -16,7 +16,7 @@ namespace com.etsoo.SMTP
             var userNameField = "UserName";
             var passwordField = "Password";
             return new SMTPClientSettings(
-                section.GetValue<string>("Host"),
+                section.GetValue<string>("Host") ?? string.Empty,
                 section.GetValue("Port", 0),
                 section.GetValue("UseSsl", false),
                 section.GetValue<string?>("Sender"),
@@ -59,11 +59,8 @@ namespace com.etsoo.SMTP
         /// <param name="message">Message</param>
         protected virtual void FormatMessage(MimeMessage message)
         {
-            if (message.Sender == null)
-            {
-                // Set the sender
-                message.Sender = MailboxAddress.Parse(Settings.Sender ?? Settings.UserName);
-            }
+            // Set the sender
+            message.Sender ??= MailboxAddress.Parse(Settings.Sender ?? Settings.UserName);
 
             if (message.From.Count == 0)
             {

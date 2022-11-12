@@ -27,7 +27,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="claims">Claims</param>
         /// <returns>User</returns>
-        public new static ServiceUser? Create(ClaimsPrincipal? claims)
+        public new static ServiceUser? Create(ClaimsPrincipal claims)
         {
             var token = UserToken.Create(claims);
             if (token == null) return null;

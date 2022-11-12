@@ -22,6 +22,6 @@
         /// Timestamp, JavaScript miliseconds
         /// 时间戳，JavaScript毫秒数
         /// </summary>
-        public long Timestamp { get; init; }
+        public required long Timestamp { get; init; }
     }
 }

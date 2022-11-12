@@ -1,7 +1,9 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.String;
 using System.Data.Common;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -14,6 +16,44 @@ namespace com.etsoo.CoreFramework.Application
     /// <typeparam name="C">Generic database connection type</typeparam>
     public record CoreApplication<C> : ICoreApplication<C> where C : DbConnection
     {
+        /// <summary>
+        /// Application name
+        /// 程序名称
+        /// </summary>
+        public static string AppName => "SmartERP";
+
+        /// <summary>
+        /// Get secret data
+        /// 获取私密数据
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="ApplicationException"></exception>
+        protected static string GetSecretData()
+        {
+            var guid = Environment.GetEnvironmentVariable(AppName, EnvironmentVariableTarget.Machine);
+            if (string.IsNullOrEmpty(guid)) throw new ApplicationException($"Secret data for {AppName} is not defined");
+            guid = guid.Replace("-", "");
+            guid = (char)((guid[0] + guid.Last()) / 2) + guid[2..];
+            return guid;
+        }
+
+        /// <summary>
+        /// Unseal data
+        /// 解密信息
+        /// </summary>
+        /// <param name="input">Base64 input data</param>
+        /// <returns>Unsealed data</returns>
+        protected static string UnsealData(string field, string? input)
+        {
+            if (string.IsNullOrEmpty(input)) throw new ApplicationException($"Empty input for {field}");
+
+            var bytes = CryptographyUtils.AESDecrypt(input, GetSecretData());
+
+            if (bytes == null) throw new ApplicationException($"Unseal input {StringUtils.HideData(input)} for {field} failed");
+
+            return Encoding.UTF8.GetString(bytes);
+        }
+
         /// <summary>
         /// Application configuration
         /// 程序配置

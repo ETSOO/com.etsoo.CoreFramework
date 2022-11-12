@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.String;
-using System.Runtime.Versioning;
 
 namespace com.etsoo.Utils.Serialization
 {
@@ -16,7 +15,6 @@ namespace com.etsoo.Utils.Serialization
         /// <typeparam name="T">Generic type</typeparam>
         /// <param name="dic">Dictionary data</param>
         /// <returns>Result</returns>
-        [RequiresPreviewFeatures]
         static abstract TSelf Create(StringKeyDictionaryObject dic);
     }
 }

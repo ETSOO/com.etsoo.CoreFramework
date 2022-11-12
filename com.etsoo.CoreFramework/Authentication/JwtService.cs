@@ -87,7 +87,7 @@ namespace com.etsoo.CoreFramework.Authentication
             var validateAudience = section.GetValue<bool?>("ValidateAudience");
 
             // Hash algorithms
-            securityAlgorithms = section.GetValue("SecurityAlgorithms", SecurityAlgorithms.RsaSha512Signature);
+            securityAlgorithms = section.GetValue("SecurityAlgorithms", SecurityAlgorithms.RsaSha512Signature)!;
 
             // Default 30 minutes
             AccessTokenMinutes = section.GetValue("AccessTokenMinutes", 30);

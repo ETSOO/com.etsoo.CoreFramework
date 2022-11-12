@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <EnablePreviewFeatures>True</EnablePreviewFeatures>
-	  <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
 	  <SignAssembly>true</SignAssembly>
 	  <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
 	  <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
@@ -18,7 +16,7 @@
 	  <Description>ETSOO Database Utilities
 亿速思维数据库工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.28</Version>
+	  <Version>1.0.29</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -35,7 +33,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper.StrongName" Version="2.0.123" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" />
     <PackageReference Include="MySql.Data" Version="8.0.31" />
   </ItemGroup>
 

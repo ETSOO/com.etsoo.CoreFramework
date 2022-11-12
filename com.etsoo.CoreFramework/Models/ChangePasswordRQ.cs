@@ -12,22 +12,21 @@ namespace com.etsoo.CoreFramework.Models
         /// Device id
         /// 设备编号
         /// </summary>
-        [Required]
         [StringLength(512, MinimumLength = 32)]
-        public string DeviceId { get; init; } = null!;
+        public required string DeviceId { get; init; }
 
         /// <summary>
         /// Current password
         /// 当前密码
         /// </summary>
         [StringLength(512, MinimumLength = 64)]
-        public string OldPassword { get; init; } = null!;
+        public required string OldPassword { get; init; }
 
         /// <summary>
         /// New password
         /// 新密码
         /// </summary>
         [StringLength(512, MinimumLength = 64)]
-        public string Password { get; init; } = null!;
+        public required string Password { get; init; }
     }
 }

@@ -20,7 +20,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// 基础仓库
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public abstract class RepoBase<C> : IRepoBase
+    public abstract partial class RepoBase<C> : IRepoBase
         where C : DbConnection
     {
         /// <summary>
@@ -115,7 +115,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns></returns>
         protected bool FilterRange(ReadOnlySpan<char> range, bool triggerFailureExcpetion = true)
         {
-            var valid = range.All(c => c is '_' or (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9'));
+            var valid = range.All(c => c is '_' or >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9');
 
             if (!valid && triggerFailureExcpetion)
             {
@@ -395,7 +395,7 @@ namespace com.etsoo.CoreFramework.Repositories
                     {
                         matchField = field[..index].Trim();
                         value = field[(index + 1)..].Trim();
-                        if (Regex.IsMatch(value, "^[0-9a-zA-Z_]+$"))
+                        if (MyRegex().IsMatch(value))
                         {
                             value = $"@{value}";
                         }
@@ -410,7 +410,7 @@ namespace com.etsoo.CoreFramework.Repositories
                     return (matchField, alias, value);
                 })
                 .Where(field => model.ChangedFields.Contains(field.matchField, StringComparer.OrdinalIgnoreCase)
-                    || (field.alias != null && model.ChangedFields.Contains(field.alias, StringComparer.OrdinalIgnoreCase)))
+                    || field.alias != null && model.ChangedFields.Contains(field.alias, StringComparer.OrdinalIgnoreCase))
                 .Select(field => $"{App.DB.EscapeIdentifier(field.matchField)} = {field.value}");
 
             if (!updateFields.Any())
@@ -475,5 +475,8 @@ namespace com.etsoo.CoreFramework.Repositories
                 throw new Exception("Command: " + sql, ex);
             }
         }
+
+        [GeneratedRegex("^[0-9a-zA-Z_]+$")]
+        private static partial Regex MyRegex();
     }
 }

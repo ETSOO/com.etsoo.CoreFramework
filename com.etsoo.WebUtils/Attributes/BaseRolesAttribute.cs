@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils;
 using Microsoft.AspNetCore.Authorization;
-using System.Runtime.Versioning;
 
 namespace com.etsoo.WebUtils.Attributes
 {
@@ -8,7 +7,6 @@ namespace com.etsoo.WebUtils.Attributes
     /// Authorization with roles
     /// 角色授权
     /// </summary>
-    [RequiresPreviewFeatures]
     public class BaseRolesAttribute<E> : AuthorizeAttribute where E : struct, Enum
     {
         /// <summary>

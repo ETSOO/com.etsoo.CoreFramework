@@ -38,8 +38,8 @@ namespace com.etsoo.Utils.Storage
         /// </summary>
         /// <param name="section">Configuration section</param>
         public LocalStorage(IConfigurationSection section) : this(
-            section.GetValue<string>("Root"),
-            section.GetValue<string>("URLRoot")
+            section.GetValue<string>("Root") ?? string.Empty,
+            section.GetValue<string>("URLRoot") ?? string.Empty
         )
         {
 

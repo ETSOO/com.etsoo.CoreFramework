@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient.Server;
-using System.Runtime.Versioning;
 
 namespace com.etsoo.Database
 {
@@ -13,14 +12,12 @@ namespace com.etsoo.Database
         /// 创建 SqlDataRecord
         /// </summary>
         /// <returns>SqlDataRecord</returns>
-        [RequiresPreviewFeatures]
         static abstract SqlDataRecord Create();
 
         /// <summary>
         /// TVP type name
         /// 表值参数类型名称
         /// </summary>
-        [RequiresPreviewFeatures]
         static abstract string TypeName { get; }
 
         /// <summary>

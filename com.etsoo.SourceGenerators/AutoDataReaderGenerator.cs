@@ -161,7 +161,6 @@ namespace com.etsoo.SourceGenerators
                 using System.Data.Common;
                 using System.Linq;
                 using System.Threading.Tasks;
-                using System.Runtime.Versioning;
                 using com.etsoo.Database;
                 using com.etsoo.Utils;
                 using com.etsoo.Utils.String;
@@ -170,7 +169,6 @@ namespace com.etsoo.SourceGenerators
                 {{
                     {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
-                        [RequiresPreviewFeatures]
                         public static async IAsyncEnumerable<{name}> CreateAsync(DbDataReader reader)
                         {{
                             // Column names

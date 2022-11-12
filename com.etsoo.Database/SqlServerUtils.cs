@@ -4,7 +4,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient.Server;
 using System.Collections;
 using System.Data;
-using System.Runtime.Versioning;
 
 namespace com.etsoo.Database
 {
@@ -384,7 +383,6 @@ namespace com.etsoo.Database
         /// <typeparam name="T">Generic ISqlServerDataRecord type</typeparam>
         /// <param name="items">Items</param>
         /// <returns>Records</returns>
-        [RequiresPreviewFeatures]
         public static IEnumerable<SqlDataRecord> ToDataRecords<T>(this IEnumerable<T> items) where T : ISqlServerDataRecord
         {
             // SqlDataRecord definition
@@ -409,7 +407,6 @@ namespace com.etsoo.Database
         /// <param name="items">Items</param>
         /// <param name="typeName">Type name</param>
         /// <returns>TVP</returns>
-        [RequiresPreviewFeatures]
         public static SqlMapper.ICustomQueryParameter ToTVP<T>(this IEnumerable<T> items, string? typeName = null) where T : ISqlServerDataRecord
         {
             var records = items.ToDataRecords();

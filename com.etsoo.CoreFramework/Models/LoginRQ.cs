@@ -12,9 +12,8 @@ namespace com.etsoo.CoreFramework.Models
         /// Login password
         /// 登录密码
         /// </summary>
-        [Required]
         [StringLength(512, MinimumLength = 64)]
-        public string Pwd { get; init; } = null!;
+        public required string Pwd { get; init; }
 
         /// <summary>
         /// Specific servce id, or uid includes organization data

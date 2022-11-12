@@ -4,7 +4,6 @@ using Dapper;
 using System.Collections;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -354,7 +353,6 @@ namespace com.etsoo.Database
         /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        [RequiresPreviewFeatures]
         public async IAsyncEnumerable<D> QuerySourceAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
             await using var connection = NewConnection();
@@ -381,7 +379,6 @@ namespace com.etsoo.Database
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
         /// <returns>Result</returns>
-        [RequiresPreviewFeatures]
         public IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null) where D : IDataReaderParser<D>
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);

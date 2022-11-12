@@ -1,5 +1,4 @@
 ﻿using System.Data.Common;
-using System.Runtime.Versioning;
 
 namespace com.etsoo.Database
 {
@@ -16,7 +15,6 @@ namespace com.etsoo.Database
         /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="reader">DataReader</param>
         /// <returns>Result</returns>
-        [RequiresPreviewFeatures]
         static abstract IAsyncEnumerable<TSelf> CreateAsync(DbDataReader reader);
     }
 }

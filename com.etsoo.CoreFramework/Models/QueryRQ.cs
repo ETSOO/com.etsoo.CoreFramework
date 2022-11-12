@@ -20,16 +20,14 @@ namespace com.etsoo.CoreFramework.Models
         /// Current page
         /// 当前页码
         /// </summary>
-        [Required]
         public uint CurrentPage { get; init; }
 
         /// <summary>
         /// Batch size
         /// 批量请求数量
         /// </summary>
-        [Required]
         [Range(1, 1000)]
-        public ushort BatchSize { get; init; }
+        public required ushort BatchSize { get; init; }
 
         /// <summary>
         /// Order by field

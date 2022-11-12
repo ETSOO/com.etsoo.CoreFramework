@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Log queue, see table SysLogQueue

@@ -313,10 +313,9 @@ namespace com.etsoo.Utils.Crypto
         /// <param name="secureManager">Secure manager</param>
         /// <returns>Unsealed data</returns>
         [return: NotNullIfNotNull("input")]
-        public static string? UnsealData(string field, string? input, Func<string, string, string>? secureManager)
+        public static string UnsealData(string field, string? input, Func<string, string, string>? secureManager)
         {
-            if (string.IsNullOrEmpty(input)) return input;
-
+            input??= string.Empty;
             return secureManager == null ? input : secureManager(field, input);
         }
     }

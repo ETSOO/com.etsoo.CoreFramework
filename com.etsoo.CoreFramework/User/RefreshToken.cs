@@ -15,7 +15,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="claims">Claims</param>
         /// <returns>Refresh token</returns>
-        public static new RefreshToken? Create(ClaimsPrincipal? claims)
+        public static new RefreshToken? Create(ClaimsPrincipal claims)
         {
             var token = UserToken.Create(claims);
             if (token == null) return null;

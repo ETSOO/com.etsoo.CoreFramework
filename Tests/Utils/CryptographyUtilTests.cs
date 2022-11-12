@@ -152,16 +152,6 @@ namespace Tests.Utils
         }
 
         [Test]
-        public void UnsealData_EmptyTest()
-        {
-            var result1 = CryptographyUtils.UnsealData("ConnectionString", null, UnsealData);
-            Assert.AreEqual(null, result1);
-
-            var result2 = CryptographyUtils.UnsealData("ConnectionString", string.Empty, UnsealData);
-            Assert.AreEqual(string.Empty, result2);
-        }
-
-        [Test]
         public void UnsealData_SuccessTest()
         {
             var result = CryptographyUtils.UnsealData("ConnectionString", "10DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);

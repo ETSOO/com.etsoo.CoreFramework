@@ -36,7 +36,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="claims">Claims</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public static CurrentUser? Create(ClaimsPrincipal claims, string? connectionId = null)
         {
             var user = ServiceUser.Create(claims);
             if (user == null) return null;
@@ -186,7 +186,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Name, Name);
             yield return new(CorporateClaim, Corporate.ToJson());
 
-            if(!string.IsNullOrEmpty(OrganizationName))
+            if (!string.IsNullOrEmpty(OrganizationName))
                 yield return new(OrganizationNameClaim, OrganizationName);
 
             if (Avatar != null)

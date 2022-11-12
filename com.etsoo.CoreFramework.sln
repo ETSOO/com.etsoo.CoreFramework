@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.DI", "com.etsoo.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.PureIO", "com.etsoo.PureIO\com.etsoo.PureIO.csproj", "{E3BDEBCD-A7F1-4E4B-A4B9-FA6C40D7CEFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.Localization", "com.etsoo.Localization\com.etsoo.Localization.csproj", "{0A4249FC-5F83-4135-91ED-3DB8E3B6895E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Localization", "com.etsoo.Localization\com.etsoo.Localization.csproj", "{0A4249FC-5F83-4135-91ED-3DB8E3B6895E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

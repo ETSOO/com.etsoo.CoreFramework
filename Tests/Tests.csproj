@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <BuildOutputTargetFolder>analyzers</BuildOutputTargetFolder>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>etsoo.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
 	  <ImplicitUsings>true</ImplicitUsings>
-	  <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
   </ItemGroup>
 
   <ItemGroup>

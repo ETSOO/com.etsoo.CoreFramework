@@ -13,24 +13,21 @@ namespace com.etsoo.CoreFramework.Models
         /// Device id
         /// 设备编号
         /// </summary>
-        [Required]
         [StringLength(512, MinimumLength = 32)]
-        public string DeviceId { get; init; } = null!;
+        public required string DeviceId { get; init; }
 
         /// <summary>
         /// Encrypted user's email or mobile
         /// 加密的用户邮箱或者手机号码
         /// </summary>
-        [Required]
         [StringLength(256, MinimumLength = 32)]
-        public string Id { get; init; } = null!;
+        public required string Id { get; init; }
 
         /// <summary>
         /// Country code, like CN = China
         /// 国家编号，如 CN = 中国
         /// </summary>
-        [Required]
         [RegionId]
-        public string Region { get; init; } = null!;
+        public required string Region { get; init; }
     }
 }

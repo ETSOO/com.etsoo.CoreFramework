@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using NUnit.Framework;
+using System.Runtime.Versioning;
 using Tests.Repositories;
 
 namespace Tests.Services
@@ -29,6 +30,7 @@ namespace Tests.Services
     }
 
     [TestFixture]
+    [SupportedOSPlatform("windows")]
     internal class ServiceBaseTests
     {
         readonly ServiceTest service;

@@ -159,13 +159,11 @@ namespace com.etsoo.SourceGenerators
                 using System;
                 using System.Collections.Generic;
                 using System.Linq;
-                using System.Runtime.Versioning;
 
                 namespace {ns}
                 {{
                     {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
-                        [RequiresPreviewFeatures]
                         public static {name} Create(StringKeyDictionaryObject dic)
                         {{
                             return new {name} {body};
