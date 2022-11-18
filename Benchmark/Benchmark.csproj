@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.2.2004" />
-    <PackageReference Include="com.etsoo.Utils" Version="1.1.40" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.2.2007" />
+    <PackageReference Include="com.etsoo.Utils" Version="1.1.41" />
     <PackageReference Include="Dapper.StrongName" Version="2.0.123" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

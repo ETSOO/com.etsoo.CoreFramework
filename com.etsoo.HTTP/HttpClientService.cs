@@ -196,6 +196,18 @@ namespace com.etsoo.HTTP
         }
 
         /// <summary>
+        /// Async get uri stream
+        /// 异步获取网址数据流
+        /// </summary>
+        /// <param name="uri">Uri</param>
+        /// <param name="token">Cancellation token</param>
+        /// <returns>Stream</returns>
+        protected async Task<Stream> GetStreamAsync(Uri uri, CancellationToken token = default)
+        {
+            return await Client.GetStreamAsync(uri, token);
+        }
+
+        /// <summary>
         /// Post Json data
         /// Post Json 数据
         /// </summary>

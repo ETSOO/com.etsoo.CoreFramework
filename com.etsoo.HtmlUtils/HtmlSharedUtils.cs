@@ -11,35 +11,6 @@ namespace com.etsoo.HtmlUtils
     public static class HtmlSharedUtils
     {
         /// <summary>
-        /// HTTP client
-        /// HTTP 客户端
-        /// </summary>
-        public static readonly HttpClient client = new();
-
-        /// <summary>
-        /// Async get uri stream
-        /// 异步获取网址数据流
-        /// </summary>
-        /// <param name="uri">Uri</param>
-        /// <returns>Stream</returns>
-        public async static Task<Stream> GetStreamAsync(Uri uri)
-        {
-            return await client.GetStreamAsync(uri);
-        }
-
-        /// <summary>
-        /// Async get uri stream
-        /// 异步获取网址数据流
-        /// </summary>
-        /// <param name="uri">Uri</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>Stream</returns>
-        public async static Task<Stream> GetStreamAsync(Uri uri, CancellationToken token)
-        {
-            return await client.GetStreamAsync(uri, token);
-        }
-
-        /// <summary>
         /// Parse table data
         /// 解析表格数据
         /// </summary>
