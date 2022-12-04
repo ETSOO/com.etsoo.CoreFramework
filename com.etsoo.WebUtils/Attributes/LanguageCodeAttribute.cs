@@ -7,7 +7,7 @@ namespace com.etsoo.WebUtils.Attributes
     /// Language code validation attribute
     /// 语言代码验证属性
     /// </summary>
-    public class LanguageCodeAttribute : ValidationAttribute
+    public partial class LanguageCodeAttribute : ValidationAttribute
     {
         /// <summary>
         /// Validity check
@@ -24,7 +24,11 @@ namespace com.etsoo.WebUtils.Attributes
                 return false;
             }
 
-            return Regex.IsMatch(valueAsString, "^[a-z]{2}(-[A-Z]{2})?$");
+            // zh-CN
+            // zh-Hans-CN
+            // zh-Hans-HK
+            // zh-Hant-HK
+            return MyRegex().IsMatch(valueAsString);
         }
 
         /// <summary>
@@ -37,5 +41,8 @@ namespace com.etsoo.WebUtils.Attributes
         {
             return string.Format(ErrorMessageString, name);
         }
+
+        [GeneratedRegex("^[a-z]{2}(-[a-zA-Z]{4})?(-[A-Z]{2})?$")]
+        private static partial Regex MyRegex();
     }
 }

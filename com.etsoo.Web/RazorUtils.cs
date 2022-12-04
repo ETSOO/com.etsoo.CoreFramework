@@ -42,7 +42,8 @@ namespace com.etsoo.Web
                 var razorEngine = new RazorEngine();
 
                 // Compile
-                return razorEngine.Compile(template, builder => {
+                return razorEngine.Compile(template, builder =>
+                {
                     // Add the model type reference
                     builder.AddAssemblyReference(typeof(M));
                 });

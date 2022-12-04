@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,39 +7,34 @@
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Company>ETSOO / 亿速思维</Company>
-    <Version>1.0.41</Version>
+    <Version>1.0.42</Version>
     <Description>ETSOO Shared Web Components
 亿速思维共享 Web 组件</Description>
     <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Web</RepositoryUrl>
-    <RepositoryType></RepositoryType>
+    <RepositoryType>Git</RepositoryType>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>etsoo.snk</AssemblyOriginatorKeyFile>
-	  <ImplicitUsings>true</ImplicitUsings>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\logo.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.9" />
+    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="RazorEngineCore" Version="2022.8.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
   </ItemGroup>
-  
-
 
 </Project>

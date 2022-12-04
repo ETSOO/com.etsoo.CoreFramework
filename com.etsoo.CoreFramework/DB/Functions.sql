@@ -153,3 +153,61 @@ BEGIN
 
 	RETURN dbo.ef_hide_data(LEFT(@Email, @Index - 1)) + RIGHT(@Email, LEN(@Email) - @Index + 1)
 END
+
+-- =============================================
+-- Create date: 2022/11/19
+-- Description:	Get Chinese text PinYin initials (128 characters maximum)
+-- =============================================
+CREATE FUNCTION [dbo].[ef_get_pinyin]
+(
+	-- Add the parameters for the function here
+	@str nvarchar(128)
+)
+RETURNS varchar(128)
+AS
+BEGIN
+	IF @str IS NULL RETURN NULL
+
+	DECLARE @re varchar(128) = '', @crs nchar(1);
+	DECLARE @strlen int = LEN(@str), @i smallint = 1;
+
+	WHILE @i <= @strlen
+		BEGIN
+			-- Current letter
+			SET @crs = SUBSTRING(@str, @i, 1);
+
+			SELECT @re = @re +
+			(CASE 
+				WHEN @crs >= 'Ž‰' THEN 'Z'
+				WHEN @crs >= 'Ñ¾' THEN 'Y'
+				WHEN @crs >= 'Ï¦' THEN 'X'
+				WHEN @crs >= 'ŒÜ' THEN 'W'
+				WHEN @crs >= 'Ëû' THEN 'T'
+				WHEN @crs >= 'Øí' THEN 'S'
+				WHEN @crs >= '…ß' THEN 'R'
+				WHEN @crs >= 'Æß' THEN 'Q'
+				WHEN @crs >= 'Šr' THEN 'P'
+				WHEN @crs >= 'àÞ' THEN 'O'
+				WHEN @crs >= '’‚' THEN 'N'
+				WHEN @crs >= '‡`' THEN 'M'
+				WHEN @crs >= 'À¬' THEN 'L'
+				WHEN @crs >= 'ßÇ' THEN 'K'
+				WHEN @crs >= 'Ø¢' THEN 'J'
+				WHEN @crs >= 'îþ' THEN 'H'
+				WHEN @crs >= 'ê¸' THEN 'G'
+				WHEN @crs >= '·¢' THEN 'F'
+				WHEN @crs >= 'ŠŠ' THEN 'E'
+				WHEN @crs >= '…ö' THEN 'D'
+				WHEN @crs >= 'àê' THEN 'C'
+				WHEN @crs >= '°Ë' THEN 'B'
+				WHEN @crs >= 'ß¹' THEN 'A'
+				ELSE ''
+			END), @i = @i + 1;
+		END
+
+	IF @re = ''
+		RETURN NULL;
+
+	RETURN @re;
+END
+GO
