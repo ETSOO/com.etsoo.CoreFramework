@@ -437,8 +437,10 @@ namespace com.etsoo.HTTP
         /// <returns>Task</returns>
         protected async Task SendAsync(string requestUri, HttpContent content, Stream stream, HttpMethod? method = null)
         {
-            var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri);
-            request.Content = content;
+            var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri)
+            {
+                Content = content
+            };
 
             var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             await ResponseToAsync(response, stream);

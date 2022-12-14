@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System.Buffers;
+using System.Collections;
 using System.Data.Common;
 using System.Text.Json;
 
@@ -129,6 +130,51 @@ namespace com.etsoo.Utils.Actions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Create result from exception
+        /// 从异常中创建操作结果
+        /// </summary>
+        /// <param name="ex">Exception</param>
+        /// <returns>Result</returns>
+        public static IActionResult From(Exception ex)
+        {
+            var result = new ActionResult
+            {
+                Title = ex.Message,
+                Field = ex.Source
+            };
+
+            foreach (DictionaryEntry entry in ex.Data)
+            {
+                var key = entry.Key.ToString();
+                if (key == null) continue;
+                result.Data[key] = entry.Value;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Async create result from HTTP response message
+        /// 异步从 HTTP 响应消息创建结果
+        /// </summary>
+        /// <param name="response">Response</param>
+        /// <returns>Result</returns>
+        public static async Task<IActionResult> FromAsync(HttpResponseMessage response)
+        {
+            var reason = response.ReasonPhrase;
+            var title = "HTTP Response Error" + (string.IsNullOrEmpty(reason) ? string.Empty : $" ({reason})");
+
+            var result = new ActionResult
+            {
+                Title =  title,
+                Detail = await response.Content.ReadAsStringAsync(),
+                Status = (int)response.StatusCode
+            };
+
+            return result;
         }
 
         /// <summary>
