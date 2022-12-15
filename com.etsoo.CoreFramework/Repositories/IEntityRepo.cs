@@ -21,7 +21,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        ValueTask<ActionResult> CreateAsync(object model);
+        ValueTask<IActionResult> CreateAsync(object model);
 
         /// <summary>
         /// Delete single entity
@@ -29,7 +29,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        ValueTask<ActionResult> DeleteAsync(T id);
+        ValueTask<IActionResult> DeleteAsync(T id);
 
         /// <summary>
         /// Delete multiple entities
@@ -37,7 +37,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        ValueTask<ActionResult> DeleteAsync(IEnumerable<T> ids);
+        ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids);
 
         /// <summary>
         /// View entity
@@ -119,7 +119,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel;
+        ValueTask<IActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel;
 
         /// <summary>
         /// Data list
@@ -153,6 +153,6 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null) where M : IdItem<T>, IUpdateModel;
+        ValueTask<(IActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null) where M : IdItem<T>, IUpdateModel;
     }
 }

@@ -36,7 +36,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<ActionResult> CreateAsync(object model)
+        public virtual async ValueTask<IActionResult> CreateAsync(object model)
         {
             var parameters = FormatParameters(model);
 
@@ -71,7 +71,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<ActionResult> DeleteAsync(T id)
+        public virtual async ValueTask<IActionResult> DeleteAsync(T id)
         {
             return await DeleteAsync(new T[] { id });
         }
@@ -82,7 +82,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<ActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
             var command = NewDeleteCommand(ids);
             var result = await QueryAsResultAsync(command);
@@ -299,7 +299,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<ActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel
+        public virtual async ValueTask<IActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel
         {
             var parameters = FormatParameters(model);
 
@@ -369,7 +369,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        public async ValueTask<(IActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where M : IdItem<T>, IUpdateModel
         {
             return await InlineUpdateAsync<T, M>(model, configs, additionalPart, additionalParams);

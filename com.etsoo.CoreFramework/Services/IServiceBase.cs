@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Actions;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.Utils.Actions;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -25,6 +26,15 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="deviceCore">Device core passphrase</param>
         /// <returns>Result</returns>
         string? DecryptDeviceData(string encryptedMessage, string deviceCore);
+
+        /// <summary>
+        /// Async init call
+        /// 异步初始化调用
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <param name="secret">Encryption secret</param>
+        /// <returns>Result</returns>
+        ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret);
 
         /// <summary>
         /// Log exception and return simple user result
