@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.Crypto;
 using MailKit.Net.Smtp;
-using Microsoft.Extensions.Configuration;
 using MimeKit;
 
 namespace com.etsoo.SMTP
@@ -11,45 +10,32 @@ namespace com.etsoo.SMTP
     /// </summary>
     public class SMTPClient : ISMTPClient
     {
-        private static SMTPClientSettings Parse(IConfigurationSection section, Func<string, string, string>? secureManager)
-        {
-            var userNameField = "UserName";
-            var passwordField = "Password";
-            return new SMTPClientSettings(
-                section.GetValue<string>("Host") ?? string.Empty,
-                section.GetValue("Port", 0),
-                section.GetValue("UseSsl", false),
-                section.GetValue<string?>("Sender"),
-                CryptographyUtils.UnsealData(userNameField, section.GetValue<string?>(userNameField), secureManager),
-                CryptographyUtils.UnsealData(passwordField, section.GetValue<string?>(passwordField), secureManager)
-            );
-        }
-
         /// <summary>
-        /// Settings
+        /// Options
         /// 配置
         /// </summary>
-        protected SMTPClientSettings Settings { get; private set; }
+        protected SMTPClientOptions Options { get; private set; }
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="settings">Settings</param>
-        public SMTPClient(SMTPClientSettings settings)
-        {
-            Settings = settings;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="section">Configuration section</param>
+        /// <param name="options">Options</param>
         /// <param name="secureManager">Secure manager</param>
-        public SMTPClient(IConfigurationSection section, Func<string, string, string>? secureManager = null) : this(Parse(section, secureManager))
+        public SMTPClient(SMTPClientOptions options, Func<string, string, string>? secureManager = null)
         {
-
+            if (secureManager == null)
+            {
+                Options = options;
+            }
+            else
+            {
+                Options = options with
+                {
+                    UserName = CryptographyUtils.UnsealData("UserName", options.UserName, secureManager),
+                    Password = CryptographyUtils.UnsealData("Password", options.Password, secureManager)
+                };
+            }
         }
 
         /// <summary>
@@ -60,7 +46,7 @@ namespace com.etsoo.SMTP
         protected virtual void FormatMessage(MimeMessage message)
         {
             // Set the sender
-            message.Sender ??= MailboxAddress.Parse(Settings.Sender ?? Settings.UserName);
+            message.Sender ??= MailboxAddress.Parse(Options.Sender ?? Options.UserName);
 
             if (message.From.Count == 0)
             {
@@ -85,12 +71,12 @@ namespace com.etsoo.SMTP
             using var client = new SmtpClient();
 
             // Connection
-            await client.ConnectAsync(Settings.Host, Settings.Port, Settings.UseSsl, token);
+            await client.ConnectAsync(Options.Host, Options.Port, Options.UseSsl, token);
 
             // Auth
-            if (!string.IsNullOrEmpty(Settings.UserName) && !string.IsNullOrEmpty(Settings.Password))
+            if (!string.IsNullOrEmpty(Options.UserName) && !string.IsNullOrEmpty(Options.Password))
             {
-                await client.AuthenticateAsync(Settings.UserName, Settings.Password, token);
+                await client.AuthenticateAsync(Options.UserName, Options.Password, token);
             }
 
             // Send

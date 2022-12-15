@@ -27,7 +27,7 @@ namespace Tests.Utils
         public void EmailUtilSend_Test()
         {
             // Arrange
-            var client = new SMTPClient(new SMTPClientSettings("smtp.exmail.qq.com", 465, true, "ETSOO <info@etsoo.com>", "info@etsoo.com", "***"));
+            var client = new SMTPClient(new SMTPClientOptions("smtp.exmail.qq.com", 465, true, "ETSOO <info@etsoo.com>", "info@etsoo.com", "***"));
 
             // Act
             var result = Assert.ThrowsAsync<AuthenticationException>(async () =>
@@ -53,8 +53,7 @@ namespace Tests.Utils
                 }
             }"));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("SMTP");
-
-            var client = new SMTPClient(section);
+            var client = new SMTPClient(section.Get<SMTPClientOptions>());
 
             // Act
             var result = Assert.ThrowsAsync<AuthenticationException>(async () =>

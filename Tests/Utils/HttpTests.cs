@@ -18,13 +18,6 @@ namespace Tests.Utils
         public decimal Price { get; init; }
     }
 
-    internal class ProductStringId
-    {
-        public string Id { get; init; } = null!;
-        public string Title { get; init; } = null!;
-        public decimal Price { get; init; }
-    }
-
     internal class ProductUpdate
     {
         public string? Title { get; init; }
@@ -88,9 +81,9 @@ namespace Tests.Utils
             return await PostAsync<Product, Product>("/products/add", product);
         }
 
-        public async Task<ProductStringId?> UpdateProductAsync()
+        public async Task<Product?> UpdateProductAsync()
         {
-            return await PutAsync<ProductUpdate, ProductStringId>("/products/1", new ProductUpdate { Title = "New Product 1", Price = 3.16M });
+            return await PutAsync<ProductUpdate, Product>("/products/1", new ProductUpdate { Title = "New Product 1", Price = 3.16M });
         }
     }
 
