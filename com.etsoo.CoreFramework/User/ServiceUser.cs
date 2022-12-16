@@ -120,7 +120,7 @@ namespace com.etsoo.CoreFramework.User
         /// 创建用户
         /// </summary>
         /// <param name="context">Http context</param>
-        /// <returns>Erp user</returns>
+        /// <returns>Service user</returns>
         public static IServiceUser? Create(HttpContext? context)
         {
             // https://stackoverflow.com/questions/32584074/whats-the-role-of-the-claimsprincipal-why-does-it-have-multiple-identities
@@ -137,7 +137,7 @@ namespace com.etsoo.CoreFramework.User
         /// 创建非空用户
         /// </summary>
         /// <param name="context">Http context</param>
-        /// <returns>Erp user</returns>
+        /// <returns>Service user</returns>
         public static IServiceUser CreateSafe(HttpContext? context)
         {
             var user = Create(context);

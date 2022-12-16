@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.Utils.String;
+using Microsoft.AspNetCore.Http;
 using System.Globalization;
 
 namespace com.etsoo.CoreFramework.User
@@ -10,6 +11,22 @@ namespace com.etsoo.CoreFramework.User
     /// </summary>
     public interface IServiceUser : IUserToken
     {
+        /// <summary>
+        /// Create user
+        /// 创建用户
+        /// </summary>
+        /// <param name="context">Http context</param>
+        /// <returns>Service user</returns>
+        static abstract IServiceUser? Create(HttpContext? context);
+
+        /// <summary>
+        /// Create non nullable user
+        /// 创建非空用户
+        /// </summary>
+        /// <param name="context">Http context</param>
+        /// <returns>Service user</returns>
+        static abstract IServiceUser CreateSafe(HttpContext? context);
+
         /// <summary>
         /// Role value
         /// 角色值
