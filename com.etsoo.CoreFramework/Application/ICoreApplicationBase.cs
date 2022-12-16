@@ -47,6 +47,22 @@ namespace com.etsoo.CoreFramework.Application
         string BuildCommandName(string identifier, IEnumerable<string> parts, bool isSystem = false);
 
         /// <summary>
+        /// Decript data
+        /// 解密数据
+        /// </summary>
+        /// <param name="cipherText">Cipher text</param>
+        /// <returns>Result</returns>
+        string DecriptData(string cipherText);
+
+        /// <summary>
+        /// Encript data
+        /// 加密数据
+        /// </summary>
+        /// <param name="plainText">Plain text</param>
+        /// <returns></returns>
+        string EncriptData(string plainText);
+
+        /// <summary>
         /// Hash password bytes
         /// 哈希密码字节数组
         /// </summary>

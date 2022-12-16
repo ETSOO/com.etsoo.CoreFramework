@@ -137,6 +137,30 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Decript data
+        /// 解密数据
+        /// </summary>
+        /// <param name="cipherText">Cipher text</param>
+        /// <returns>Result</returns>
+        public string DecriptData(string cipherText)
+        {
+            var bytes = CryptographyUtils.AESDecrypt(cipherText, Configuration.PrivateKey);
+            if (bytes == null) throw new ApplicationException("Decript Data Failed");
+            return Encoding.UTF8.GetString(bytes);
+        }
+
+        /// <summary>
+        /// Encript data
+        /// 加密数据
+        /// </summary>
+        /// <param name="plainText">Plain text</param>
+        /// <returns></returns>
+        public string EncriptData(string plainText)
+        {
+            return CryptographyUtils.AESEncrypt(plainText, Configuration.PrivateKey);
+        }
+
+        /// <summary>
         /// Hash password bytes
         /// 哈希密码字节数组
         /// </summary>
