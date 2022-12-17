@@ -27,7 +27,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected IServiceUser? User { get; }
+        public virtual IServiceUser? User { get; }
 
         /// <summary>
         /// Application

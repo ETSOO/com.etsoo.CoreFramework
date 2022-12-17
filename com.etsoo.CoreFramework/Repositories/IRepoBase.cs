@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
@@ -19,6 +20,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 标识
         /// </summary>
         string Flag { get; }
+
+        /// <summary>
+        /// Current user
+        /// 当前用户
+        /// </summary>
+        IServiceUser? User { get; }
 
         /// <summary>
         /// Add system parameters
