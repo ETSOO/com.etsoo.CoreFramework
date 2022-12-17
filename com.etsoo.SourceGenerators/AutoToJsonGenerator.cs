@@ -36,6 +36,10 @@ namespace com.etsoo.SourceGenerators
                 {
                     var (symbol, typeSymbol, nullable) = member;
 
+                    // Attribute data
+                    var attributeData = symbol.GetAttributeData("com.etsoo.Utils.Serialization.PIIAttribute");
+                    if (attributeData != null) continue;
+
                     // Field name
                     var fieldName = symbol.Name;
 

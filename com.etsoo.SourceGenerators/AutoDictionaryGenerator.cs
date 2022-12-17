@@ -38,8 +38,8 @@ namespace com.etsoo.SourceGenerators
                     // Field type name
                     var typeName = typeSymbol.GetTypeName(nullable, ns);
 
-                    // ArrayProperty attribute data
-                    var arrayData = symbol.GetAttributeData(arrayPropertyType.FullName);
+                    // Attribute data
+                    var attributeData = symbol.GetAttributeData(arrayPropertyType.FullName);
 
                     // Value part
                     string valuePart;
@@ -71,7 +71,7 @@ namespace com.etsoo.SourceGenerators
                         }
 
                         // Splitter
-                        var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
+                        var splitter = Extensions.CharToString(attributeData?.GetValue<char?>("Splitter") ?? ',');
 
                         var arrayType = itemTypeSymbol.Name;
                         if (arrayType.Equals("String"))
@@ -90,7 +90,7 @@ namespace com.etsoo.SourceGenerators
                         }
 
                         // Splitter
-                        var splitter = Extensions.CharToString(arrayData?.GetValue<char?>("Splitter") ?? ',');
+                        var splitter = Extensions.CharToString(attributeData?.GetValue<char?>("Splitter") ?? ',');
 
                         var listType = itemTypeSymbol.Name;
                         if (listType.Equals("String"))

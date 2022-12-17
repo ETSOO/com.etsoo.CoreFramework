@@ -53,7 +53,7 @@ namespace Tests.Utils
                 }
             }"));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("SMTP");
-            var client = new SMTPClient(section.Get<SMTPClientOptions>());
+            var client = new SMTPClient(section.Get<SMTPClientOptions>()!);
 
             // Act
             var result = Assert.ThrowsAsync<AuthenticationException>(async () =>

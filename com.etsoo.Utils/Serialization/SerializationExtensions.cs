@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.Utils.Serialization
 {
@@ -10,6 +11,12 @@ namespace com.etsoo.Utils.Serialization
     /// </summary>
     public static class SerializationExtensions
     {
+        /// <summary>
+        /// Mask for serialization
+        /// 序列化掩码
+        /// </summary>
+        public const string Mask = "***";
+
         /// <summary>
         /// Create Utf8 Json writer
         /// Utf8 Json创建器
@@ -90,6 +97,27 @@ namespace com.etsoo.Utils.Serialization
                 return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// PII attribute masking policy
+        /// PII 属性屏蔽策略
+        /// </summary>
+        /// <param name="typeInfo">Type info</param>
+        public static void PIIAttributeMaskingPolicy(JsonTypeInfo typeInfo)
+        {
+            foreach (var propertyInfo in typeInfo.Properties)
+            {
+                var hasPII = propertyInfo.AttributeProvider?.IsDefined(typeof(PIIAttribute), true);
+                if (hasPII == true)
+                {
+                    var getProperty = propertyInfo.Get;
+                    if (getProperty is not null)
+                    {
+                        propertyInfo.Get = null;
+                    }
+                }
+            }
         }
     }
 }

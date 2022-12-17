@@ -1,11 +1,13 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System.Data.Common;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -61,11 +63,27 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         public virtual IAppConfiguration Configuration { get; }
 
+        private JsonSerializerOptions? _defaultJsonSerializerOptions;
         /// <summary>
         /// Default Json serializer options
         /// 默认的Json序列化器选项
         /// </summary>
-        public JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
+        public JsonSerializerOptions DefaultJsonSerializerOptions
+        {
+            get
+            {
+                if (_defaultJsonSerializerOptions == null)
+                {
+                    var defaultOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+                    _defaultJsonSerializerOptions = ConfigureJsonSerializerOptions(defaultOptions);
+                }
+                return _defaultJsonSerializerOptions!;
+            }
+            set
+            {
+                _defaultJsonSerializerOptions = ConfigureJsonSerializerOptions(value);
+            }
+        }
 
         /// <summary>
         /// Database
@@ -87,9 +105,6 @@ namespace com.etsoo.CoreFramework.Application
             IDatabase<C> db
         )
         {
-            // Json options
-            DefaultJsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-
             // Update
             (
                 Configuration,
@@ -202,6 +217,26 @@ namespace com.etsoo.CoreFramework.Application
         public async Task<string> HashPasswordAsync(string password)
         {
             return Convert.ToBase64String(await HashPasswordBytesAsync(password));
+        }
+
+        /// <summary>
+        /// Configure default Json serializer options
+        /// 配置默认的 Json 序列化器选项
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <returns>Result</returns>
+        protected virtual JsonSerializerOptions ConfigureJsonSerializerOptions(JsonSerializerOptions options)
+        {
+            options.WriteIndented = false;
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            options.PropertyNameCaseInsensitive = true;
+            options.DictionaryKeyPolicy = options.PropertyNamingPolicy;
+            options.TypeInfoResolver = new DefaultJsonTypeInfoResolver
+            {
+                Modifiers = { SerializationExtensions.PIIAttributeMaskingPolicy }
+            };
+
+            return options;
         }
     }
 }

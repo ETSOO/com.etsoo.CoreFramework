@@ -1,6 +1,5 @@
 ﻿using com.etsoo.SourceGenerators.Attributes;
-using System;
-using System.Collections.Generic;
+using com.etsoo.Utils.Serialization;
 using System.ComponentModel.DataAnnotations;
 
 namespace Tests
@@ -66,7 +65,11 @@ namespace Tests
 
         public decimal? DecimalValue { get; init; }
 
+        [PII]
         public ushort UShortValue { get; init; }
+
+        [PII]
+        public string? Secret { get; init; }
 
         public DateTime? Date { get; init; }
 
