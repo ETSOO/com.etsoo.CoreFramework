@@ -14,7 +14,7 @@ namespace com.etsoo.SMTP
         /// Options
         /// 配置
         /// </summary>
-        protected SMTPClientOptions Options { get; private set; }
+        public SMTPClientOptions Options { get; }
 
         /// <summary>
         /// Constructor
@@ -51,6 +51,27 @@ namespace com.etsoo.SMTP
             if (message.From.Count == 0)
             {
                 // Set one from
+                message.From.Add(message.Sender);
+            }
+
+            // Default recipients
+            if (Options.To != null)
+            {
+                message.To.AddRange(Options.To.Select(item => MailboxAddress.Parse(item)));
+            }
+
+            if (Options.Cc != null)
+            {
+                message.Cc.AddRange(Options.Cc.Select(item => MailboxAddress.Parse(item)));
+            }
+
+            if (Options.Bcc != null)
+            {
+                message.Bcc.AddRange(Options.Bcc.Select(item => MailboxAddress.Parse(item)));
+            }
+
+            if (message.To.Count == 0)
+            {
                 message.From.Add(message.Sender);
             }
         }

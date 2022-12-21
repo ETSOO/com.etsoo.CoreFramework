@@ -9,6 +9,12 @@ namespace com.etsoo.SMTP
     public interface ISMTPClient
     {
         /// <summary>
+        /// Options
+        /// 配置
+        /// </summary>
+        SMTPClientOptions Options { get; }
+
+        /// <summary>
         /// Send email
         /// 发送电子邮件
         /// </summary>
