@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using com.etsoo.Utils.Serialization;
+using NUnit.Framework;
 using System.Buffers;
 using System.Text;
 using System.Text.Json;
@@ -31,6 +32,15 @@ namespace Tests.Utils
 
             // Assert
             Assert.IsTrue(json.Contains("keys"));
+        }
+
+        [Test]
+        public void GetPropertyCaseInsensitiveTests()
+        {
+            var json = """{"contactTemplate": "abc"}""";
+            var doc = JsonDocument.Parse(json);
+            var template = doc.RootElement.GetPropertyCaseInsensitive("ContactTemplate");
+            Assert.AreEqual("abc", template?.GetString());
         }
     }
 }

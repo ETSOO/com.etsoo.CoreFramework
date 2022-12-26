@@ -119,5 +119,21 @@ namespace com.etsoo.Utils.Serialization
                 }
             }
         }
+
+        /// <summary>
+        /// Get property of JsonElement with case insensitive
+        /// 获取不区分大小写的 JsonElement 属性
+        /// </summary>
+        /// <param name="element">Json element</param>
+        /// <param name="propertyName">Property name</param>
+        /// <returns>Result</returns>
+        public static JsonElement? GetPropertyCaseInsensitive(this JsonElement element, string propertyName)
+        {
+            foreach (var property in element.EnumerateObject().OfType<JsonProperty>())
+            {
+                if (property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)) return property.Value;
+            }
+            return null;
+        }
     }
 }
