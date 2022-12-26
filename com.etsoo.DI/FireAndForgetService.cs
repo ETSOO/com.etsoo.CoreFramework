@@ -30,6 +30,27 @@ namespace com.etsoo.DI
         /// Fire an action
         /// 触发动作
         /// </summary>
+        /// <param name="bullet">Action</param>
+        public void FireAsync(Func<ILogger, Task> bullet)
+        {
+            Task.Run(async () =>
+            {
+                await using var scope = scopeFactory.CreateAsyncScope();
+                try
+                {
+                    await bullet(logger);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, "Fire and Forget service crashed!");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Fire an action
+        /// 触发动作
+        /// </summary>
         /// <typeparam name="T1">Dependency 1</typeparam>
         /// <param name="bullet">Action</param>
         public void FireAsync<T1>(Func<T1, ILogger, Task> bullet) where T1 : notnull

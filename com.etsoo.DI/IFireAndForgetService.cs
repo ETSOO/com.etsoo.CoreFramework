@@ -12,6 +12,13 @@ namespace com.etsoo.DI
         /// Fire an action
         /// 触发动作
         /// </summary>
+        /// <param name="bullet">Action</param>
+        void FireAsync(Func<ILogger, Task> bullet);
+
+        /// <summary>
+        /// Fire an action
+        /// 触发动作
+        /// </summary>
         /// <typeparam name="T1">Dependency 1</typeparam>
         /// <param name="bullet">Action</param>
         void FireAsync<T1>(Func<T1, ILogger, Task> bullet) where T1 : notnull;
