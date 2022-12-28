@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
-using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -26,10 +25,9 @@ namespace com.etsoo.CoreFramework.Services
         /// 构造函数
         /// </summary>
         /// <param name="app">App</param>
-        /// <param name="user">User</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public EntityServiceBase(ICoreApplication<C> app, IServiceUser user, R repo, ILogger logger) : base(app, user, repo, logger)
+        public EntityServiceBase(ICoreApplication<C> app, R repo, ILogger logger) : base(app, repo, logger)
         {
         }
 

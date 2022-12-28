@@ -27,12 +27,16 @@ namespace com.etsoo.CoreFramework.Services
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public LoginedServiceBase(ICoreApplication<C> app, IServiceUser user, R repo, ILogger logger) : base(app, repo, logger)
+        public LoginedServiceBase(ICoreApplication<C> app, R repo, ILogger logger) : base(app, repo, logger)
         {
-            User = user;
+            if (repo.User == null)
+            {
+                throw new UnauthorizedAccessException("No Logined User");
+            }
+
+            User = repo.User;
         }
     }
 }
