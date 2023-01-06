@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.Web
+﻿using Microsoft.Extensions.Logging;
+
+namespace com.etsoo.Web
 {
     /// <summary>
     /// CORS policy setup options
@@ -11,6 +13,12 @@
         /// 公开的标头
         /// </summary>
         public string[] ExposedHeaders { get; init; } = Array.Empty<string>();
+
+        /// <summary>
+        /// Logger, for debug purpose only
+        /// 日志记录器，仅用于调试目的
+        /// </summary>
+        public ILogger? Logger { get; init; }
 
         /// <summary>
         /// Include localhost addresses
@@ -56,7 +64,11 @@
         public bool Check(string origin)
         {
             // Localhost / 127.*.*.* accepted
-            if (IncludeLocals && new Uri(origin).IsLoopback) return true;
+            if (IncludeLocals && new Uri(origin).IsLoopback)
+            {
+                Logger?.LogDebug("Origin {origin} is local and IncludeLocals is true", origin);
+                return true;
+            }
 
             if (Sites?.Any() is true)
             {
@@ -67,7 +79,11 @@
                 {
                     var siteParts = site.Split('.');
 
-                    if (siteParts.Length != len) return false;
+                    if (siteParts.Length != len)
+                    {
+                        Logger?.LogDebug("Valid site {site} parts length is not equal with origin {origin}", site, origin);
+                        return false;
+                    }
 
                     for (var i = 0; i < len; i++)
                     {
@@ -93,14 +109,18 @@
                                     continue;
                                 }
                             }
+
+                            Logger?.LogDebug("Site {site} failed origin {origin} at part {i}, {part}/{opart}", site, origin, i, part, opart);
                             return false;
                         }
                     }
 
+                    Logger?.LogDebug("Site {site} validates origin {origin}", site, origin);
                     return true;
                 });
             }
 
+            Logger?.LogDebug("No valid sites defined");
             return false;
         }
     }
