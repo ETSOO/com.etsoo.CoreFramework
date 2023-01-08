@@ -12,14 +12,8 @@ namespace com.etsoo.Utils.String
     /// String utils
     /// 字符串工具类
     /// </summary>
-    public static class StringUtils
+    public static partial class StringUtils
     {
-        /// <summary>
-        /// String type
-        /// 字符串类型
-        /// </summary>
-        public static readonly Type StringType = typeof(string);
-
         /// <summary>
         /// Hide normal data
         /// 隐藏一般信息
@@ -285,7 +279,7 @@ namespace com.etsoo.Utils.String
         /// <returns>Result</returns>
         public static string RemoveNonLetters(string input)
         {
-            return new Regex("[^a-zA-Z0-9]").Replace(input, "");
+            return MyRegex().Replace(input, "");
         }
 
         private delegate bool TryParseDelegate<T>(string s, out T input);
@@ -423,7 +417,7 @@ namespace com.etsoo.Utils.String
             }
 
             var converter = TypeDescriptor.GetConverter(typeof(T));
-            if (converter.CanConvertFrom(StringType))
+            if (converter.CanConvertFrom(Types.StringType))
             {
                 return (T?)converter.ConvertFromInvariantString(s);
             }
@@ -468,5 +462,8 @@ namespace com.etsoo.Utils.String
         {
             return Encoding.UTF8.GetString(WriteJsonBytes(fun, options));
         }
+
+        [GeneratedRegex("[^a-zA-Z0-9]")]
+        private static partial Regex MyRegex();
     }
 }

@@ -135,5 +135,53 @@ namespace com.etsoo.Utils.Serialization
             }
             return null;
         }
+
+        /// <summary>
+        /// Get array from JsonElement
+        /// 从 JsonElement 获取数组
+        /// </summary>
+        /// <typeparam name="T">Generic array type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<T?> GetArray<T>(this JsonElement element)
+        {
+            // When not a Array
+            if (element.ValueKind != JsonValueKind.Array) yield break;
+
+            // Default value, string or other classes will be null
+            var dv = default(T);
+
+            // Options
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+            foreach (var item in element.EnumerateArray())
+            {
+                // Kind
+                var kind = item.ValueKind;
+
+                object? value = dv switch
+                {
+                    bool => (kind == JsonValueKind.True || kind == JsonValueKind.False) && item.TryGetByte(out var v) ? v : null,
+                    byte[] => kind == JsonValueKind.String && item.TryGetBytesFromBase64(out var v) ? v : null,
+                    DateTime => kind == JsonValueKind.String && item.TryGetDateTime(out var v) ? v : null,
+                    DateTimeOffset => kind == JsonValueKind.String && item.TryGetDateTimeOffset(out var v) ? v : null,
+                    decimal => kind == JsonValueKind.Number && item.TryGetDecimal(out var v) ? v : null,
+                    double => kind == JsonValueKind.Number && item.TryGetDouble(out var v) ? v : null,
+                    Guid => kind == JsonValueKind.String && item.TryGetGuid(out var v) ? v : null,
+                    short => kind == JsonValueKind.Number && item.TryGetInt16(out var v) ? v : null,
+                    int => kind == JsonValueKind.Number && item.TryGetInt32(out var v) ? v : null,
+                    long => kind == JsonValueKind.Number && item.TryGetInt64(out var v) ? v : null,
+                    sbyte => kind == JsonValueKind.Number && item.TryGetSByte(out var v) ? v : null,
+                    float => kind == JsonValueKind.Number && item.TryGetSingle(out var v) ? v : null,
+                    ushort => kind == JsonValueKind.Number && item.TryGetUInt16(out var v) ? v : null,
+                    uint => kind == JsonValueKind.Number && item.TryGetUInt32(out var v) ? v : null,
+                    ulong => kind == JsonValueKind.Number && item.TryGetUInt64(out var v) ? v : null,
+                    _ => kind == JsonValueKind.String || typeof(T) == Types.StringType ? item.ToString() : item.Deserialize<T>(options)
+                };
+
+                if (value == null) yield return default;
+                else if (value is T tv) yield return tv;
+            }
+        }
     }
 }
