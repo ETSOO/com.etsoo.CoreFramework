@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Repositories
@@ -271,11 +272,16 @@ namespace com.etsoo.CoreFramework.Repositories
             // Content type
             response.ContentType = "application/json";
 
+            // Result
+            bool result;
+
             // Write to
             if (collectionNames == null)
-                await ReadToStreamAsync(command, response.BodyWriter);
+                result = await ReadToStreamAsync(command, response.BodyWriter);
             else
-                await ReadToStreamAsync(command, response.BodyWriter, DataFormat.Json, collectionNames);
+                result = await ReadToStreamAsync(command, response.BodyWriter, DataFormat.Json, collectionNames);
+
+            if (!result) response.StatusCode = (int)HttpStatusCode.NoContent;
         }
 
         /// <summary>
