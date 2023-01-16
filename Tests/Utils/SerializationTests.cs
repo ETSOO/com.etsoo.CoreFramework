@@ -47,7 +47,7 @@ namespace Tests.Utils
         [Test]
         public void GetArrayTests()
         {
-            var json = """{"stringItem": "abc", "stringArray": ["a", "b", "c"], "intArray": [1, 2], "object": [{"id": "1", "label": "Label"}]}""";
+            var json = """{"stringItem": "abc", "stringArray": ["a", "b", "c"], "intArray": [1, 2, "3", "a"], "object": [{"id": "1", "label": "Label"}]}""";
             var doc = JsonDocument.Parse(json);
 
             var stringItem = doc.RootElement.GetProperty("stringItem");
@@ -59,8 +59,13 @@ namespace Tests.Utils
             Assert.AreEqual("c", stringArray.Last());
 
             var intArray = doc.RootElement.GetProperty("intArray").GetArray<int>();
-            Assert.AreEqual(2, intArray.Count());
+            Assert.AreEqual(4, intArray.Count());
             Assert.AreEqual(1, intArray.First());
+            Assert.IsNull(intArray.ElementAt(2));
+
+            var intArrayNotNull = doc.RootElement.GetProperty("intArray").GetArray<int>(true).WhereNotNull();
+            Assert.AreEqual(3, intArrayNotNull.Count());
+            Assert.AreEqual(3, intArrayNotNull.ElementAt(2));
 
             var objArray = doc.RootElement.GetProperty("object").GetArray<IdLabelItem>();
             Assert.AreEqual(1, objArray.Count());

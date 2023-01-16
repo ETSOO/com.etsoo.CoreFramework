@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using com.etsoo.Utils.String;
+using System.Buffers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -137,50 +138,115 @@ namespace com.etsoo.Utils.Serialization
         }
 
         /// <summary>
+        /// Get value
+        /// 获取值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Result</returns>
+        public static T? GetValue<T>(this JsonElement element, bool loose = false) where T : struct
+        {
+            // Default value, string or other classes will be null
+            var dv = default(T);
+
+            // Kind
+            var kind = element.ValueKind;
+
+            object? value = dv switch
+            {
+                bool => (kind == JsonValueKind.True || kind == JsonValueKind.False) && element.TryGetByte(out var v) ? v : (loose ? StringUtils.TryParse<bool>(element.ToString()) : null),
+                DateTime => kind == JsonValueKind.String && element.TryGetDateTime(out var v) ? v : null,
+                DateTimeOffset => kind == JsonValueKind.String && element.TryGetDateTimeOffset(out var v) ? v : null,
+                decimal => kind == JsonValueKind.Number && element.TryGetDecimal(out var v) ? v : (loose ? StringUtils.TryParse<decimal>(element.ToString()) : null),
+                double => kind == JsonValueKind.Number && element.TryGetDouble(out var v) ? v : (loose ? StringUtils.TryParse<double>(element.ToString()) : null),
+                Guid => kind == JsonValueKind.String && element.TryGetGuid(out var v) ? v : null,
+                short => kind == JsonValueKind.Number && element.TryGetInt16(out var v) ? v : (loose ? StringUtils.TryParse<short>(element.ToString()) : null),
+                int => kind == JsonValueKind.Number && element.TryGetInt32(out var v) ? v : (loose ? StringUtils.TryParse<int>(element.ToString()) : null),
+                long => kind == JsonValueKind.Number && element.TryGetInt64(out var v) ? v : (loose ? StringUtils.TryParse<long>(element.ToString()) : null),
+                sbyte => kind == JsonValueKind.Number && element.TryGetSByte(out var v) ? v : (loose ? StringUtils.TryParse<byte>(element.ToString()) : null),
+                float => kind == JsonValueKind.Number && element.TryGetSingle(out var v) ? v : (loose ? StringUtils.TryParse<float>(element.ToString()) : null),
+                ushort => kind == JsonValueKind.Number && element.TryGetUInt16(out var v) ? v : (loose ? StringUtils.TryParse<ushort>(element.ToString()) : null),
+                uint => kind == JsonValueKind.Number && element.TryGetUInt32(out var v) ? v : (loose ? StringUtils.TryParse<uint>(element.ToString()) : null),
+                ulong => kind == JsonValueKind.Number && element.TryGetUInt64(out var v) ? v : (loose ? StringUtils.TryParse<ulong>(element.ToString()) : null),
+                _ => null
+            };
+
+            if (value is T tv) return tv;
+            else return null;
+        }
+
+        /// <summary>
+        /// Get value
+        /// 获取值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Result</returns>
+        public static T? GetValue<T>(this JsonElement element) where T : class
+        {
+            // Kind
+            var kind = element.ValueKind;
+
+            // Value
+            var type = typeof(T);
+            if (kind == JsonValueKind.String && type == Types.StringType)
+            {
+                return element.ToString() as T;
+            }
+            else if (kind == JsonValueKind.String && type == Types.ByteArrayType)
+            {
+                if (element.TryGetBytesFromBase64(out var v)) return v as T;
+                else return default;
+            }
+            else if (kind == JsonValueKind.Object)
+            {
+                return element.Deserialize<T>(SharedUtils.JsonDefaultSerializerOptions);
+            }
+            else
+            {
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Get array from JsonElement
         /// 从 JsonElement 获取数组
         /// </summary>
         /// <typeparam name="T">Generic array type</typeparam>
         /// <param name="element">Json element</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
         /// <returns>Result</returns>
-        public static IEnumerable<T?> GetArray<T>(this JsonElement element)
+        public static IEnumerable<T?> GetArray<T>(this JsonElement element, bool loose = false) where T : struct
         {
             // When not a Array
             if (element.ValueKind != JsonValueKind.Array) yield break;
 
-            // Default value, string or other classes will be null
-            var dv = default(T);
+            foreach (var item in element.EnumerateArray())
+            {
+                var value = item.GetValue<T>(loose);
+                yield return value;
+            }
+        }
 
-            // Options
-            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+        /// <summary>
+        /// Get array from JsonElement
+        /// 从 JsonElement 获取数组
+        /// </summary>
+        /// <typeparam name="T">Generic array type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<T?> GetArray<T>(this JsonElement element) where T : class
+        {
+            // When not a Array
+            if (element.ValueKind != JsonValueKind.Array) yield break;
 
             foreach (var item in element.EnumerateArray())
             {
-                // Kind
-                var kind = item.ValueKind;
-
-                object? value = dv switch
-                {
-                    bool => (kind == JsonValueKind.True || kind == JsonValueKind.False) && item.TryGetByte(out var v) ? v : null,
-                    byte[] => kind == JsonValueKind.String && item.TryGetBytesFromBase64(out var v) ? v : null,
-                    DateTime => kind == JsonValueKind.String && item.TryGetDateTime(out var v) ? v : null,
-                    DateTimeOffset => kind == JsonValueKind.String && item.TryGetDateTimeOffset(out var v) ? v : null,
-                    decimal => kind == JsonValueKind.Number && item.TryGetDecimal(out var v) ? v : null,
-                    double => kind == JsonValueKind.Number && item.TryGetDouble(out var v) ? v : null,
-                    Guid => kind == JsonValueKind.String && item.TryGetGuid(out var v) ? v : null,
-                    short => kind == JsonValueKind.Number && item.TryGetInt16(out var v) ? v : null,
-                    int => kind == JsonValueKind.Number && item.TryGetInt32(out var v) ? v : null,
-                    long => kind == JsonValueKind.Number && item.TryGetInt64(out var v) ? v : null,
-                    sbyte => kind == JsonValueKind.Number && item.TryGetSByte(out var v) ? v : null,
-                    float => kind == JsonValueKind.Number && item.TryGetSingle(out var v) ? v : null,
-                    ushort => kind == JsonValueKind.Number && item.TryGetUInt16(out var v) ? v : null,
-                    uint => kind == JsonValueKind.Number && item.TryGetUInt32(out var v) ? v : null,
-                    ulong => kind == JsonValueKind.Number && item.TryGetUInt64(out var v) ? v : null,
-                    _ => kind == JsonValueKind.String || typeof(T) == Types.StringType ? item.ToString() : item.Deserialize<T>(options)
-                };
-
-                if (value == null) yield return default;
-                else if (value is T tv) yield return tv;
+                var value = item.GetValue<T>();
+                yield return value;
             }
         }
     }
