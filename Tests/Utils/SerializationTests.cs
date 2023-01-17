@@ -45,6 +45,23 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void GetValueTests()
+        {
+            var json = """{"stringItem": "abc", "boolItem1": "true", "boolItem2": true, "intItem": 12.5}""";
+            var root = JsonDocument.Parse(json).RootElement;
+
+            var boolItem1 = root.GetProperty("boolItem1");
+            Assert.IsNull(boolItem1.GetValue<bool>());
+            Assert.IsTrue(boolItem1.GetValue<bool>(true));
+
+            var boolItem2 = root.GetProperty("boolItem2");
+            Assert.IsTrue(boolItem2.GetValue<bool>());
+
+            var intItem = root.GetProperty("intItem");
+            Assert.IsNull(intItem.GetValue<int>());
+        }
+
+        [Test]
         public void GetArrayTests()
         {
             var json = """{"stringItem": "abc", "stringArray": ["a", "b", "c"], "intArray": [1, 2, "3", "a"], "object": [{"id": "1", "label": "Label"}]}""";

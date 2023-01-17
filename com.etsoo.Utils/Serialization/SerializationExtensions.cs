@@ -155,7 +155,7 @@ namespace com.etsoo.Utils.Serialization
 
             object? value = dv switch
             {
-                bool => (kind == JsonValueKind.True || kind == JsonValueKind.False) && element.TryGetByte(out var v) ? v : (loose ? StringUtils.TryParse<bool>(element.ToString()) : null),
+                bool => (kind == JsonValueKind.True || kind == JsonValueKind.False) ? element.GetBoolean() : (loose ? StringUtils.TryParse<bool>(element.ToString()) : null),
                 DateTime => kind == JsonValueKind.String && element.TryGetDateTime(out var v) ? v : null,
                 DateTimeOffset => kind == JsonValueKind.String && element.TryGetDateTimeOffset(out var v) ? v : null,
                 decimal => kind == JsonValueKind.Number && element.TryGetDecimal(out var v) ? v : (loose ? StringUtils.TryParse<decimal>(element.ToString()) : null),
@@ -164,7 +164,8 @@ namespace com.etsoo.Utils.Serialization
                 short => kind == JsonValueKind.Number && element.TryGetInt16(out var v) ? v : (loose ? StringUtils.TryParse<short>(element.ToString()) : null),
                 int => kind == JsonValueKind.Number && element.TryGetInt32(out var v) ? v : (loose ? StringUtils.TryParse<int>(element.ToString()) : null),
                 long => kind == JsonValueKind.Number && element.TryGetInt64(out var v) ? v : (loose ? StringUtils.TryParse<long>(element.ToString()) : null),
-                sbyte => kind == JsonValueKind.Number && element.TryGetSByte(out var v) ? v : (loose ? StringUtils.TryParse<byte>(element.ToString()) : null),
+                byte => kind == JsonValueKind.Number && element.TryGetByte(out var v) ? v : (loose ? StringUtils.TryParse<byte>(element.ToString()) : null),
+                sbyte => kind == JsonValueKind.Number && element.TryGetSByte(out var v) ? v : (loose ? StringUtils.TryParse<sbyte>(element.ToString()) : null),
                 float => kind == JsonValueKind.Number && element.TryGetSingle(out var v) ? v : (loose ? StringUtils.TryParse<float>(element.ToString()) : null),
                 ushort => kind == JsonValueKind.Number && element.TryGetUInt16(out var v) ? v : (loose ? StringUtils.TryParse<ushort>(element.ToString()) : null),
                 uint => kind == JsonValueKind.Number && element.TryGetUInt32(out var v) ? v : (loose ? StringUtils.TryParse<uint>(element.ToString()) : null),
