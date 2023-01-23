@@ -16,10 +16,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.13.4.2080" />
-    <PackageReference Include="com.etsoo.Utils" Version="1.1.47" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.4.2087" />
+    <PackageReference Include="com.etsoo.Utils" Version="1.1.49" />
     <PackageReference Include="Dapper.StrongName" Version="2.0.123" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
