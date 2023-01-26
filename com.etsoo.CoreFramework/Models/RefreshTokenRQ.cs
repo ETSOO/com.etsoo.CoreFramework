@@ -20,7 +20,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 登录密码
         /// </summary>
         [StringLength(512, MinimumLength = 64)]
-        public string? Pwd;
+        public string? Pwd { get; init; }
 
         /// <summary>
         /// Service id
