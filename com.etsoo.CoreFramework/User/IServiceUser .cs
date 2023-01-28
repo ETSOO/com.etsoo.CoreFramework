@@ -17,7 +17,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="context">Http context</param>
         /// <returns>Service user</returns>
-        static IServiceUser? Create(HttpContext? context) => null;
+        static virtual IServiceUser? Create(HttpContext? context) => null;
 
         /// <summary>
         /// Create non nullable user
@@ -25,7 +25,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="context">Http context</param>
         /// <returns>Service user</returns>
-        static IServiceUser CreateSafe(HttpContext? context) => throw new UnauthorizedAccessException();
+        static virtual IServiceUser CreateSafe(HttpContext? context) => throw new UnauthorizedAccessException();
 
         /// <summary>
         /// Role value

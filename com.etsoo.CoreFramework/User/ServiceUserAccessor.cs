@@ -6,15 +6,29 @@ namespace com.etsoo.CoreFramework.User
     /// Service user accessor
     /// 服务用户访问器
     /// </summary>
-    public class ServiceUserAccessor : IServiceUserAccessor
+    public class ServiceUserAccessor<T> : IServiceUserAccessor<T> where T : class, IServiceUser
     {
-        private readonly HttpContext? context;
+        /// <summary>
+        /// Http Context
+        /// HTTP上下文
+        /// </summary>
+        protected readonly HttpContext? context;
 
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="context">Http context</param>
         public ServiceUserAccessor(HttpContext? context)
         {
             this.context = context;
         }
 
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="httpContextAccessor">Http context accessor</param>
         public ServiceUserAccessor(IHttpContextAccessor httpContextAccessor) : this(httpContextAccessor.HttpContext)
         {
         }
@@ -23,12 +37,23 @@ namespace com.etsoo.CoreFramework.User
         /// Get user
         /// 获取用户
         /// </summary>
-        public IServiceUser? User => ServiceUser.Create(context);
+        public T? User => T.Create(context) as T;
 
         /// <summary>
         /// Get non-null user
         /// 获取非空用户
         /// </summary>
-        public IServiceUser UserSafe => ServiceUser.CreateSafe(context);
+        public T UserSafe
+        {
+            get
+            {
+                var user = User;
+                if (user == null)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+                return user;
+            }
+        }
     }
 }
