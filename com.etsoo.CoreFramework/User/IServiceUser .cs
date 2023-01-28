@@ -2,6 +2,7 @@
 using com.etsoo.Utils.String;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
+using System.Net;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -26,6 +27,17 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="context">Http context</param>
         /// <returns>Service user</returns>
         static virtual IServiceUser CreateSafe(HttpContext? context) => throw new UnauthorizedAccessException();
+
+        /// <summary>
+        /// Create user from result data
+        /// 从操作结果数据创建用户
+        /// </summary>
+        /// <param name="data">Result data</param>
+        /// <param name="ip">Ip address</param>
+        /// <param name="language">Language</param>
+        /// <param name="region">Country or region</param>
+        /// <returns>User</returns>
+        static virtual IServiceUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region) => null;
 
         /// <summary>
         /// Role value
