@@ -4,18 +4,7 @@
     /// Service user accessor interface
     /// 服务用户访问器接口
     /// </summary>
-    public interface IServiceUserAccessor<T> where T : IServiceUser
+    public interface IServiceUserAccessor : IUserAccessor<IServiceUser>
     {
-        /// <summary>
-        /// Get user
-        /// 获取用户
-        /// </summary>
-        T? User { get; }
-
-        /// <summary>
-        /// Get non-null user
-        /// 获取非空用户
-        /// </summary>
-        T UserSafe { get; }
     }
 }
