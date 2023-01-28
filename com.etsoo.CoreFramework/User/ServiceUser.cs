@@ -121,7 +121,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="context">Http context</param>
         /// <returns>Service user</returns>
-        public static IServiceUser? Create(HttpContext? context)
+        public static ServiceUser? Create(HttpContext? context)
         {
             // https://stackoverflow.com/questions/32584074/whats-the-role-of-the-claimsprincipal-why-does-it-have-multiple-identities
             // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
@@ -138,7 +138,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="context">Http context</param>
         /// <returns>Service user</returns>
-        public static IServiceUser CreateSafe(HttpContext? context)
+        public static ServiceUser CreateSafe(HttpContext? context)
         {
             var user = Create(context);
             if (user == null)

@@ -6,7 +6,7 @@ namespace com.etsoo.CoreFramework.User
     /// Service user accessor
     /// 服务用户访问器
     /// </summary>
-    public class ServiceUserAccessor : UserAccessor<IServiceUser>, IServiceUserAccessor
+    public class ServiceUserAccessor : UserAccessor<ServiceUser>, IServiceUserAccessor
     {
         /// <summary>
         /// Constructor
