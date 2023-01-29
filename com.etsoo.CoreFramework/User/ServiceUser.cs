@@ -22,8 +22,8 @@ namespace com.etsoo.CoreFramework.User
         public const string RoleValueClaim = "rolevalue";
 
         /// <summary>
-        /// Create user
-        /// 创建用户
+        /// Create user from claims
+        /// 从声明创建用户
         /// </summary>
         /// <param name="claims">Claims</param>
         /// <returns>User</returns>
@@ -74,7 +74,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="data">Input</param>
         /// <returns>Result</returns>
-        protected static (string? id, string? organization, short? Role, int? deviceId, Guid? uid) GetData(StringKeyDictionaryObject data)
+        static (string? id, string? organization, short? Role, int? deviceId, Guid? uid) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -94,7 +94,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         /// <returns>User</returns>
-        public static ServiceUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
+        public static ServiceUser? CreateFromData(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
         {
             // Get data
             var (id, organization, role, deviceId, uid) = GetData(data);

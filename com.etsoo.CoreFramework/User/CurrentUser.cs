@@ -71,7 +71,7 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, bool Corporate) GetLocalData(StringKeyDictionaryObject data)
+        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, bool Corporate) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Name"),
@@ -92,25 +92,28 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
+        public static CurrentUser? CreateFromData(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
+            // Base
+            var token = ServiceUser.CreateFromData(data, ip, language, region);
+            if (token == null) return null;
+
             // Get data
-            var (id, organization, role, deviceId, uid) = GetData(data);
-            var (name, orgName, avatar, jsonData, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, corporate) = GetData(data);
 
             // Validation
-            if (id == null || string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 return null;
 
             // New user
             return new CurrentUser(
-                id,
-                uid,
-                organization,
+                token.Id,
+                token.Uid,
+                token.Organization,
                 name,
-                role.GetValueOrDefault(),
+                token.RoleValue,
                 ip,
-                deviceId.GetValueOrDefault(),
+                token.DeviceId,
                 language,
                 region,
                 corporate,
@@ -216,7 +219,7 @@ namespace com.etsoo.CoreFramework.User
             base.Update(data);
 
             // Editable fields
-            var (name, orgName, avatar, jsonData, corporate) = GetLocalData(data);
+            var (name, orgName, avatar, jsonData, corporate) = GetData(data);
 
             // Name
             if (name != null)
