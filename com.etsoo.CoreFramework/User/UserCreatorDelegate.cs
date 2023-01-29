@@ -10,5 +10,5 @@ namespace com.etsoo.CoreFramework.User
     /// </summary>
     /// <typeparam name="T">Generic user type</typeparam>
     /// <returns>Result</returns>
-    public delegate T UserCreatorDelegate<T>(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region) where T : IServiceUser;
+    public delegate T? UserCreatorDelegate<T>(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region) where T : IServiceUser;
 }
