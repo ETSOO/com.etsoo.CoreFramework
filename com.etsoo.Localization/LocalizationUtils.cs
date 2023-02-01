@@ -47,6 +47,47 @@ namespace com.etsoo.Localization
         }
 
         /// <summary>
+        /// Get regions by currency (USD, CNY), one currency may be used in multiple countries
+        /// 从币种获取区域信息
+        /// </summary>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        public static IEnumerable<(RegionInfo, CultureInfo)> GetRegionsByCurrency(string currency)
+        {
+            // RegionInfo.CurrentRegion;
+
+            // Two letter code ISO3166 of country / region
+            // new RegionInfo("CN");
+
+            // Cultrue, but new RegionInfo("zh-Hans") will failed because of missing country/region info
+            // new RegionInfo("zh-CN"), new RegionInfo("zh-Hans-CN")
+
+            var cultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+            foreach (var culture in cultures)
+            {
+                var region = new RegionInfo(culture.Name);
+                if (region.ISOCurrencySymbol.Equals(currency))
+                {
+                    yield return (region, culture);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get cultures by country / region code
+        /// Two letter code ISO3166, like CN
+        /// 从国家编号获取文化信息
+        /// </summary>
+        /// <param name="country"></param>
+        /// <returns></returns>
+        public static IEnumerable<CultureInfo> GetCulturesByCountry(string country)
+        {
+            var ends = $"-{country}";
+            return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                              .Where(c => c.Name.EndsWith(ends));
+        }
+
+        /// <summary>
         /// Utc datetime to local
         /// UTC时间转换为本地时间
         /// </summary>

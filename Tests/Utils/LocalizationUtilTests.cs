@@ -59,5 +59,22 @@ namespace Tests.Utils
             Assert.AreEqual(DateTimeKind.Utc, result.Kind);
             Assert.AreEqual(6, result.Day);
         }
+
+        [Test]
+        public void GetRegionsByCurrencyTests()
+        {
+            var (region, culture) = LocalizationUtils.GetRegionsByCurrency("CNY").FirstOrDefault(item => item.Item2.Name.StartsWith("zh-"));
+            Assert.AreEqual("CN", region.TwoLetterISORegionName);
+            Assert.AreEqual("zh-Hans-CN", culture.Name);
+            Assert.IsTrue(LocalizationUtils.GetRegionsByCurrency("EUR").Count() > 3);
+        }
+
+        [Test]
+        public void GetCulturesByCountryTests()
+        {
+            var cultures = LocalizationUtils.GetCulturesByCountry("SG");
+            Assert.IsTrue(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")));
+            Assert.AreEqual(4, cultures.Count());
+        }
     }
 }
