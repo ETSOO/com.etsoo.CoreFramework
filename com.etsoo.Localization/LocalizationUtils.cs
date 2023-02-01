@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
 using TimeZoneConverter;
 
 namespace com.etsoo.Localization
@@ -9,6 +10,8 @@ namespace com.etsoo.Localization
     /// </summary>
     public static class LocalizationUtils
     {
+        private static ConcurrentDictionary<string, (string, string, string)> cachedCurrencies = new();
+
         /// <summary>
         /// Set culture
         /// 设置文化
@@ -52,7 +55,7 @@ namespace com.etsoo.Localization
         /// </summary>
         /// <param name="currency"></param>
         /// <returns></returns>
-        public static IEnumerable<(RegionInfo, CultureInfo)> GetRegionsByCurrency(string currency)
+        public static IEnumerable<(RegionInfo Region, CultureInfo Culture)> GetRegionsByCurrency(string currency)
         {
             // RegionInfo.CurrentRegion;
 
@@ -71,6 +74,33 @@ namespace com.etsoo.Localization
                     yield return (region, culture);
                 }
             }
+        }
+
+        /// <summary>
+        /// Get currency data
+        /// 获取币种信息
+        /// </summary>
+        /// <param name="currency">Curency code</param>
+        /// <returns>Result</returns>
+        public static (string Symbol, string NativeName, string EnglishName)? GetCurrencyData(string currency)
+        {
+            if (cachedCurrencies.TryGetValue(currency, out var data))
+            {
+                return data;
+            }
+
+            var items = GetRegionsByCurrency(currency);
+            if (items.Any())
+            {
+                var region = items.First().Region;
+
+                data = (region.CurrencySymbol, region.CurrencyNativeName, region.CurrencyEnglishName);
+                cachedCurrencies.TryAdd(currency, data);
+
+                return data;
+            }
+
+            return null;
         }
 
         /// <summary>

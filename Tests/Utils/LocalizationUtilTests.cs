@@ -63,9 +63,9 @@ namespace Tests.Utils
         [Test]
         public void GetRegionsByCurrencyTests()
         {
-            var (region, culture) = LocalizationUtils.GetRegionsByCurrency("CNY").FirstOrDefault(item => item.Item2.Name.StartsWith("zh-"));
-            Assert.AreEqual("CN", region.TwoLetterISORegionName);
-            Assert.AreEqual("zh-Hans-CN", culture.Name);
+            var (region, culture) = LocalizationUtils.GetRegionsByCurrency("CNY").FirstOrDefault(item => item.Culture.Name.StartsWith("zh-"));
+            Assert.AreEqual("CN", region?.TwoLetterISORegionName);
+            Assert.AreEqual("zh-Hans-CN", culture?.Name);
             Assert.IsTrue(LocalizationUtils.GetRegionsByCurrency("EUR").Count() > 3);
         }
 
@@ -75,6 +75,14 @@ namespace Tests.Utils
             var cultures = LocalizationUtils.GetCulturesByCountry("SG");
             Assert.IsTrue(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")));
             Assert.AreEqual(4, cultures.Count());
+        }
+
+        [Test]
+        public void GetCurrencyDataTests()
+        {
+            var data = LocalizationUtils.GetCurrencyData("CNY");
+            Assert.AreEqual("¥", data?.Symbol);
+            Assert.AreEqual("Chinese Yuan", data?.EnglishName);
         }
     }
 }
