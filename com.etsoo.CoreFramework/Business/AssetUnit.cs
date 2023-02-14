@@ -1,26 +1,11 @@
 ﻿namespace com.etsoo.CoreFramework.Business
 {
     /// <summary>
-    /// Product units
-    /// 产品单位
+    /// Asset units
+    /// 资产单位
     /// </summary>
-    public enum ProductUnit : byte
+    public enum AssetUnit : byte
     {
-        /// <summary>
-        /// Picese
-        /// 件
-        /// </summary>
-        PC = 1,
-
-        /// <summary>
-        /// Set
-        /// 套
-        /// </summary>
-        SET = 2,
-
-        /**
-         * Merge from RepeatOption
-         * **/
         /// <summary>
         /// Hour
         /// 小时
@@ -85,30 +70,6 @@
         /// Time
         /// 次
         /// </summary>
-        TIME = 99,
-
-        /// <summary>
-        /// Gram
-        /// 克
-        /// </summary>
-        GRAM = 40,
-
-        /// <summary>
-        /// 500G
-        /// 斤
-        /// </summary>
-        JIN = 41,
-
-        /// <summary>
-        /// Kilogram
-        /// 千克
-        /// </summary>
-        KILOGRAM = 42,
-
-        /// <summary>
-        /// Ton
-        /// 吨
-        /// </summary>
-        TON = 49
+        TIME = 99
     }
 }
