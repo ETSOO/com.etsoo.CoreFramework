@@ -36,5 +36,11 @@
         /// </summary>
 
         string WebUrl { get; }
+
+        /// <summary>
+        /// Cache hours
+        /// 缓存小时数
+        /// </summary>
+        double CacheHours { get; }
     }
 }

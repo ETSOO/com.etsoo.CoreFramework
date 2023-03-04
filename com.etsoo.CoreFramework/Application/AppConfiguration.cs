@@ -25,7 +25,8 @@ namespace com.etsoo.CoreFramework.Application
             string[]? cultures = null,
             string? name = null,
             bool modelValidated = false,
-            string? webUrl = null
+            string? webUrl = null,
+            double cacheHours = 24
         )
         {
             // Default languages
@@ -33,6 +34,7 @@ namespace com.etsoo.CoreFramework.Application
 
             ModelValidated = modelValidated;
             WebUrl = webUrl ?? "http://localhost";
+            CacheHours = cacheHours;
 
             if (string.IsNullOrEmpty(name))
             {
@@ -61,7 +63,8 @@ namespace com.etsoo.CoreFramework.Application
             section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
             section.GetValue<string?>("Name"),
             modelValidated,
-            section.GetValue<string?>("WebUrl"))
+            section.GetValue<string?>("WebUrl"),
+            section.GetValue<double?>("CacheHours").GetValueOrDefault(24))
         {
         }
 
@@ -94,5 +97,11 @@ namespace com.etsoo.CoreFramework.Application
         /// 网页地址
         /// </summary>
         public string WebUrl { get; }
+
+        /// <summary>
+        /// Cache hours
+        /// 缓存小时数
+        /// </summary>
+        public double CacheHours { get; }
     }
 }
