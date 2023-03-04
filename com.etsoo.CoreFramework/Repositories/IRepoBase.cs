@@ -106,6 +106,16 @@ namespace com.etsoo.CoreFramework.Repositories
         Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
+        /// Async read JSON data to HTTP Response and return the bytes
+        /// 异步读取JSON数据到HTTP响应并返回写入的字节
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="response">HTTP Response</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
+        /// <returns>Task</returns>
+        Task<ReadOnlyMemory<byte>> ReadJsonToStreamWithReturnAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null);
+
+        /// <summary>
         /// Quick read data
         /// 快速读取数据
         /// </summary>

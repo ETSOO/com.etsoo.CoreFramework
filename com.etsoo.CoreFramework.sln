@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.CoreFramework", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{C39EA40E-BE2D-4473-A798-C90A9CF41758}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "Benchmark\Benchmark.csproj", "{D4AB4C53-D70E-4337-BB5A-EFD9F5DE8D2F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Utils", "com.etsoo.Utils\com.etsoo.Utils.csproj", "{CF54EA4E-9047-4480-AA19-4C190A2ED5CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{CA908B8D-DE52-4592-A247-A0C2E58D70AC}"
@@ -55,10 +53,6 @@ Global
 		{C39EA40E-BE2D-4473-A798-C90A9CF41758}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C39EA40E-BE2D-4473-A798-C90A9CF41758}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C39EA40E-BE2D-4473-A798-C90A9CF41758}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D4AB4C53-D70E-4337-BB5A-EFD9F5DE8D2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4AB4C53-D70E-4337-BB5A-EFD9F5DE8D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4AB4C53-D70E-4337-BB5A-EFD9F5DE8D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4AB4C53-D70E-4337-BB5A-EFD9F5DE8D2F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF54EA4E-9047-4480-AA19-4C190A2ED5CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF54EA4E-9047-4480-AA19-4C190A2ED5CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF54EA4E-9047-4480-AA19-4C190A2ED5CC}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -11,12 +11,12 @@
 		<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.DI</RepositoryUrl>
 		<Authors>ETSOO SmartERP NextGen Team</Authors>
 		<Company>ETSOO / 亿速思维</Company>
-		<Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+		<Copyright>Copyright © ETSOO 2004 - 2023</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>ETSOO DI Utilities
 亿速思维注入工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.8</Version>
+		<Version>1.0.9</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>

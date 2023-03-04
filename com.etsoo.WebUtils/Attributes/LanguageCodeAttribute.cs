@@ -24,6 +24,8 @@ namespace com.etsoo.WebUtils.Attributes
                 return false;
             }
 
+            // zh
+            // zh-Hans
             // zh-CN
             // zh-Hans-CN
             // zh-Hans-HK

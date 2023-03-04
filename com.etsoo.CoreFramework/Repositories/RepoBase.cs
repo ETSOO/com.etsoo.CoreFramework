@@ -285,6 +285,39 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Async read JSON data to HTTP Response and return the bytes
+        /// 异步读取JSON数据到HTTP响应并返回写入的字节
+        /// </summary>
+        /// <param name="command">Command</param>
+        /// <param name="response">HTTP Response</param>
+        /// <param name="collectionNames">Collection names, null means single collection</param>
+        /// <returns>Task</returns>
+        public async Task<ReadOnlyMemory<byte>> ReadJsonToStreamWithReturnAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null)
+        {
+            // Content type
+            response.ContentType = "application/json";
+
+            // Result
+            bool result;
+
+            var writer = new ArrayBufferWriter<byte>();
+
+            // Write to
+            if (collectionNames == null)
+                result = await ReadToStreamAsync(command, writer);
+            else
+                result = await ReadToStreamAsync(command, writer, DataFormat.Json, collectionNames);
+
+            // Write bytes
+            var bytes = writer.WrittenMemory;
+            await response.BodyWriter.WriteAsync(bytes);
+
+            if (!result) response.StatusCode = (int)HttpStatusCode.NoContent;
+
+            return bytes;
+        }
+
+        /// <summary>
         /// Quick read data
         /// 快速读取数据
         /// </summary>

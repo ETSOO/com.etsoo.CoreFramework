@@ -36,18 +36,19 @@ namespace com.etsoo.Web
         public static async Task<string> RenderAsync<M>(string key, string template, M model)
         {
             // Get or add the compiled version
-            var compiledTemplate = templateCache.GetOrAdd(key, k =>
+            if (!templateCache.TryGetValue(key, out var compiledTemplate))
             {
                 // Engine
                 var razorEngine = new RazorEngine();
 
                 // Compile
-                return razorEngine.Compile(template, builder =>
+                compiledTemplate = await razorEngine.CompileAsync(template, builder =>
                 {
-                    // Add the model type reference
                     builder.AddAssemblyReference(typeof(M));
                 });
-            });
+
+                templateCache.TryAdd(key, compiledTemplate);
+            }
 
             // Run and return the result
             return await compiledTemplate.RunAsync(model);

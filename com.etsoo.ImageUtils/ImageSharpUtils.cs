@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils;
-using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 
@@ -49,7 +48,10 @@ namespace com.etsoo.ImageUtils
                         var mime = schema[index..endIndex].Trim();
 
                         // Find format
-                        format = Configuration.Default.ImageFormatsManager.FindFormatByMimeType(mime);
+                        if (Configuration.Default.ImageFormatsManager.TryFindFormatByMimeType(mime, out var foundFormat))
+                        {
+                            format = foundFormat;
+                        }
                     }
                 }
             }

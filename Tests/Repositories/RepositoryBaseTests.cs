@@ -3,8 +3,11 @@ using com.etsoo.CoreFramework.Repositories;
 using com.etsoo.Database;
 using com.etsoo.Utils;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
+using Moq;
 using NUnit.Framework;
+using System.IO.Pipelines;
 using System.Text;
 
 namespace Tests.Repositories
@@ -153,6 +156,25 @@ namespace Tests.Repositories
             Assert.IsTrue(result);
             Assert.IsTrue(json.Contains("\"users\":"));
             Assert.IsTrue(json.Contains("\"data2\":"));
+        }
+
+        [Test]
+        public async Task ReadJsonToStreamWithReturnAsync_Test()
+        {
+            // Arrange
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var command = new CommandDefinition(sql);
+            using var stream = SharedUtils.GetStream();
+
+            // Act
+            var mock = new Mock<HttpResponse>();
+            mock.Setup((o) => o.BodyWriter).Returns(PipeWriter.Create(new MemoryStream()));
+
+            var result = await repo.ReadJsonToStreamWithReturnAsync(command, mock.Object, new[] { "users" });
+            var json = Encoding.UTF8.GetString(result.ToArray());
+
+            // Assert
+            Assert.IsTrue(json.Contains("id"));
         }
     }
 }

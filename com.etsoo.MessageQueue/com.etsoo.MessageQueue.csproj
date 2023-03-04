@@ -11,12 +11,12 @@
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.MessageQueue</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
 	  <Company>ETSOO / 亿速思维</Company>
-	  <Copyright>Copyright © ETSOO 2004 - 2022</Copyright>
+	  <Copyright>Copyright © ETSOO 2004 - 2023</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Description>ETSOO Messge Queue Utilities
 亿速思维消息队列工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.13</Version>
+	  <Version>1.0.14</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
