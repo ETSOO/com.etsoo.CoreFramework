@@ -1,5 +1,4 @@
-﻿using SixLabors.ImageSharp;
-using ZXing.Common;
+﻿using ZXing.Common;
 
 namespace com.etsoo.ImageUtils.Barcode
 {
@@ -62,6 +61,6 @@ namespace com.etsoo.ImageUtils.Barcode
         /// Content
         /// 内容
         /// </summary>
-        public string Content { get; set; } = string.Empty;
+        public required string Content { get; set; }
     }
 }

@@ -13,6 +13,6 @@ namespace com.etsoo.CoreFramework.Models
         /// 核心系统的令牌
         /// </summary>
         [Required]
-        public string Token { get; init; } = null!;
+        public required string Token { get; init; }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using com.etsoo.Utils.Models;
 using com.etsoo.Utils.Serialization;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Buffers;
 using System.Text;
@@ -11,6 +13,121 @@ namespace Tests.Utils
     [TestFixture]
     public class SerializationTests
     {
+        private IDistributedCache CreateDistributedCache()
+        {
+            var services = new ServiceCollection();
+            services.AddDistributedMemoryCache();
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IDistributedCache>();
+        }
+
+        [Test]
+        public async Task CacheFactoryDoStringAsyncTest()
+        {
+            // Arrange
+            var cache = CreateDistributedCache();
+            var key = "key";
+            var value = "value";
+
+            // Act
+            var result = await CacheFactory.DoStringAsync(cache, 1, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.AreEqual(value, result);
+            Assert.AreEqual(value, cache.GetString(key));
+        }
+
+        [Test]
+        public async Task CacheFactoryDoStringAsyncDisabledTest()
+        {
+            // Arrange
+            var cache = CreateDistributedCache();
+            var key = "key";
+            var value = "value";
+
+            // Act
+            var result = await CacheFactory.DoStringAsync(cache, 0, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.AreEqual(value, result);
+            Assert.IsTrue(string.IsNullOrEmpty(cache.GetString(key)));
+        }
+
+        [Test]
+        public async Task CacheFactoryDoAsyncTest()
+        {
+            // Arrange
+            var cache = CreateDistributedCache();
+            var key = "key";
+            var value = new UserModel
+            {
+                Id = 1001,
+                Name = "Admin 1",
+                Status = UserModel.StatusEnum.Deleted
+            };
+
+            // Act
+            var result = await CacheFactory.DoAsync(cache, 1, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.AreEqual(value, result);
+
+            // Act
+            var resultCached = await CacheFactory.DoAsync(cache, 1, () => key, async () =>
+            {
+                Assert.Fail("Not cached");
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.AreNotEqual(value, resultCached);
+        }
+
+        [Test]
+        public async Task CacheFactoryDoBytesAsyncTest()
+        {
+            // Arrange
+            var cache = CreateDistributedCache();
+            var key = "key";
+            var value = Encoding.UTF8.GetBytes("value");
+
+            // Act
+            var (result, cached) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.IsTrue(cached);
+
+            // Act
+            var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
+            {
+                Assert.Fail("Not cached");
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.IsFalse(cached1);
+        }
+
         [Test]
         public async Task ToJsonTest()
         {
