@@ -34,7 +34,7 @@ namespace com.etsoo.Utils.Serialization
             var key = keyFunc();
 
             var cachedBytes = await cache.GetAsync(key);
-            if (cachedBytes is not null)
+            if (cachedBytes is not null && cachedBytes.Any())
             {
                 return await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes));
             }
@@ -74,7 +74,7 @@ namespace com.etsoo.Utils.Serialization
             var key = keyFunc();
 
             var cachedValue = await cache.GetAsync(key);
-            if (cachedValue is not null)
+            if (cachedValue is not null && cachedValue.Any())
             {
                 return (cachedValue, false);
             }

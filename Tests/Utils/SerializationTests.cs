@@ -129,6 +129,35 @@ namespace Tests.Utils
         }
 
         [Test]
+        public async Task CacheFactoryDoBytesAsyncEmptyTest()
+        {
+            // Arrange
+            var cache = CreateDistributedCache();
+            var key = "key";
+            var value = Array.Empty<byte>();
+
+            // Act
+            var (result, cached) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.IsTrue(cached);
+
+            // Act
+            var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
+            {
+                await Task.CompletedTask;
+                return value;
+            });
+
+            // Assert
+            Assert.IsTrue(cached1);
+        }
+
+        [Test]
         public async Task ToJsonTest()
         {
             // Arrange
