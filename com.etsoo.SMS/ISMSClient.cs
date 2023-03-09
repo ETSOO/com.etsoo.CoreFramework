@@ -22,8 +22,9 @@ namespace com.etsoo.SMS
         /// <param name="mobiles">Mobiles</param>
         /// <param name="vars">Variables</param>
         /// <param name="templateId">Template id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, string templateId);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, string templateId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async send SMS with template id
@@ -33,8 +34,9 @@ namespace com.etsoo.SMS
         /// <param name="mobiles">Mobiles</param>
         /// <param name="vars">Variables</param>
         /// <param name="templateId">Template id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, string templateId);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, string templateId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async send SMS
@@ -44,8 +46,9 @@ namespace com.etsoo.SMS
         /// <param name="mobiles">Mobiles</param>
         /// <param name="vars">Variables</param>
         /// <param name="template">Template</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<string> mobiles, Dictionary<string, string> vars, TemplateItem? template = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async send SMS
@@ -55,8 +58,9 @@ namespace com.etsoo.SMS
         /// <param name="mobiles">Mobiles</param>
         /// <param name="vars">Variables</param>
         /// <param name="template">Template</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, TemplateItem? template = null);
+        Task<ActionResult> SendAsync(TemplateKind kind, IEnumerable<AddressRegion.Phone> mobiles, Dictionary<string, string> vars, TemplateItem? template = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async send code with template id
@@ -65,8 +69,9 @@ namespace com.etsoo.SMS
         /// <param name="mobile">Mobile</param>
         /// <param name="code">Code</param>
         /// <param name="templateId">Template id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, string templateId);
+        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, string templateId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async send code
@@ -75,7 +80,8 @@ namespace com.etsoo.SMS
         /// <param name="mobile">Mobile</param>
         /// <param name="code">Code</param>
         /// <param name="template">Template</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, TemplateItem? template = null);
+        Task<ActionResult> SendCodeAsync(AddressRegion.Phone mobile, string code, TemplateItem? template = null, CancellationToken cancellationToken = default);
     }
 }
