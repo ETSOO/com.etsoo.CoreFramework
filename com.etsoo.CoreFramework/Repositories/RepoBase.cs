@@ -58,15 +58,16 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="name">Command text</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null)
+        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default)
         {
             type ??=  App.DB.SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
             // For stored procedure, remove null value parameters
             if (type == CommandType.StoredProcedure) parameters?.ClearNulls();
 
-            return new CommandDefinition(name, parameters, commandType: type);
+            return new CommandDefinition(name, parameters, commandType: type, cancellationToken: cancellationToken);
         }
 
         /// <summary>
@@ -239,7 +240,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -256,7 +257,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer, format, collectionNames);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -310,7 +311,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Write bytes
             var bytes = writer.WrittenMemory;
-            await response.BodyWriter.WriteAsync(bytes);
+            await response.BodyWriter.WriteAsync(bytes, command.CancellationToken);
 
             if (!result) response.StatusCode = (int)HttpStatusCode.NoContent;
 
@@ -322,15 +323,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 快速读取数据
         /// </summary>
         /// <typeparam name="E">Generic return type</typeparam>
+        /// <param name="sql">SQL script</param>
+        /// <param name="parameters">Parameter</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null)
+        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null, CancellationToken cancellationToken = default)
         {
-            var command = CreateCommand(sql, parameters, CommandType.Text);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
 
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryFirstAsync<E>(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -500,7 +504,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (User != null)
                 AddSystemParameters(parameters);
 
-            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
+            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text, configs.CancellationToken);
 
             try
             {

@@ -19,6 +19,12 @@
         public string IdField { get; init; } = "Id";
 
         /// <summary>
+        /// Cancellation token
+        /// 取消令牌
+        /// </summary>
+        public CancellationToken CancellationToken { get; init; } = default;
+
+        /// <summary>
         /// Table name, default is entity name
         /// 表格名称，默认为实体名称
         /// </summary>

@@ -240,7 +240,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="image">Image</param>
         /// <param name="path">Path</param>
         /// <returns>Result</returns>
-        public static bool SaveImage(System.Drawing.Image image, string path)
+        public static bool SaveImage(Image image, string path)
         {
             var codec = GetCodecInfo(path);
             if (codec == null)
@@ -259,7 +259,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="stream">Stream</param>
         /// <param name="format">Format</param>
         /// <returns>Result</returns>
-        public static bool SaveImage(System.Drawing.Image image, Stream stream, ImageFormat? format = null)
+        public static bool SaveImage(Image image, Stream stream, ImageFormat? format = null)
         {
             var codec = GetCodecInfo(format ?? image.RawFormat);
             if (codec == null)

@@ -143,7 +143,7 @@ namespace com.etsoo.Database
             // Has content
             var hasContent = reader.HasRows;
 
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync(command.CancellationToken))
             {
                 // Get the TextReader
                 using var textReader = reader.GetTextReader(0);
@@ -189,7 +189,7 @@ namespace com.etsoo.Database
                     hasContent = true;
 
                     // The content maybe splitted into severl rows
-                    while (await reader.ReadAsync())
+                    while (await reader.ReadAsync(command.CancellationToken))
                     {
                         // NULL may returned
                         if (await reader.IsDBNullAsync(0))
@@ -214,7 +214,7 @@ namespace com.etsoo.Database
                 Encoding.UTF8.GetBytes(format.CreateElementEnd(name), writer);
 
                 i++;
-            } while (await reader.NextResultAsync());
+            } while (await reader.NextResultAsync(command.CancellationToken));
 
             // JSON / XML ends
             Encoding.UTF8.GetBytes(format.RootEnd, writer);

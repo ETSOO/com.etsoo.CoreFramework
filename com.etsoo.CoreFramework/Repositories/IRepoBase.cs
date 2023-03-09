@@ -120,8 +120,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 快速读取数据
         /// </summary>
         /// <typeparam name="E">Generic return type</typeparam>
+        /// <param name="sql">SQL script</param>
+        /// <param name="parameters">Parameter</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null);
+        Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Inline SQL command update

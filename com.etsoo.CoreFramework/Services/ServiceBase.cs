@@ -330,10 +330,12 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="critical">Is critical</param>
         protected void LogException(Exception ex, string message, bool critical = false)
         {
+#pragma warning disable CA2254
             if (critical)
                 Logger.LogCritical(ex, message);
             else
                 Logger.LogError(ex, message);
+#pragma warning restore CA2254
         }
     }
 }

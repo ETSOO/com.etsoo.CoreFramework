@@ -121,11 +121,12 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request uri</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> DeleteAsync<T>(string requestUri)
+        protected async Task<T?> DeleteAsync<T>(string requestUri, CancellationToken cancellationToken = default)
         {
-            using var response = await Client.DeleteAsync(requestUri);
-            return await ResponseToAsync<T>(response);
+            using var response = await Client.DeleteAsync(requestUri, cancellationToken);
+            return await ResponseToAsync<T>(response, cancellationToken);
         }
 
         /// <summary>
@@ -134,18 +135,19 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <param name="requestUri">Request uri</param>
         /// <param name="saveStream">Save stream</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Filename</returns>
-        protected async Task<string> DownloadAsync(string requestUri, Stream saveStream)
+        protected async Task<string> DownloadAsync(string requestUri, Stream saveStream, CancellationToken cancellationToken = default)
         {
             // Get response
-            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             // Ensure success
             response.EnsureSuccessStatusCode();
 
             // Download stream
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            await stream.CopyToAsync(saveStream);
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            await stream.CopyToAsync(saveStream, cancellationToken);
 
             // https://stackoverflow.com/questions/12145390/how-to-set-downloading-file-name-in-asp-net-web-api
             // Filename
@@ -160,10 +162,11 @@ namespace com.etsoo.HTTP
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request uri</param>
         /// <param name="serializerOptions">Serializer options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> GetAsync<T>(string requestUri, JsonSerializerOptions? serializerOptions = null)
+        protected async Task<T?> GetAsync<T>(string requestUri, JsonSerializerOptions? serializerOptions = null, CancellationToken cancellationToken = default)
         {
-            return await Client.GetFromJsonAsync<T>(requestUri, serializerOptions ?? Options);
+            return await Client.GetFromJsonAsync<T>(requestUri, serializerOptions ?? Options, cancellationToken);
         }
 
         /// <summary>
@@ -172,11 +175,12 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <param name="requestUri">Request uri</param>
         /// <param name="stream">Target stream</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected async Task GetAsync(string requestUri, Stream stream)
+        protected async Task GetAsync(string requestUri, Stream stream, CancellationToken cancellationToken = default)
         {
-            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead);
-            await ResponseToAsync(response, stream);
+            using var response = await Client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            await ResponseToAsync(response, stream, cancellationToken);
         }
 
         /// <summary>
@@ -187,12 +191,13 @@ namespace com.etsoo.HTTP
         /// <typeparam name="E">Generic error type</typeparam>
         /// <param name="requestUri">Request uri</param>
         /// <param name="dataField">Data unique field</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> GetAsync<D, E>(string requestUri, string dataField)
+        protected async Task<HttpClientResult<D, E>> GetAsync<D, E>(string requestUri, string dataField, CancellationToken cancellationToken = default)
         {
             // Get response
-            using var response = await Client.GetAsync(requestUri);
-            return await ResponseToAsync<D, E>(response, dataField);
+            using var response = await Client.GetAsync(requestUri, cancellationToken);
+            return await ResponseToAsync<D, E>(response, dataField, cancellationToken);
         }
 
         /// <summary>
@@ -200,11 +205,11 @@ namespace com.etsoo.HTTP
         /// 异步获取网址数据流
         /// </summary>
         /// <param name="uri">Uri</param>
-        /// <param name="token">Cancellation token</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Stream</returns>
-        protected async Task<Stream> GetStreamAsync(Uri uri, CancellationToken token = default)
+        protected async Task<Stream> GetStreamAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            return await Client.GetStreamAsync(uri, token);
+            return await Client.GetStreamAsync(uri, cancellationToken);
         }
 
         /// <summary>
@@ -217,13 +222,14 @@ namespace com.etsoo.HTTP
         /// <param name="data">Data</param>
         /// <param name="serializerOptions">Serializer options</param>
         /// <param name="contentLengthRequird">Content-Length required</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null, bool contentLengthRequird = false)
+        protected async Task<T?> PostAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null, bool contentLengthRequird = false, CancellationToken cancellationToken = default)
         {
             using var response = contentLengthRequird
-                ? await Client.PostAsync(requestUri, CreateJsonStringContent(data, serializerOptions ?? OptionsOut))
-                : await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
-            return await ResponseToAsync<T>(response);
+                ? await Client.PostAsync(requestUri, CreateJsonStringContent(data, serializerOptions ?? OptionsOut), cancellationToken)
+                : await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut, cancellationToken);
+            return await ResponseToAsync<T>(response, cancellationToken);
         }
 
         /// <summary>
@@ -236,12 +242,13 @@ namespace com.etsoo.HTTP
         /// <param name="data">Data</param>
         /// <param name="dataField">Data unique field</param>
         /// <param name="serializerOptions">Serializer options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null)
+        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null, CancellationToken cancellationToken = default)
         {
             // Get response
-            using var response = await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
-            return await ResponseToAsync<D, E>(response, dataField);
+            using var response = await Client.PostAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut, cancellationToken);
+            return await ResponseToAsync<D, E>(response, dataField, cancellationToken);
         }
 
         /// <summary>
@@ -253,12 +260,13 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="content">Content</param>
         /// <param name="dataField">Data unique field</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, HttpContent content, string dataField)
+        protected async Task<HttpClientResult<D, E>> PostAsync<D, E>(string requestUri, HttpContent content, string dataField, CancellationToken cancellationToken = default)
         {
             // Get response
-            using var response = await Client.PostAsync(requestUri, content);
-            return await ResponseToAsync<D, E>(response, dataField);
+            using var response = await Client.PostAsync(requestUri, content, cancellationToken);
+            return await ResponseToAsync<D, E>(response, dataField, cancellationToken);
         }
 
         /// <summary>
@@ -270,8 +278,9 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request Uri</param>
         /// <param name="data">Data</param>
         /// <param name="formatter">Data formatter</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PostFormAsync<D, T>(string requestUri, D data, Func<KeyValuePair<string, object>, KeyValuePair<string, string?>>? formatter = null)
+        protected async Task<T?> PostFormAsync<D, T>(string requestUri, D data, Func<KeyValuePair<string, object>, KeyValuePair<string, string?>>? formatter = null, CancellationToken cancellationToken = default)
         {
             // Deserialize
             var result = await SharedUtils.ObjectToDictionaryAsync(data);
@@ -288,7 +297,7 @@ namespace com.etsoo.HTTP
             }
 
             // Return
-            return await PostFormAsync<T>(requestUri, items as IEnumerable<KeyValuePair<string, string>>);
+            return await PostFormAsync<T>(requestUri, items as IEnumerable<KeyValuePair<string, string>>, cancellationToken);
         }
 
         /// <summary>
@@ -298,11 +307,12 @@ namespace com.etsoo.HTTP
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="requestUri">Request Uri</param>
         /// <param name="data">Directionry data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PostFormAsync<T>(string requestUri, IEnumerable<KeyValuePair<string, string>> data)
+        protected async Task<T?> PostFormAsync<T>(string requestUri, IEnumerable<KeyValuePair<string, string>> data, CancellationToken cancellationToken = default)
         {
-            using var response = await Client.PostAsync(requestUri, new FormUrlEncodedContent(data));
-            return await ResponseToAsync<T>(response);
+            using var response = await Client.PostAsync(requestUri, new FormUrlEncodedContent(data), cancellationToken);
+            return await ResponseToAsync<T>(response, cancellationToken);
         }
 
         /// <summary>
@@ -314,11 +324,12 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="data">Data</param>
         /// <param name="serializerOptions">Serializer options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> PutAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null)
+        protected async Task<T?> PutAsync<D, T>(string requestUri, D data, JsonSerializerOptions? serializerOptions = null, CancellationToken cancellationToken = default)
         {
-            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
-            return await ResponseToAsync<T>(response);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut, cancellationToken);
+            return await ResponseToAsync<T>(response, cancellationToken);
         }
 
         /// <summary>
@@ -331,12 +342,13 @@ namespace com.etsoo.HTTP
         /// <param name="data">Data</param>
         /// <param name="dataField">Data unique field</param>
         /// <param name="serializerOptions">Serializer options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> PutAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null)
+        protected async Task<HttpClientResult<D, E>> PutAsync<D, E>(string requestUri, D data, string dataField, JsonSerializerOptions? serializerOptions = null, CancellationToken cancellationToken = default)
         {
             // Get response
-            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut);
-            return await ResponseToAsync<D, E>(response, dataField);
+            using var response = await Client.PutAsJsonAsync(requestUri, data, serializerOptions ?? OptionsOut, cancellationToken);
+            return await ResponseToAsync<D, E>(response, dataField, cancellationToken);
         }
 
         /// <summary>
@@ -345,14 +357,15 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <param name="response">Http response</param>
         /// <param name="stream">Target stream</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task ResponseToAsync(HttpResponseMessage response, Stream stream)
+        protected async Task ResponseToAsync(HttpResponseMessage response, Stream stream, CancellationToken cancellationToken = default)
         {
             // Ensure success
             response.EnsureSuccessStatusCode();
 
             // Copy to stream
-            await response.Content.CopyToAsync(stream);
+            await response.Content.CopyToAsync(stream, cancellationToken);
         }
 
         /// <summary>
@@ -361,15 +374,16 @@ namespace com.etsoo.HTTP
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="response">Http response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> ResponseToAsync<T>(HttpResponseMessage response)
+        protected async Task<T?> ResponseToAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken = default)
         {
             // Ensure success
             response.EnsureSuccessStatusCode();
 
             // Deserialize
             // Ignore case
-            return await response.Content.ReadFromJsonAsync<T>(Options);
+            return await response.Content.ReadFromJsonAsync<T>(Options, cancellationToken);
         }
 
         /// <summary>
@@ -380,29 +394,30 @@ namespace com.etsoo.HTTP
         /// <typeparam name="E">Generic error type</typeparam>
         /// <param name="response">Http response</param>
         /// <param name="dataField">Data unique field</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<HttpClientResult<D, E>> ResponseToAsync<D, E>(HttpResponseMessage response, string dataField)
+        protected async Task<HttpClientResult<D, E>> ResponseToAsync<D, E>(HttpResponseMessage response, string dataField, CancellationToken cancellationToken = default)
         {
             response.EnsureSuccessStatusCode();
 
             // Get stream
-            await using var stream = await response.Content.ReadAsStreamAsync();
+            await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             // Test first 128-byte characters only
             Memory<byte> bytes = new byte[128];
-            await stream.ReadAsync(bytes);
+            await stream.ReadAsync(bytes, cancellationToken);
 
             var chars = Encoding.UTF8.GetString(bytes.Span);
             stream.Position = 0;
 
             if (Regex.IsMatch(chars, "[\\{\"\\s](" + dataField + ")[\"]?:", RegexOptions.Multiline))
             {
-                var data = await JsonSerializer.DeserializeAsync<D>(stream, Options);
+                var data = await JsonSerializer.DeserializeAsync<D>(stream, Options, cancellationToken);
                 return new HttpClientResult<D, E>(data, default);
             }
             else
             {
-                var error = await JsonSerializer.DeserializeAsync<E>(stream, Options);
+                var error = await JsonSerializer.DeserializeAsync<E>(stream, Options, cancellationToken);
                 return new HttpClientResult<D, E>(default, error);
             }
         }
@@ -414,16 +429,17 @@ namespace com.etsoo.HTTP
         /// <param name="requestUri">Request uri</param>
         /// <param name="content">Content</param>
         /// <param name="method">Method</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Json result</returns>
-        protected async Task<T?> SendAsync<T>(string requestUri, HttpContent content, HttpMethod? method = null)
+        protected async Task<T?> SendAsync<T>(string requestUri, HttpContent content, HttpMethod? method = null, CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri)
             {
                 Content = content
             };
 
-            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            return await ResponseToAsync<T>(response);
+            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            return await ResponseToAsync<T>(response, cancellationToken);
         }
 
         /// <summary>
@@ -434,16 +450,17 @@ namespace com.etsoo.HTTP
         /// <param name="content">Content</param>
         /// <param name="stream">Target stream</param>
         /// <param name="method">Method</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected async Task SendAsync(string requestUri, HttpContent content, Stream stream, HttpMethod? method = null)
+        protected async Task SendAsync(string requestUri, HttpContent content, Stream stream, HttpMethod? method = null, CancellationToken cancellationToken = default)
         {
             var request = new HttpRequestMessage(method ?? HttpMethod.Post, requestUri)
             {
                 Content = content
             };
 
-            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            await ResponseToAsync(response, stream);
+            var response = await Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            await ResponseToAsync(response, stream, cancellationToken);
         }
     }
 }

@@ -18,13 +18,15 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="keyFunc">Key generation function</param>
         /// <param name="actionFunc">Value generaction function</param>
         /// <param name="options">Options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         public static async Task<T?> DoAsync<T>(
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
             Func<Task<T?>> actionFunc,
-            DistributedCacheEntryOptions? options = null)
+            DistributedCacheEntryOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
             if (cacheHours <= 0)
             {
@@ -33,10 +35,10 @@ namespace com.etsoo.Utils.Serialization
 
             var key = keyFunc();
 
-            var cachedBytes = await cache.GetAsync(key);
+            var cachedBytes = await cache.GetAsync(key, cancellationToken);
             if (cachedBytes is not null && cachedBytes.Any())
             {
-                return await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes));
+                return await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes), cancellationToken: cancellationToken);
             }
 
             var newValue = await actionFunc();
@@ -45,7 +47,7 @@ namespace com.etsoo.Utils.Serialization
             {
                 SlidingExpiration = TimeSpan.FromHours(cacheHours)
             };
-            await cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(newValue), options);
+            await cache.SetAsync(key, JsonSerializer.SerializeToUtf8Bytes(newValue), options, cancellationToken);
 
             return newValue;
         }
@@ -58,13 +60,15 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="keyFunc">Key generation function</param>
         /// <param name="actionFunc">Value generaction function</param>
         /// <param name="options">Options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
         public static async Task<(ReadOnlyMemory<byte>, bool)> DoBytesAsync(
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
             Func<Task<ReadOnlyMemory<byte>>> actionFunc,
-            DistributedCacheEntryOptions? options = null)
+            DistributedCacheEntryOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
             if (cacheHours <= 0)
             {
@@ -73,7 +77,7 @@ namespace com.etsoo.Utils.Serialization
 
             var key = keyFunc();
 
-            var cachedValue = await cache.GetAsync(key);
+            var cachedValue = await cache.GetAsync(key, cancellationToken);
             if (cachedValue is not null && cachedValue.Any())
             {
                 return (cachedValue, false);
@@ -85,7 +89,7 @@ namespace com.etsoo.Utils.Serialization
             {
                 SlidingExpiration = TimeSpan.FromHours(cacheHours)
             };
-            await cache.SetAsync(key, newValue.ToArray(), options);
+            await cache.SetAsync(key, newValue.ToArray(), options, cancellationToken);
 
             return (newValue, true);
         }
@@ -98,13 +102,15 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="keyFunc">Key generation function</param>
         /// <param name="actionFunc">Value generaction function</param>
         /// <param name="options">Options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         public static async Task<string> DoStringAsync(
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
             Func<Task<string>> actionFunc,
-            DistributedCacheEntryOptions? options = null)
+            DistributedCacheEntryOptions? options = null,
+            CancellationToken cancellationToken = default)
         {
             if (cacheHours <= 0)
             {
@@ -113,7 +119,7 @@ namespace com.etsoo.Utils.Serialization
 
             var key = keyFunc();
 
-            var cachedValue = await cache.GetStringAsync(key);
+            var cachedValue = await cache.GetStringAsync(key, cancellationToken);
             if (!string.IsNullOrEmpty(cachedValue))
             {
                 return cachedValue;
@@ -125,7 +131,7 @@ namespace com.etsoo.Utils.Serialization
             {
                 SlidingExpiration = TimeSpan.FromHours(cacheHours)
             };
-            await cache.SetStringAsync(key, newValue, options);
+            await cache.SetStringAsync(key, newValue, options, cancellationToken);
 
             return newValue;
         }

@@ -165,8 +165,9 @@ namespace com.etsoo.Database
         /// 带回调的数据库链接
         /// </summary>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task WithConnection(Func<C, Task> func);
+        Task WithConnection(Func<C, Task> func, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// With callback connection
@@ -174,8 +175,9 @@ namespace com.etsoo.Database
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<T> WithConnection<T>(Func<C, Task<T>> func);
+        Task<T> WithConnection<T>(Func<C, Task<T>> func, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// With callback connection
@@ -183,8 +185,9 @@ namespace com.etsoo.Database
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func);
+        ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Execute a command asynchronously
@@ -199,8 +202,9 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The number of rows affected</returns>
-        Task<int> ExecuteAsync(string commandText, object? parameters = null, CommandType? commandType = null);
+        Task<int> ExecuteAsync(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Execute parameterized SQL that selects a single value
@@ -217,8 +221,9 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The first cell selected as T</returns>
-        Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null);
+        Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async query command as source generated object list
@@ -246,8 +251,9 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<IEnumerable<T>> QueryAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null);
+        Task<IEnumerable<T>> QueryAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async query command as single object
@@ -266,8 +272,9 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<T?> QuerySingleAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null);
+        Task<T?> QuerySingleAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async query command as source generated object list
@@ -277,8 +284,9 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null) where D : IDataReaderParser<D>;
+        IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
 
         /// <summary>
         /// Async query command as action result

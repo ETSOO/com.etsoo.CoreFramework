@@ -60,7 +60,7 @@ namespace com.etsoo.ImageUtils
 
             await using var ms = SharedUtils.GetStream(Convert.FromBase64String(input.Trim()));
 
-            using var image = await SixLabors.ImageSharp.Image.LoadAsync(ms, token);
+            using var image = await Image.LoadAsync(ms, token);
 
             await image.SaveAsync(stream, format, token);
 

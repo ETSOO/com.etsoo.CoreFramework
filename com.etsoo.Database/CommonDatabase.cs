@@ -184,12 +184,13 @@ namespace com.etsoo.Database
         /// 带回调的数据库链接
         /// </summary>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public async Task WithConnection(Func<C, Task> func)
+        public async Task WithConnection(Func<C, Task> func, CancellationToken cancellationToken = default)
         {
             await using var connection = NewConnection();
 
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             await func(connection);
 
@@ -202,12 +203,13 @@ namespace com.etsoo.Database
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<T> WithConnection<T>(Func<C, Task<T>> func)
+        public async Task<T> WithConnection<T>(Func<C, Task<T>> func, CancellationToken cancellationToken = default)
         {
             await using var connection = NewConnection();
 
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             return await func(connection);
         }
@@ -218,12 +220,13 @@ namespace com.etsoo.Database
         /// </summary>
         /// <typeparam name="T">Generic result type</typeparam>
         /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func)
+        public async ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func, CancellationToken cancellationToken = default)
         {
             await using var connection = NewConnection();
 
-            await connection.OpenAsync();
+            await connection.OpenAsync(cancellationToken);
 
             return await func(connection);
         }
@@ -239,19 +242,22 @@ namespace com.etsoo.Database
             return await WithConnection((connection) =>
             {
                 return connection.ExecuteAsync(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
         /// Execute a command asynchronously
         /// SQL Server: SET NOCOUNT OFF, MySQL: UseAffectedRows = True
         /// </summary>
-        /// <param name="command">The command to execute on this connection</param>
+        /// <param name="commandText">Command text</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The number of rows affected</returns>
-        public async Task<int> ExecuteAsync(string commandText, object? parameters = null, CommandType? commandType = null)
+        public async Task<int> ExecuteAsync(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
-            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return await ExecuteAsync(command);
         }
 
@@ -266,7 +272,7 @@ namespace com.etsoo.Database
             return await WithConnection((connection) =>
             {
                 return connection.ExecuteScalarAsync<T>(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -276,11 +282,12 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The first cell selected as T</returns>
-        public async Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        public async Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
-            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return await ExecuteScalarAsync<T>(command);
         }
 
@@ -296,7 +303,7 @@ namespace com.etsoo.Database
             return await WithConnection((connection) =>
             {
                 return connection.QueryAsync<T>(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -307,11 +314,12 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<IEnumerable<T>> QueryAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
-            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return await QueryAsync<T>(command);
         }
 
@@ -327,7 +335,7 @@ namespace com.etsoo.Database
             return await WithConnection((connection) =>
             {
                 return connection.QueryFirstOrDefaultAsync<T>(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -338,11 +346,12 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<T?> QuerySingleAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null)
+        public async Task<T?> QuerySingleAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
-            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return await QuerySingleAsync<T>(command);
         }
 
@@ -378,11 +387,12 @@ namespace com.etsoo.Database
         /// <param name="commandText">The command to execute on this connection</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="commandType">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null) where D : IDataReaderParser<D>
+        public IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
-            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType);
+            var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return QuerySourceAsync<D>(command);
         }
 
@@ -397,7 +407,7 @@ namespace com.etsoo.Database
             return await WithValueConnection((connection) =>
             {
                 return connection.QueryAsResultAsync(command);
-            });
+            }, command.CancellationToken);
         }
 
         /// <summary>
