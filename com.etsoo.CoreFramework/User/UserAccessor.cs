@@ -13,13 +13,21 @@
         public T? User { get; }
 
         /// <summary>
+        /// Cancellation token
+        /// 取消令牌
+        /// </summary>
+        public CancellationToken CancellationToken { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="user">User</param>
-        public UserAccessor(T? user)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public UserAccessor(T? user, CancellationToken cancellationToken)
         {
             User = user;
+            CancellationToken = cancellationToken;
         }
 
         /// <summary>

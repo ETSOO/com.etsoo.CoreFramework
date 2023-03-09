@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using com.etsoo.WebUtils;
+using Microsoft.AspNetCore.Http;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -14,7 +15,7 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="httpContextAccessor">Http context accessor</param>
         public ServiceUserAccessor(IHttpContextAccessor httpContextAccessor)
-            : base(ServiceUser.Create(httpContextAccessor.HttpContext))
+            : base(ServiceUser.Create(httpContextAccessor.HttpContext), httpContextAccessor.CancellationToken())
         {
         }
     }
