@@ -22,8 +22,9 @@ namespace com.etsoo.CoreFramework.Repositories
     /// virutal + override vs new: https://stackoverflow.com/questions/159978/c-sharp-keyword-usage-virtualoverride-vs-new
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
-    public abstract partial class RepoBase<C> : IRepoBase
+    public abstract partial class RepoBase<C, A> : IRepoBase
         where C : DbConnection
+        where A : ICoreApplication<C>
     {
         /// <summary>
         /// Current user
@@ -41,7 +42,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Application
         /// 程序对象
         /// </summary>
-        protected virtual ICoreApplication<C> App { get; }
+        protected readonly A App;
 
         /// <summary>
         /// Constructor
@@ -50,7 +51,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="app">Application</param>
         /// <param name="flag">Flag</param>
         /// <param name="user">Current user</param>
-        protected RepoBase(ICoreApplication<C> app, string flag, IServiceUser? user = null) => (App, Flag, User) = (app, flag, user);
+        protected RepoBase(A app, string flag, IServiceUser? user = null) => (App, Flag, User) = (app, flag, user);
 
         /// <summary>
         /// Create command, default parameters added

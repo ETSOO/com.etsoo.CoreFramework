@@ -17,16 +17,17 @@ namespace com.etsoo.CoreFramework.Repositories
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityRepo<C, T> : RepoBase<C>, IEntityRepo<T>
+    public abstract class EntityRepo<C, T, A> : RepoBase<C, A>, IEntityRepo<T>
         where C : DbConnection
         where T : struct
+        where A : ICoreApplication<C>
     {
         /// <summary>
         /// Public data view range
         /// </summary>
         public const string PublicRange = "public";
 
-        protected EntityRepo(ICoreApplication<C> app, string flag, IServiceUser? user = null) : base(app, flag, user)
+        protected EntityRepo(A app, string flag, IServiceUser? user = null) : base(app, flag, user)
         {
         }
 
