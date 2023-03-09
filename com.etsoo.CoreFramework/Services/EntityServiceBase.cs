@@ -27,7 +27,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="app">App</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public EntityServiceBase(ICoreApplication<C> app, R repo, ILogger logger) : base(app, repo, logger)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public EntityServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default)
+            : base(app, repo, logger, cancellationToken)
         {
         }
 
@@ -39,7 +41,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> CreateAsync(object model)
         {
-            return await Repo.CreateAsync(model);
+            return await Repo.CreateAsync(model, CancellationToken);
         }
 
         /// <summary>
@@ -50,7 +52,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> DeleteAsync(T id)
         {
-            return await Repo.DeleteAsync(id);
+            return await Repo.DeleteAsync(id, CancellationToken);
         }
 
         /// <summary>
@@ -61,7 +63,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
-            return await Repo.DeleteAsync(ids);
+            return await Repo.DeleteAsync(ids, CancellationToken);
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
         {
-            await Repo.ListAsync(model, response);
+            await Repo.ListAsync(model, response, CancellationToken);
         }
 
         /// <summary>
@@ -87,7 +89,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct
         {
-            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames);
+            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames, CancellationToken);
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Entity</returns>
         public async Task<E> ReadAsync<E>(T id, string range = "default")
         {
-            return await Repo.ReadAsync<E>(id, range);
+            return await Repo.ReadAsync<E>(id, range, CancellationToken);
         }
 
         /// <summary>
@@ -114,7 +116,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, range, collectionNames);
+            await Repo.ReadAsync(response, id, range, collectionNames, CancellationToken);
         }
 
         /// <summary>
@@ -128,7 +130,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReportAsync(response, range, modal, collectionNames);
+            await Repo.ReportAsync(response, range, modal, collectionNames, CancellationToken);
         }
 
         /// <summary>
@@ -139,7 +141,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Rows affected</returns>
         public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
         {
-            return await Repo.SortAsync(sortData);
+            return await Repo.SortAsync(sortData, CancellationToken);
         }
 
         /// <summary>
@@ -150,7 +152,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> UpdateAsync(UpdateModel<T> model)
         {
-            return await Repo.UpdateAsync(model);
+            return await Repo.UpdateAsync(model, CancellationToken);
         }
 
         /// <summary>
@@ -163,7 +165,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, "update", collectionNames);
+            await Repo.ReadAsync(response, id, "update", collectionNames, CancellationToken);
         }
     }
 }

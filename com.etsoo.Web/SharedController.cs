@@ -1,10 +1,10 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
+using com.etsoo.WebUtils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Mime;
@@ -37,6 +37,12 @@ namespace com.etsoo.Web
         protected readonly string? UserAgent;
 
         /// <summary>
+        /// Cancellation token
+        /// 取消令牌
+        /// </summary>
+        protected readonly CancellationToken CancellationToken;
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -44,17 +50,17 @@ namespace com.etsoo.Web
         /// <param name="context">Http context accessor</param>
         public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor context) : base()
         {
-            var ip = context.HttpContext?.Connection.RemoteIpAddress;
-            if (ip == null)
-            {
-                throw new NullReferenceException(nameof(ip));
-            }
-            Ip = ip;
-
-            CoreApp = coreApp;
+            // Remote IP
+            Ip = context.RemoteIpAddress();
 
             // IHeaderDictionary will return StringValues.Empty for missing entries
-            UserAgent = context.HttpContext?.Request.Headers[HeaderNames.UserAgent];
+            UserAgent = context.UserAgent();
+
+            // Cancellation token
+            CancellationToken = context.CancellationToken();
+
+            // App reference
+            CoreApp = coreApp;
         }
 
         /// <summary>

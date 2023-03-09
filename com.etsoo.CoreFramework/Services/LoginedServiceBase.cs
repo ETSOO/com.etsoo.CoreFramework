@@ -20,7 +20,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Current user
         /// 当前用户
         /// </summary>
-        virtual protected IServiceUser User { get; }
+        protected readonly IServiceUser User;
 
         /// <summary>
         /// Constructor
@@ -29,7 +29,8 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="app">Application</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public LoginedServiceBase(ICoreApplication<C> app, R repo, ILogger logger) : base(app, repo, logger)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public LoginedServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default) : base(app, repo, logger, cancellationToken)
         {
             if (repo.User == null)
             {

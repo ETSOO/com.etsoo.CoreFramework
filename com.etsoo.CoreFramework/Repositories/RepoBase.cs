@@ -28,19 +28,19 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        public virtual IServiceUser? User { get; }
-
-        /// <summary>
-        /// Application
-        /// 程序对象
-        /// </summary>
-        virtual protected ICoreApplication<C> App { get; }
+        public IServiceUser? User { get; }
 
         /// <summary>
         /// Flag
         /// 标识
         /// </summary>
         public string Flag { get; }
+
+        /// <summary>
+        /// Application
+        /// 程序对象
+        /// </summary>
+        protected readonly ICoreApplication<C> App;
 
         /// <summary>
         /// Constructor

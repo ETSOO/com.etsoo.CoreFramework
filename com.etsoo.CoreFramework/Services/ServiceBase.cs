@@ -32,19 +32,25 @@ namespace com.etsoo.CoreFramework.Services
         /// Application
         /// 程序对象
         /// </summary>
-        virtual protected ICoreApplication<C> App { get; }
+        protected readonly ICoreApplication<C> App;
 
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
-        protected ILogger Logger { get; }
+        protected readonly ILogger Logger;
 
         /// <summary>
         /// Database repository
         /// 数据库仓库
         /// </summary>
-        protected R Repo { get; }
+        protected readonly R Repo;
+
+        /// <summary>
+        /// Cancellation token
+        /// 取消令牌
+        /// </summary>
+        protected readonly CancellationToken CancellationToken;
 
         /// <summary>
         /// Secret passphrase
@@ -59,11 +65,13 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="app">Application</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        public ServiceBase(ICoreApplication<C> app, R repo, ILogger logger)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public ServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default)
         {
             App = app;
             Repo = repo;
             Logger = logger;
+            CancellationToken = cancellationToken;
         }
 
         /// <summary>
