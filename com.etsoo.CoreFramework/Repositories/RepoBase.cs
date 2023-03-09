@@ -19,6 +19,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// <summary>
     /// Base repository
     /// 基础仓库
+    /// virutal + override vs new: https://stackoverflow.com/questions/159978/c-sharp-keyword-usage-virtualoverride-vs-new
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
     public abstract partial class RepoBase<C> : IRepoBase
@@ -28,7 +29,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Current user
         /// 当前用户
         /// </summary>
-        public IServiceUser? User { get; }
+        public virtual IServiceUser? User { get; }
 
         /// <summary>
         /// Flag
@@ -40,7 +41,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// Application
         /// 程序对象
         /// </summary>
-        protected readonly ICoreApplication<C> App;
+        protected virtual ICoreApplication<C> App { get; }
 
         /// <summary>
         /// Constructor

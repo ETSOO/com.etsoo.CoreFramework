@@ -32,19 +32,19 @@ namespace com.etsoo.CoreFramework.Services
         /// Application
         /// 程序对象
         /// </summary>
-        protected readonly ICoreApplication<C> App;
+        protected virtual ICoreApplication<C> App { get; }
+
+        /// <summary>
+        /// Database repository
+        /// 数据库仓库
+        /// </summary>
+        protected virtual R Repo { get; }
 
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
         protected readonly ILogger Logger;
-
-        /// <summary>
-        /// Database repository
-        /// 数据库仓库
-        /// </summary>
-        protected readonly R Repo;
 
         /// <summary>
         /// Cancellation token
