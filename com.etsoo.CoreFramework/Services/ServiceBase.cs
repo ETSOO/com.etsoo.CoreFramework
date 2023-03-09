@@ -16,9 +16,10 @@ namespace com.etsoo.CoreFramework.Services
     /// Service base for business logic
     /// 业务逻辑的基础服务
     /// </summary>
-    public abstract class ServiceBase<C, R> : IServiceBase
+    public abstract class ServiceBase<C, R, A> : IServiceBase
         where C : DbConnection
         where R : IRepoBase
+        where A : ICoreApplication<C>
     {
         // Duration seconds for time span of the server side and browser/client side
         private const int DurationSeconds = 120;
@@ -32,7 +33,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Application
         /// 程序对象
         /// </summary>
-        protected virtual ICoreApplication<C> App { get; }
+        protected virtual A App { get; }
 
         /// <summary>
         /// Database repository
@@ -66,7 +67,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public ServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default)
+        public ServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default)
         {
             App = app;
             Repo = repo;

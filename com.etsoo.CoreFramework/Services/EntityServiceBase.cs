@@ -15,10 +15,11 @@ namespace com.etsoo.CoreFramework.Services
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityServiceBase<C, R, T> : LoginedServiceBase<C, R>, IEntityServiceBase<T>
+    public abstract class EntityServiceBase<C, R, T, A> : LoginedServiceBase<C, R, A>, IEntityServiceBase<T>
         where C : DbConnection
         where R : IEntityRepo<T>
         where T : struct
+        where A : ICoreApplication<C>
     {
         /// <summary>
         /// Constructor
@@ -28,7 +29,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public EntityServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default)
+        public EntityServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default)
             : base(app, repo, logger, cancellationToken)
         {
         }

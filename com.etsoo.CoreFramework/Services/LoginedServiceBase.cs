@@ -12,9 +12,10 @@ namespace com.etsoo.CoreFramework.Services
     /// </summary>
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
-    public abstract class LoginedServiceBase<C, R> : ServiceBase<C, R>
+    public abstract class LoginedServiceBase<C, R, A> : ServiceBase<C, R, A>
         where C : DbConnection
         where R : IRepoBase
+        where A : ICoreApplication<C>
     {
         /// <summary>
         /// Current user
@@ -30,7 +31,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public LoginedServiceBase(ICoreApplication<C> app, R repo, ILogger logger, CancellationToken cancellationToken = default) : base(app, repo, logger, cancellationToken)
+        public LoginedServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default) : base(app, repo, logger, cancellationToken)
         {
             if (repo.User == null)
             {

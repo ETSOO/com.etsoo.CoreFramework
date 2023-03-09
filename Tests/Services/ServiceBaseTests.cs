@@ -12,7 +12,7 @@ using Tests.Repositories;
 
 namespace Tests.Services
 {
-    internal class ServiceTest : ServiceBase<SqlConnection, IntEntityRepository>
+    internal class ServiceTest : ServiceBase<SqlConnection, IntEntityRepository, ICoreApplication<SqlConnection>>
     {
         public ServiceTest(ICoreApplication<SqlConnection> app, IntEntityRepository repo, ILogger logger) : base(app, repo, logger)
         {
