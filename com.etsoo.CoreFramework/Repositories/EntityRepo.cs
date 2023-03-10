@@ -36,15 +36,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 创建实体
         /// </summary>
         /// <param name="model">Model</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> CreateAsync(object model, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<IActionResult> CreateAsync(object model)
         {
             var parameters = FormatParameters(model);
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("create"), parameters, cancellationToken: cancellationToken);
+            var command = CreateCommand(GetCommandName("create"), parameters);
 
             return await QueryAsResultAsync(command);
         }
@@ -54,9 +53,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 创建删除命令
         /// </summary>
         /// <param name="ids">Entity ids</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids, CancellationToken cancellationToken = default)
+        protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids)
         {
             var parameters = new DbParameters();
 
@@ -65,7 +63,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            return CreateCommand(GetCommandName("delete"), parameters, cancellationToken: cancellationToken);
+            return CreateCommand(GetCommandName("delete"), parameters);
         }
 
         /// <summary>
@@ -73,11 +71,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 删除单个实体
         /// </summary>
         /// <param name="id">Entity id</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(T id, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<IActionResult> DeleteAsync(T id)
         {
-            return await DeleteAsync(new T[] { id }, cancellationToken);
+            return await DeleteAsync(new T[] { id });
         }
 
         /// <summary>
@@ -85,11 +82,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 删除多个实体
         /// </summary>
         /// <param name="ids">Entity ids</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
-            var command = NewDeleteCommand(ids, cancellationToken);
+            var command = NewDeleteCommand(ids);
             var result = await QueryAsResultAsync(command);
 
             // Send back the ids
@@ -125,9 +121,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="range">View range</param>
         /// <param name="format">Date format</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReadCommand(T id, string range, DataFormat? format = null, CancellationToken cancellationToken = default)
+        protected virtual CommandDefinition NewReadCommand(T id, string range, DataFormat? format = null)
         {
             var name = GetReadCommand(range, format);
 
@@ -140,7 +135,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 AddSystemParameters(parameters);
             }
 
-            return CreateCommand(name, parameters, cancellationToken: cancellationToken);
+            return CreateCommand(name, parameters);
         }
 
         /// <summary>
@@ -150,16 +145,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic entity data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Entity</returns>
-        public virtual async Task<E> ReadAsync<E>(T id, string range = "default", CancellationToken cancellationToken = default)
+        public virtual async Task<E> ReadAsync<E>(T id, string range = "default")
         {
-            var command = NewReadCommand(id, range, null, cancellationToken);
+            var command = NewReadCommand(id, range, null);
 
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryFirstAsync<E>(command);
-            }, cancellationToken);
+            }, CancellationToken);
         }
 
         /// <summary>
@@ -170,12 +164,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="format">Data format</param>
         /// <param name="multipleResults">Multiple results</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual async Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default)
+        public virtual async Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null)
         {
             format ??= DataFormat.Json;
-            var command = NewReadCommand(id, range, format, cancellationToken);
+            var command = NewReadCommand(id, range, format);
 
             if (collectionNames == null)
                 await ReadToStreamAsync(command, writer);
@@ -191,11 +184,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default)
+        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
-            var command = NewReadCommand(id, range, DataFormat.Json, cancellationToken);
+            var command = NewReadCommand(id, range, DataFormat.Json);
             await ReadJsonToStreamAsync(command, response, collectionNames);
         }
 
@@ -206,9 +198,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">Report range</param>
         /// <param name="model">Condition model</param>
         /// <param name="format">Date format</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewReportCommand(string range, object? model = null, DataFormat? format = null, CancellationToken cancellationToken = default)
+        protected virtual CommandDefinition NewReportCommand(string range, object? model = null, DataFormat? format = null)
         {
             // Avoid possible SQL injection attack
             FilterRange(range);
@@ -238,15 +229,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic list item type</typeparam>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual async Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null, CancellationToken cancellationToken = default)
+        public virtual async Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null)
         {
-            var command = NewReportCommand(range, modal, null, cancellationToken);
+            var command = NewReportCommand(range, modal, null);
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryAsync<E>(command);
-            }, cancellationToken);
+            }, CancellationToken);
         }
 
         /// <summary>
@@ -258,12 +248,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default)
+        public virtual async Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null)
         {
             format ??= DataFormat.Json;
-            var command = NewReportCommand(range, modal, format, cancellationToken);
+            var command = NewReportCommand(range, modal, format);
 
             if (collectionNames == null)
                 await ReadToStreamAsync(command, writer);
@@ -279,11 +268,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default)
+        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
         {
-            var command = NewReportCommand(range, modal, DataFormat.Json, cancellationToken);
+            var command = NewReportCommand(range, modal, DataFormat.Json);
             await ReadJsonToStreamAsync(command, response, collectionNames);
         }
 
@@ -292,16 +280,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 数据排序
         /// </summary>
         /// <param name="sortData">Data to sort</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rows affected</returns>
-        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData, CancellationToken cancellationToken = default)
+        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
         {
             var parameters = new DbParameters();
             parameters.Add("Items", App.DB.DictionaryToParameter(sortData, null, null, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, App.BuildCommandName)));
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("sort"), parameters, cancellationToken: cancellationToken);
+            var command = CreateCommand(GetCommandName("sort"), parameters);
 
             return await ExecuteAsync(command);
         }
@@ -312,15 +299,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <typeparam name="M">Generic entity model type</typeparam>
         /// <param name="model">Model</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> UpdateAsync<M>(M model, CancellationToken cancellationToken = default) where M : IdItem<T>, IUpdateModel
+        public virtual async ValueTask<IActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel
         {
             var parameters = FormatParameters(model);
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("update"), parameters, cancellationToken: cancellationToken);
+            var command = CreateCommand(GetCommandName("update"), parameters);
 
             var result = await QueryAsResultAsync(command);
 
@@ -336,15 +322,14 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response, CancellationToken cancellationToken = default)
+        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
         {
             var parameters = FormatParameters(model);
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("list as json"), parameters, cancellationToken: cancellationToken);
+            var command = CreateCommand(GetCommandName("list as json"), parameters);
 
             await ReadJsonToStreamAsync(command, response);
         }
@@ -357,9 +342,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default) where E : struct where D : QueryRQ<E>
+        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where D : QueryRQ<E>
         {
             var parameters = FormatParameters(model);
 
@@ -371,7 +355,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 commandText = commandText.Replace("query as", $"query {queryKey} as");
             }
 
-            var command = CreateCommand(GetCommandName(commandText), parameters, cancellationToken: cancellationToken);
+            var command = CreateCommand(GetCommandName(commandText), parameters);
 
             await ReadJsonToStreamAsync(command, response, collectionNames);
         }

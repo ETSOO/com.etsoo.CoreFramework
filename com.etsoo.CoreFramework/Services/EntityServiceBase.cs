@@ -42,7 +42,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> CreateAsync(object model)
         {
-            return await Repo.CreateAsync(model, CancellationToken);
+            return await Repo.CreateAsync(model);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> DeleteAsync(T id)
         {
-            return await Repo.DeleteAsync(id, CancellationToken);
+            return await Repo.DeleteAsync(id);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
-            return await Repo.DeleteAsync(ids, CancellationToken);
+            return await Repo.DeleteAsync(ids);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
         {
-            await Repo.ListAsync(model, response, CancellationToken);
+            await Repo.ListAsync(model, response);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct
         {
-            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames, CancellationToken);
+            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Entity</returns>
         public async Task<E> ReadAsync<E>(T id, string range = "default")
         {
-            return await Repo.ReadAsync<E>(id, range, CancellationToken);
+            return await Repo.ReadAsync<E>(id, range);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, range, collectionNames, CancellationToken);
+            await Repo.ReadAsync(response, id, range, collectionNames);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReportAsync(response, range, modal, collectionNames, CancellationToken);
+            await Repo.ReportAsync(response, range, modal, collectionNames);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Rows affected</returns>
         public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
         {
-            return await Repo.SortAsync(sortData, CancellationToken);
+            return await Repo.SortAsync(sortData);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual async ValueTask<IActionResult> UpdateAsync(UpdateModel<T> model)
         {
-            return await Repo.UpdateAsync(model, CancellationToken);
+            return await Repo.UpdateAsync(model);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Task</returns>
         public async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, "update", collectionNames, CancellationToken);
+            await Repo.ReadAsync(response, id, "update", collectionNames);
         }
     }
 }

@@ -20,27 +20,24 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 创建实体
         /// </summary>
         /// <param name="model">Model</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> CreateAsync(object model, CancellationToken cancellationToken = default);
+        ValueTask<IActionResult> CreateAsync(object model);
 
         /// <summary>
         /// Delete single entity
         /// 删除单个实体
         /// </summary>
         /// <param name="id">Entity id</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> DeleteAsync(T id, CancellationToken cancellationToken = default);
+        ValueTask<IActionResult> DeleteAsync(T id);
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
         /// <param name="ids">Entity ids</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids, CancellationToken cancellationToken = default);
+        ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids);
 
         /// <summary>
         /// View entity
@@ -49,9 +46,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic entity data type</typeparam>
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Entity</returns>
-        Task<E> ReadAsync<E>(T id, string range = "default", CancellationToken cancellationToken = default);
+        Task<E> ReadAsync<E>(T id, string range = "default");
 
         /// <summary>
         /// View entity to PipeWriter
@@ -62,9 +58,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="format">Data format</param>
         /// <param name="collectionNames">Collection names</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default);
+        Task ReadAsync(IBufferWriter<byte> writer, T id, string range = "default", DataFormat? format = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// View entity JSON data HTTP Response
@@ -74,9 +69,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Id</param>
         /// <param name="range">Range</param>
         /// <param name="collectionNames">Collection names</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default);
+        Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Entity report
@@ -85,9 +79,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D">Generic list item type</typeparam>
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null, CancellationToken cancellationToken = default);
+        Task<IEnumerable<E>> ReportAsync<E>(string range, object? modal = null);
 
         /// <summary>
         /// Entity report to PipeWriter
@@ -98,9 +91,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="modal">Condition modal</param>
         /// <param name="format">Data format</param>
         /// <param name="collectionNames">Collection names</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default);
+        Task ReportAsync(IBufferWriter<byte> writer, string range, object? modal = null, DataFormat? format = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Entity JSON report to HTTP Response
@@ -110,27 +102,24 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="range">View range</param>
         /// <param name="modal">Condition modal</param>
         /// <param name="collectionNames">Collection names</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default);
+        Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null);
 
         /// <summary>
         /// Sort data
         /// 数据排序
         /// </summary>
         /// <param name="sortData">Data to sort</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rows affected</returns>
-        Task<int> SortAsync(Dictionary<T, short> sortData, CancellationToken cancellationToken = default);
+        Task<int> SortAsync(Dictionary<T, short> sortData);
 
         /// <summary>
         /// Update entity
         /// 更新实体
         /// </summary>
         /// <param name="model">Model</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> UpdateAsync<M>(M model, CancellationToken cancellationToken = default) where M : IdItem<T>, IUpdateModel;
+        ValueTask<IActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel;
 
         /// <summary>
         /// Data list
@@ -138,9 +127,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ListAsync(TiplistRQ<T> model, HttpResponse response, CancellationToken cancellationToken = default);
+        Task ListAsync(TiplistRQ<T> model, HttpResponse response);
 
         /// <summary>
         /// Query data
@@ -152,9 +140,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key word, default is empty</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null, CancellationToken cancellationToken = default) where E : struct where M : QueryRQ<E>;
+        Task QueryAsync<E, M>(M model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where M : QueryRQ<E>;
 
         /// <summary>
         /// Quick update

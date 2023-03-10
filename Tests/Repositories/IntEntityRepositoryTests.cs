@@ -13,7 +13,7 @@ namespace Tests.Repositories
     /// <summary>
     /// Int id entity repository
     /// </summary>
-    internal class IntEntityRepository : EntityRepo<SqlConnection, int>
+    internal class IntEntityRepository : EntityRepo<SqlConnection, int, ICoreApplication<SqlConnection>>
     {
         public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag, null) { }
 

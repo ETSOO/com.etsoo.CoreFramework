@@ -21,7 +21,7 @@ namespace Tests.Repositories
         /// <summary>
         /// Repository base
         /// </summary>
-        private class RepositoryBaseTest : RepoBase<SqliteConnection>
+        private class RepositoryBaseTest : RepoBase<SqliteConnection, ICoreApplication<SqliteConnection>>
         {
             public RepositoryBaseTest(ICoreApplication<SqliteConnection> app) : base(app, "test") { }
         }

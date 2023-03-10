@@ -48,8 +48,8 @@ namespace com.etsoo.CoreFramework.Services
         protected readonly ILogger Logger;
 
         /// <summary>
-        /// Cancellation token
-        /// 取消令牌
+        /// Cancellation token, with the feature, only transient or scoped scenario can used
+        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
         /// </summary>
         protected readonly CancellationToken CancellationToken;
 

@@ -45,13 +45,20 @@ namespace com.etsoo.CoreFramework.Repositories
         protected readonly A App;
 
         /// <summary>
+        /// Cancellation token, with the feature, only transient or scoped scenario can used
+        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
+        /// </summary>
+        protected readonly CancellationToken CancellationToken;
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
         /// <param name="flag">Flag</param>
         /// <param name="user">Current user</param>
-        protected RepoBase(A app, string flag, IServiceUser? user = null) => (App, Flag, User) = (app, flag, user);
+        protected RepoBase(A app, string flag, IServiceUser? user = null, CancellationToken cancellationToken = default) =>
+            (App, Flag, User, CancellationToken) = (app, flag, user, cancellationToken);
 
         /// <summary>
         /// Create command, default parameters added
@@ -60,16 +67,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="name">Command text</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default)
+        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null)
         {
             type ??=  App.DB.SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
 
             // For stored procedure, remove null value parameters
             if (type == CommandType.StoredProcedure) parameters?.ClearNulls();
 
-            return new CommandDefinition(name, parameters, commandType: type, cancellationToken: cancellationToken);
+            return new CommandDefinition(name, parameters, commandType: type, cancellationToken: CancellationToken);
         }
 
         /// <summary>
@@ -242,7 +248,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer);
-            }, command.CancellationToken);
+            }, CancellationToken);
         }
 
         /// <summary>
@@ -259,7 +265,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer, format, collectionNames);
-            }, command.CancellationToken);
+            }, CancellationToken);
         }
 
         /// <summary>
@@ -313,7 +319,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Write bytes
             var bytes = writer.WrittenMemory;
-            await response.BodyWriter.WriteAsync(bytes, command.CancellationToken);
+            await response.BodyWriter.WriteAsync(bytes, CancellationToken);
 
             if (!result) response.StatusCode = (int)HttpStatusCode.NoContent;
 
@@ -327,16 +333,15 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic return type</typeparam>
         /// <param name="sql">SQL script</param>
         /// <param name="parameters">Parameter</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null, CancellationToken cancellationToken = default)
+        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null)
         {
-            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            var command = CreateCommand(sql, parameters, CommandType.Text);
 
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryFirstAsync<E>(command);
-            }, command.CancellationToken);
+            }, CancellationToken);
         }
 
         /// <summary>
@@ -506,7 +511,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (User != null)
                 AddSystemParameters(parameters);
 
-            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text, configs.CancellationToken);
+            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
 
             try
             {
