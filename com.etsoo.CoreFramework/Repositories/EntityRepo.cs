@@ -27,8 +27,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         public const string PublicRange = "public";
 
-        protected EntityRepo(A app, string flag, IServiceUser? user = null, CancellationToken cancellationToken = default) :
-            base(app, flag, user, cancellationToken)
+        protected EntityRepo(A app, string flag, IServiceUser? user = null) :
+            base(app, flag, user)
         {
         }
 

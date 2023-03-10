@@ -33,6 +33,12 @@ namespace com.etsoo.CoreFramework.Repositories
         public virtual IServiceUser? User { get; }
 
         /// <summary>
+        /// Cancellation token, with the feature, only transient or scoped scenario can used
+        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; } = default;
+
+        /// <summary>
         /// Flag
         /// 标识
         /// </summary>
@@ -45,20 +51,14 @@ namespace com.etsoo.CoreFramework.Repositories
         protected readonly A App;
 
         /// <summary>
-        /// Cancellation token, with the feature, only transient or scoped scenario can used
-        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
-        /// </summary>
-        protected readonly CancellationToken CancellationToken;
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="app">Application</param>
         /// <param name="flag">Flag</param>
         /// <param name="user">Current user</param>
-        protected RepoBase(A app, string flag, IServiceUser? user = null, CancellationToken cancellationToken = default) =>
-            (App, Flag, User, CancellationToken) = (app, flag, user, cancellationToken);
+        protected RepoBase(A app, string flag, IServiceUser? user = null) =>
+            (App, Flag, User) = (app, flag, user);
 
         /// <summary>
         /// Create command, default parameters added

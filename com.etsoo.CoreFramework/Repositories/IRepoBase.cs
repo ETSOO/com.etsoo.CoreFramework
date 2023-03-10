@@ -28,6 +28,12 @@ namespace com.etsoo.CoreFramework.Repositories
         IServiceUser? User { get; }
 
         /// <summary>
+        /// Cancellation token, with the feature, only transient or scoped scenario can used
+        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
+        /// </summary>
+        CancellationToken CancellationToken { get; set; }
+
+        /// <summary>
         /// Add system parameters
         /// 添加系统参数
         /// </summary>
