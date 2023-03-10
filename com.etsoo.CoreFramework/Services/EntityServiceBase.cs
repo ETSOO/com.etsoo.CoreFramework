@@ -28,9 +28,8 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="app">App</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        public EntityServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default)
-            : base(app, repo, logger, cancellationToken)
+        public EntityServiceBase(A app, R repo, ILogger logger)
+            : base(app, repo, logger)
         {
         }
 

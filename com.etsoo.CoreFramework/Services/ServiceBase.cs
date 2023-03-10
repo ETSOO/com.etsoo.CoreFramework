@@ -66,13 +66,12 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="app">Application</param>
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        public ServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default)
+        public ServiceBase(A app, R repo, ILogger logger)
         {
             App = app;
             Repo = repo;
             Logger = logger;
-            CancellationToken = cancellationToken;
+            CancellationToken = repo.CancellationToken;
         }
 
         /// <summary>

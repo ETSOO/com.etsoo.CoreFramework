@@ -31,7 +31,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="repo">Repository</param>
         /// <param name="logger">Logger</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public LoginedServiceBase(A app, R repo, ILogger logger, CancellationToken cancellationToken = default) : base(app, repo, logger, cancellationToken)
+        public LoginedServiceBase(A app, R repo, ILogger logger) : base(app, repo, logger)
         {
             if (repo.User == null)
             {
