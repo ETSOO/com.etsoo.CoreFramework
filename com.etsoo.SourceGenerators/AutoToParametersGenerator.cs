@@ -92,35 +92,46 @@ namespace com.etsoo.SourceGenerators
                         if (typeName == null || typeName == string.Empty)
                         {
                             var enumSymbol = (INamedTypeSymbol)typeSymbol;
-                            typeName = enumSymbol.EnumUnderlyingType?.Name;
-                            if (typeName == null)
-                                typeName = "Byte";
+                            typeName = enumSymbol.EnumUnderlyingType?.Name ?? "Byte";
                         }
 
                         valuePart = $"({typeName}){fieldName}";
+                    }
+                    else if (typeName == "json")
+                    {
+                        isDbString = true;
+                        valuePart = $"JsonSerializer.Serialize({fieldName}, com.etsoo.Utils.SharedUtils.JsonDefaultSerializerOptions).ToDbString({isAnsi.ToCode()}, {length.ToIntCode()}, {fixedLength.ToCode()})";
                     }
                     else if (typeSymbol.TypeKind == TypeKind.Array)
                     {
                         // Array type
                         var arraySymbol = (IArrayTypeSymbol)typeSymbol;
                         var itemTypeSymbol = arraySymbol.ElementType;
-                        if (!itemTypeSymbol.IsSimpleType())
+                        if (itemTypeSymbol.IsSimpleType())
                         {
-                            continue;
+                            var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
+
+                            isDbString = true;
+
+                            if (string.IsNullOrEmpty(typeName))
+                            {
+                                // String
+                                valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
+                            }
+                            else
+                            {
+                                // SQL Server TVP
+                                valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
+                            }
                         }
-                        var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
-
-                        isDbString = true;
-
-                        if (string.IsNullOrEmpty(typeName))
+                        else if (itemTypeSymbol.InheritedFrom("com.etsoo.Database.ISqlServerDataRecord"))
                         {
-                            // String
-                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
+                            isDbString = true;
+                            valuePart = $"{fieldName}.ToTVP()";
                         }
                         else
                         {
-                            // SQL Server TVP
-                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
+                            continue;
                         }
                     }
                     else if (typeSymbol.IsList())
@@ -128,23 +139,31 @@ namespace com.etsoo.SourceGenerators
                         // Item type
                         var listSymbol = (INamedTypeSymbol)typeSymbol;
                         var itemTypeSymbol = listSymbol.TypeArguments[0];
-                        if (!itemTypeSymbol.IsSimpleType())
+                        if (itemTypeSymbol.IsSimpleType())
                         {
-                            continue;
+                            var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
+
+                            isDbString = true;
+
+                            if (string.IsNullOrEmpty(typeName))
+                            {
+                                // String
+                                valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
+                            }
+                            else
+                            {
+                                // SQL Server TVP
+                                valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
+                            }
                         }
-                        var itemDbType = GetDbType(itemTypeSymbol, isAnsi);
-
-                        isDbString = true;
-
-                        if (string.IsNullOrEmpty(typeName))
+                        else if (itemTypeSymbol.InheritedFrom("com.etsoo.Database.ISqlServerDataRecord"))
                         {
-                            // String
-                            valuePart = $"app.DB.ListToParameter({fieldName}, {itemDbType}, {length.ToIntCode()}, (type) => SqlServerUtils.GetListCommand(type, app.BuildCommandName))";
+                            isDbString = true;
+                            valuePart = $"{fieldName}.ToTVP()";
                         }
                         else
                         {
-                            // SQL Server TVP
-                            valuePart = $"SqlServerUtils.ListToIdRecords({fieldName}, {itemDbType}, {length.ToIntCode()}).AsTableValuedParameter(\"{typeName}\")";
+                            continue;
                         }
                     }
                     else if (typeSymbol.IsDictionary())
@@ -245,6 +264,7 @@ namespace com.etsoo.SourceGenerators
                 using com.etsoo.CoreFramework.Application;
                 using System;
                 using System.Data;
+                using System.Text.Json;
 
                 namespace {ns}
                 {{
@@ -301,12 +321,10 @@ namespace com.etsoo.SourceGenerators
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            /*
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-            */
+            //if (!System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    System.Diagnostics.Debugger.Launch();
+            //}
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToParametersAttribute)));

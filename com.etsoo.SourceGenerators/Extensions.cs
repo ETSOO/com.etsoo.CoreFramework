@@ -36,7 +36,8 @@ namespace com.etsoo.SourceGenerators
         /// <returns>Result</returns>
         public static bool HasAttribute(this SyntaxList<AttributeListSyntax> lists, string ns, string className)
         {
-            return lists.Any(list => list.Attributes.Any(a => {
+            return lists.Any(list => list.Attributes.Any(a =>
+            {
                 // Name match
                 var name = a.Name.ToString();
                 if (name.Equals(className) || (name + "Attribute").Equals(className))
@@ -144,7 +145,8 @@ namespace com.etsoo.SourceGenerators
         /// <returns>Attribute data</returns>
         public static AttributeData? GetAttributeData(this ISymbol symbol, string type)
         {
-            return symbol.GetAttributes().SingleOrDefault(a => {
+            return symbol.GetAttributes().SingleOrDefault(a =>
+            {
                 if (a.AttributeClass != null)
                 {
                     return a.AttributeClass.ToDisplayString().Equals(type);
@@ -180,7 +182,7 @@ namespace com.etsoo.SourceGenerators
                 }
             }
 
-            if(value == null)
+            if (value == null)
             {
                 return default;
             }
@@ -380,11 +382,11 @@ namespace com.etsoo.SourceGenerators
                 // Public properties only
                 if (member.DeclaredAccessibility != Accessibility.Public) continue;
 
-                if(member is IPropertySymbol pSymbol && ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly)))
+                if (member is IPropertySymbol pSymbol && ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly)))
                 {
                     continue;
                 }
-                else if(member is IFieldSymbol fs && !isRead && fs.IsReadOnly)
+                else if (member is IFieldSymbol fs && !isRead && fs.IsReadOnly)
                 {
                     continue;
                 }
@@ -417,7 +419,7 @@ namespace com.etsoo.SourceGenerators
         /// <returns>Enum type</returns>
         public static ITypeSymbol? GetEnumType(this ITypeSymbol type)
         {
-            if(type.TypeKind == TypeKind.Enum)
+            if (type.TypeKind == TypeKind.Enum)
             {
                 return type;
             }
@@ -456,6 +458,18 @@ namespace com.etsoo.SourceGenerators
             }
 
             return typeSymbol.Name + (nullable ? "?" : string.Empty);
+        }
+
+        /// <summary>
+        /// Detect the type symbol directly inherit from the interface
+        /// 检测类型符号是否直接从接口继承
+        /// </summary>
+        /// <param name="typeSymbol">Type symbol</param>
+        /// <param name="interfaceName">Interface name</param>
+        /// <returns>Result</returns>
+        public static bool InheritedFrom(this ITypeSymbol typeSymbol, string interfaceName)
+        {
+            return typeSymbol.Interfaces.Any(i => i.OriginalDefinition.ToDisplayString().Equals(interfaceName));
         }
 
         /// <summary>

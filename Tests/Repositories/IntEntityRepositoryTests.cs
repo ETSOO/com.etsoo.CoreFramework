@@ -33,6 +33,12 @@ namespace Tests.Repositories
         {
             // No additional parameters will be passed
         }
+
+        public IDbParameters CreateStudentParameters(Student student)
+        {
+            var parameters = FormatParameters(student);
+            return parameters;
+        }
     }
 
     /// <summary>
@@ -169,6 +175,19 @@ namespace Tests.Repositories
             stream.Position = 0;
             var content = SharedUtils.StreamToString(stream);
             Assert.IsTrue(content.Contains("Admin 2"));
+        }
+
+        [Test]
+        public void CreateStudentParametersTest()
+        {
+            var student = new Student
+            {
+                JsonBooks = new List<Book> { new Book { Name = "Json Book 1", Price = 3.2M }, new Book { Name = "Json Book 2", Price = 3.6M } },
+                Books = new List<Book> { new Book { Name = "Book 1", Price = 4.2M }, new Book { Name = "Book 2", Price = 8.3M } }
+            };
+            var parameters = repo.CreateStudentParameters(student);
+            Assert.IsTrue(parameters.ParameterNames.Contains("JsonBooks"));
+            Assert.IsTrue(parameters.ParameterNames.Contains("Books"));
         }
     }
 }

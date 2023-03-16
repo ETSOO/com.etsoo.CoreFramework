@@ -11,6 +11,8 @@ namespace com.etsoo.SourceGenerators
 {
     /// <summary>
     /// Auto ToJson generator
+    /// Simple alternative to System.Text.Json.SourceGeneration
+    /// https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation
     /// </summary>
     [Generator]
     public class AutoToJsonGenerator : ISourceGenerator
