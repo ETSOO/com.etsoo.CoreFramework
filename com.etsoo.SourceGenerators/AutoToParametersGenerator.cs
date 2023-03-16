@@ -43,10 +43,14 @@ namespace com.etsoo.SourceGenerators
                     if (ignore)
                         continue;
 
+                    // StringLengthAttribute, avoid duplicate set
+                    var stringLengthAttribute = symbol.GetAttributeData("System.ComponentModel.DataAnnotations.StringLengthAttribute");
+                    var stringLength = stringLengthAttribute?.GetValue<int?>("MaximumLength");
+
                     // Is ansi, not unicode
                     var isAnsi = attributeData?.GetValue<bool?>(isAnsiName);
                     var fixedLength = attributeData?.GetValue<bool?>(fixedLengthName);
-                    var length = attributeData?.GetValue<int?>(lengthName);
+                    var length = attributeData?.GetValue<int?>(lengthName) ?? stringLength;
 
                     // Object field name
                     var fieldName = symbol.Name;

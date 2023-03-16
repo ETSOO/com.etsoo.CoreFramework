@@ -1,6 +1,7 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.SourceGenerators.Attributes;
 using Microsoft.Data.SqlClient.Server;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 namespace Tests
@@ -30,6 +31,9 @@ namespace Tests
     [AutoToParameters]
     public partial record Student
     {
+        [StringLength(50, MinimumLength = 2)]
+        public required string Name { get; init; }
+
         [Property(TypeName = "json")]
         public IEnumerable<Book>? JsonBooks { get; init; }
 

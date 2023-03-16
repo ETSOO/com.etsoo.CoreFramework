@@ -182,6 +182,7 @@ namespace Tests.Repositories
         {
             var student = new Student
             {
+                Name = "Student Name",
                 JsonBooks = new List<Book> { new Book { Name = "Json Book 1", Price = 3.2M }, new Book { Name = "Json Book 2", Price = 3.6M } },
                 Books = new List<Book> { new Book { Name = "Book 1", Price = 4.2M }, new Book { Name = "Book 2", Price = 8.3M } }
             };
