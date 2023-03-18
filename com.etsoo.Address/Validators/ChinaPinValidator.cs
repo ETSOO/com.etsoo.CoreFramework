@@ -36,7 +36,7 @@ namespace com.etsoo.Address.Validators
         /// Birthday
         /// 出生日期
         /// </summary>
-        public readonly DateTime? Birthday;
+        public readonly DateTimeOffset? Birthday;
 
         /// <summary>
         /// Gender
@@ -72,9 +72,9 @@ namespace com.etsoo.Address.Validators
                 DistrictNum = district;
             }
 
-            if (len >= 14 && DateTime.TryParseExact(pin[6..14], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            if (len >= 14 && DateTimeOffset.TryParseExact(pin[6..14], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
             {
-                Birthday = date;
+                Birthday = TimeZoneInfo.ConvertTime(date, TimeZoneInfo.FindSystemTimeZoneById("China Standard Time"));
             }
 
             if (len >= 17 && int.TryParse(pin.AsSpan(14, 3), out var g))
