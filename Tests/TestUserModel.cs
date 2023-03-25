@@ -23,6 +23,11 @@ namespace Tests
     {
         // Name
         public string? Name { get; init; }
+
+        public void Setup()
+        {
+
+        }
     }
 
     [AutoToParameters]

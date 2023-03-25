@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace com.etsoo.SourceGenerators
@@ -155,6 +156,14 @@ namespace com.etsoo.SourceGenerators
             // Is Virtual
             var virtualKeyword = tds.HasToken(SyntaxKind.SealedKeyword) || keyword.Equals("struct") ? "" : " virtual";
 
+            // Has to call setup?
+            var hasSetup = tds.Members
+                .Where(member => member is MethodDeclarationSyntax)
+                .Cast<MethodDeclarationSyntax>()
+                .Any(method => method.Identifier.Text == "Setup"
+                    && method.ParameterList.Parameters.Count == 0
+                    && method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
+
             // Inheritance
             var externals = new List<string>();
 
@@ -186,6 +195,7 @@ namespace com.etsoo.SourceGenerators
                         /// <returns>Task</returns>
                         public{virtualKeyword} async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
                         {{
+                            {(hasSetup ? "Setup();\n" : "")};
                             // Utf8JsonWriter
                             using var w = options.CreateJsonWriter(writer);
 

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace com.etsoo.SourceGenerators
@@ -247,6 +248,14 @@ namespace com.etsoo.SourceGenerators
             // Keyword
             var keyword = tds.Keyword.ToString();
 
+            // Has to call setup?
+            var hasSetup = tds.Members
+                .Where(member => member is MethodDeclarationSyntax)
+                .Cast<MethodDeclarationSyntax>()
+                .Any(method => method.Identifier.Text == "Setup"
+                    && method.ParameterList.Parameters.Count == 0
+                    && method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
+
             // Is Public
             var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
 
@@ -285,6 +294,7 @@ namespace com.etsoo.SourceGenerators
                         /// <returns>Dynamic parameters</returns>
                         public{virtualKeyword} IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
+                            {(hasSetup ? "Setup();\n" : "")};
                             var parameters = new DbParameters();
 
                             {string.Join(";\n", body)};
