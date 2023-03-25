@@ -250,6 +250,9 @@ namespace com.etsoo.SourceGenerators
             // Is Public
             var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
 
+            // Is Virtual
+            var virtualKeyword = keyword.Equals("struct") ? "" : " virtual";
+
             // Inheritance
             var externals = new List<string>();
 
@@ -280,7 +283,7 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <param name=""app"">Application</param>
                         /// <returns>Dynamic parameters</returns>
-                        public IDbParameters AsParameters(ICoreApplicationBase app)
+                        public{virtualKeyword} IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
                             var parameters = new DbParameters();
 

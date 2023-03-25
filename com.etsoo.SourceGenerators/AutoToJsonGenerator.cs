@@ -152,6 +152,9 @@ namespace com.etsoo.SourceGenerators
             // Is Public
             var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
 
+            // Is Virtual
+            var virtualKeyword = keyword.Equals("struct") ? "" : " virtual";
+
             // Inheritance
             var externals = new List<string>();
 
@@ -181,7 +184,7 @@ namespace com.etsoo.SourceGenerators
                         /// <param name=""options"">Options</param>
                         /// <param name=""fields"">Fields allowed</param>
                         /// <returns>Task</returns>
-                        public async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
+                        public{virtualKeyword} async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
                         {{
                             // Utf8JsonWriter
                             using var w = options.CreateJsonWriter(writer);
