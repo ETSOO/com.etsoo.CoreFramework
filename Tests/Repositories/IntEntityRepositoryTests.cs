@@ -79,6 +79,19 @@ namespace Tests.Repositories
         }
 
         [Test]
+        public void UpdateUserSetupFailedTest()
+        {
+            var model = new UpdateUser
+            {
+                Id = 1001,
+                Name = "Etsoo",
+                ChangedFields = new string[] { "Name" }
+            };
+
+            Assert.Throws<Exception>(() => model.AsParameters(app));
+        }
+
+        [Test]
         public async Task CreateAsync_Test()
         {
             // Arrange

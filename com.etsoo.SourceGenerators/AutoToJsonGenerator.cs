@@ -160,9 +160,10 @@ namespace com.etsoo.SourceGenerators
             var hasSetup = tds.Members
                 .Where(member => member is MethodDeclarationSyntax)
                 .Cast<MethodDeclarationSyntax>()
-                .Any(method => method.Identifier.Text == "Setup"
-                    && method.ParameterList.Parameters.Count == 0
-                    && method.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
+                .Any(m => m.Identifier.Text == "Setup"
+                    && m.ParameterList.Parameters.Count == 0
+                    && m.ReturnType.ToString() == "bool"
+                    && m.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
 
             // Inheritance
             var externals = new List<string>();
@@ -195,7 +196,7 @@ namespace com.etsoo.SourceGenerators
                         /// <returns>Task</returns>
                         public{virtualKeyword} async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
                         {{
-                            {(hasSetup ? "Setup();\n" : "")};
+                            {(hasSetup ? "if (!Setup()) return;\n" : "")};
                             // Utf8JsonWriter
                             using var w = options.CreateJsonWriter(writer);
 

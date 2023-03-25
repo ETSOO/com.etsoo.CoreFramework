@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.Database;
 using com.etsoo.SourceGenerators.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,9 +25,9 @@ namespace Tests
         // Name
         public string? Name { get; init; }
 
-        public void Setup()
+        public bool Setup(IDbParameters parameters)
         {
-
+            throw new Exception("Validation failed");
         }
     }
 
