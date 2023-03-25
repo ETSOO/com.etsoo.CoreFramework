@@ -251,7 +251,7 @@ namespace com.etsoo.SourceGenerators
             var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
 
             // Is Virtual
-            var virtualKeyword = keyword.Equals("struct") ? "" : " virtual";
+            var virtualKeyword = tds.HasToken(SyntaxKind.SealedKeyword) || keyword.Equals("struct") ? "" : " virtual";
 
             // Inheritance
             var externals = new List<string>();
