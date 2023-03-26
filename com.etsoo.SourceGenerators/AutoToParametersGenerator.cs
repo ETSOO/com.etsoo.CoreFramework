@@ -253,8 +253,9 @@ namespace com.etsoo.SourceGenerators
                 .Where(member => member is MethodDeclarationSyntax)
                 .Cast<MethodDeclarationSyntax>()
                 .Any(m => m.Identifier.Text == "Setup"
-                    && m.ParameterList.Parameters.Count == 1
+                    && m.ParameterList.Parameters.Count == 2
                     && m.ParameterList.Parameters[0].Type?.ToString() == "IDbParameters"
+                    && m.ParameterList.Parameters[1].Type?.ToString() == "ICoreApplicationBase"
                     && m.ReturnType.ToString() == "bool"
                     && m.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
 
@@ -297,7 +298,7 @@ namespace com.etsoo.SourceGenerators
                         public{virtualKeyword} IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
                             var parameters = new DbParameters();
-                            {(hasSetup ? "if (!Setup(parameters)) return parameters;\n" : "")};
+                            {(hasSetup ? "if (!Setup(parameters, app)) return parameters;\n" : "")};
 
                             {string.Join(";\n", body)};
 
