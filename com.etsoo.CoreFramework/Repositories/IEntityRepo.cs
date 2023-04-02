@@ -40,6 +40,15 @@ namespace com.etsoo.CoreFramework.Repositories
         ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids);
 
         /// <summary>
+        /// Merge
+        /// 合并
+        /// </summary>
+        /// <typeparam name="M">Generic request data type</typeparam>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        ValueTask<IActionResult> MergeAsync<M>(M rq) where M : MergeRQ;
+
+        /// <summary>
         /// View entity
         /// 浏览实体
         /// </summary>

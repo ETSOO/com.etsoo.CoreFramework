@@ -44,6 +44,15 @@ namespace com.etsoo.CoreFramework.Services
         Task ListAsync(TiplistRQ<T> model, HttpResponse response);
 
         /// <summary>
+        /// Merge
+        /// 合并
+        /// </summary>
+        /// <typeparam name="M">Generic request data type</typeparam>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        ValueTask<IActionResult> MergeAsync<M>(M rq) where M : MergeRQ;
+
+        /// <summary>
         /// Query
         /// 查询
         /// </summary>

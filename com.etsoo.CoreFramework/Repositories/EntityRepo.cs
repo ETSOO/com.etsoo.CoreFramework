@@ -116,6 +116,23 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Merge
+        /// 合并
+        /// </summary>
+        /// <typeparam name="M">Generic request data type</typeparam>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        public virtual async ValueTask<IActionResult> MergeAsync<M>(M rq) where M : MergeRQ
+        {
+            var parameters = FormatParameters(rq);
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("merge"), parameters);
+
+            return await QueryAsResultAsync(command);
+        }
+
+        /// <summary>
         /// Create read command
         /// 创建读取命令
         /// </summary>
