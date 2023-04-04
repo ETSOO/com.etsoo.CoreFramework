@@ -138,8 +138,8 @@ namespace com.etsoo.Utils.Serialization
         }
 
         /// <summary>
-        /// Get value
-        /// 获取值
+        /// Get JsonElement value
+        /// 获取 JsonElement 值
         /// </summary>
         /// <typeparam name="T">Generic value type</typeparam>
         /// <param name="element">Json element</param>
@@ -170,6 +170,49 @@ namespace com.etsoo.Utils.Serialization
                 ushort => kind == JsonValueKind.Number && element.TryGetUInt16(out var v) ? v : (loose ? StringUtils.TryParse<ushort>(element.ToString()) : null),
                 uint => kind == JsonValueKind.Number && element.TryGetUInt32(out var v) ? v : (loose ? StringUtils.TryParse<uint>(element.ToString()) : null),
                 ulong => kind == JsonValueKind.Number && element.TryGetUInt64(out var v) ? v : (loose ? StringUtils.TryParse<ulong>(element.ToString()) : null),
+                _ => null
+            };
+
+            if (value is T tv) return tv;
+            else return null;
+        }
+
+        /// <summary>
+        /// Get Utf8JsonReader value
+        /// 获取 Utf8JsonReader 值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="reader">Json reader</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Result</returns>
+        public static T? GetValue<T>(this Utf8JsonReader reader, bool loose = false) where T : struct
+        {
+            // Default value, string or other classes will be null
+            var dv = default(T);
+
+            // Kind
+            var kind = reader.TokenType;
+
+            // String
+            var stringValue = reader.ValueSpan.ToString();
+
+            object? value = dv switch
+            {
+                bool => (kind == JsonTokenType.True || kind == JsonTokenType.False) ? reader.GetBoolean() : (loose ? StringUtils.TryParse<bool>(stringValue) : null),
+                DateTime => kind == JsonTokenType.String && reader.TryGetDateTime(out var v) ? v : null,
+                DateTimeOffset => kind == JsonTokenType.String && reader.TryGetDateTimeOffset(out var v) ? v : null,
+                decimal => kind == JsonTokenType.Number && reader.TryGetDecimal(out var v) ? v : (loose ? StringUtils.TryParse<decimal>(stringValue) : null),
+                double => kind == JsonTokenType.Number && reader.TryGetDouble(out var v) ? v : (loose ? StringUtils.TryParse<double>(stringValue) : null),
+                Guid => kind == JsonTokenType.String && reader.TryGetGuid(out var v) ? v : null,
+                short => kind == JsonTokenType.Number && reader.TryGetInt16(out var v) ? v : (loose ? StringUtils.TryParse<short>(stringValue) : null),
+                int => kind == JsonTokenType.Number && reader.TryGetInt32(out var v) ? v : (loose ? StringUtils.TryParse<int>(stringValue) : null),
+                long => kind == JsonTokenType.Number && reader.TryGetInt64(out var v) ? v : (loose ? StringUtils.TryParse<long>(stringValue) : null),
+                byte => kind == JsonTokenType.Number && reader.TryGetByte(out var v) ? v : (loose ? StringUtils.TryParse<byte>(stringValue) : null),
+                sbyte => kind == JsonTokenType.Number && reader.TryGetSByte(out var v) ? v : (loose ? StringUtils.TryParse<sbyte>(stringValue) : null),
+                float => kind == JsonTokenType.Number && reader.TryGetSingle(out var v) ? v : (loose ? StringUtils.TryParse<float>(stringValue) : null),
+                ushort => kind == JsonTokenType.Number && reader.TryGetUInt16(out var v) ? v : (loose ? StringUtils.TryParse<ushort>(stringValue) : null),
+                uint => kind == JsonTokenType.Number && reader.TryGetUInt32(out var v) ? v : (loose ? StringUtils.TryParse<uint>(stringValue) : null),
+                ulong => kind == JsonTokenType.Number && reader.TryGetUInt64(out var v) ? v : (loose ? StringUtils.TryParse<ulong>(stringValue) : null),
                 _ => null
             };
 

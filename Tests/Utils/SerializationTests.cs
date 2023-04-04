@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Models;
+﻿using com.etsoo.Database;
+using com.etsoo.Utils.Models;
 using com.etsoo.Utils.Serialization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,12 @@ using System.Text.Json.Serialization;
 
 namespace Tests.Utils
 {
+    public class FormatTest
+    {
+        [JsonConverter(typeof(DataFormatConverter))]
+        public DataFormat? Format { get; set; }
+    }
+
     [TestFixture]
     public class SerializationTests
     {
@@ -205,6 +212,20 @@ namespace Tests.Utils
 
             var intItem = root.GetProperty("intItem");
             Assert.IsNull(intItem.GetValue<int>());
+        }
+
+        [Test]
+        public void Utf8JsonReaderGetValueTests()
+        {
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            var json = """{"format":1}""";
+            var result = JsonSerializer.Deserialize<FormatTest>(json, options);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(DataFormat.Json, result?.Format);
+
+            var jsonResult = JsonSerializer.Serialize(result, options);
+            Assert.IsNotNull(jsonResult);
+            Assert.AreEqual(json, jsonResult);
         }
 
         [Test]

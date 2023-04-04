@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils;
+using System.Text.Json;
 
 namespace com.etsoo.Database
 {
@@ -58,6 +59,16 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public abstract string CreateElementEnd(string name);
 
+        /// <summary>
+        /// Write JSON
+        /// 写入JSON
+        /// </summary>
+        /// <param name="writer">Writer</param>
+        public override void WriteJson(Utf8JsonWriter writer)
+        {
+            writer.WriteNumberValue(Value);
+        }
+
         // XML format
         private class XmlDataFormat : DataFormat
         {
@@ -102,4 +113,10 @@ namespace com.etsoo.Database
             }
         }
     }
+
+    /// <summary>
+    /// Data format JSON converter
+    /// 数据格式 JSON 转化器
+    /// </summary>
+    public class DataFormatConverter : EnumerationConverter<DataFormat, byte> { }
 }

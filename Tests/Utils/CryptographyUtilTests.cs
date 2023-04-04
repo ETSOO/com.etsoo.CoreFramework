@@ -23,8 +23,7 @@ namespace Tests.Utils
         private static string UnsealData(string field, string input)
         {
             var bytes = CryptographyUtils.AESDecrypt(input, DoSecretData("30ebc559-4d78-4a27-915b-927107e52fa7"));
-            if (bytes == null) throw new ApplicationException(field);
-            return Encoding.UTF8.GetString(bytes);
+            return bytes == null ? throw new ApplicationException(field) : Encoding.UTF8.GetString(bytes);
         }
 
         public CryptographyUtilTests()

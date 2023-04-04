@@ -1,4 +1,8 @@
-﻿namespace com.etsoo.Utils
+﻿using com.etsoo.Utils.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace com.etsoo.Utils
 {
     /// <summary>
     /// Enumeration
@@ -7,8 +11,12 @@
     /// https://lostechies.com/jimmybogard/2008/08/12/enumeration-classes/
     /// </summary>
     /// <typeparam name="T">Id generic type</typeparam>
-    public abstract class Enumeration<T> : IComparable where T : IComparable
+    public abstract class Enumeration<T> : IComparable where T : struct, IComparable
     {
+        /// <summary>
+        /// All items created
+        /// 所有创建的项目
+        /// </summary>
         public static readonly List<Enumeration<T>> Items = new();
 
         /// <summary>
@@ -45,8 +53,11 @@
         /// <returns>Result</returns>
         public int CompareTo(object? obj)
         {
-            if (obj == null) return 0;
-            return Value.CompareTo(((Enumeration<T>)obj).Value);
+            if (obj is not Enumeration<T> e)
+            {
+                return 0;
+            }
+            return Value.CompareTo(e.Value);
         }
 
         /// <summary>
@@ -79,5 +90,32 @@
         /// </summary>
         /// <returns>Result</returns>
         public override string ToString() => Name;
+
+        /// <summary>
+        /// Write JSON
+        /// 写入JSON
+        /// </summary>
+        /// <param name="writer">Writer</param>
+        public abstract void WriteJson(Utf8JsonWriter writer);
+    }
+
+    /// <summary>
+    /// Enumeration JSON converter
+    /// 枚举 JSON 转换器
+    /// </summary>
+    /// <typeparam name="E">Generic Enumeration type</typeparam>
+    /// <typeparam name="T">Generic Value type</typeparam>
+    public abstract class EnumerationConverter<E, T> : JsonConverter<E> where E : Enumeration<T> where T : struct, IComparable
+    {
+        public override E? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var value = reader.GetValue<T>();
+            return Enumeration<T>.Items.FirstOrDefault(item => item.GetType().IsSubclassOf(typeToConvert) && item.Value.Equals(value)) as E;
+        }
+
+        public override void Write(Utf8JsonWriter writer, E value, JsonSerializerOptions options)
+        {
+            value.WriteJson(writer);
+        }
     }
 }
