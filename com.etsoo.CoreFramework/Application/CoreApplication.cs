@@ -52,9 +52,9 @@ namespace com.etsoo.CoreFramework.Application
 
             var bytes = CryptographyUtils.AESDecrypt(input, secretData);
 
-            if (bytes == null) throw new ApplicationException($"Unseal input {StringUtils.HideData(input)} for {field} failed");
-
-            return Encoding.UTF8.GetString(bytes);
+            return bytes == null
+                ? throw new ApplicationException($"Unseal input {StringUtils.HideData(input)} for {field} failed")
+                : Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
@@ -160,8 +160,7 @@ namespace com.etsoo.CoreFramework.Application
         public string DecriptData(string cipherText)
         {
             var bytes = CryptographyUtils.AESDecrypt(cipherText, Configuration.PrivateKey);
-            if (bytes == null) throw new ApplicationException("Decript Data Failed");
-            return Encoding.UTF8.GetString(bytes);
+            return bytes == null ? throw new ApplicationException("Decript Data Failed") : Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>

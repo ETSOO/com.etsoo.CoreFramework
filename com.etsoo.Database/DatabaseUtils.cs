@@ -8,7 +8,7 @@ namespace com.etsoo.Database
     /// Database util
     /// 数据库工具
     /// </summary>
-    public static class DatabaseUtils
+    public static partial class DatabaseUtils
     {
         /// <summary>
         /// Is the string only ansii characters
@@ -88,9 +88,9 @@ namespace com.etsoo.Database
         {
             if (string.IsNullOrWhiteSpace(input) || input.Length > maxLength) return false;
 
-            if (!Regex.IsMatch(input, @"(\n|\r\n?|;|\*|--|'|""|=|sp_|xp_)"))
+            if (!MyRegex().IsMatch(input))
             {
-                if (!Regex.IsMatch(input, @"(^|\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\s", RegexOptions.IgnoreCase))
+                if (!MyRegex1().IsMatch(input))
                 {
                     return true;
                 }
@@ -137,5 +137,11 @@ namespace com.etsoo.Database
             // Default
             return null;
         }
+
+        [GeneratedRegex("(\\n|\\r\\n?|;|\\*|--|'|\"|=|sp_|xp_)")]
+        private static partial Regex MyRegex();
+
+        [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase, "zh-CN")]
+        private static partial Regex MyRegex1();
     }
 }
