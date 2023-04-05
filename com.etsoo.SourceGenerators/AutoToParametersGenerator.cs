@@ -252,12 +252,13 @@ namespace com.etsoo.SourceGenerators
             var hasSetup = tds.Members
                 .Where(member => member is MethodDeclarationSyntax)
                 .Cast<MethodDeclarationSyntax>()
-                .Any(m => m.Identifier.Text == "Setup"
+                .Any(m => m.Identifier.Text == "SetupAsync"
+                    && m.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AsyncKeyword))
                     && m.ParameterList.Parameters.Count == 2
                     && m.ParameterList.Parameters[0].Type?.ToString() == "IDbParameters"
                     && m.ParameterList.Parameters[1].Type?.ToString() == "ICoreApplicationBase"
-                    && m.ReturnType.ToString() == "bool"
-                    && m.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.PublicKeyword)));
+                    && m.ReturnType.ToString() == "Task<bool>"
+                    && m.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.ProtectedKeyword)));
 
             // Is Public
             var isPublic = tds.HasToken(SyntaxKind.PublicKeyword);
@@ -298,7 +299,7 @@ namespace com.etsoo.SourceGenerators
                         public{virtualKeyword} IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
                             var parameters = new DbParameters();
-                            {(hasSetup ? "if (!Setup(parameters, app)) return parameters;\n" : "")};
+                            {(hasSetup ? "if (!SetupAsync(parameters, app).GetAwaiter().GetResult()) return parameters;\n" : "")};
 
                             {string.Join(";\n", body)};
 

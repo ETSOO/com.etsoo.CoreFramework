@@ -26,8 +26,9 @@ namespace Tests
         // Name
         public string? Name { get; init; }
 
-        public bool Setup(IDbParameters parameters, ICoreApplicationBase app)
+        protected async Task<bool> SetupAsync(IDbParameters parameters, ICoreApplicationBase app)
         {
+            await Task.CompletedTask;
             throw new Exception("Validation failed");
         }
     }
