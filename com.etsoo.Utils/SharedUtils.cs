@@ -235,8 +235,8 @@ namespace com.etsoo.Utils
         {
             // Default options
             options ??= JsonDefaultSerializerOptions;
-            oldDataName = nameof(oldData);
-            newDataName = nameof(newData);
+            oldDataName ??= nameof(oldData);
+            newDataName ??= nameof(newData);
 
             // Stream
             await using var ms = GetStream();

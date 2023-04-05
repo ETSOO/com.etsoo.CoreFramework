@@ -4,6 +4,7 @@ namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Id / name item
+    /// 'required' keyword not supported by JsonSerializerContext
     /// 编号 / 名称项目
     /// </summary>
     public record IdNameItem
