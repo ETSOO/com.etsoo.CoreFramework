@@ -144,50 +144,6 @@ namespace com.etsoo.Database
         /// <param name="fields">Update fields</param>
         /// <returns>Command</returns>
         StringBuilder GetUpdateCommand(string tableName, string alias, string fields);
-    }
-
-    /// <summary>
-    /// Generic database interface
-    /// 通用数据库接口
-    /// </summary>
-    /// <typeparam name="C">Generic connection type</typeparam>
-    public interface IDatabase<C> : IDatabase where C : DbConnection
-    {
-        /// <summary>
-        /// New database connection
-        /// 新数据库链接对象
-        /// </summary>
-        /// <returns>Connection</returns>
-        C NewConnection();
-
-        /// <summary>
-        /// With callback connection
-        /// 带回调的数据库链接
-        /// </summary>
-        /// <param name="func">Callback function</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Task</returns>
-        Task WithConnection(Func<C, Task> func, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// With callback connection
-        /// 带回调的数据库链接
-        /// </summary>
-        /// <typeparam name="T">Generic result type</typeparam>
-        /// <param name="func">Callback function</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Result</returns>
-        Task<T> WithConnection<T>(Func<C, Task<T>> func, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// With callback connection
-        /// 带回调的数据库链接
-        /// </summary>
-        /// <typeparam name="T">Generic result type</typeparam>
-        /// <param name="func">Callback function</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Result</returns>
-        ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Execute a command asynchronously
@@ -295,5 +251,49 @@ namespace com.etsoo.Database
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
         ValueTask<ActionResult?> QueryAsResultAsync(CommandDefinition command);
+    }
+
+    /// <summary>
+    /// Generic database interface
+    /// 通用数据库接口
+    /// </summary>
+    /// <typeparam name="C">Generic connection type</typeparam>
+    public interface IDatabase<C> : IDatabase where C : DbConnection
+    {
+        /// <summary>
+        /// New database connection
+        /// 新数据库链接对象
+        /// </summary>
+        /// <returns>Connection</returns>
+        C NewConnection();
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
+        Task WithConnection(Func<C, Task> func, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<T> WithConnection<T>(Func<C, Task<T>> func, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// With callback connection
+        /// 带回调的数据库链接
+        /// </summary>
+        /// <typeparam name="T">Generic result type</typeparam>
+        /// <param name="func">Callback function</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        ValueTask<T> WithValueConnection<T>(Func<C, ValueTask<T>> func, CancellationToken cancellationToken = default);
     }
 }
