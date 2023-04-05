@@ -27,7 +27,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 批量请求数量
         /// </summary>
         [Range(1, 1000)]
-        public required ushort BatchSize { get; set; }
+        public ushort BatchSize { get; set; }
 
         /// <summary>
         /// Order by field
