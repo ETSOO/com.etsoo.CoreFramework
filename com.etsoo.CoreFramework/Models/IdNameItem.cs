@@ -8,16 +8,10 @@ namespace com.etsoo.CoreFramework.Models
     /// </summary>
     public record IdNameItem
     {
+        [JsonRequired]
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-    }
 
-    /// <summary>
-    /// Id / name JSON context
-    /// 编号 / 名称项目 JSON 上下文
-    /// </summary>
-    [JsonSerializable(typeof(IdNameItem))]
-    public partial class IdNameContext : JsonSerializerContext
-    {
+        [JsonRequired]
+        public string Name { get; set; } = string.Empty;
     }
 }
