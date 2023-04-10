@@ -40,8 +40,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        Task ListAsync(TiplistRQ<T> model, HttpResponse response);
+        Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null);
 
         /// <summary>
         /// Merge

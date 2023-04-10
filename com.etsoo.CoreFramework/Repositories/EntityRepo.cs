@@ -340,14 +340,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
+        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
         {
             var parameters = FormatParameters(model);
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("list as json"), parameters);
+            var commandText = !string.IsNullOrEmpty(queryKey) && FilterRange(queryKey, false)
+                ? $"list {queryKey} as json" : "list as json";
+
+            var command = CreateCommand(GetCommandName(commandText), parameters);
 
             await ReadJsonToStreamAsync(command, response);
         }
@@ -367,11 +371,8 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            var commandText = "query as json";
-            if (!string.IsNullOrEmpty(queryKey) && FilterRange(queryKey, false))
-            {
-                commandText = commandText.Replace("query as", $"query {queryKey} as");
-            }
+            var commandText = !string.IsNullOrEmpty(queryKey) && FilterRange(queryKey, false)
+                ? $"query {queryKey} as json" : "query as json";
 
             var command = CreateCommand(GetCommandName(commandText), parameters);
 

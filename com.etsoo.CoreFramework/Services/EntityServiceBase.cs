@@ -72,10 +72,11 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Data model</param>
         /// <param name="response">HTTP Response</param>
+        /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response)
+        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
         {
-            await Repo.ListAsync(model, response);
+            await Repo.ListAsync(model, response, queryKey);
         }
 
         /// <summary>
