@@ -189,6 +189,18 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void DataFormatParseTests()
+        {
+            var result = DataFormat.TryParse<DataFormat>(1, out var item);
+            Assert.IsTrue(result);
+            Assert.AreEqual(DataFormat.Json, item);
+
+            var result1 = DataFormat.TryParse<DataFormat>(2, out var item1);
+            Assert.IsFalse(result1);
+            Assert.IsNull(item1);
+        }
+
+        [Test]
         public void GetPropertyCaseInsensitiveTests()
         {
             var json = """{"contactTemplate": "abc"}""";

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Serialization;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,6 +19,36 @@ namespace com.etsoo.Utils
         /// 所有创建的项目
         /// </summary>
         public static readonly List<Enumeration<T>> Items = new();
+
+        /// <summary>
+        /// Try to parse item with value
+        /// 尝试通过值解析项目
+        /// </summary>
+        /// <typeparam name="E">Generic return type</typeparam>
+        /// <param name="value">Value</param>
+        /// <param name="item">Parsed item</param>
+        /// <returns>Success or not</returns>
+        public static bool TryParse<E>(T value, [NotNullWhen(true)] out E? item)
+            where E : Enumeration<T>
+        {
+            item = Items.FirstOrDefault(item => item.Value.Equals(value) && item.GetType().IsSubclassOf(typeof(E))) as E;
+            return item != null;
+        }
+
+        /// <summary>
+        /// Try to parse item with name
+        /// 尝试通过名称解析项目
+        /// </summary>
+        /// <typeparam name="E">Generic return type</typeparam>
+        /// <param name="name">Name</param>
+        /// <param name="item">Parsed item</param>
+        /// <returns>Success or not</returns>
+        public static bool TryParse<E>(string name, [NotNullWhen(true)] out E? item)
+            where E : Enumeration<T>
+        {
+            item = Items.FirstOrDefault(item => item.Name.Equals(name) && item.GetType().IsSubclassOf(typeof(E))) as E;
+            return item != null;
+        }
 
         /// <summary>
         /// Value
@@ -110,7 +141,7 @@ namespace com.etsoo.Utils
         public override E? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var value = reader.GetValue<T>();
-            return Enumeration<T>.Items.FirstOrDefault(item => item.GetType().IsSubclassOf(typeToConvert) && item.Value.Equals(value)) as E;
+            return Enumeration<T>.Items.FirstOrDefault(item => item.Value.Equals(value) && item.GetType().IsSubclassOf(typeToConvert)) as E;
         }
 
         public override void Write(Utf8JsonWriter writer, E value, JsonSerializerOptions options)
