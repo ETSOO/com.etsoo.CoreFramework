@@ -25,10 +25,16 @@
         Approved = 100,
 
         /// <summary>
+        /// Doing
+        /// 处理中
+        /// </summary>
+        Doing = 110,
+
+        /// <summary>
         /// Audited
         /// 已审核
         /// </summary>
-        Audited = 111,
+        Audited = 120,
 
         /// <summary>
         /// Inactivated
