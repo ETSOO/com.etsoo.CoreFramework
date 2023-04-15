@@ -180,5 +180,16 @@ namespace com.etsoo.CoreFramework.Services
         {
             await Repo.ReadAsync(response, id, "update", collectionNames);
         }
+
+        /// <summary>
+        /// Update status
+        /// 更新状态
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        public virtual async ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq)
+        {
+            return await Repo.UpdateStatusAsync(rq);
+        }
     }
 }

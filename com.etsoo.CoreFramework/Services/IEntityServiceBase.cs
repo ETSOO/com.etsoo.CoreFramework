@@ -121,5 +121,13 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
         Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null);
+
+        /// <summary>
+        /// Update status
+        /// 更新状态
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq);
     }
 }

@@ -335,6 +335,25 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Update status
+        /// 更新状态
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        public virtual async ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq)
+        {
+            var parameters = new DbParameters();
+            parameters.Add("Id", rq.Id);
+            parameters.Add("Status", (byte)rq.Status);
+
+            AddSystemParameters(parameters);
+
+            var command = CreateCommand(GetCommandName("update status"), parameters);
+
+            return await QueryAsResultAsync(command);
+        }
+
+        /// <summary>
         /// Data list
         /// 数据列表
         /// </summary>

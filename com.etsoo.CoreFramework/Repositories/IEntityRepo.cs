@@ -131,6 +131,14 @@ namespace com.etsoo.CoreFramework.Repositories
         ValueTask<IActionResult> UpdateAsync<M>(M model) where M : IdItem<T>, IUpdateModel;
 
         /// <summary>
+        /// Update status
+        /// 更新状态
+        /// </summary>
+        /// <param name="rq">Request data</param>
+        /// <returns>Result</returns>
+        ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq);
+
+        /// <summary>
         /// Data list
         /// 数据列表
         /// </summary>
