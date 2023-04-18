@@ -1,13 +1,11 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
+using com.etsoo.Utils;
 using com.etsoo.Utils.Crypto;
-using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System.Data.Common;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -226,16 +224,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Result</returns>
         protected virtual JsonSerializerOptions ConfigureJsonSerializerOptions(JsonSerializerOptions options)
         {
-            options.WriteIndented = false;
-            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.PropertyNameCaseInsensitive = true;
-            options.DictionaryKeyPolicy = options.PropertyNamingPolicy;
-            options.TypeInfoResolver = new DefaultJsonTypeInfoResolver
-            {
-                Modifiers = { SerializationExtensions.PIIAttributeMaskingPolicy }
-            };
-
-            return options;
+            return SharedUtils.JsonDefaultSerializerOptionsSetup(options);
         }
     }
 }

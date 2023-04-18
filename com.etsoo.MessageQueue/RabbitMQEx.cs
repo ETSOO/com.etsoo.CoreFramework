@@ -486,8 +486,7 @@ namespace com.etsoo.Utils.MessageQueue
                 Connection.Dispose();
 
             // Connection.CreateModel may fail, check existence
-            if (Channel != null)
-                Channel.Dispose();
+            Channel?.Dispose();
 
             GC.SuppressFinalize(this);
         }

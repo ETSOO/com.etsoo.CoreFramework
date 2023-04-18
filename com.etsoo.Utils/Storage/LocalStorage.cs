@@ -153,11 +153,7 @@ namespace com.etsoo.Utils.Storage
             if (!fi.Exists)
                 return null;
 
-            return await Task.Run(() =>
-            {
-                // Returns a read-only FileStream object with the FileShare mode set to Read
-                return fi.OpenRead();
-            });
+            return await Task.Run(fi.OpenRead);
         }
 
         /// <summary>

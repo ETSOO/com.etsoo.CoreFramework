@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Text.Unicode;
 
 namespace com.etsoo.Utils
@@ -20,14 +21,34 @@ namespace com.etsoo.Utils
         /// Json default serializer options
         /// Json 默认序列化选项
         /// </summary>
-        public static JsonSerializerOptions JsonDefaultSerializerOptions => new()
+        public static JsonSerializerOptions JsonDefaultSerializerOptions => JsonDefaultSerializerOptionsSetup(new());
+
+        /// <summary>
+        /// Json default serializer options setup
+        /// Json 默认序列化选项设置
+        /// </summary>
+        /// <param name="options">Options</param>
+        /// <returns>Options</returns>
+        public static JsonSerializerOptions JsonDefaultSerializerOptionsSetup(JsonSerializerOptions options)
         {
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-            WriteIndented = false,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
+            options.Encoder ??= JavaScriptEncoder.Create(UnicodeRanges.All);
+
+            options.WriteIndented = false;
+            options.PropertyNameCaseInsensitive = true;
+
+            if (options.DefaultIgnoreCondition == JsonIgnoreCondition.Never)
+                options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+
+            options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
+            options.DictionaryKeyPolicy ??= JsonNamingPolicy.CamelCase;
+
+            options.TypeInfoResolver ??= new DefaultJsonTypeInfoResolver
+            {
+                Modifiers = { SerializationExtensions.PIIAttributeMaskingPolicy }
+            };
+
+            return options;
+        }
 
         /// <summary>
         /// Get enum value related keys
