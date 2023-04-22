@@ -7,15 +7,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Tests
 {
+    public interface IUserData
+    {
+        public int Test { get; set; }
+    }
+
     [AutoDataReaderGenerator]
     [AutoDictionaryGenerator]
     [AutoToJson]
     [AutoToParameters]
-    public partial record DirectUser : QueryRQ<int>
+    public partial record DirectUser : QueryRQ<int>, IUserData
     {
         public string Name { get; init; } = null!;
 
         public readonly int ReadOnlyField;
+
+        public int Test { get; set; }
 
         public bool WriteOnlyProperty { set { } }
     }

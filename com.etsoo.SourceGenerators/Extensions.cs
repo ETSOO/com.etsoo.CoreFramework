@@ -323,7 +323,7 @@ namespace com.etsoo.SourceGenerators
                     {
                         var sm = context.Compilation.GetSemanticModel(nameSyntax.SyntaxTree);
                         var symbol = sm.GetSymbolInfo(nameSyntax).Symbol;
-                        if (symbol == null || symbol is not INamedTypeSymbol namedSymbol || namedSymbol.Locations == null) continue;
+                        if (symbol == null || symbol is not INamedTypeSymbol namedSymbol || namedSymbol.TypeKind == TypeKind.Interface || namedSymbol.Locations == null) continue;
 
                         if (depth == 0)
                         {
