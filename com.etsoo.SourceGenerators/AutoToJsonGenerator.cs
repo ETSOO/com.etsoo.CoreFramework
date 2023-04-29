@@ -197,7 +197,7 @@ namespace com.etsoo.SourceGenerators
                         /// <returns>Task</returns>
                         public{virtualKeyword} async Task ToJsonAsync(System.Buffers.IBufferWriter<byte> writer, JsonSerializerOptions options, IEnumerable<string>? fields = null)
                         {{
-                            {(hasSetup ? "if (!(await SetupAsync())) return;\n" : "")};
+                            {(hasSetup ? "if (!(await SetupAsync())) return;\n" : "")}
                             // Utf8JsonWriter
                             using var w = options.CreateJsonWriter(writer);
 

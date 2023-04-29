@@ -162,6 +162,9 @@
   <data name="InvalidMobile" xml:space="preserve">
     <value>不是有效的手机号码</value>
   </data>
+  <data name="InvalidStatus" xml:space="preserve">
+    <value>当前状态下不允许操作</value>
+  </data>
   <data name="IPAddressChanged" xml:space="preserve">
     <value>IP地址已更改</value>
   </data>

@@ -299,7 +299,7 @@ namespace com.etsoo.SourceGenerators
                         public{virtualKeyword} IDbParameters AsParameters(ICoreApplicationBase app)
                         {{
                             var parameters = new DbParameters();
-                            {(hasSetup ? "if (!SetupAsync(parameters, app).GetAwaiter().GetResult()) return parameters;\n" : "")};
+                            {(hasSetup ? "if (!SetupAsync(parameters, app).GetAwaiter().GetResult()) return parameters;\n" : "")}
 
                             {string.Join(";\n", body)};
 

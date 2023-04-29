@@ -196,6 +196,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation not allowed in current state.
+        /// </summary>
+        public static string InvalidStatus {
+            get {
+                return ResourceManager.GetString("InvalidStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IP address has been changed.
         /// </summary>
         public static string IPAddressChanged {

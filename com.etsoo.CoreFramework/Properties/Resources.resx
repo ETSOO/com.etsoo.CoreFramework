@@ -162,6 +162,9 @@
   <data name="InvalidMobile" xml:space="preserve">
     <value>It is not a valid mobile phone number</value>
   </data>
+  <data name="InvalidStatus" xml:space="preserve">
+    <value>Operation not allowed in current state</value>
+  </data>
   <data name="IPAddressChanged" xml:space="preserve">
     <value>IP address has been changed</value>
   </data>
