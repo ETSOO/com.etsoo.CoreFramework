@@ -10,7 +10,7 @@ namespace com.etsoo.Localization
     /// </summary>
     public static class LocalizationUtils
     {
-        private static ConcurrentDictionary<string, (string, string, string)> cachedCurrencies = new();
+        private static readonly ConcurrentDictionary<string, (string, string, string)> cachedCurrencies = new();
 
         /// <summary>
         /// Set culture

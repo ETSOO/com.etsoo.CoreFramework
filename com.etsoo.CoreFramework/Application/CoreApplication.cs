@@ -1,8 +1,11 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
+using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
+using Dapper;
+using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Text.Json;
@@ -225,6 +228,24 @@ namespace com.etsoo.CoreFramework.Application
         protected virtual JsonSerializerOptions ConfigureJsonSerializerOptions(JsonSerializerOptions options)
         {
             return SharedUtils.JsonDefaultSerializerOptionsSetup(options);
+        }
+
+        /// <summary>
+        /// Get API user data
+        /// 获取API用户数据
+        /// </summary>
+        /// <param name="organizationId">Organization id</param>
+        /// <param name="userId">User id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Action result</returns>
+        public virtual async Task<IActionResult?> GetApiUserDataAsync(int organizationId, int userId, CancellationToken cancellationToken = default)
+        {
+            var parameters = new DbParameters();
+            parameters.Add("CurrentOrg", organizationId);
+            parameters.Add("CurrentUser", userId);
+
+            var command = new CommandDefinition("ep_auth_get_api_user_data", parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
+            return await DB.QueryAsResultAsync(command);
         }
     }
 }

@@ -141,11 +141,7 @@ namespace com.etsoo.CoreFramework.User
         public static ServiceUser CreateSafe(HttpContext? context)
         {
             var user = Create(context);
-            if (user == null)
-            {
-                throw new UnauthorizedAccessException();
-            }
-            return user;
+            return user ?? throw new UnauthorizedAccessException();
         }
 
         /// <summary>
