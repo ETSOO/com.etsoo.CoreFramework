@@ -19,6 +19,12 @@ namespace com.etsoo.Web
     public abstract class SharedController : ControllerBase
     {
         /// <summary>
+        /// HttpCotext accessor
+        /// HttpCotext 访问器
+        /// </summary>
+        protected readonly IHttpContextAccessor context;
+
+        /// <summary>
         /// Core application
         /// 核心程序对象
         /// </summary>
@@ -50,6 +56,9 @@ namespace com.etsoo.Web
         /// <param name="context">Http context accessor</param>
         public SharedController(ICoreApplicationBase coreApp, IHttpContextAccessor context) : base()
         {
+            // Accessor
+            this.context = context;
+
             // Remote IP
             Ip = context.RemoteIpAddress();
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System.Net;
+using System.Security.Claims;
 
 namespace com.etsoo.WebUtils
 {
@@ -19,6 +20,39 @@ namespace com.etsoo.WebUtils
         public static CancellationToken CancellationToken(this IHttpContextAccessor accessor)
         {
             return accessor.HttpContext.RequestAborted;
+        }
+
+        /// <summary>
+        /// Get Enum item from Accessor
+        /// 从访问器中获取枚举项
+        /// </summary>
+        /// <typeparam name="T">Generic Enum type</typeparam>
+        /// <param name="accessor">Accessor</param>
+        /// <param name="claimType">Claim type</param>
+        /// <returns>Result</returns>
+        public static T? GetEnumClaim<T>(this IHttpContextAccessor accessor, string claimType) where T : struct, Enum
+        {
+            return accessor.HttpContext.User.GetEnumClaim<T>(claimType);
+        }
+
+        /// <summary>
+        /// Get Enum item from claim
+        /// 从声明中获取枚举项
+        /// </summary>
+        /// <typeparam name="T">Generic Enum type</typeparam>
+        /// <param name="principal">Claims principal</param>
+        /// <param name="claimType">Claim type</param>
+        /// <returns>Result</returns>
+        public static T? GetEnumClaim<T>(this ClaimsPrincipal principal, string claimType) where T : struct, Enum
+        {
+            var claimValue = principal.FindFirst(claimType)?.Value;
+
+            if (!string.IsNullOrEmpty(claimValue) && Enum.TryParse<T>(claimValue, out var p))
+            {
+                return p;
+            }
+
+            return default;
         }
 
         /// <summary>
