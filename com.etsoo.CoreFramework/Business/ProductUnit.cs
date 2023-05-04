@@ -88,6 +88,12 @@
         TIME = 99,
 
         /// <summary>
+        /// Money
+        /// 储值
+        /// </summary>
+        MONEY = 100,
+
+        /// <summary>
         /// Gram
         /// 克
         /// </summary>
