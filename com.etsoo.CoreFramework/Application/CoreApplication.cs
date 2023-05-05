@@ -157,10 +157,11 @@ namespace com.etsoo.CoreFramework.Application
         /// 解密数据
         /// </summary>
         /// <param name="cipherText">Cipher text</param>
+        /// <param name="key">Key</param>
         /// <returns>Result</returns>
-        public string DecriptData(string cipherText)
+        public string DecriptData(string cipherText, string key = "")
         {
-            var bytes = CryptographyUtils.AESDecrypt(cipherText, Configuration.PrivateKey);
+            var bytes = CryptographyUtils.AESDecrypt(cipherText, key + Configuration.PrivateKey);
             return bytes == null ? throw new ApplicationException("Decript Data Failed") : Encoding.UTF8.GetString(bytes);
         }
 
@@ -169,10 +170,11 @@ namespace com.etsoo.CoreFramework.Application
         /// 加密数据
         /// </summary>
         /// <param name="plainText">Plain text</param>
-        /// <returns></returns>
-        public string EncriptData(string plainText)
+        /// <param name="key">Key</param>
+        /// <returns>Result</returns>
+        public string EncriptData(string plainText, string key = "")
         {
-            return CryptographyUtils.AESEncrypt(plainText, Configuration.PrivateKey);
+            return CryptographyUtils.AESEncrypt(plainText, key + Configuration.PrivateKey);
         }
 
         /// <summary>

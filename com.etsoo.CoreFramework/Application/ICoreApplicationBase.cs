@@ -51,16 +51,18 @@ namespace com.etsoo.CoreFramework.Application
         /// 解密数据
         /// </summary>
         /// <param name="cipherText">Cipher text</param>
+        /// <param name="key">Key</param>
         /// <returns>Result</returns>
-        string DecriptData(string cipherText);
+        string DecriptData(string cipherText, string key = "");
 
         /// <summary>
         /// Encript data
         /// 加密数据
         /// </summary>
         /// <param name="plainText">Plain text</param>
-        /// <returns></returns>
-        string EncriptData(string plainText);
+        /// <param name="key">Key</param>
+        /// <returns>Result</returns>
+        string EncriptData(string plainText, string key = "");
 
         /// <summary>
         /// Hash password bytes
