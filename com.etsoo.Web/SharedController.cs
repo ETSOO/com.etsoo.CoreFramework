@@ -117,11 +117,12 @@ namespace com.etsoo.Web
             {
                 deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
             }
-            catch
+            catch (Exception ex)
             {
                 // Exception happened when device upgraded or changed view model (windows to mobile)
                 // Client should response to it to clear cached device id
-                deviceCore = null;
+                result = service.LogException(ex);
+                return false;
             }
 
             if (string.IsNullOrEmpty(deviceCore))
