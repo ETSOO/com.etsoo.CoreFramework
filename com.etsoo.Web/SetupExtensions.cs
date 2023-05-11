@@ -17,13 +17,13 @@ namespace com.etsoo.Web
         {
             // .WithOrigins(Cors)
             // .SetIsOriginAllowedToAllowWildcardSubdomains()
-            builder.SetIsOriginAllowed(origin => options.Check(origin))
+            builder.SetIsOriginAllowed(options.Check)
 
                 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
                 // https://stackoverflow.com/questions/24687313/what-exactly-does-the-access-control-allow-credentials-header-do
                 // JWT is not a cookie solution, disable it without allow credential
-                // .AllowCredentials()
-                .DisallowCredentials()
+                .AllowCredentials()
+                //.DisallowCredentials()
 
                 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
                 // Without it will popup error: Request header field content-type is not allowed by Access-Control-Allow-Headers in preflight response
