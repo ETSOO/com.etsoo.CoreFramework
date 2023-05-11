@@ -83,6 +83,8 @@ namespace com.etsoo.CoreFramework.Authentication
                 validAudience = defaultAudience;
             }
 
+            var tokenUrls = section.GetSection("TokenUrls").Get<IEnumerable<string>?>();
+
             // Whether validate audience
             var validateAudience = section.GetValue<bool?>("ValidateAudience");
 
@@ -141,6 +143,35 @@ namespace com.etsoo.CoreFramework.Authentication
                 options.TokenValidationParameters = CreateValidationParameters();
                 if (validateAudience != null)
                     options.TokenValidationParameters.ValidateAudience = validateAudience.Value;
+
+                // Sending the access token in the query string is required due to
+                // a limitation in Browser APIs. We restrict it to only calls to the
+                // SignalR hub in this code.
+                // See https://docs.microsoft.com/aspnet/core/signalr/security#access-token-logging
+                // for more information about security considerations when using
+                // the query string to transmit the access token.
+                if (tokenUrls?.Any() is true)
+                {
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var path = context.HttpContext.Request.Path;
+                            if (tokenUrls.Any(url => path.StartsWithSegments(url)))
+                            {
+                                var accessToken = context.Request.Query["access_token"];
+
+                                if (!string.IsNullOrEmpty(accessToken))
+                                {
+                                    // Read the token out of the query string
+                                    context.Token = accessToken;
+                                }
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                }
             });
         }
 

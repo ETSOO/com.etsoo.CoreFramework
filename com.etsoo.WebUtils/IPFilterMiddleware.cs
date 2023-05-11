@@ -62,16 +62,19 @@ namespace com.etsoo.WebUtils
         public async Task InvokeAsync(HttpContext context)
         {
             var remoteIp = context.Connection.RemoteIpAddress;
-            if (remoteIp.IsIPv4MappedToIPv6) remoteIp = remoteIp.MapToIPv4();
-
-            if (
-                (_whitelist != null && !(_whitelist.Any(ip => ip.Equals(remoteIp))))
-                ||
-                (_blacklist != null && _blacklist.Any(ip => ip.Equals(remoteIp)))
-            )
+            if (remoteIp != null)
             {
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                return;
+                if (remoteIp.IsIPv4MappedToIPv6) remoteIp = remoteIp.MapToIPv4();
+
+                if (
+                    (_whitelist != null && !(_whitelist.Any(ip => ip.Equals(remoteIp))))
+                    ||
+                    (_blacklist != null && _blacklist.Any(ip => ip.Equals(remoteIp)))
+                )
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    return;
+                }
             }
 
             await _next.Invoke(context);

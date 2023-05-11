@@ -16,7 +16,7 @@
 	  <Description>ETSOO Web Utilities
 亿速思维 Web 工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.36</Version>
+	  <Version>1.0.37</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -32,7 +32,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>

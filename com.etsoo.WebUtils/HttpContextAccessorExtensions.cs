@@ -19,7 +19,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static CancellationToken CancellationToken(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext.RequestAborted;
+            return accessor.HttpContext?.RequestAborted ?? default;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static T? GetEnumClaim<T>(this IHttpContextAccessor accessor, string claimType) where T : struct, Enum
         {
-            return accessor.HttpContext.User.GetEnumClaim<T>(claimType);
+            return accessor.HttpContext?.User.GetEnumClaim<T>(claimType);
         }
 
         /// <summary>
@@ -61,9 +61,9 @@ namespace com.etsoo.WebUtils
         /// </summary>
         /// <param name="accessor">Accessor</param>
         /// <returns>Result</returns>
-        public static IPAddress LocalIpAddress(this IHttpContextAccessor accessor)
+        public static IPAddress? LocalIpAddress(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext.Connection.LocalIpAddress;
+            return accessor.HttpContext?.Connection.LocalIpAddress;
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace com.etsoo.WebUtils
         /// </summary>
         /// <param name="accessor">Accessor</param>
         /// <returns>Result</returns>
-        public static IPAddress RemoteIpAddress(this IHttpContextAccessor accessor)
+        public static IPAddress? RemoteIpAddress(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext.Connection.RemoteIpAddress;
+            return accessor.HttpContext?.Connection.RemoteIpAddress;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static string? UserAgent(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext.Request.Headers[HeaderNames.UserAgent];
+            return accessor.HttpContext?.Request.Headers[HeaderNames.UserAgent];
         }
     }
 }

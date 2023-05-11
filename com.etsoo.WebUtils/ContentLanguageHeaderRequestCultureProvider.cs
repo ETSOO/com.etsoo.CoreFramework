@@ -9,7 +9,7 @@ namespace com.etsoo.WebUtils
     public class ContentLanguageHeaderRequestCultureProvider : RequestCultureProvider
     {
         /// <inheritdoc />
-        public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
+        public override Task<ProviderCultureResult?> DetermineProviderCultureResult(HttpContext httpContext)
         {
             ArgumentNullException.ThrowIfNull(httpContext);
 
@@ -20,7 +20,7 @@ namespace com.etsoo.WebUtils
                 return NullProviderCultureResult;
             }
 
-            return Task.FromResult(new ProviderCultureResult(contentLanguage));
+            return Task.FromResult<ProviderCultureResult?>(new ProviderCultureResult(contentLanguage));
         }
     }
 }

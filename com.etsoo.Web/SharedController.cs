@@ -60,7 +60,12 @@ namespace com.etsoo.Web
             this.context = context;
 
             // Remote IP
-            Ip = context.RemoteIpAddress();
+            var ip = context.RemoteIpAddress();
+            if (ip == null)
+            {
+                throw new NullReferenceException(nameof(ip));
+            }
+            Ip = ip;
 
             // IHeaderDictionary will return StringValues.Empty for missing entries
             UserAgent = context.UserAgent();
