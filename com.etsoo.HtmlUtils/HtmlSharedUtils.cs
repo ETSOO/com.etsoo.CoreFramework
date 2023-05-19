@@ -11,6 +11,26 @@ namespace com.etsoo.HtmlUtils
     public static class HtmlSharedUtils
     {
         /// <summary>
+        /// Manipulate HTML elements
+        /// 操作HTML元素
+        /// </summary>
+        /// <param name="stream">HTML stream</param>
+        /// <param name="selector">Selector</param>
+        /// <param name="action">Action</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
+        public async static Task ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
+        {
+            var parser = new HtmlParser();
+            var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
+            var elements = doc.QuerySelectorAll<IHtmlElement>(selector);
+            foreach (var element in elements)
+            {
+                await action(element);
+            }
+        }
+
+        /// <summary>
         /// Parse table data
         /// 解析表格数据
         /// </summary>
@@ -19,13 +39,14 @@ namespace com.etsoo.HtmlUtils
         /// <param name="selector">Table selector</param>
         /// <param name="creator">Row data creator</param>
         /// <param name="titleRowIndex">Title row index, -1 means no titles</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Parsed data and continue or not</returns>
-        public async static Task<List<T>> ParseTable<T>(Stream stream, string selector, Func<List<string>?, List<string>, int, (T?, bool)> creator, int titleRowIndex = 0)
+        public async static Task<List<T>> ParseTable<T>(Stream stream, string selector, Func<List<string>?, List<string>, int, (T?, bool)> creator, int titleRowIndex = 0, CancellationToken cancellationToken = default)
         {
             var items = new List<T>();
 
             var parser = new HtmlParser();
-            var doc = await parser.ParseDocumentAsync(stream);
+            var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
             var element = doc.QuerySelector(selector);
 
             var startIndex = titleRowIndex + 1;
