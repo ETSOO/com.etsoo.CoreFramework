@@ -18,8 +18,8 @@ namespace com.etsoo.HtmlUtils
         /// <param name="selector">Selector</param>
         /// <param name="action">Action</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Task</returns>
-        public async static Task ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
+        /// <returns>Document</returns>
+        public async static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
         {
             var parser = new HtmlParser();
             var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
@@ -28,6 +28,7 @@ namespace com.etsoo.HtmlUtils
             {
                 await action(element);
             }
+            return doc;
         }
 
         /// <summary>
