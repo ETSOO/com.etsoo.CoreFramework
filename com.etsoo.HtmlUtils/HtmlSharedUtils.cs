@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.HtmlUtils
 {
@@ -8,8 +9,132 @@ namespace com.etsoo.HtmlUtils
     /// HTML shared utils
     /// HTML共享的工具
     /// </summary>
-    public static class HtmlSharedUtils
+    public static partial class HtmlSharedUtils
     {
+        /// <summary>
+        /// Remove all tags but keep its content
+        /// 删除所有标签但是保留内容
+        /// </summary>
+        /// <param name="html">HTML string</param>
+        /// <returns>Result</returns>
+        public static string RemoveAllTags(string html)
+        {
+            return MyRegex2().Replace(html, string.Empty);
+        }
+
+        /// <summary>
+        /// Remove line breaks
+        /// 删除换行符
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>Result</returns>
+        public static string RemoveLineBreaks(string input)
+        {
+            return MyRegex3().Replace(input, string.Empty);
+        }
+
+        /// <summary>
+        /// Remove script tags and its content
+        /// 删除脚本标签和其内容
+        /// </summary>
+        /// <param name="html">HTML string</param>
+        /// <returns>Result</returns>
+        public static string RemoveScripts(string html)
+        {
+            return MyRegex().Replace(html, string.Empty);
+        }
+
+        /// <summary>
+        /// Remove style tags and its content
+        /// 删除样式标签和其内容
+        /// </summary>
+        /// <param name="html">HTML string</param>
+        /// <returns>Result</returns>
+        public static string RemoveStyles(string html)
+        {
+            return MyRegex1().Replace(html, string.Empty);
+        }
+
+        /// <summary>
+        /// Get introduction
+        /// 获取简介
+        /// </summary>
+        /// <param name="html">HTML string</param>
+        /// <param name="maxChars">Max characters for the introduction</param>
+        /// <param name="lookupText">Lookup text</param>
+        /// <param name="isWord">Is English word style</param>
+        /// <returns>Result</returns>
+        public static string GetIntroduction(string html, ushort maxChars, string? lookupText = null, bool isWord = false)
+        {
+            // Remove scripts
+            var scriptRemoved = RemoveScripts(html);
+
+            // Remove styles
+            var styleRemoved = RemoveStyles(scriptRemoved);
+
+            // All tags
+            var tagRemoved = RemoveAllTags(styleRemoved);
+
+            // Remove line breaks
+            var content = RemoveLineBreaks(tagRemoved);
+
+            if (isWord)
+            {
+                // Add blanks
+                content = MyRegex4().Replace(content, " ");
+            }
+
+            // Remove trailing blanks
+            content = content.Trim();
+
+            // Len
+            var len = content.Length;
+
+            // Long lookup text
+            if (maxChars <= lookupText?.Length)
+            {
+                return lookupText;
+            }
+            else if (maxChars >= len)
+            {
+                return content;
+            }
+
+            // Index
+            var index = string.IsNullOrEmpty(lookupText) ? -1 : content.IndexOf(lookupText);
+            int left, right;
+
+            if (index == -1)
+            {
+                left = 0;
+                right = maxChars;
+            }
+            else
+            {
+                left = index - (maxChars - lookupText!.Length) / 2;
+                if (left < 0) left = 0;
+
+                right = left+ maxChars;
+            }
+
+            if (isWord)
+            {
+                // Adjust right index for word case
+                var wordIndex = content.IndexOf(" ", right - 1);
+                if (wordIndex == -1)
+                {
+                    if (len - right < 10) right = len;
+                }
+                else
+                {
+                    right = wordIndex;
+                }
+            }
+
+            var part = content[left..right];
+            return (left > 0 ? "..." : string.Empty) + part + (right < len ? "..." : string.Empty);
+        }
+
         /// <summary>
         /// Manipulate HTML elements
         /// 操作HTML元素
@@ -74,5 +199,20 @@ namespace com.etsoo.HtmlUtils
 
             return items;
         }
+
+        [GeneratedRegex("<script.*?</script>", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+        private static partial Regex MyRegex();
+
+        [GeneratedRegex("<style.*?</style>", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+        private static partial Regex MyRegex1();
+
+        [GeneratedRegex("<.*?>", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+        private static partial Regex MyRegex2();
+
+        [GeneratedRegex("\r\n?|\n", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+        private static partial Regex MyRegex3();
+
+        [GeneratedRegex("(?<=[.\\?!])(?=[^\\s])")]
+        private static partial Regex MyRegex4();
     }
 }

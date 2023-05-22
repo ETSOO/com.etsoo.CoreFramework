@@ -54,12 +54,6 @@ namespace com.etsoo.CoreFramework.Services
         protected readonly CancellationToken CancellationToken;
 
         /// <summary>
-        /// Secret passphrase
-        /// 安全密码
-        /// </summary>
-        protected string? Passphrase { get; set; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
