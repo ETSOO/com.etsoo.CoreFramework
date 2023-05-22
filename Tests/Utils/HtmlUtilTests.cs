@@ -57,7 +57,7 @@ namespace Tests.Utils
         {
             // Arrange
             string html = "<p>This is a sample HTML string.</p><p>It contains some content.</p>";
-            ushort maxChars = 16;
+            ushort maxChars = 12;
             string lookupText = "is a";
 
             // Act
@@ -72,7 +72,7 @@ namespace Tests.Utils
         {
             // Arrange
             string html = "<p>This is a sample HTML string.</p><p>It contains some content.</p>";
-            ushort maxChars = 16;
+            ushort maxChars = 10;
             string lookupText = "sample";
 
             // Act
@@ -87,7 +87,7 @@ namespace Tests.Utils
         {
             // Arrange
             string html = "<p>这是样本HTML字符串。</p><p>考虑字符串合并</p>";
-            ushort maxChars = 10;
+            ushort maxChars = 8;
             string lookupText = "样本";
 
             // Act

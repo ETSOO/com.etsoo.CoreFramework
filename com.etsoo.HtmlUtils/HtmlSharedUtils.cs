@@ -60,11 +60,11 @@ namespace com.etsoo.HtmlUtils
         /// 获取简介
         /// </summary>
         /// <param name="html">HTML string</param>
-        /// <param name="maxChars">Max characters for the introduction</param>
+        /// <param name="maxChars">Max characters excluding lookupText length for the introduction</param>
         /// <param name="lookupText">Lookup text</param>
         /// <param name="isWord">Is English word style</param>
         /// <returns>Result</returns>
-        public static string GetIntroduction(string html, ushort maxChars, string? lookupText = null, bool isWord = false)
+        public static string GetIntroduction(string html, int maxChars, string? lookupText = null, bool isWord = false)
         {
             // Remove scripts
             var scriptRemoved = RemoveScripts(html);
@@ -90,12 +90,13 @@ namespace com.etsoo.HtmlUtils
             // Len
             var len = content.Length;
 
-            // Long lookup text
-            if (maxChars <= lookupText?.Length)
+            // Auto increase
+            if (lookupText != null)
             {
-                return lookupText;
+                maxChars += lookupText.Length;
             }
-            else if (maxChars >= len)
+
+            if (maxChars >= len)
             {
                 return content;
             }
