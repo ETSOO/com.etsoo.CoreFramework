@@ -126,6 +126,9 @@
   <data name="AccountExpired" xml:space="preserve">
     <value>Account expired on {0}</value>
   </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>Authorization Failed</value>
+  </data>
   <data name="CodeExpired" xml:space="preserve">
     <value>Code Expired</value>
   </data>

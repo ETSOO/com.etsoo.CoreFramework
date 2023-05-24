@@ -88,6 +88,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorization Failed.
+        /// </summary>
+        public static string AuthFailed {
+            get {
+                return ResourceManager.GetString("AuthFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Code Expired.
         /// </summary>
         public static string CodeExpired {

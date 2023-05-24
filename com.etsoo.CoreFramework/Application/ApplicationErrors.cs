@@ -51,6 +51,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError AccountExpired => new(nameof(AccountExpired), Resources.AccountExpired);
 
         /// <summary>
+        /// Authorization failed
+        /// 授权失败
+        /// </summary>
+        public static ApplicationError AuthFailed => new(nameof(AuthFailed), Resources.AuthFailed);
+
+        /// <summary>
         /// Code Expired
         /// 验证码已过期
         /// </summary>
@@ -255,6 +261,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(AccessDenied) => AccessDenied,
                 nameof(AccountDisabled) => AccountDisabled,
                 nameof(AccountExpired) => AccountExpired,
+                nameof(AuthFailed) => AuthFailed,
                 nameof(CodeExpired) => CodeExpired,
                 nameof(CodeFrozen) => CodeFrozen,
                 nameof(CodesNoMatch) => CodesNoMatch,

@@ -126,6 +126,9 @@
   <data name="AccountExpired" xml:space="preserve">
     <value>賬戶已於 {0} 到期</value>
   </data>
+  <data name="AuthFailed" xml:space="preserve">
+    <value>授權失敗！</value>
+  </data>
   <data name="CodeExpired" xml:space="preserve">
     <value>驗證碼已過期</value>
   </data>
