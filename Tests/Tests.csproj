@@ -9,6 +9,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\etsoo.snk</AssemblyOriginatorKeyFile>
 	  <ImplicitUsings>true</ImplicitUsings>
+	  <UserSecretsId>99058a1f-f915-4f72-95aa-3d261c145a4e</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -18,9 +19,10 @@
 
   <ItemGroup>
     <PackageReference Include="com.etsoo.Testing" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +32,7 @@
     <ProjectReference Include="..\com.etsoo.HTTP\com.etsoo.HTTP.csproj" />
     <ProjectReference Include="..\com.etsoo.ImageUtils\com.etsoo.ImageUtils.csproj" />
     <ProjectReference Include="..\com.etsoo.Localization\com.etsoo.Localization.csproj" />
+    <ProjectReference Include="..\com.etsoo.MessageQueue\com.etsoo.MessageQueue.csproj" />
     <ProjectReference Include="..\com.etsoo.PureIO\com.etsoo.PureIO.csproj" />
     <ProjectReference Include="..\com.etsoo.SMTP\com.etsoo.SMTP.csproj" />
     <ProjectReference Include="..\com.etsoo.SourceGenerators\com.etsoo.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
