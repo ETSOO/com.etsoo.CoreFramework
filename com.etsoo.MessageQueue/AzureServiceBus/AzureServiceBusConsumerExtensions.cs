@@ -21,7 +21,7 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         {
             services.AddSingleton<IMessageQueueConsumer, AzureServiceBusConsumer>((provider) =>
             {
-                return new AzureServiceBusConsumer(AzureServiceBusUtils.CreateServiceBusProcessor(options), provider.GetServices<IMessageQueueProcessor>(), provider.GetRequiredService<ILogger>());
+                return new AzureServiceBusConsumer(AzureServiceBusUtils.CreateServiceBusProcessor(options), provider.GetServices<IMessageQueueProcessor>(), provider.GetRequiredService<ILogger<AzureServiceBusConsumer>>());
             });
             return services;
         }
