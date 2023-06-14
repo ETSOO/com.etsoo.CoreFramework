@@ -68,13 +68,19 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                     if (properties.AppId != null) bp.AppId = properties.AppId;
                     if (properties.CorrelationId != null) bp.CorrelationId = properties.CorrelationId;
                     if (properties.Type != null) bp.Type = properties.Type;
-                    if (properties.UserId != null) bp.UserId = properties.UserId;
                     if (properties.ContentEncoding != null) bp.ContentEncoding = properties.ContentEncoding;
                     if (properties.ContentType != null) bp.ContentType = properties.ContentType;
                     if (properties.Priority.HasValue) bp.Priority = properties.Priority.Value;
                     if (properties.ReplyTo != null) bp.ReplyTo = properties.ReplyTo;
                     if (properties.TimeToLive.HasValue) bp.Expiration = properties.TimeToLive.Value.TotalMilliseconds.ToString();
+
                     if (properties.Headers != null) bp.Headers = properties.Headers;
+                    if (bp.Headers.TryGetValue("LoginUserId", out var user))
+                    {
+                        bp.UserId = Convert.ToString(user);
+                    }
+
+                    if (properties.UserId != null) bp.Headers[nameof(properties.UserId)] = properties.UserId;
                 }
 
                 channel.ConfirmSelect();
