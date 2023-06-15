@@ -116,6 +116,7 @@ namespace com.etsoo.HtmlUtils
                 if (left < 0) left = 0;
 
                 right = left+ maxChars;
+                if (right > len) right = len;
             }
 
             if (isWord)

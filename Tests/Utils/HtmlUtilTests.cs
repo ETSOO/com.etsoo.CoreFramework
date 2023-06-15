@@ -96,5 +96,20 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual("这是样本HTML字符...", introduction);
         }
+
+        [Test]
+        public void GetIntroduction_RealCase_ReturnsLookupText()
+        {
+            // Arrange
+            string html = """服务器地址：qd.etsoo.com<p>服务器用户名：administrator</p><p>服务器密码：<span class="eo-lock" contenteditable="false">$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==</span></p>""";
+            ushort maxChars = 20;
+            string lookupText = "$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==";
+
+            // Act
+            string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText);
+
+            // Assert
+            Assert.AreEqual("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==", introduction);
+        }
     }
 }
