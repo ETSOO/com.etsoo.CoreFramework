@@ -13,7 +13,7 @@ namespace Tests.MessageQueue
         public async Task ProducerSendAsyncTest()
         {
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP" });
-            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true });
+            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERP", UserId = "GUID" });
             await producer.DisposeAsync();
             Assert.IsNotNull(messageId);
         }
@@ -22,7 +22,7 @@ namespace Tests.MessageQueue
         public async Task ProducerReceiveAsyncTest()
         {
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP" });
-            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true });
+            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERP", UserId = "GUID" });
             await producer.DisposeAsync();
 
             var source = new CancellationTokenSource(1000);
@@ -41,6 +41,7 @@ namespace Tests.MessageQueue
             await consumer.ReceiveAsync(source.Token);
 
             Assert.IsTrue(messages.Any());
+            Assert.IsTrue(messages.Any(m => "GUID".Equals(m.UserId)));
             Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
         }
     }

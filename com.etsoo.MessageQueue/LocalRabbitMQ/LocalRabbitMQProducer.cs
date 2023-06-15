@@ -75,7 +75,9 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                     if (properties.TimeToLive.HasValue) bp.Expiration = properties.TimeToLive.Value.TotalMilliseconds.ToString();
 
                     if (properties.Headers != null) bp.Headers = properties.Headers;
-                    if (bp.Headers.TryGetValue("LoginUserId", out var user))
+                    else bp.Headers ??= new Dictionary<string, object>();
+
+                    if (bp.Headers.TryGetValue(LocalRabbitMQUtils.LoginUserIdField, out var user) && user != null)
                     {
                         bp.UserId = Convert.ToString(user);
                     }

@@ -10,6 +10,8 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
     /// </summary>
     public static class LocalRabbitMQUtils
     {
+        public const string LoginUserIdField = "LoginUserId";
+
         private static readonly ConcurrentDictionary<string, IConnection> connections = new();
 
         /// <summary>
@@ -68,11 +70,14 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 Priority = bp.Priority,
                 ReplyTo = bp.ReplyTo,
                 Type = bp.Type,
-                UserId = bp.UserId,
                 Timestamp = bp.Timestamp.UnixTime,
                 Headers = bp.Headers ?? new Dictionary<string, object>()
             };
 
+            var userId = p.Headers.GetHeaderValue(nameof(p.UserId));
+            if (userId != null) p.UserId = userId;
+
+            p.Headers[LoginUserIdField] = bp.UserId;
             p.Headers[nameof(bp.Persistent)] = bp.Persistent;
             p.Headers[nameof(bp.CorrelationId)] = bp.CorrelationId;
             p.Headers[nameof(bp.Expiration)] = bp.Expiration;
