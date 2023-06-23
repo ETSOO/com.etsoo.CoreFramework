@@ -115,6 +115,12 @@
         /// Ton
         /// 吨
         /// </summary>
-        TON = 49
+        TON = 49,
+
+        /// <summary>
+        /// Cubic meter
+        /// 立方米
+        /// </summary>
+        M3 = 50
     }
 }
