@@ -22,6 +22,12 @@ namespace com.etsoo.CoreFramework.User
         public const string RoleValueClaim = "rolevalue";
 
         /// <summary>
+        /// Service claim type
+        /// 服务值类型
+        /// </summary>
+        public const string ServiceClaim = "service";
+
+        /// <summary>
         /// Create user from claims
         /// 从声明创建用户
         /// </summary>
@@ -44,6 +50,9 @@ namespace com.etsoo.CoreFramework.User
             // User Uid
             Guid? uid = Guid.TryParse(userUidString, out var userUidTemp) ? userUidTemp : null;
 
+            // Service
+            var service = claims.FindFirstValue(ServiceClaim);
+
             // New user
             return new ServiceUser(
                 token.Id,
@@ -53,7 +62,10 @@ namespace com.etsoo.CoreFramework.User
                 token.ClientIp,
                 token.DeviceId,
                 new CultureInfo(language),
-                token.Region);
+                token.Region)
+            {
+                Service = service
+            };
         }
 
         /// <summary>
@@ -163,6 +175,12 @@ namespace com.etsoo.CoreFramework.User
         public CultureInfo Language { get; }
 
         /// <summary>
+        /// Service
+        /// 服务
+        /// </summary>
+        public string? Service { get; set; }
+
+        /// <summary>
         /// User Uid
         /// 用户全局编号
         /// </summary>
@@ -213,6 +231,7 @@ namespace com.etsoo.CoreFramework.User
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(RoleValueClaim, RoleValue.ToString());
             if (Uid != null) yield return new(ClaimTypes.PrimarySid, Uid.Value.ToString());
+            if (Service != null) yield return new(ServiceClaim, Service);
 
             if (Role.HasValue)
             {

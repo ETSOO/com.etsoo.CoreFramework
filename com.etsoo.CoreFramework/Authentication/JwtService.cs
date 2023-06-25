@@ -295,6 +295,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Token</returns>
         public string CreateAccessToken(IServiceUser user, string? audience = null, string? keyId = null)
         {
+            user.Service = keyId;
             return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes), keyId));
         }
 

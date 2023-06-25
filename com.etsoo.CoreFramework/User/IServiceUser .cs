@@ -35,6 +35,12 @@ namespace com.etsoo.CoreFramework.User
         Guid? Uid { get; }
 
         /// <summary>
+        /// Service
+        /// 服务
+        /// </summary>
+        string? Service { get; set; }
+
+        /// <summary>
         /// Update
         /// 更新
         /// </summary>
