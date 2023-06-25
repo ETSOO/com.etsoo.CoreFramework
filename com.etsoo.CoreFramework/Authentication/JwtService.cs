@@ -134,6 +134,51 @@ namespace com.etsoo.CoreFramework.Authentication
                 return keys;
             };
 
+            // Sending the access token in the query string is required due to
+            // a limitation in Browser APIs. We restrict it to only calls to the
+            // SignalR hub in this code.
+            // See https://docs.microsoft.com/aspnet/core/signalr/security#access-token-logging
+            // for more information about security considerations when using
+            // the query string to transmit the access token.
+            if (tokenUrls?.Any() is true)
+            {
+                void messageReceived(MessageReceivedContext context)
+                {
+                    var path = context.HttpContext.Request.Path;
+                    if (tokenUrls.Any(url => path.StartsWithSegments(url)))
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        if (!string.IsNullOrEmpty(accessToken))
+                        {
+                            // Read the token out of the query string
+                            context.Token = accessToken;
+                        }
+                    }
+                }
+
+                if (events == null)
+                {
+                    events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = (context) =>
+                        {
+                            messageReceived(context);
+                            return Task.CompletedTask;
+                        }
+                    };
+                }
+                else
+                {
+                    var OnMessageReceived = events.OnMessageReceived;
+                    events.OnMessageReceived = (context) =>
+                    {
+                        messageReceived(context);
+                        return OnMessageReceived(context);
+                    };
+                }
+            }
+
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -149,31 +194,6 @@ namespace com.etsoo.CoreFramework.Authentication
                 options.TokenValidationParameters = CreateValidationParameters();
                 if (validateAudience != null)
                     options.TokenValidationParameters.ValidateAudience = validateAudience.Value;
-
-                // Sending the access token in the query string is required due to
-                // a limitation in Browser APIs. We restrict it to only calls to the
-                // SignalR hub in this code.
-                // See https://docs.microsoft.com/aspnet/core/signalr/security#access-token-logging
-                // for more information about security considerations when using
-                // the query string to transmit the access token.
-                if (tokenUrls?.Any() is true)
-                {
-                    options.Events.OnMessageReceived = (context) =>
-                    {
-                        var path = context.HttpContext.Request.Path;
-                        if (tokenUrls.Any(url => path.StartsWithSegments(url)))
-                        {
-                            var accessToken = context.Request.Query["access_token"];
-
-                            if (!string.IsNullOrEmpty(accessToken))
-                            {
-                                // Read the token out of the query string
-                                context.Token = accessToken;
-                            }
-                        }
-                        return options.Events.OnMessageReceived(context);
-                    };
-                }
             });
         }
 
