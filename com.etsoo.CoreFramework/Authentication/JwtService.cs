@@ -56,11 +56,13 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="secureManager">Secure manager</param>
         /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
         /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
+        /// <param name="events">Events handler</param>
         public JwtService(IServiceCollection services,
             IConfigurationSection section,
             Func<string, string, string>? secureManager = null,
             IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
-            TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null)
+            TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null,
+            JwtBearerEvents? events = null)
         {
             // Jwt section is required
             if (!section.Exists())
@@ -135,6 +137,10 @@ namespace com.etsoo.CoreFramework.Authentication
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
+                // Events handler
+                if (events != null)
+                    options.Events = events;
+
                 // Useful forwarding the JWT in an outgoing request
                 // https://stackoverflow.com/questions/57057749/what-is-the-purpose-of-jwtbeareroptions-savetoken-property-in-asp-net-core-2-0
                 options.SaveToken = false;
