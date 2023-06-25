@@ -66,6 +66,7 @@ namespace com.etsoo.CoreFramework.User
                 corporate,
                 connectionId)
             {
+                Service = user.Service,
                 Avatar = avatar,
                 OrganizationName = orgName
             };
