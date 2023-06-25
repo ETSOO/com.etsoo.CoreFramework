@@ -137,7 +137,7 @@ namespace com.etsoo.CoreFramework.Authentication
             // Adding Authentication  
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                // Events handler
+                // Events handlers
                 if (events != null)
                     options.Events = events;
 
@@ -158,24 +158,20 @@ namespace com.etsoo.CoreFramework.Authentication
                 // the query string to transmit the access token.
                 if (tokenUrls?.Any() is true)
                 {
-                    options.Events = new JwtBearerEvents
+                    options.Events.OnMessageReceived = (context) =>
                     {
-                        OnMessageReceived = context =>
+                        var path = context.HttpContext.Request.Path;
+                        if (tokenUrls.Any(url => path.StartsWithSegments(url)))
                         {
-                            var path = context.HttpContext.Request.Path;
-                            if (tokenUrls.Any(url => path.StartsWithSegments(url)))
+                            var accessToken = context.Request.Query["access_token"];
+
+                            if (!string.IsNullOrEmpty(accessToken))
                             {
-                                var accessToken = context.Request.Query["access_token"];
-
-                                if (!string.IsNullOrEmpty(accessToken))
-                                {
-                                    // Read the token out of the query string
-                                    context.Token = accessToken;
-                                }
+                                // Read the token out of the query string
+                                context.Token = accessToken;
                             }
-
-                            return Task.CompletedTask;
                         }
+                        return options.Events.OnMessageReceived(context);
                     };
                 }
             });
