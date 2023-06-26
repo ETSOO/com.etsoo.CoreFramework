@@ -60,6 +60,11 @@ namespace com.etsoo.MessageQueue
         public long Timestamp { get; set; }
 
         /// <summary>
+        /// Cache data for 
+        /// </summary>
+        public object? CacheData { get; set; }
+
+        /// <summary>
         /// Message header field table
         /// </summary>
         public IDictionary<string, object>? Headers { get; set; }
