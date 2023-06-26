@@ -72,9 +72,9 @@ namespace com.etsoo.Address.Validators
                 DistrictNum = district;
             }
 
-            if (len >= 14 && DateTimeOffset.TryParseExact(pin[6..14], "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            if (len >= 14 && DateTimeOffset.TryParseExact(pin[6..14] + "+08", "yyyyMMddzz", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
             {
-                Birthday = TimeZoneInfo.ConvertTime(date, TimeZoneInfo.FindSystemTimeZoneById("China Standard Time"));
+                Birthday = date;
             }
 
             if (len >= 17 && int.TryParse(pin.AsSpan(14, 3), out var g))

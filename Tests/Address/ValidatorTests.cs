@@ -9,10 +9,11 @@ namespace Tests.Address
         [Test]
         public void ChinaPinValidatorFalseTests()
         {
-            var validator = new ChinaPinValidator("430124198812181876");
+            var validator = new ChinaPinValidator("430124198812081876");
             Assert.IsFalse(validator.Valid);
             Assert.AreEqual("M", validator.Gender);
             Assert.AreEqual(12, validator.Birthday?.Month);
+            Assert.AreEqual(8, validator.Birthday?.Day);
         }
 
         [Test]
