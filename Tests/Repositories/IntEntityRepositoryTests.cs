@@ -112,6 +112,16 @@ namespace Tests.Repositories
         }
 
         [Test]
+        public async Task ReadAsync_Test()
+        {
+            var data = await repo.ReadAsync<TestUserModule>(-1);
+            Assert.IsNull(data);
+
+            data = await repo.ReadDirectAsync<TestUserModule>(-1);
+            Assert.IsNull(data);
+        }
+
+        [Test]
         public async Task UpdateAsync_Test()
         {
             // Arrange

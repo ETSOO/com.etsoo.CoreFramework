@@ -157,6 +157,24 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// View entity with direct way
+        /// 直接方式浏览实体
+        /// </summary>
+        /// <typeparam name="E">Generic entity data type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        public virtual async Task<E?> ReadDirectAsync<E>(T id, string range = "default")
+        {
+            var command = NewReadCommand(id, range, null);
+
+            return await App.DB.WithConnection((connection) =>
+            {
+                return connection.QueryFirstOrDefaultAsync<E>(command);
+            }, CancellationToken);
+        }
+
+        /// <summary>
         /// View entity
         /// 浏览实体
         /// </summary>
@@ -164,14 +182,10 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public virtual async Task<E> ReadAsync<E>(T id, string range = "default")
+        public virtual async ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
         {
             var command = NewReadCommand(id, range, null);
-
-            return await App.DB.WithConnection((connection) =>
-            {
-                return connection.QueryFirstAsync<E>(command);
-            }, CancellationToken);
+            return await QueryAsAsync<E>(command);
         }
 
         /// <summary>

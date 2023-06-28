@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -113,9 +114,22 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public async Task<E> ReadAsync<E>(T id, string range = "default")
+        public async ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
         {
             return await Repo.ReadAsync<E>(id, range);
+        }
+
+        /// <summary>
+        /// View entity with direct way
+        /// 直接方式浏览实体
+        /// </summary>
+        /// <typeparam name="E">Generic entity data type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        public async Task<E?> ReadDirectAsync<E>(T id, string range = "default")
+        {
+            return await Repo.ReadDirectAsync<E>(id, range);
         }
 
         /// <summary>

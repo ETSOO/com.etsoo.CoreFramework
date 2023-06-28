@@ -56,7 +56,17 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        Task<E> ReadAsync<E>(T id, string range = "default");
+        ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>;
+
+        /// <summary>
+        /// View entity with direct way
+        /// 直接方式浏览实体
+        /// </summary>
+        /// <typeparam name="E">Generic entity data type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        Task<E?> ReadDirectAsync<E>(T id, string range = "default");
 
         /// <summary>
         /// View entity to PipeWriter
