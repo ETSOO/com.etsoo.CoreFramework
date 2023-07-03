@@ -148,9 +148,24 @@ namespace com.etsoo.HtmlUtils
         /// <returns>Document</returns>
         public async static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
         {
+            return await ManipulateElementsAsync<IHtmlElement>(stream, selector, action, cancellationToken);
+        }
+
+        /// <summary>
+        /// Manipulate HTML elements
+        /// 操作HTML元素
+        /// </summary>
+        /// <param name="stream">HTML stream</param>
+        /// <param name="selector">Selector</param>
+        /// <param name="action">Action</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Document</returns>
+        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
+            where T : IHtmlElement
+        {
             var parser = new HtmlParser();
             var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
-            var elements = doc.QuerySelectorAll<IHtmlElement>(selector);
+            var elements = doc.QuerySelectorAll<T>(selector);
             foreach (var element in elements)
             {
                 await action(element);
