@@ -189,6 +189,44 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// View entity
+        /// 浏览实体
+        /// </summary>
+        /// <typeparam name="E1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="E2">Generic dataset 2 object type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        public virtual async Task<(E1?, E2[])> ReadAsync<E1, E2>(T id, string range = "default")
+            where E1 : IDataReaderParser<E1>
+            where E2 : IDataReaderParser<E2>
+        {
+            var command = NewReadCommand(id, range, null);
+            var (list1, list2) = await QueryAsListAsync<E1, E2>(command);
+            return (await list1.FirstOrDefaultAsync(), await list2.ToArrayAsync());
+        }
+
+        /// <summary>
+        /// View entity
+        /// 浏览实体
+        /// </summary>
+        /// <typeparam name="E1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="E2">Generic dataset 2 object type</typeparam>
+        /// <typeparam name="E3">Generic dataset 3 object type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        public virtual async Task<(E1?, E2[], E3[])> ReadAsync<E1, E2, E3>(T id, string range = "default")
+            where E1 : IDataReaderParser<E1>
+            where E2 : IDataReaderParser<E2>
+            where E3 : IDataReaderParser<E3>
+        {
+            var command = NewReadCommand(id, range, null);
+            var (list1, list2, list3) = await QueryAsListAsync<E1, E2, E3>(command);
+            return (await list1.FirstOrDefaultAsync(), await list2.ToArrayAsync(), await list3.ToArrayAsync());
+        }
+
+        /// <summary>
         /// View entity to PipeWriter
         /// 浏览实体数据到PipeWriter
         /// </summary>

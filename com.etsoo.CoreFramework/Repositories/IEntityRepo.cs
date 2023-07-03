@@ -59,6 +59,34 @@ namespace com.etsoo.CoreFramework.Repositories
         ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>;
 
         /// <summary>
+        /// View entity
+        /// 浏览实体
+        /// </summary>
+        /// <typeparam name="E1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="E2">Generic dataset 2 object type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        Task<(E1?, E2[])> ReadAsync<E1, E2>(T id, string range = "default")
+            where E1 : IDataReaderParser<E1>
+            where E2 : IDataReaderParser<E2>;
+
+        /// <summary>
+        /// View entity
+        /// 浏览实体
+        /// </summary>
+        /// <typeparam name="E1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="E2">Generic dataset 2 object type</typeparam>
+        /// <typeparam name="E3">Generic dataset 3 object type</typeparam>
+        /// <param name="id">Entity id</param>
+        /// <param name="range">Limited range</param>
+        /// <returns>Entity</returns>
+        Task<(E1?, E2[], E3[])> ReadAsync<E1, E2, E3>(T id, string range = "default")
+            where E1 : IDataReaderParser<E1>
+            where E2 : IDataReaderParser<E2>
+            where E3 : IDataReaderParser<E3>;
+
+        /// <summary>
         /// View entity with direct way
         /// 直接方式浏览实体
         /// </summary>

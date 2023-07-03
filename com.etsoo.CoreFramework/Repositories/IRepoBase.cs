@@ -74,6 +74,32 @@ namespace com.etsoo.CoreFramework.Repositories
         IAsyncEnumerable<T> QueryAsListAsync<T>(CommandDefinition command) where T : IDataReaderParser<T>;
 
         /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>)> QueryAsListAsync<D1, D2>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>;
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <typeparam name="D3">Generic dataset 3 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>, IAsyncEnumerable<D3>)> QueryAsListAsync<D1, D2, D3>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>
+            where D3 : IDataReaderParser<D3>;
+
+        /// <summary>
         /// Query command as action result
         /// 执行命令返回操作结果
         /// </summary>
