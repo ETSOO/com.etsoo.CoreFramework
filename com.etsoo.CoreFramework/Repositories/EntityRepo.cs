@@ -203,7 +203,7 @@ namespace com.etsoo.CoreFramework.Repositories
         {
             var command = NewReadCommand(id, range, null);
             var (list1, list2) = await QueryAsListAsync<E1, E2>(command);
-            return (await list1.FirstOrDefaultAsync(), await list2.ToArrayAsync());
+            return (list1.FirstOrDefault(), list2);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace com.etsoo.CoreFramework.Repositories
         {
             var command = NewReadCommand(id, range, null);
             var (list1, list2, list3) = await QueryAsListAsync<E1, E2, E3>(command);
-            return (await list1.FirstOrDefaultAsync(), await list2.ToArrayAsync(), await list3.ToArrayAsync());
+            return (list1.FirstOrDefault(), list2, list3);
         }
 
         /// <summary>

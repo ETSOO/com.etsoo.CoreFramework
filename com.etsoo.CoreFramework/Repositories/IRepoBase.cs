@@ -81,7 +81,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>)> QueryAsListAsync<D1, D2>(CommandDefinition command)
+        Task<(D1[], D2[])> QueryAsListAsync<D1, D2>(CommandDefinition command)
             where D1 : IDataReaderParser<D1>
             where D2 : IDataReaderParser<D2>;
 
@@ -94,7 +94,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D3">Generic dataset 3 object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>, IAsyncEnumerable<D3>)> QueryAsListAsync<D1, D2, D3>(CommandDefinition command)
+        Task<(D1[], D2[], D3[])> QueryAsListAsync<D1, D2, D3>(CommandDefinition command)
             where D1 : IDataReaderParser<D1>
             where D2 : IDataReaderParser<D2>
             where D3 : IDataReaderParser<D3>;

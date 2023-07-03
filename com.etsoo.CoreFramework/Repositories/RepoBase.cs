@@ -217,12 +217,21 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public async Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>)> QueryAsListAsync<D1, D2>(CommandDefinition command)
+        public async Task<(D1[], D2[])> QueryAsListAsync<D1, D2>(CommandDefinition command)
             where D1 : IDataReaderParser<D1>
             where D2 : IDataReaderParser<D2>
         {
             await using var reader = await App.DB.NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
-            return (D1.CreateAsync(reader), D2.CreateAsync(reader));
+
+            var d1 = await D1.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
+
+            var d2Next = await reader.NextResultAsync(command.CancellationToken);
+            var d2 = d2Next ? await D2.CreateAsync(reader).ToArrayAsync(command.CancellationToken) : Array.Empty<D2>();
+
+            await reader.CloseAsync();
+            await reader.DisposeAsync();
+
+            return (d1, d2);
         }
 
         /// <summary>
@@ -234,13 +243,32 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="D3">Generic dataset 3 object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public async Task<(IAsyncEnumerable<D1>, IAsyncEnumerable<D2>, IAsyncEnumerable<D3>)> QueryAsListAsync<D1, D2, D3>(CommandDefinition command)
+        public async Task<(D1[], D2[], D3[])> QueryAsListAsync<D1, D2, D3>(CommandDefinition command)
             where D1 : IDataReaderParser<D1>
             where D2 : IDataReaderParser<D2>
             where D3 : IDataReaderParser<D3>
         {
             await using var reader = await App.DB.NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
-            return (D1.CreateAsync(reader), D2.CreateAsync(reader), D3.CreateAsync(reader));
+
+            var d1 = await D1.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
+
+            var d2Next = await reader.NextResultAsync(command.CancellationToken);
+            var d2 = d2Next ? await D2.CreateAsync(reader).ToArrayAsync(command.CancellationToken) : Array.Empty<D2>();
+
+            D3[] d3;
+            if (d2Next && await reader.NextResultAsync(command.CancellationToken))
+            {
+                d3 = await D3.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
+            }
+            else
+            {
+                d3 = Array.Empty<D3>();
+            }
+
+            await reader.CloseAsync();
+            await reader.DisposeAsync();
+
+            return (d1, d2, d3);
         }
 
         /// <summary>
