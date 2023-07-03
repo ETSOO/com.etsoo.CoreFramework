@@ -56,6 +56,23 @@ namespace Tests.Utils
             Assert.AreEqual(expectedResult, result);
         }
 
+        private static IEnumerable<TestCaseData> FormatFileSizeTestData
+        {
+            get
+            {
+                yield return new TestCaseData(1551859712, "1.45 GB", 2);
+                yield return new TestCaseData(1551859712, "1.4 GB", 1);
+                yield return new TestCaseData(1125000, "1.07 MB", 2);
+            }
+        }
+
+        [TestCaseSource(nameof(FormatFileSizeTestData))]
+        public void FormatFileSize_Test(long input, string expected, int fractionDigits)
+        {
+            var result = StringUtils.FormatFileSize(input, fractionDigits);
+            Assert.AreEqual(expected, result);
+        }
+
         [Test]
         public void HideData_Test()
         {

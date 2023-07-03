@@ -15,6 +15,19 @@ namespace com.etsoo.Utils.String
     public static partial class StringUtils
     {
         /// <summary>
+        /// Format file size
+        /// 格式化文件大小
+        /// </summary>
+        /// <param name="size">File size</param>
+        /// <param name="fractionDigits">Fraction digits</param>
+        /// <returns>Result</returns>
+        public static string FormatFileSize(long size, int fractionDigits = 2)
+        {
+            int i = size == 0 ? 0 : (int)Math.Floor(Math.Log(size) / Math.Log(1024));
+            return $"{(size / Math.Pow(1024, i)).ToString($"F{fractionDigits}")} {new string[] { "B", "KB", "MB", "GB", "TB", "PB" }[i]}";
+        }
+
+        /// <summary>
         /// Hide normal data
         /// 隐藏一般信息
         /// </summary>
