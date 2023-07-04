@@ -38,6 +38,12 @@
         string WebUrl { get; }
 
         /// <summary>
+        /// Api url
+        /// 接口地址
+        /// </summary>
+        string ApiUrl { get; }
+
+        /// <summary>
         /// Cache hours
         /// 缓存小时数
         /// </summary>
