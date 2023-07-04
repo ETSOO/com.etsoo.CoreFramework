@@ -20,12 +20,15 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="name">Unique name</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
         /// <param name="webUrl">Web Url</param>
+        /// <param name="apiUrl">API Url</param>
+        /// <param name="cacheHours">Cache hours</param>
         public AppConfiguration(
             string privateKey,
             string[]? cultures = null,
             string? name = null,
             bool modelValidated = false,
             string? webUrl = null,
+            string? apiUrl = null,
             double cacheHours = 24
         )
         {
@@ -34,6 +37,7 @@ namespace com.etsoo.CoreFramework.Application
 
             ModelValidated = modelValidated;
             WebUrl = webUrl ?? "http://localhost";
+            ApiUrl = apiUrl ?? "http://localhost/api";
             CacheHours = cacheHours;
 
             if (string.IsNullOrEmpty(name))
@@ -64,6 +68,7 @@ namespace com.etsoo.CoreFramework.Application
             section.GetValue<string?>("Name"),
             modelValidated,
             section.GetValue<string?>("WebUrl"),
+            section.GetValue<string?>("ApiUrl"),
             section.GetValue<double?>("CacheHours").GetValueOrDefault(24))
         {
         }
@@ -97,6 +102,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 网页地址
         /// </summary>
         public string WebUrl { get; }
+
+        /// <summary>
+        /// Api url
+        /// 接口地址
+        /// </summary>
+        public string ApiUrl { get; }
 
         /// <summary>
         /// Cache hours
