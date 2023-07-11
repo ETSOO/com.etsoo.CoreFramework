@@ -20,7 +20,7 @@ namespace com.etsoo.MessageQueue
         public static async Task<ReadOnlyMemory<byte>> ToJsonBytesAsync<T>(T model, CancellationToken cancellationToken)
         {
             await using var stream = SharedUtils.GetStream();
-            await JsonSerializer.SerializeAsync(stream, model, new JsonSerializerOptions(JsonSerializerDefaults.Web), cancellationToken);
+            await JsonSerializer.SerializeAsync(stream, model, SharedUtils.JsonDefaultSerializerOptions, cancellationToken);
             return stream.ToArray().AsMemory();
         }
 
@@ -35,7 +35,7 @@ namespace com.etsoo.MessageQueue
         public static async ValueTask<T?> FromJsonBytesAsync<T>(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken) where T : class
         {
             await using var stream = SharedUtils.GetStream(bytes.Span);
-            return await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions(JsonSerializerDefaults.Web), cancellationToken);
+            return await JsonSerializer.DeserializeAsync<T>(stream, SharedUtils.JsonDefaultSerializerOptions, cancellationToken);
         }
     }
 }

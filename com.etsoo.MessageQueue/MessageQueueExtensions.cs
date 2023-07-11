@@ -71,5 +71,29 @@ namespace com.etsoo.MessageQueue
 
             return default;
         }
+
+        /// <summary>
+        /// To JSON string
+        /// 转化为 JSON 字符串
+        /// </summary>
+        /// <param name="bytes">JSON bytes</param>
+        /// <returns>Result</returns>
+        public static string ToJsonString(this ReadOnlyMemory<byte> bytes)
+        {
+            return Encoding.UTF8.GetString(bytes.Span);
+        }
+
+        /// <summary>
+        /// Async JSON bytes to model
+        /// 异步 JSON 字节转化为模型
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="bytes">JSON bytes</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
+        public static async ValueTask<T?> ToMessageAsync<T>(this ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken) where T : class
+        {
+            return await MessageQueueUtils.FromJsonBytesAsync<T>(bytes, cancellationToken);
+        }
     }
 }
