@@ -73,6 +73,19 @@ namespace com.etsoo.MessageQueue
         }
 
         /// <summary>
+        /// Async model to JSON bytes
+        /// 异步模型到 JSON 字节
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public static async Task<ReadOnlyMemory<byte>> ToJsonBytesAsync<T>(this T model, CancellationToken cancellationToken) where T : IMessageQueueMessage
+        {
+            return await MessageQueueUtils.ToJsonBytesAsync(model, cancellationToken);
+        }
+
+        /// <summary>
         /// To JSON string
         /// 转化为 JSON 字符串
         /// </summary>

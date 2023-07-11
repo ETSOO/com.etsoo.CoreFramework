@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Text;
 
 namespace com.etsoo.MessageQueue.LocalRabbitMQ
 {
@@ -79,7 +78,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError(ex, "Message: {message}, Properties: {properties}", Encoding.UTF8.GetString(e.Body.ToArray()), properties);
+                        Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
                         channel.BasicNack(e.DeliveryTag, false, true);
                     }
                 };
