@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils.Actions;
 using Microsoft.AspNetCore.Http;
@@ -16,12 +17,18 @@ namespace com.etsoo.CoreFramework.Services
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityServiceBase<C, R, T, A> : LoginedServiceBase<C, R, A>, IEntityServiceBase<T>
+    public abstract class EntityServiceBase<C, R, T, A, L> : ServiceBase<C, R, A>, IEntityServiceBase<T>
         where C : DbConnection
         where R : IEntityRepo<T>
         where T : struct
         where A : ICoreApplication<C>
     {
+        /// <summary>
+        /// Current user
+        /// 当前用户
+        /// </summary>
+        protected readonly IServiceUser? User;
+
         /// <summary>
         /// Constructor
         /// 构造函数
@@ -32,6 +39,8 @@ namespace com.etsoo.CoreFramework.Services
         public EntityServiceBase(A app, R repo, ILogger logger)
             : base(app, repo, logger)
         {
+            // RepoBase.AddSystemParameters will check when the user login required
+            User = repo.User;
         }
 
         /// <summary>
