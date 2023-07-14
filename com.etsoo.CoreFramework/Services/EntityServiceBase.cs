@@ -17,7 +17,7 @@ namespace com.etsoo.CoreFramework.Services
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityServiceBase<C, R, T, A, L> : ServiceBase<C, R, A>, IEntityServiceBase<T>
+    public abstract class EntityServiceBase<C, R, T, A> : ServiceBase<C, R, A>, IEntityServiceBase<T>
         where C : DbConnection
         where R : IEntityRepo<T>
         where T : struct
@@ -40,6 +40,7 @@ namespace com.etsoo.CoreFramework.Services
             : base(app, repo, logger)
         {
             // RepoBase.AddSystemParameters will check when the user login required
+            // For constructor, userAccessor.UserSafe can also check
             User = repo.User;
         }
 
