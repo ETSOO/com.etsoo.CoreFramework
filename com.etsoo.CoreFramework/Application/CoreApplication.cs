@@ -178,6 +178,17 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Get exchange key
+        /// </summary>
+        /// <param name="key">Encryption key</param>
+        /// <param name="serviceId">Service id</param>
+        /// <returns>Result</returns>
+        public virtual string GetExchangeKey(string key, int serviceId)
+        {
+            return $"{key}-S{serviceId}";
+        }
+
+        /// <summary>
         /// Hash password bytes
         /// 哈希密码字节数组
         /// </summary>

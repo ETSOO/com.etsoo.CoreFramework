@@ -65,6 +65,14 @@ namespace com.etsoo.CoreFramework.Application
         string EncriptData(string plainText, string key = "");
 
         /// <summary>
+        /// Get exchange key
+        /// </summary>
+        /// <param name="key">Encryption key</param>
+        /// <param name="serviceId">Service id</param>
+        /// <returns>Result</returns>
+        string GetExchangeKey(string key, int serviceId);
+
+        /// <summary>
         /// Hash password bytes
         /// 哈希密码字节数组
         /// </summary>
