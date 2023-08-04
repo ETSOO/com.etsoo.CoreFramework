@@ -85,7 +85,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
+        public virtual async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
         {
             await Repo.ListAsync(model, response, queryKey);
         }
@@ -124,7 +124,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public async ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
+        public virtual async ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
         {
             return await Repo.ReadAsync<E>(id, range);
         }
@@ -137,7 +137,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public async Task<E?> ReadDirectAsync<E>(T id, string range = "default")
+        public virtual async Task<E?> ReadDirectAsync<E>(T id, string range = "default")
         {
             return await Repo.ReadDirectAsync<E>(id, range);
         }
@@ -151,7 +151,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="range">Range</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
+        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
             await Repo.ReadAsync(response, id, range, collectionNames);
         }
@@ -200,7 +200,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
+        public virtual async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
             await Repo.ReadAsync(response, id, "update", collectionNames);
         }

@@ -413,7 +413,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        public async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
+        public virtual async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
         {
             var parameters = FormatParameters(model);
 
@@ -436,7 +436,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="queryKey">Query key word, default is empty</param>
         /// <param name="collectionNames">Collection names, null means single collection</param>
         /// <returns>Task</returns>
-        public async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where D : QueryRQ<E>
+        public virtual async Task QueryAsync<E, D>(D model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct where D : QueryRQ<E>
         {
             var parameters = FormatParameters(model);
 
@@ -460,7 +460,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
         /// <returns>Result</returns>
-        public async ValueTask<(IActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        public virtual async ValueTask<(IActionResult Result, UpdateResultData<T>? Data)> QuickUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
             where M : IdItem<T>, IUpdateModel
         {
             return await InlineUpdateAsync<T, M>(model, configs, additionalPart, additionalParams);
