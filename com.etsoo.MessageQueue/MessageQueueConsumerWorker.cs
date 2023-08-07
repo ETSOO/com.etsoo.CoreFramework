@@ -27,11 +27,11 @@ namespace com.etsoo.MessageQueue
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Message queue worker started");
+            _logger.LogInformation("Message queue consumer worker started");
 
             await _consumer.ReceiveAsync(stoppingToken);
 
-            _logger.LogInformation("Message queue worker completed");
+            _logger.LogInformation("Message queue consumer worker completed");
         }
     }
 }
