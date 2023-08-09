@@ -20,7 +20,7 @@ namespace Tests.MessageQueue
             });
             var producer = new GooglePubSubProducer(client);
 
-            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true });
+            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest" });
 
             await producer.DisposeAsync();
             await client.DisposeAsync();
@@ -39,7 +39,7 @@ namespace Tests.MessageQueue
             });
             var producer = new GooglePubSubProducer(client);
 
-            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true });
+            var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest" });
 
             await producer.DisposeAsync();
 
