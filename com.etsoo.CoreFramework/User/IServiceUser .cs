@@ -32,7 +32,7 @@ namespace com.etsoo.CoreFramework.User
         /// User Uid
         /// 用户全局编号
         /// </summary>
-        Guid? Uid { get; }
+        string? Uid { get; }
 
         /// <summary>
         /// Service

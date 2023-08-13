@@ -177,7 +177,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, Guid? uid, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
+        public CurrentUser(string id, string? uid, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
             : base(id, uid, organization, roleValue, clientIp, deviceId, language, region)
         {
             Name = name;
