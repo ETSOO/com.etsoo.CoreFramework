@@ -249,13 +249,15 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="organizationId">Organization id</param>
         /// <param name="userId">User id</param>
+        /// <param name="deviceId">Device id</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Action result</returns>
-        public virtual async Task<IActionResult?> GetApiUserDataAsync(int organizationId, int userId, CancellationToken cancellationToken = default)
+        public virtual async Task<IActionResult?> GetApiUserDataAsync(int organizationId, int userId, int deviceId, CancellationToken cancellationToken = default)
         {
             var parameters = new DbParameters();
             parameters.Add("CurrentOrg", organizationId);
             parameters.Add("CurrentUser", userId);
+            parameters.Add("CurrentDevice", deviceId);
 
             var command = new CommandDefinition("ep_auth_get_api_user_data", parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
             return await DB.QueryAsResultAsync(command);
