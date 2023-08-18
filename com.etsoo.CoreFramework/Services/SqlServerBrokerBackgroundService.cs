@@ -24,8 +24,7 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         protected readonly IDatabase<SqlConnection> db;
 
-        readonly int _receiveRows;
-        readonly int _waitForTimeoutMS;
+        readonly string queueCommand;
 
         /// <summary>
         /// Constructor
@@ -33,15 +32,15 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="logger">Logger</param>
         /// <param name="db">Database</param>
+        /// <param name="queueName">Queue name to listen</param>
         /// <param name="receiveRows">Rows to receive</param>
         /// <param name="waitForTimeoutMS">Miliseconds to wait for timeout</param>
-        public SqlServerBrokerBackgroundService(ILogger logger, IDatabase<SqlConnection> db, int receiveRows = 10, int waitForTimeoutMS = 10000)
+        public SqlServerBrokerBackgroundService(ILogger logger, IDatabase<SqlConnection> db, string queueName, int receiveRows = 10, int waitForTimeoutMS = 10000)
         {
             this.logger = logger;
             this.db = db;
 
-            _receiveRows = receiveRows;
-            _waitForTimeoutMS = waitForTimeoutMS;
+            queueCommand = $"WAITFOR (RECEIVE TOP({receiveRows}) message_type_name, message_body, conversation_handle, service_name, service_contract_name FROM {queueName}), TIMEOUT {waitForTimeoutMS}";
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -55,7 +54,7 @@ namespace com.etsoo.CoreFramework.Services
 
                     await using var transaction = connection.BeginTransaction();
 
-                    await using var command = new SqlCommand($"WAITFOR (RECEIVE TOP({_receiveRows}) message_type_name, message_body, conversation_handle, service_name, service_contract_name FROM BusinessQueue), TIMEOUT {_waitForTimeoutMS};", connection);
+                    await using var command = new SqlCommand(queueCommand, connection);
                     command.Transaction = transaction;
 
                     await using var reader = command.ExecuteReader();
