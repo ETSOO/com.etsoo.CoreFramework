@@ -1,8 +1,10 @@
 ﻿using com.etsoo.Database;
+using com.etsoo.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Text.Json;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -99,6 +101,20 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="contractName">Contract name</param>
         /// <param name="stoppingToken">Stopping token</param>
         /// <returns>Task</returns>
-        protected abstract Task DoWorkAsync(string messageTypeName, byte[] messageBytes, string messageId, string serviceName, string contractName, CancellationToken stoppingToken);
+        protected abstract Task DoWorkAsync(string messageTypeName, ReadOnlyMemory<byte> messageBytes, string messageId, string serviceName, string contractName, CancellationToken stoppingToken);
+
+        /// <summary>
+        /// Async to message
+        /// 异步转化为信息
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="bytes">Message bytes</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        protected async Task<T?> ToMessageAsync<T>(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)
+        {
+            await using var stream = SharedUtils.GetStream(bytes.Span);
+            return await JsonSerializer.DeserializeAsync<T>(stream, SharedUtils.JsonDefaultSerializerOptions, cancellationToken);
+        }
     }
 }
