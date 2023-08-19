@@ -318,7 +318,7 @@ namespace com.etsoo.CoreFramework.Repositories
         public async Task ReadJsonToStreamAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
             // Content type
-            response.ContentType = "application/json";
+            response.JsonContentType();
 
             // Result
             bool result;
@@ -343,7 +343,7 @@ namespace com.etsoo.CoreFramework.Repositories
         public async Task<ReadOnlyMemory<byte>> ReadJsonToStreamWithReturnAsync(CommandDefinition command, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
             // Content type
-            response.ContentType = "application/json";
+            response.JsonContentType();
 
             // Result
             bool result;

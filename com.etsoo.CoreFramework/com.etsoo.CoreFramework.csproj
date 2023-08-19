@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO Shared Core Framework
 亿速思维共享核心框架</Description>
-    <Version>1.3.34</Version>
+    <Version>1.3.35</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
