@@ -245,6 +245,50 @@ namespace com.etsoo.Database
         IAsyncEnumerable<D> QuerySourceAsync<D>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
 
         /// <summary>
+        /// Async query command as first object
+        /// 异步执行命令返回源第一个对象
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        ValueTask<D?> QuerySourceFirstAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Async query command as source generated object list
+        /// 异步执行命令返回源生成对象列表
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        Task<D[]> QueryListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        Task<(D1[], D2[])> QueryListAsync<D1, D2>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>;
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <typeparam name="D3">Generic dataset 3 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        Task<(D1[], D2[], D3[])> QueryListAsync<D1, D2, D3>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>
+            where D3 : IDataReaderParser<D3>;
+
+        /// <summary>
         /// Async query command as action result
         /// 异步执行命令返回操作结果
         /// </summary>

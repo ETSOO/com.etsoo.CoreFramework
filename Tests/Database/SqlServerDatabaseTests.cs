@@ -102,7 +102,7 @@ namespace Tests.Utils
             // Act
             using var reader = await connection.ExecuteReaderAsync(sql);
 
-            var users = await (TestUserModule.CreateAsync(reader)).ToListAsync();
+            var users = await TestUserModule.CreateListAsync(reader);
 
             // Assert
             Assert.IsTrue(users.Count == 1);

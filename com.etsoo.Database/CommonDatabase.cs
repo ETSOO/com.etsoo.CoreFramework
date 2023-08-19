@@ -366,17 +366,27 @@ namespace com.etsoo.Database
         {
             await using var connection = NewConnection();
 
-            await using var reader = await connection.ExecuteReaderAsync(command);
+            await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
-            var items = D.CreateAsync(reader);
-
-            await foreach (var item in items)
-            {
-                yield return item;
-            }
+            var items = D.CreateAsync(reader, command.CancellationToken);
+            await foreach (var item in items) yield return item;
 
             await reader.CloseAsync();
             await connection.CloseAsync();
+        }
+
+        /// <summary>
+        /// Async query command as first object
+        /// 异步执行命令返回源第一个对象
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async ValueTask<D?> QuerySourceFirstAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        {
+            var items = QuerySourceAsync<D>(command);
+            await foreach (var item in items) return item;
+            return default;
         }
 
         /// <summary>
@@ -394,6 +404,89 @@ namespace com.etsoo.Database
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
             var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
             return QuerySourceAsync<D>(command);
+        }
+
+        /// <summary>
+        /// Async query command as source generated object list
+        /// 异步执行命令返回源生成对象列表
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async Task<D[]> QueryListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        {
+            await using var connection = NewConnection();
+
+            await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
+
+            var items = await D.CreateListAsync(reader, command.CancellationToken);
+
+            await reader.CloseAsync();
+            await connection.CloseAsync();
+
+            return items.ToArray();
+        }
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async Task<(D1[], D2[])> QueryListAsync<D1, D2>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>
+        {
+            await using var reader = await NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
+
+            var d1 = (await D1.CreateListAsync(reader, command.CancellationToken)).ToArray();
+
+            var d2Next = await reader.NextResultAsync(command.CancellationToken);
+            var d2 = d2Next ? (await D2.CreateListAsync(reader, command.CancellationToken)).ToArray() : Array.Empty<D2>();
+
+            await reader.CloseAsync();
+            await reader.DisposeAsync();
+
+            return (d1, d2);
+        }
+
+        /// <summary>
+        /// Async query command as object list
+        /// 异步执行命令返回对象列表
+        /// </summary>
+        /// <typeparam name="D1">Generic dataset 1 object type</typeparam>
+        /// <typeparam name="D2">Generic dataset 2 object type</typeparam>
+        /// <typeparam name="D3">Generic dataset 3 object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public async Task<(D1[], D2[], D3[])> QueryListAsync<D1, D2, D3>(CommandDefinition command)
+            where D1 : IDataReaderParser<D1>
+            where D2 : IDataReaderParser<D2>
+            where D3 : IDataReaderParser<D3>
+        {
+            await using var reader = await NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
+
+            var d1 = (await D1.CreateListAsync(reader, command.CancellationToken)).ToArray();
+
+            var d2Next = await reader.NextResultAsync(command.CancellationToken);
+            var d2 = d2Next ? (await D2.CreateListAsync(reader, command.CancellationToken)).ToArray() : Array.Empty<D2>();
+
+            D3[] d3;
+            if (d2Next && await reader.NextResultAsync(command.CancellationToken))
+            {
+                d3 = (await D3.CreateListAsync(reader, command.CancellationToken)).ToArray();
+            }
+            else
+            {
+                d3 = Array.Empty<D3>();
+            }
+
+            await reader.CloseAsync();
+            await reader.DisposeAsync();
+
+            return (d1, d2, d3);
         }
 
         /// <summary>

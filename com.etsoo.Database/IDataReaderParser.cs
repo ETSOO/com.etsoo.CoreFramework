@@ -9,12 +9,23 @@ namespace com.etsoo.Database
     public interface IDataReaderParser<TSelf> where TSelf : IDataReaderParser<TSelf>
     {
         /// <summary>
+        /// Create object async list from DataReader
+        /// 从DataReader创建异步对象列表
+        /// </summary>
+        /// <typeparam name="T">Generic object type</typeparam>
+        /// <param name="reader">DataReader</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        static abstract IAsyncEnumerable<TSelf> CreateAsync(DbDataReader reader, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Create object list from DataReader
         /// 从DataReader创建对象列表
         /// </summary>
         /// <typeparam name="T">Generic object type</typeparam>
         /// <param name="reader">DataReader</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        static abstract IAsyncEnumerable<TSelf> CreateAsync(DbDataReader reader);
+        static abstract Task<List<TSelf>> CreateListAsync(DbDataReader reader, CancellationToken cancellationToken = default);
     }
 }

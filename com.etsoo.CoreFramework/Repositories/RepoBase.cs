@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.DB;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
@@ -143,12 +144,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Result</returns>
         virtual protected IDbParameters FormatParameters(object parameters)
         {
-            if (parameters is IModelParameters p)
-            {
-                return p.AsParameters(App);
-            }
-
-            return DatabaseUtils.FormatParameters(parameters) ?? new DbParameters();
+            return DBUtils.FormatParameters(parameters, App);
         }
 
         /// <summary>
@@ -193,8 +189,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Result</returns>
         public async ValueTask<D?> QueryAsAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
-            var list = QueryAsListAsync<D>(command);
-            return await list.FirstOrDefaultAsync();
+            return await App.DB.QuerySourceFirstAsync<D>(command);
         }
 
         /// <summary>
@@ -221,17 +216,7 @@ namespace com.etsoo.CoreFramework.Repositories
             where D1 : IDataReaderParser<D1>
             where D2 : IDataReaderParser<D2>
         {
-            await using var reader = await App.DB.NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
-
-            var d1 = await D1.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
-
-            var d2Next = await reader.NextResultAsync(command.CancellationToken);
-            var d2 = d2Next ? await D2.CreateAsync(reader).ToArrayAsync(command.CancellationToken) : Array.Empty<D2>();
-
-            await reader.CloseAsync();
-            await reader.DisposeAsync();
-
-            return (d1, d2);
+            return await App.DB.QueryListAsync<D1, D2>(command);
         }
 
         /// <summary>
@@ -248,27 +233,7 @@ namespace com.etsoo.CoreFramework.Repositories
             where D2 : IDataReaderParser<D2>
             where D3 : IDataReaderParser<D3>
         {
-            await using var reader = await App.DB.NewConnection().ExecuteReaderAsync(command, CommandBehavior.Default);
-
-            var d1 = await D1.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
-
-            var d2Next = await reader.NextResultAsync(command.CancellationToken);
-            var d2 = d2Next ? await D2.CreateAsync(reader).ToArrayAsync(command.CancellationToken) : Array.Empty<D2>();
-
-            D3[] d3;
-            if (d2Next && await reader.NextResultAsync(command.CancellationToken))
-            {
-                d3 = await D3.CreateAsync(reader).ToArrayAsync(command.CancellationToken);
-            }
-            else
-            {
-                d3 = Array.Empty<D3>();
-            }
-
-            await reader.CloseAsync();
-            await reader.DisposeAsync();
-
-            return (d1, d2, d3);
+            return await App.DB.QueryListAsync<D1, D2, D3>(command);
         }
 
         /// <summary>

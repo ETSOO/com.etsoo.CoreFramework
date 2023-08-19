@@ -160,6 +160,7 @@ namespace com.etsoo.SourceGenerators
                 using System.Collections.Generic;
                 using System.Data.Common;
                 using System.Linq;
+                using System.Runtime.CompilerServices;
                 using System.Threading.Tasks;
                 using com.etsoo.Database;
                 using com.etsoo.Utils;
@@ -169,15 +170,30 @@ namespace com.etsoo.SourceGenerators
                 {{
                     {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
-                        public static async IAsyncEnumerable<{name}> CreateAsync(DbDataReader reader)
+                        public static async IAsyncEnumerable<{name}> CreateAsync(DbDataReader reader, [EnumeratorCancellation] CancellationToken cancellationToken = default)
                         {{
                             // Column names
                             var names = reader.GetColumnNames().ToList();
 
-                            while(await reader.ReadAsync())
+                            while(await reader.ReadAsync(cancellationToken))
                             {{
                                 yield return new {name} {body};
                             }}
+                        }}
+
+                        public static async Task<List<{name}>> CreateListAsync(DbDataReader reader, CancellationToken cancellationToken = default)
+                        {{
+                            // Column names
+                            var names = reader.GetColumnNames().ToList();
+
+                            var list = new List<{name}>();
+
+                            while(await reader.ReadAsync(cancellationToken))
+                            {{
+                                list.Add(new {name} {body});
+                            }}
+
+                            return list;
                         }}
                     }}
                 }}
