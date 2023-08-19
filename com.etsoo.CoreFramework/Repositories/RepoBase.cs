@@ -193,15 +193,27 @@ namespace com.etsoo.CoreFramework.Repositories
         }
 
         /// <summary>
+        /// Async query command as object source list
+        /// 异步执行命令返回对象源列表
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="command">Command</param>
+        /// <returns>Result</returns>
+        public IAsyncEnumerable<D> QueryAsSourceAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        {
+            return App.DB.QuerySourceAsync<D>(command);
+        }
+
+        /// <summary>
         /// Async query command as object list
         /// 异步执行命令返回对象列表
         /// </summary>
         /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="command">Command</param>
         /// <returns>Result</returns>
-        public IAsyncEnumerable<D> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
+        public async Task<D[]> QueryAsListAsync<D>(CommandDefinition command) where D : IDataReaderParser<D>
         {
-            return App.DB.QuerySourceAsync<D>(command);
+            return await App.DB.QueryListAsync<D>(command);
         }
 
         /// <summary>
