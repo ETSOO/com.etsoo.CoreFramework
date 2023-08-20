@@ -71,12 +71,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <returns>Command</returns>
         protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null)
         {
-            type ??=  App.DB.SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
-
-            // For stored procedure, remove null value parameters
-            if (type == CommandType.StoredProcedure) parameters?.ClearNulls();
-
-            return new CommandDefinition(name, parameters, commandType: type, cancellationToken: CancellationToken);
+            var command = App.DB.CreateCommand(name, parameters, type, CancellationToken);
+            return command;
         }
 
         /// <summary>

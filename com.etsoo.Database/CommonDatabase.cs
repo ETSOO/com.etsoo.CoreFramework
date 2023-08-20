@@ -88,6 +88,25 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Create command definition
+        /// 创建命令定义
+        /// </summary>
+        /// <param name="name">Command name or text</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="type">Type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public virtual CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default)
+        {
+            type ??=  SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text;
+
+            // For stored procedure, remove null value parameters
+            if (type == CommandType.StoredProcedure) parameters?.ClearNulls();
+
+            return new CommandDefinition(name, parameters, commandType: type, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
         /// New database connection
         /// 新数据库链接对象
         /// </summary>

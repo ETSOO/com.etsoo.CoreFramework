@@ -38,6 +38,17 @@ namespace com.etsoo.Database
         void AddParameter(IDbParameters parameters, string name, object? value, DbType type);
 
         /// <summary>
+        /// Create command definition
+        /// 创建命令定义
+        /// </summary>
+        /// <param name="name">Command name or text</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="type">Type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Escape identifier
         /// 转义标识符
         /// </summary>
