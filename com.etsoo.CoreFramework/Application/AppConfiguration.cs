@@ -9,6 +9,18 @@ namespace com.etsoo.CoreFramework.Application
     /// </summary>
     public record AppConfiguration : IAppConfiguration
     {
+        /// <summary>
+        /// Create mini application configuration
+        /// 创建迷你应用程序配置
+        /// </summary>
+        /// <param name="privateKey">Private key</param>
+        /// <returns>Result</returns>
+        public static AppConfiguration Create(string? privateKey = null)
+        {
+            privateKey ??= CryptographyUtils.CreateRandString(RandStringKind.All, 12).ToString();
+            return new AppConfiguration(privateKey, name: "MiniApp");
+        }
+
         private const string PrivateKeyField = "PrivateKey";
 
         /// <summary>
