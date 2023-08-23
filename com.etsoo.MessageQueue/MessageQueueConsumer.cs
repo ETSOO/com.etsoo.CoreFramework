@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using com.etsoo.MessageQueue.QueueProcessors;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace com.etsoo.MessageQueue

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.MessageQueue;
+using com.etsoo.MessageQueue.QueueProcessors;
 using System.Text;
 
 namespace Tests.MessageQueue

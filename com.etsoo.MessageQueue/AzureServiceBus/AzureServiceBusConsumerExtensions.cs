@@ -1,4 +1,5 @@
 ﻿using com.etsoo.MessageQueue.GooglePubSub;
+using com.etsoo.MessageQueue.QueueProcessors;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

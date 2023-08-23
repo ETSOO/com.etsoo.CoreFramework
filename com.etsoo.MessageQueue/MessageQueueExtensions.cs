@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.MessageQueue.QueueProcessors;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 

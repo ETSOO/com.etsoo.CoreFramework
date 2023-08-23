@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using com.etsoo.MessageQueue.QueueProcessors;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace com.etsoo.MessageQueue.LocalRabbitMQ

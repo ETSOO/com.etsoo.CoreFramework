@@ -71,7 +71,21 @@ namespace com.etsoo.CoreFramework.Services
                         var serviceName = reader.GetString(3);
                         var contractName = reader.GetString(4);
 
-                        await DoWorkAsync(messageTypeName, messageBytes, messageId, serviceName, contractName, stoppingToken);
+                        try
+                        {
+                            await DoWorkAsync(messageTypeName, messageBytes, messageId, serviceName, contractName, stoppingToken);
+                        }
+                        catch (IntermittenException ex)
+                        {
+                            // Retry
+                            logger.LogError(ex, "Message {messageId} of {typeName} failed to process, will retry later: {body}", messageId, messageTypeName, Encoding.UTF8.GetString(messageBytes));
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            // Only warning
+                            logger.LogError(ex, "Message {messageId} of {typeName} failed to process: {body}", messageId, messageTypeName, Encoding.UTF8.GetString(messageBytes));
+                        }
                     }
 
                     await reader.CloseAsync();

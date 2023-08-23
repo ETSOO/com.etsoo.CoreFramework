@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.MessageQueue
+﻿namespace com.etsoo.MessageQueue.QueueProcessors
 {
     /// <summary>
     /// Message queue processor

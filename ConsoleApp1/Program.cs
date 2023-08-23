@@ -3,6 +3,7 @@ using com.etsoo.ImageUtils.Barcode;
 using com.etsoo.MessageQueue;
 using com.etsoo.MessageQueue.AzureServiceBus;
 using com.etsoo.MessageQueue.GooglePubSub;
+using com.etsoo.MessageQueue.QueueProcessors;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;

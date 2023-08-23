@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using com.etsoo.MessageQueue.QueueProcessors;
 using Microsoft.Extensions.Logging;
 
 namespace com.etsoo.MessageQueue.AzureServiceBus
