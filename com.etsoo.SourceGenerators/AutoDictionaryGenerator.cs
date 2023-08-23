@@ -29,6 +29,9 @@ namespace com.etsoo.SourceGenerators
                 {
                     var (symbol, typeSymbol, nullable) = member;
 
+                    // Ignore static field
+                    if (symbol.IsStatic) continue;
+
                     // Object field name
                     var fieldName = symbol.Name;
 

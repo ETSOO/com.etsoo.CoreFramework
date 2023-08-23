@@ -36,6 +36,9 @@ namespace com.etsoo.SourceGenerators
                 {
                     var (symbol, typeSymbol, nullable) = member;
 
+                    // Ignore static field
+                    if (symbol.IsStatic) continue;
+
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(propertyType.FullName);
 

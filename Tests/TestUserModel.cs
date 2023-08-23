@@ -56,6 +56,12 @@ namespace Tests
     public partial record TestUserModule
     {
         /// <summary>
+        /// Type
+        /// 类型
+        /// </summary>
+        public static string Type => "Test";
+
+        /// <summary>
         /// Status enum
         /// 状态枚举
         /// </summary>
