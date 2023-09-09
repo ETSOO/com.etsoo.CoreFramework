@@ -161,5 +161,20 @@ namespace Tests.Utils
             // Assert
             Assert.IsTrue(stream.Length == "{\"Name\":\"Admin 1\"}".Length);
         }
+
+        [Test]
+        public async Task ExecuteToStreamAsyncWithEmpty_Test()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream();
+            using var connection = db.NewConnection();
+
+            // Act
+            // {"name":"Admin 1"}
+            var result = await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 0 FOR JSON PATH"), stream);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
     }
 }

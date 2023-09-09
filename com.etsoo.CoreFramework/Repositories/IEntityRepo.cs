@@ -28,16 +28,18 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 删除单个实体
         /// </summary>
         /// <param name="id">Entity id</param>
+        /// <param name="range">Range</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> DeleteAsync(T id);
+        ValueTask<IActionResult> DeleteAsync(T id, string? range = null);
 
         /// <summary>
         /// Delete multiple entities
         /// 删除多个实体
         /// </summary>
         /// <param name="ids">Entity ids</param>
+        /// <param name="range">Range</param>
         /// <returns>Action result</returns>
-        ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids);
+        ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids, string? range = null);
 
         /// <summary>
         /// Merge

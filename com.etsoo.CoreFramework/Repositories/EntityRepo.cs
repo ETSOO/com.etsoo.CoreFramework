@@ -54,8 +54,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 创建删除命令
         /// </summary>
         /// <param name="ids">Entity ids</param>
+        /// <param name="range">Range</param>
         /// <returns>Command</returns>
-        protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids)
+        protected virtual CommandDefinition NewDeleteCommand(IEnumerable<T> ids, string? range = null)
         {
             var parameters = new DbParameters();
 
@@ -64,7 +65,8 @@ namespace com.etsoo.CoreFramework.Repositories
 
             AddSystemParameters(parameters);
 
-            return CreateCommand(GetCommandName("delete"), parameters);
+            var command = string.IsNullOrEmpty(range) ? "delete" : range;
+            return CreateCommand(GetCommandName(command), parameters);
         }
 
         /// <summary>
@@ -72,10 +74,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 删除单个实体
         /// </summary>
         /// <param name="id">Entity id</param>
+        /// <param name="range">Range</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(T id)
+        public virtual async ValueTask<IActionResult> DeleteAsync(T id, string? range = null)
         {
-            return await DeleteAsync(new T[] { id });
+            return await DeleteAsync(new T[] { id }, range);
         }
 
         /// <summary>
@@ -83,10 +86,11 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 删除多个实体
         /// </summary>
         /// <param name="ids">Entity ids</param>
+        /// <param name="range">Range</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids, string? range = null)
         {
-            var command = NewDeleteCommand(ids);
+            var command = NewDeleteCommand(ids, range);
             var result = await QueryAsResultAsync(command);
 
             // Send back the ids

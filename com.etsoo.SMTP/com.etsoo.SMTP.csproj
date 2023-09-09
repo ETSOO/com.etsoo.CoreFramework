@@ -16,7 +16,7 @@
 	  <Description>ETSOO SMTP Utilities
 亿速思维 SMTP 工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.36</Version>
+	  <Version>1.0.37</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="4.1.0" />
-    <PackageReference Include="MimeKit" Version="4.1.0" />
+    <PackageReference Include="MailKit" Version="4.2.0" />
+    <PackageReference Include="MimeKit" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>
