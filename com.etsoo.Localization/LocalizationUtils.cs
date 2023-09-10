@@ -25,12 +25,24 @@ namespace com.etsoo.Localization
 
             // Set related cultures
             var ci = new CultureInfo(language);
+            SetCulture(ci);
+
+            return ci;
+        }
+
+        /// <summary>
+        /// Set culture
+        /// 设置文化
+        /// </summary>
+        /// <param name="ci">Culture info</param>
+        /// <returns>Changed or not</returns>
+        public static void SetCulture(CultureInfo ci)
+        {
+            // Set related cultures
             CultureInfo.CurrentCulture = ci;
             CultureInfo.CurrentUICulture = ci;
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
-
-            return ci;
         }
 
         /// <summary>
