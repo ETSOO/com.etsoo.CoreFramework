@@ -1,7 +1,6 @@
 ﻿using com.etsoo.Utils;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
 
 namespace com.etsoo.ImageUtils
 {
@@ -13,17 +12,16 @@ namespace com.etsoo.ImageUtils
     public static class ImageSharpUtils
     {
         /// <summary>
-        /// Create image from Base64 string and save to the stream
-        /// 从 Base64 字符串创建图像并保存到流
+        /// Create stream from Base64 string
+        /// 从 Base64 字符串创建流
         /// </summary>
         /// <param name="input">Input Base64 string</param>
-        /// <param name="stream">Stream</param>
-        /// <param name="token">Cancellation token</param>
-        /// <returns>Extension and size in pixel</returns>
-        public static async Task<(string extension, Size pxSize)> CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
+        /// <param name="format">Image format</param>
+        /// <returns>Stream</returns>
+        public static Stream CreateStreamFromBase64String(string input, out IImageFormat? format)
         {
             // Format
-            IImageFormat? format = null;
+            format = null;
 
             // Parse base64 string
             var index = input.IndexOf(',');
@@ -57,15 +55,27 @@ namespace com.etsoo.ImageUtils
                 }
             }
 
-            format ??= PngFormat.Instance;
+            return SharedUtils.GetStream(Convert.FromBase64String(input.Trim()));
+        }
 
-            await using var ms = SharedUtils.GetStream(Convert.FromBase64String(input.Trim()));
+        /// <summary>
+        /// Create image from Base64 string and save to the stream
+        /// 从 Base64 字符串创建图像并保存到流
+        /// </summary>
+        /// <param name="input">Input Base64 string</param>
+        /// <param name="targetSize">Resizing target size</param>
+        /// <param name="targetStream">Stream for saving</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Extension and size in pixel</returns>
+        public static async Task<string> CreateFromBase64StringAsync(string input, Size targetSize, Stream targetStream, CancellationToken cancellationToken = default)
+        {
+            // Parse
+            await using var stream = CreateStreamFromBase64String(input, out var format);
 
-            using var image = await Image.LoadAsync(ms, token);
+            // Resize
+            format = await ResizeImageStreamAsync(stream, targetSize, targetStream, format, cancellationToken);
 
-            await image.SaveAsync(stream, format, token);
-
-            return (format.FileExtensions.First(), image.Size);
+            return format.FileExtensions.First();
         }
 
         /// <summary>
@@ -73,60 +83,62 @@ namespace com.etsoo.ImageUtils
         /// 异步调整图像流大小，保持原始比例
         /// </summary>
         /// <param name="imageStream">Image stream to resize</param>
-        /// <param name="width">Target width</param>
-        /// <param name="height">Target height</param>
+        /// <param name="targetSize">Target size</param>
         /// <param name="targetStream">Target stream</param>
+        /// <param name="defaultFormat">Default image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Task</returns>
-        public static async Task ResizeImageStreamAsync(Stream imageStream, int? width, int? height, Stream targetStream, CancellationToken cancellationToken = default)
+        /// <returns>Image format</returns>
+        public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
         {
-            var w = width.GetValueOrDefault();
-            var h = height.GetValueOrDefault();
-            if (w < 10 && h < 10)
+            var width = targetSize.Width;
+            var height = targetSize.Height;
+            if (width < 10 && height < 10)
             {
-                throw new ArgumentException("Both width and height are invalid");
+                throw new ArgumentException("Both width and height less than 10px are invalid");
             }
 
             // Source image
             using var image = Image.Load(imageStream);
 
+            // Image format
+            var format = image.Metadata.DecodedImageFormat ?? defaultFormat ?? JpegFormat.Instance;
+
             var sourceSize = image.Size;
 
             int targetWidth, targetHeight;
-            if (w >= 10)
+            if (width >= 10)
             {
-                if (sourceSize.Width < w)
+                if (sourceSize.Width < width)
                 {
                     await imageStream.CopyToAsync(targetStream, cancellationToken);
-                    return;
+                    return format;
                 }
 
-                targetWidth = w;
-                targetHeight = w * sourceSize.Height / sourceSize.Width;
+                targetWidth = width;
+                targetHeight = width * sourceSize.Height / sourceSize.Width;
             }
             else
             {
-                if (sourceSize.Height < h)
+                if (sourceSize.Height < height)
                 {
                     await imageStream.CopyToAsync(targetStream, cancellationToken);
-                    return;
+                    return format;
                 }
 
-                targetHeight = h;
-                targetWidth = h * sourceSize.Width / sourceSize.Height;
+                targetHeight = height;
+                targetWidth = height * sourceSize.Width / sourceSize.Height;
             }
-
-            // Image format
-            var format = image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;
 
             image.Mutate(x => x.Resize(targetWidth, targetHeight));
 
             // Save
             await image.SaveAsync(targetStream, format, cancellationToken);
+
+            return format;
         }
 
         /// <summary>
-        /// Async resize image stream
+        /// Async resize image stream with adjustment
         /// 异步调整图像流大小
         /// </summary>
         /// <param name="imageStream">Image stream to resize</param>
@@ -134,25 +146,26 @@ namespace com.etsoo.ImageUtils
         /// <param name="targetStream">Target stream</param>
         /// <param name="cropSource">Crop source or leave blank for the target</param>
         /// <param name="blankColor">Blank area color</param>
+        /// <param name="defaultFormat">Default image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, bool cropSource = true, Color? blankColor = null, CancellationToken cancellationToken = default)
+        public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, bool cropSource = true, Color? blankColor = null, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
         {
             // Source image
             using var image = Image.Load(imageStream);
+
+            // Image format
+            var format = image.Metadata.DecodedImageFormat ?? defaultFormat ?? JpegFormat.Instance;
 
             var sourceSize = image.Size;
             if (sourceSize.Width < targetSize.Width && sourceSize.Height < targetSize.Height)
             {
                 await imageStream.CopyToAsync(targetStream, cancellationToken);
-                return;
+                return format;
             }
 
             // Size calculation
             var (source, target, isResizing) = ImageShared.Calculate(sourceSize.Width, sourceSize.Height, targetSize.Width, targetSize.Height, cropSource);
-
-            // Image format
-            var format = image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;
 
             if (isResizing)
             {
@@ -179,6 +192,8 @@ namespace com.etsoo.ImageUtils
                 );
                 await newImage.SaveAsync(targetStream, format, cancellationToken);
             }
+
+            return format;
         }
     }
 }
