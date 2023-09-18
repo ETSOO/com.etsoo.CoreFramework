@@ -20,7 +20,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="stream">Stream</param>
         /// <param name="token">Cancellation token</param>
         /// <returns>Extension</returns>
-        public static async Task<string> CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
+        public static async Task<(string extension, Size pxSize)> CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
         {
             // Format
             IImageFormat? format = null;
