@@ -19,7 +19,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="input">Input Base64 string</param>
         /// <param name="stream">Stream</param>
         /// <param name="token">Cancellation token</param>
-        /// <returns>Extension</returns>
+        /// <returns>Extension and size in pixel</returns>
         public static async Task<(string extension, Size pxSize)> CreateFromBase64StringAsync(string input, Stream stream, CancellationToken token = default)
         {
             // Format
@@ -65,7 +65,7 @@ namespace com.etsoo.ImageUtils
 
             await image.SaveAsync(stream, format, token);
 
-            return format.FileExtensions.First();
+            return (format.FileExtensions.First(), image.Size);
         }
 
         /// <summary>
