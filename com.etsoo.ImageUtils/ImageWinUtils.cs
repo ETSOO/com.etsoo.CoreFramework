@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
+using Color = System.Drawing.Color;
 using Image = System.Drawing.Image;
 using Rectangle = System.Drawing.Rectangle;
 using Size = System.Drawing.Size;
@@ -106,9 +107,10 @@ namespace com.etsoo.ImageUtils
         /// </summary>
         /// <param name="source">Source stream</param>
         /// <param name="targetSize">Target size</param>
-        /// <param name="cropSource">Crop source or leave blank for the target, null means as exact size as possible with crop</param>
+        /// <param name="cropSource">Crop source or leave blank for the target</param>
+        /// <param name="blankColor">Blank area color</param>
         /// <returns>Resized bitmap</returns>
-        public static Bitmap? Resize(Stream source, Size targetSize, bool cropSource)
+        public static Bitmap? Resize(Stream source, Size targetSize, bool cropSource = true, Color? blankColor = null)
         {
             // Parse as image first
             using var image = Image.FromStream(source, false, false);
@@ -119,7 +121,7 @@ namespace com.etsoo.ImageUtils
 
             // Continue with Bitmap processing
             using var bm = new Bitmap(image);
-            return ResizeInternal(bm, targetSize, cropSource);
+            return ResizeInternal(bm, targetSize, cropSource, blankColor);
         }
 
         /// <summary>
@@ -128,79 +130,27 @@ namespace com.etsoo.ImageUtils
         /// </summary>
         /// <param name="source">Source bitmap</param>
         /// <param name="targetSize">Target size</param>
-        /// <param name="cropSource">Crop source or leave blank for the target, null means as exact size as possible with crop</param>
+        /// <param name="cropSource">Crop source or leave blank for the target</param>
+        /// <param name="blankColor">Blank area color</param>
         /// <returns>Resized bitmap</returns>
-        public static Bitmap? Resize(Bitmap source, Size targetSize, bool cropSource)
+        public static Bitmap? Resize(Bitmap source, Size targetSize, bool cropSource = true, Color? blankColor = null)
         {
             // Ignore small size
             if (source.Width <= targetSize.Width && source.Height <= targetSize.Height)
                 return null;
 
-            return ResizeInternal(source, targetSize, cropSource);
+            return ResizeInternal(source, targetSize, cropSource, blankColor);
         }
 
         // Resize with size validated
-        private static Bitmap ResizeInternal(Bitmap source, Size targetSize, bool cropSource)
+        private static Bitmap ResizeInternal(Bitmap sourceBM, Size targetSize, bool cropSource, Color? blankColor)
         {
-            // Source size
-            var sw = source.Width;
-            var sh = source.Height;
+            var (source, target, _) = ImageShared.Calculate(sourceBM.Width, sourceBM.Height, targetSize.Width, targetSize.Height, cropSource);
 
-            // Target size
-            var tw = targetSize.Width;
-            var th = targetSize.Height;
+            var destArea = new Rectangle(source.X, source.Y, source.Width, source.Height);
+            var sourceArea = new Rectangle(target.X, target.Y, target.Width, target.Height);
 
-            // Ratio
-            var rw = (float)sw / tw;
-            var rh = (float)sh / th;
-
-            Rectangle destArea, sourceArea;
-
-            if (cropSource)
-            {
-                // Crop content in center
-                int x = 0, y = 0;
-                if (rw > rh)
-                {
-                    var newSW = Convert.ToInt32(tw * rh);
-                    x = (sw - newSW) / 2;
-                    sw = newSW;
-                }
-                else
-                {
-                    var newSH = Convert.ToInt32(th * rw);
-                    y = (sh - newSH) / 2;
-                    sh = newSH;
-                }
-
-                // Avoid zoom out
-                if (tw > sw)
-                    tw = sw;
-                if (th > sh)
-                    th = sh;
-
-                sourceArea = new Rectangle(x, y, sw, sh);
-                destArea = new Rectangle(0, 0, tw, th);
-            }
-            else
-            {
-                // All content in center with target width or height
-                if (rw > rh)
-                {
-                    // Reduce target height
-                    th = Convert.ToInt32(sh / rw);
-                }
-                else
-                {
-                    // Reduce target width
-                    tw = Convert.ToInt32(sw / rh);
-                }
-
-                sourceArea = new Rectangle(0, 0, sw, sh);
-                destArea = new Rectangle(0, 0, tw, th);
-            }
-
-            return Resize(source, destArea, sourceArea);
+            return Resize(sourceBM, destArea, sourceArea);
         }
 
         /// <summary>
@@ -210,11 +160,16 @@ namespace com.etsoo.ImageUtils
         /// <param name="source">Source bitmap</param>
         /// <param name="destArea">Destination area</param>
         /// <param name="sourceArea">Source area</param>
+        /// <param name="blankColor">Blank area color</param>
         /// <returns>Resized bitmap</returns>
-        public static Bitmap Resize(Bitmap source, Rectangle destArea, Rectangle sourceArea)
+        public static Bitmap Resize(Bitmap source, Rectangle destArea, Rectangle sourceArea, Color? blankColor = null)
         {
             // Target bitmap
             var resized = new Bitmap(destArea.Width, destArea.Height);
+
+            // Keep transparent
+            if (blankColor.HasValue) resized.MakeTransparent(blankColor.Value);
+            else resized.MakeTransparent();
 
             // Target graphics
             using var g = Graphics.FromImage(resized);

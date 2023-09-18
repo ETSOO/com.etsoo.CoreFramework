@@ -1,10 +1,6 @@
-﻿using Azure.Messaging.ServiceBus;
-using com.etsoo.ImageUtils.Barcode;
+﻿using com.etsoo.ImageUtils.Barcode;
 using com.etsoo.MessageQueue;
-using com.etsoo.MessageQueue.AzureServiceBus;
-using com.etsoo.MessageQueue.GooglePubSub;
 using com.etsoo.MessageQueue.QueueProcessors;
-using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -76,6 +72,16 @@ namespace ConsoleApp1
 
             //await CreateQRCode();
 
+            /*
+            var consumer = new LocalRabbitMQConsumer(
+                new LocalRabbitMQConsumerOptions { QueueName = "SmartERP" },
+                new[] { new SimpleProcessor(action) },
+                logger
+               );
+            await consumer.ReceiveAsync(source.Token);
+            */
+
+            /*
             var loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddConsole(); // Register console logger provider
@@ -88,15 +94,6 @@ namespace ConsoleApp1
             var action = (MessageReceivedProperties properties, SimpleData? data) =>
             {
             };
-
-            /*
-            var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "SmartERP" },
-                new[] { new SimpleProcessor(action) },
-                logger
-               );
-            await consumer.ReceiveAsync(source.Token);
-            */
 
             var connectionString = "Endpoint=sb://etsoo-sb-au-east.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=aQKdC0XHHo3wLEEooO30wrZDE6qT1+dbk+ASbAY8vJw=";
             var client = AzureServiceBusUtils.CreateServiceBusSender(new AzureServiceBusProducerOptions
@@ -126,9 +123,15 @@ namespace ConsoleApp1
                );
             await consumer.ReceiveAsync(source.Token);
 
-            Console.Read();
-
             source.Cancel();
+
+            await using var stream = File.OpenRead("D:\\a.jpg");
+            await using var targetStream = File.OpenWrite("D:\\a1.jpg");
+            await ImageSharpUtils.ResizeImageStreamAsync(stream, 500, null, targetStream);
+            Console.WriteLine("Done");
+            */
+
+            Console.Read();
         }
 
         public static int solution(int[] A)
