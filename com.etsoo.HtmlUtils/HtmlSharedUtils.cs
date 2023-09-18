@@ -1,4 +1,5 @@
-﻿using AngleSharp.Dom;
+﻿using AngleSharp;
+using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using System.Text.RegularExpressions;
@@ -11,6 +12,28 @@ namespace com.etsoo.HtmlUtils
     /// </summary>
     public static partial class HtmlSharedUtils
     {
+        /// <summary>
+        /// Create default CSS parser
+        /// 创建默认 CSS 解析器
+        /// </summary>
+        /// <returns></returns>
+        public static HtmlParser CreateDefaultCssParser()
+        {
+            var config = Configuration.Default.WithCss();
+
+            /*
+                .WithRenderDevice(new DefaultRenderDevice
+                {
+                    DeviceHeight = 768,
+                    DeviceWidth = 1024,
+                });
+            */
+
+            var context = BrowsingContext.New(config);
+
+            return new HtmlParser(new HtmlParserOptions(), context);
+        }
+
         /// <summary>
         /// Remove all tags but keep its content
         /// 删除所有标签但是保留内容
@@ -146,9 +169,24 @@ namespace com.etsoo.HtmlUtils
         /// <param name="action">Action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public async static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
+        public static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
         {
-            return await ManipulateElementsAsync<IHtmlElement>(stream, selector, action, cancellationToken);
+            return ManipulateElementsAsync(stream, selector, action, false, cancellationToken);
+        }
+
+        /// <summary>
+        /// Manipulate HTML elements with CSS
+        /// 操作HTML元素并解析样式
+        /// </summary>
+        /// <param name="stream">HTML stream</param>
+        /// <param name="selector">Selector</param>
+        /// <param name="action">Action</param>
+        /// <param name="parseStyle">Parse style or not</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Document</returns>
+        public static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, bool parseStyle, CancellationToken cancellationToken = default)
+        {
+            return ManipulateElementsAsync<IHtmlElement>(stream, selector, action, parseStyle, cancellationToken);
         }
 
         /// <summary>
@@ -160,10 +198,27 @@ namespace com.etsoo.HtmlUtils
         /// <param name="action">Action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
+        public static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
             where T : IHtmlElement
         {
-            var parser = new HtmlParser();
+            return ManipulateElementsAsync(stream, selector, action, false, cancellationToken);
+        }
+
+        /// <summary>
+        /// Manipulate HTML elements
+        /// 操作HTML元素
+        /// </summary>
+        /// <param name="stream">HTML stream</param>
+        /// <param name="selector">Selector</param>
+        /// <param name="action">Action</param>
+        /// <param name="parseStyle">Parse style or not</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Document</returns>
+        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, bool parseStyle, CancellationToken cancellationToken = default)
+            where T : IHtmlElement
+        {
+            var parser = parseStyle ? CreateDefaultCssParser() : new HtmlParser();
+
             var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
             var elements = doc.QuerySelectorAll<T>(selector);
             foreach (var element in elements)
