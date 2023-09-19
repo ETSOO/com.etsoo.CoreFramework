@@ -1,4 +1,7 @@
-﻿using AngleSharp.Html.Dom;
+﻿using AngleSharp.Css;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Values;
+using AngleSharp.Html.Dom;
 using com.etsoo.HtmlUtils;
 using com.etsoo.Utils;
 using NUnit.Framework;
@@ -39,6 +42,30 @@ namespace Tests.Utils
             });
             Assert.AreEqual(count, 2);
             Assert.AreEqual(htmlUpdated, doc.Body?.InnerHtml);
+        }
+
+        [Test]
+        public async Task ManipulateElementsWithStyleAsyncGenericTests()
+        {
+            var html = """<p><img src="a.jpg" style="width: 10%;"/><img src="b.png" style="width: 120px"/><img src="c.bmp" style="width: 100pt;"/></p>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var widths = new List<double>();
+            var device = HtmlSharedUtils.DefaultRenderDevice;
+            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
+            {
+                var style = img.GetStyle();
+                if (Length.TryParse(style.GetWidth(), out var width))
+                {
+                    widths.Add(width.AsPx(device, RenderMode.Horizontal));
+                }
+
+                await Task.CompletedTask;
+            }, true);
+
+            Assert.AreEqual(3, widths.Count);
+            Assert.AreEqual(device.RenderWidth * 0.1, widths[0]);
+            Assert.AreEqual(120, widths[1]);
+            Assert.AreEqual(133.33, Math.Round(widths[2], 2));
         }
 
         [Test]

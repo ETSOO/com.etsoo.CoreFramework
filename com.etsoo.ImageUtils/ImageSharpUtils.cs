@@ -85,7 +85,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="imageStream">Image stream to resize</param>
         /// <param name="targetSize">Target size</param>
         /// <param name="targetStream">Target stream</param>
-        /// <param name="defaultFormat">Default image format</param>
+        /// <param name="defaultFormat">Image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Image format</returns>
         public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
@@ -101,35 +101,26 @@ namespace com.etsoo.ImageUtils
             using var image = Image.Load(imageStream);
 
             // Image format
-            var format = image.Metadata.DecodedImageFormat ?? defaultFormat ?? JpegFormat.Instance;
+            var format = defaultFormat ?? image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;
 
             var sourceSize = image.Size;
 
-            int targetWidth, targetHeight;
-            if (width >= 10)
+            int targetWidth = 0, targetHeight = 0;
+            if (width >= 10 && sourceSize.Width >= width)
             {
-                if (sourceSize.Width < width)
-                {
-                    await imageStream.CopyToAsync(targetStream, cancellationToken);
-                    return format;
-                }
-
                 targetWidth = width;
                 targetHeight = width * sourceSize.Height / sourceSize.Width;
             }
-            else
+            else if (sourceSize.Height >= height)
             {
-                if (sourceSize.Height < height)
-                {
-                    await imageStream.CopyToAsync(targetStream, cancellationToken);
-                    return format;
-                }
-
                 targetHeight = height;
                 targetWidth = height * sourceSize.Width / sourceSize.Height;
             }
 
-            image.Mutate(x => x.Resize(targetWidth, targetHeight));
+            if (targetWidth > 0 && targetHeight > 0)
+            {
+                image.Mutate(x => x.Resize(targetWidth, targetHeight));
+            }
 
             // Save
             await image.SaveAsync(targetStream, format, cancellationToken);
@@ -146,7 +137,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="targetStream">Target stream</param>
         /// <param name="cropSource">Crop source or leave blank for the target</param>
         /// <param name="blankColor">Blank area color</param>
-        /// <param name="defaultFormat">Default image format</param>
+        /// <param name="defaultFormat">Image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
         public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, bool cropSource = true, Color? blankColor = null, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
@@ -155,43 +146,45 @@ namespace com.etsoo.ImageUtils
             using var image = Image.Load(imageStream);
 
             // Image format
-            var format = image.Metadata.DecodedImageFormat ?? defaultFormat ?? JpegFormat.Instance;
+            var format = defaultFormat ?? image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;
 
             var sourceSize = image.Size;
             if (sourceSize.Width < targetSize.Width && sourceSize.Height < targetSize.Height)
             {
-                await imageStream.CopyToAsync(targetStream, cancellationToken);
-                return format;
-            }
-
-            // Size calculation
-            var (source, target, isResizing) = ImageShared.Calculate(sourceSize.Width, sourceSize.Height, targetSize.Width, targetSize.Height, cropSource);
-
-            if (isResizing)
-            {
-                // Simple mode
-                image.Mutate(x => x.Resize(targetSize));
-                await image.SaveAsync(targetStream, format, cancellationToken);
+                // Ignore
             }
             else
             {
-                if (cropSource)
+                // Size calculation
+                var (source, target, isResizing) = ImageShared.Calculate(sourceSize.Width, sourceSize.Height, targetSize.Width, targetSize.Height, cropSource);
+
+                if (isResizing)
                 {
-                    var sourceRect = new Rectangle(source.X, source.Y, source.Width, source.Height);
-                    image.Mutate(x => x.Crop(sourceRect).Resize(target.Width, target.Height));
+                    // Simple mode
+                    image.Mutate(x => x.Resize(targetSize));
+
                 }
                 else
                 {
-                    image.Mutate(x => x.Resize(target.Width, target.Height));
-                }
+                    if (cropSource)
+                    {
+                        var sourceRect = new Rectangle(source.X, source.Y, source.Width, source.Height);
+                        image.Mutate(x => x.Crop(sourceRect).Resize(target.Width, target.Height));
+                    }
+                    else
+                    {
+                        image.Mutate(x => x.Resize(target.Width, target.Height));
+                    }
 
-                var newImage = new Image<Rgba32>(targetSize.Width, targetSize.Height);
-                newImage.Mutate(x => x
-                    .BackgroundColor(blankColor.GetValueOrDefault(Color.Transparent))
-                    .DrawImage(image, new Point(target.X, target.Y), 1)
-                );
-                await newImage.SaveAsync(targetStream, format, cancellationToken);
+                    var newImage = new Image<Rgba32>(targetSize.Width, targetSize.Height);
+                    newImage.Mutate(x => x
+                        .BackgroundColor(blankColor.GetValueOrDefault(Color.Transparent))
+                        .DrawImage(image, new Point(target.X, target.Y), 1)
+                    );
+                }
             }
+
+            await image.SaveAsync(targetStream, format, cancellationToken);
 
             return format;
         }

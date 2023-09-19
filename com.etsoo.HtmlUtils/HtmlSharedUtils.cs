@@ -1,4 +1,5 @@
 ﻿using AngleSharp;
+using AngleSharp.Css;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -13,21 +14,28 @@ namespace com.etsoo.HtmlUtils
     public static partial class HtmlSharedUtils
     {
         /// <summary>
+        /// Default render device
+        /// 默认渲染设备
+        /// </summary>
+        public readonly static DefaultRenderDevice DefaultRenderDevice = new()
+        {
+            DeviceHeight = 1080,
+            DeviceWidth = 1920,
+            Resolution = 72,
+            ViewPortWidth = 1000,
+            ViewPortHeight = 1800
+        };
+
+        /// <summary>
         /// Create default CSS parser
         /// 创建默认 CSS 解析器
         /// </summary>
         /// <returns></returns>
         public static HtmlParser CreateDefaultCssParser()
         {
-            var config = Configuration.Default.WithCss();
-
-            /*
-                .WithRenderDevice(new DefaultRenderDevice
-                {
-                    DeviceHeight = 768,
-                    DeviceWidth = 1024,
-                });
-            */
+            var config = Configuration.Default
+                .WithRenderDevice(DefaultRenderDevice)
+                .WithCss();
 
             var context = BrowsingContext.New(config);
 

@@ -36,7 +36,7 @@ namespace Tests.Utils
 
             // Act
             using var ms = new MemoryStream();
-            var ext = await ImageSharpUtils.CreateFromBase64StringAsync(base64, ms);
+            var ext = await ImageSharpUtils.CreateFromBase64StringAsync(base64, new SixLabors.ImageSharp.Size(900, 900), ms);
 
             // Assert
             Assert.AreEqual("png", ext);
