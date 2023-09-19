@@ -1,5 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Css;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Values;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -166,6 +168,38 @@ namespace com.etsoo.HtmlUtils
 
             var part = content[left..right];
             return (left > 0 ? "..." : string.Empty) + part + (right < len ? "..." : string.Empty);
+        }
+
+        /// <summary>
+        /// Get element's style size
+        /// 获取元素的样式大小
+        /// </summary>
+        /// <param name="element">Element</param>
+        /// <param name="dimensions">Dimensions</param>
+        /// <param name="currentView">Current view or static style</param>
+        /// <returns>Result</returns>
+        public static (double? width, double? height) GetStyleSize(IElement element, IRenderDimensions? dimensions = null, bool currentView = false)
+        {
+            var style = currentView ? element.ComputeCurrentStyle() : element.GetStyle();
+
+            dimensions ??= DefaultRenderDevice;
+
+            double? widthValue = null;
+            double? heightValue = null;
+
+            var widthText = style.GetWidth();
+            if (!string.IsNullOrEmpty(widthText) && Length.TryParse(widthText, out Length width))
+            {
+                widthValue = width.AsPx(dimensions, RenderMode.Horizontal);
+            }
+
+            var heightText = style.GetHeight();
+            if (!string.IsNullOrEmpty(heightText) && Length.TryParse(heightText, out Length height))
+            {
+                heightValue = height.AsPx(dimensions, RenderMode.Vertical);
+            }
+
+            return (widthValue, heightValue);
         }
 
         /// <summary>

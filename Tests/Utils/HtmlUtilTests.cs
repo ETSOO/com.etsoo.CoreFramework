@@ -155,5 +155,26 @@ namespace Tests.Utils
             // Assert
             Assert.AreEqual("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==", introduction);
         }
+
+        [Test]
+        public async Task GetStyleSizeTests()
+        {
+            var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" style="width: 120px"/><img src="c.bmp" style="height: 100pt;"/></p>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var sizes = new List<(double? width, double? height)>();
+            var device = HtmlSharedUtils.DefaultRenderDevice;
+            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
+            {
+                sizes.Add(HtmlSharedUtils.GetStyleSize(img, device));
+                await Task.CompletedTask;
+            }, true);
+
+            Assert.AreEqual(3, sizes.Count);
+            Assert.AreEqual((device.RenderWidth * 0.1, device.RenderHeight * 0.2), sizes[0]);
+            Assert.AreEqual(120, sizes[1].width);
+            Assert.IsNull(sizes[1].height);
+            Assert.IsNull(sizes[2].width);
+            Assert.AreEqual(133.33, Math.Round(sizes[2].height.GetValueOrDefault(), 2));
+        }
     }
 }
