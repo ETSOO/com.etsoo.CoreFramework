@@ -83,7 +83,7 @@ namespace com.etsoo.ImageUtils
         /// 异步调整图像流大小，保持原始比例
         /// </summary>
         /// <param name="imageStream">Image stream to resize</param>
-        /// <param name="targetSize">Target size</param>
+        /// <param name="targetSize">Target size, will be changed to the actual size after processing</param>
         /// <param name="targetStream">Target stream</param>
         /// <param name="defaultFormat">Image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -120,6 +120,10 @@ namespace com.etsoo.ImageUtils
             if (targetWidth > 0 && targetHeight > 0)
             {
                 image.Mutate(x => x.Resize(targetWidth, targetHeight));
+
+                // Set back for tracking
+                targetSize.Width = targetWidth;
+                targetSize.Height = targetHeight;
             }
 
             // Save

@@ -6,7 +6,7 @@ namespace com.etsoo.Database
     /// Sqlite utils
     /// Sqlite 工具类
     /// </summary>
-    public static class SqliteUtils
+    public static partial class SqliteUtils
     {
         /// <summary>
         /// To JSON bool command
@@ -30,8 +30,8 @@ namespace com.etsoo.Database
         public static string ToJsonCommand(this string fields, bool withoutArrayWrapper = false)
         {
             // (?<!) = Negative lookbehind, no '(' found before ')'
-            var regex = new Regex(@"(?<!\([^\)]+)\s*,\s*", RegexOptions.Compiled | RegexOptions.Multiline);
-            var regexItem = new Regex(@"(\s+AS\s+|\.)*([a-zA-Z_$][0-9a-zA-Z_$]*)$", RegexOptions.Compiled);
+            var regex = MyRegex();
+            var regexItem = MyRegex1();
 
             var items = regex.Split(fields);
             var r = new List<string>();
@@ -61,5 +61,10 @@ namespace com.etsoo.Database
             else
                 return $"json_group_array({command})";
         }
+
+        [GeneratedRegex("(?<!\\([^\\)]+)\\s*,\\s*", RegexOptions.Multiline | RegexOptions.Compiled)]
+        private static partial Regex MyRegex();
+        [GeneratedRegex("(\\s+AS\\s+|\\.)*([a-zA-Z_$][0-9a-zA-Z_$]*)$", RegexOptions.Compiled)]
+        private static partial Regex MyRegex1();
     }
 }
