@@ -73,9 +73,9 @@ namespace com.etsoo.ImageUtils
             await using var stream = CreateStreamFromBase64String(input, out var format);
 
             // Resize
-            format = await ResizeImageStreamAsync(stream, targetSize, targetStream, format, cancellationToken);
+            var result = await ResizeImageStreamAsync(stream, targetSize, targetStream, format, cancellationToken);
 
-            return format.FileExtensions.First();
+            return result.format.FileExtensions.First();
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace com.etsoo.ImageUtils
         /// 异步调整图像流大小，保持原始比例
         /// </summary>
         /// <param name="imageStream">Image stream to resize</param>
-        /// <param name="targetSize">Target size, will be changed to the actual size after processing</param>
+        /// <param name="targetSize">Target size</param>
         /// <param name="targetStream">Target stream</param>
         /// <param name="defaultFormat">Image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -129,7 +129,7 @@ namespace com.etsoo.ImageUtils
             // Save
             await image.SaveAsync(targetStream, format, cancellationToken);
 
-            return format;
+            return (format, targetSize);
         }
 
         /// <summary>
