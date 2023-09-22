@@ -88,7 +88,7 @@ namespace com.etsoo.ImageUtils
         /// <param name="defaultFormat">Image format</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Image format</returns>
-        public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
+        public static async Task<(IImageFormat format, Size size)> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
         {
             var width = targetSize.Width;
             var height = targetSize.Height;
