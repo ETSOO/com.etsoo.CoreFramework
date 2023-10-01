@@ -187,6 +187,14 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void MakeStartHtmlTagWithTagsTests()
+        {
+            var html = " Hello, world! <p>Facilities Offered:</p><hr>";
+            var result = HtmlIOUtils.MakeStartHtmlTag(html);
+            Assert.AreEqual("<p>Hello, world! </p><p>Facilities Offered:</p><hr>", result);
+        }
+
+        [Test]
         public void ClearTagsTests()
         {
             var html = "<p><br></p><ul><li>Guest laundry facility</li></ul><p><br></p><p><br></p><p><br></p>";

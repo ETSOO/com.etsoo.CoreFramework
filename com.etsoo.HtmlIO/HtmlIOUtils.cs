@@ -107,7 +107,7 @@ namespace com.etsoo.HtmlIO
                 if (index == -1) content = $"<p>{content}</p>";
                 else
                 {
-                    content = $"<p>{content[0..index]}</p>{content[index]}";
+                    content = $"<p>{content[0..index]}</p>{content[index..]}";
                 }
             }
 
