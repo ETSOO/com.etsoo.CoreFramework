@@ -14,6 +14,17 @@ namespace com.etsoo.HtmlIO
     public static class HtmlIOUtils
     {
         /// <summary>
+        /// Clear unnecessary tags
+        /// 清除不需要的标签
+        /// </summary>
+        /// <param name="content">Content</param>
+        /// <returns>Result</returns>
+        public static string ClearTags(string content)
+        {
+            return content.Replace("<p><br></p>", "");
+        }
+
+        /// <summary>
         /// Async format editor content
         /// 异步格式编辑器内容
         /// </summary>
@@ -26,6 +37,12 @@ namespace com.etsoo.HtmlIO
         public static async Task<string?> FormatEditorContentAsync(IStorage storage, string path, string? content, ILogger? logger = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(content)) return null;
+
+            // Clear tags
+            content = ClearTags(content);
+
+            // Start with HTML tag
+            MakeStartHtmlTag(content);
 
             await using var stream = SharedUtils.GetStream(content);
             var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
@@ -71,6 +88,30 @@ namespace com.etsoo.HtmlIO
                 }
             }, true, cancellationToken);
             return doc.Body?.InnerHtml ?? content;
+        }
+
+        /// <summary>
+        /// Make start HTML tag
+        /// 添加开始 HTML 标签
+        /// </summary>
+        /// <param name="content">Raw content</param>
+        /// <returns>Result</returns>
+        public static string MakeStartHtmlTag(string content)
+        {
+            // Start with HTML tag
+            content = content.Trim();
+
+            if (!content.StartsWith('<'))
+            {
+                var index = content.IndexOf('<');
+                if (index == -1) content = $"<p>{content}</p>";
+                else
+                {
+                    content = $"<p>{content[0..index]}</p>{content[index]}";
+                }
+            }
+
+            return content;
         }
     }
 }

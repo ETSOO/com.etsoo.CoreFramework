@@ -2,6 +2,7 @@
 using AngleSharp.Css.Dom;
 using AngleSharp.Css.Values;
 using AngleSharp.Html.Dom;
+using com.etsoo.HtmlIO;
 using com.etsoo.HtmlUtils;
 using com.etsoo.Utils;
 using NUnit.Framework;
@@ -175,6 +176,22 @@ namespace Tests.Utils
             Assert.IsNull(sizes[1].height);
             Assert.IsNull(sizes[2].width);
             Assert.AreEqual(133.33, Math.Round(sizes[2].height.GetValueOrDefault(), 2));
+        }
+
+        [Test]
+        public void MakeStartHtmlTagTests()
+        {
+            var html = " Hello, world! ";
+            var result = HtmlIOUtils.MakeStartHtmlTag(html);
+            Assert.AreEqual("<p>Hello, world!</p>", result);
+        }
+
+        [Test]
+        public void ClearTagsTests()
+        {
+            var html = "<p><br></p><ul><li>Guest laundry facility</li></ul><p><br></p><p><br></p><p><br></p>";
+            var result = HtmlIOUtils.ClearTags(html);
+            Assert.AreEqual("<ul><li>Guest laundry facility</li></ul>", result);
         }
     }
 }

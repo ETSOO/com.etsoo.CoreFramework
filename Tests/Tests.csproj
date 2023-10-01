@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\com.etsoo.Address\com.etsoo.Address.csproj" />
     <ProjectReference Include="..\com.etsoo.CoreFramework\com.etsoo.CoreFramework.csproj" />
+    <ProjectReference Include="..\com.etsoo.HtmlIO\com.etsoo.HtmlIO.csproj" />
     <ProjectReference Include="..\com.etsoo.HtmlUtils\com.etsoo.HtmlUtils.csproj" />
     <ProjectReference Include="..\com.etsoo.HTTP\com.etsoo.HTTP.csproj" />
     <ProjectReference Include="..\com.etsoo.ImageUtils\com.etsoo.ImageUtils.csproj" />
