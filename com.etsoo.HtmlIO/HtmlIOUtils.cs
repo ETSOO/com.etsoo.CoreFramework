@@ -42,7 +42,7 @@ namespace com.etsoo.HtmlIO
             content = ClearTags(content);
 
             // Start with HTML tag
-            MakeStartHtmlTag(content);
+            content = MakeStartHtmlTag(content);
 
             await using var stream = SharedUtils.GetStream(content);
             var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
