@@ -528,8 +528,9 @@ namespace com.etsoo.SourceGenerators
         /// 是否为简单的数据库类型
         /// </summary>
         /// <param name="type">Type</param>
+        /// <param name="ignoreObject">Ignore object type or not</param>
         /// <returns>Simple DB type or not</returns>
-        public static bool IsSimpleType(this ITypeSymbol type)
+        public static bool IsSimpleType(this ITypeSymbol type, bool ignoreObject = false)
         {
             var typeName = type.Name;
 
@@ -537,6 +538,10 @@ namespace com.etsoo.SourceGenerators
             if (typeName == "TimeSpan")
             {
                 return true;
+            }
+            else if (typeName == "Object" && ignoreObject)
+            {
+                return false;
             }
 
             // Try to parse with name

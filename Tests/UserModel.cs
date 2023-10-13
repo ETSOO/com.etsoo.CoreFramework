@@ -52,6 +52,9 @@ namespace Tests
         [Property(TypeName = "et_int_ids")]
         public int[]? Friends { get; init; }
 
+        [Property(TypeName = "json")]
+        public object? JsonData { get; init; }
+
         /// <summary>
         /// List
         /// </summary>

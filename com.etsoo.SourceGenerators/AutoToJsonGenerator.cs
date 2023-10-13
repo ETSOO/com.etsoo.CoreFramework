@@ -71,7 +71,7 @@ namespace com.etsoo.SourceGenerators
                         ");
                     }
 
-                    if (typeSymbol.IsSimpleType())
+                    if (typeSymbol.IsSimpleType(true))
                     {
                         // Value field
                         var valueField = nullable && typeSymbol.IsValueType ? $"{fieldName}.Value" : fieldName;

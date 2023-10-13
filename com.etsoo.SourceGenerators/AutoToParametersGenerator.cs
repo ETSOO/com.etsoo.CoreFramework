@@ -75,7 +75,7 @@ namespace com.etsoo.SourceGenerators
                     // Is dbstring
                     bool isDbString = false;
 
-                    if (typeSymbol.IsSimpleType())
+                    if (typeSymbol.IsSimpleType(true))
                     {
                         // Default type name from member's type
                         if (typeName == null || typeName == string.Empty)
