@@ -19,7 +19,7 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         /// <returns>Result</returns>
         public static IServiceCollection AddGooglePubSubConsumer(this IServiceCollection services, GooglePubSubConsumerOptions options)
         {
-            services.AddSingleton<IMessageQueueConsumer, GooglePubSubConsumer>((provider) =>
+            services.AddHostedService((provider) =>
             {
                 return new GooglePubSubConsumer(GooglePubSubUtils.CreateSubscriberClient(options), provider.GetServices<IMessageQueueProcessor>(), provider.GetRequiredService<ILogger<GooglePubSubConsumer>>());
             });

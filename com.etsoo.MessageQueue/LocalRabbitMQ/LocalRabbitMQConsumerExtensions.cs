@@ -19,7 +19,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         /// <returns>Result</returns>
         public static IServiceCollection AddLocalRabbitMQConsumer(this IServiceCollection services, LocalRabbitMQConsumerOptions options)
         {
-            services.AddSingleton<IMessageQueueConsumer, LocalRabbitMQConsumer>((provider) =>
+            services.AddHostedService((provider) =>
             {
                 return new LocalRabbitMQConsumer(options, provider.GetServices<IMessageQueueProcessor>(), provider.GetRequiredService<ILogger<LocalRabbitMQConsumer>>());
             });

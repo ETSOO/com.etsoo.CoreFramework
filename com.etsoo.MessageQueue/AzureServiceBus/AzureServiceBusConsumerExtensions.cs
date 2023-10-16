@@ -20,7 +20,7 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         /// <returns>Result</returns>
         public static IServiceCollection AddAzureServiceBusConsumer(this IServiceCollection services, AzureServiceBusConsumerOptions options)
         {
-            services.AddSingleton<IMessageQueueConsumer, AzureServiceBusConsumer>((provider) =>
+            services.AddHostedService((provider) =>
             {
                 return new AzureServiceBusConsumer(AzureServiceBusUtils.CreateServiceBusProcessor(options), provider.GetServices<IMessageQueueProcessor>(), provider.GetRequiredService<ILogger<AzureServiceBusConsumer>>());
             });
