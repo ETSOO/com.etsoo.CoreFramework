@@ -11,7 +11,9 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
     /// </summary>
     public class LocalRabbitMQConsumer : MessageQueueConsumer
     {
-        private readonly LocalRabbitMQConsumerOptions _options;
+        readonly LocalRabbitMQConsumerOptions _options;
+
+        AsyncEventingBasicConsumer? _consumer;
 
         public LocalRabbitMQConsumer(LocalRabbitMQConsumerOptions options, IEnumerable<IMessageQueueProcessor> processors, ILogger logger)
             : base(processors, logger)
@@ -19,9 +21,40 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
             _options = options;
         }
 
-        public override async Task ReceiveAsync(CancellationToken cancellationToken)
+        private async Task MessageHandler(object sender, BasicDeliverEventArgs e)
         {
-            await Task.Run(() =>
+            var consumer = sender as AsyncEventingBasicConsumer;
+            if (consumer == null) return;
+            var channel = consumer.Model;
+
+            using var cancellationTokenSource = new CancellationTokenSource();
+
+            var properties = new MessageReceivedProperties();
+            try
+            {
+                properties = LocalRabbitMQUtils.CreatePropertiesFromArgs(e);
+                await ProcessAsync(e.Body, properties, cancellationTokenSource.Token);
+                channel.BasicAck(e.DeliveryTag, false);
+            }
+            catch (Exception ex)
+            {
+                cancellationTokenSource.Cancel();
+
+                Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
+                channel.BasicNack(e.DeliveryTag, false, true);
+            }
+
+            cancellationTokenSource.Dispose();
+        }
+
+        /// <summary>
+        /// Triggered when the application host is ready to start the service
+        /// 当程序准备好启动服务时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        public override async Task StartAsync(CancellationToken cancellationToken)
+        {
+            var consumer = await Task.Run(() =>
             {
                 var connection = LocalRabbitMQUtils.CreateConnection(_options);
 
@@ -68,33 +101,48 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 }
 
                 var consumer = new AsyncEventingBasicConsumer(channel);
-                consumer.Received += async (sender, e) =>
-                {
-                    var properties = new MessageReceivedProperties();
-                    try
-                    {
-                        properties = LocalRabbitMQUtils.CreatePropertiesFromArgs(e);
-                        await ProcessAsync(e.Body, properties, cancellationToken);
-                        channel.BasicAck(e.DeliveryTag, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
-                        channel.BasicNack(e.DeliveryTag, false, true);
-                    }
-                };
+                consumer.Received += MessageHandler;
 
                 channel.BasicConsume(queue: queue,
                          autoAck: false,
                          consumer: consumer);
 
-                // Keep running
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                }
-
-                channel.Dispose();
+                return consumer;
             }, cancellationToken);
+
+            _consumer = consumer;
+        }
+
+        /// <summary>
+        /// Triggered when the application host is performing a graceful shutdown
+        /// 当程序执行正常关闭时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await Task.Run(() =>
+            {
+                if (_consumer != null)
+                {
+                    _consumer.Received -= MessageHandler;
+
+                    if (_consumer.Model.IsOpen)
+                        _consumer.Model.Close();
+
+                    _consumer.Model.Dispose();
+
+                    _consumer = null;
+                }
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Dispose of resources
+        /// 处置资源
+        /// </summary>
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

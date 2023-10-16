@@ -53,8 +53,6 @@ namespace Tests.MessageQueue
             await producer.DisposeAsync();
             await sender.DisposeAsync();
 
-            var source = new CancellationTokenSource(3000);
-
             var messages = new List<MessageReceivedProperties>();
             var action = (MessageReceivedProperties properties, SimpleData? data) =>
             {
@@ -71,7 +69,9 @@ namespace Tests.MessageQueue
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
-            await consumer.ReceiveAsync(source.Token);
+            await consumer.StartAsync(default);
+            await Task.Delay(1000);
+            await consumer.StopAsync(default);
 
             await subscriber.DisposeAsync();
 

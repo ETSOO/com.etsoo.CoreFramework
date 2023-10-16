@@ -31,14 +31,6 @@ namespace com.etsoo.MessageQueue
         }
 
         /// <summary>
-        /// Async start receive messages
-        /// 异步开始接收消息
-        /// </summary>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Task</returns>
-        public abstract Task ReceiveAsync(CancellationToken cancellationToken);
-
-        /// <summary>
         /// Process message
         /// 处理消息
         /// </summary>
@@ -72,5 +64,25 @@ namespace com.etsoo.MessageQueue
                 throw new AggregateException(exceptions);
             }
         }
+
+        /// <summary>
+        /// Triggered when the application host is ready to start the service
+        /// 当程序准备好启动服务时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        public abstract Task StartAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Triggered when the application host is performing a graceful shutdown
+        /// 当程序执行正常关闭时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
+        public abstract Task StopAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Dispose of resources
+        /// 处置资源
+        /// </summary>
+        public abstract void Dispose();
     }
 }

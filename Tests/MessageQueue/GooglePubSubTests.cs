@@ -43,13 +43,13 @@ namespace Tests.MessageQueue
 
             await producer.DisposeAsync();
 
-            var source = new CancellationTokenSource(3000);
-
             var messages = new List<MessageReceivedProperties>();
             var action = (MessageReceivedProperties properties, SimpleData? data) =>
             {
                 messages.Add(properties);
             };
+
+            var source = new CancellationTokenSource();
 
             var subscriber = await GooglePubSubUtils.CreateSubscriberClientAsync(new GooglePubSubConsumerOptions
             {
@@ -62,7 +62,12 @@ namespace Tests.MessageQueue
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
-            await consumer.ReceiveAsync(source.Token);
+
+            // Fire and go, will keep running
+            consumer.StartAsync(source.Token);
+
+            await Task.Delay(2000);
+            await consumer.StopAsync(source.Token);
 
             await subscriber.DisposeAsync();
             await client.DisposeAsync();

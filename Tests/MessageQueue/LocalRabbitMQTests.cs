@@ -26,8 +26,6 @@ namespace Tests.MessageQueue
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
 
-            var source = new CancellationTokenSource(1000);
-
             var messages = new List<MessageReceivedProperties>();
             var action = (MessageReceivedProperties properties, SimpleData? data) =>
             {
@@ -39,7 +37,9 @@ namespace Tests.MessageQueue
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
-            await consumer.ReceiveAsync(source.Token);
+            await consumer.StartAsync(default);
+            await Task.Delay(1000);
+            await consumer.StopAsync(default);
 
             Assert.IsTrue(messages.Any());
             Assert.IsTrue(messages.Any(m => "GUID".Equals(m.UserId)));
@@ -53,7 +53,7 @@ namespace Tests.MessageQueue
             var messageId = await producer.SendAsync(Encoding.UTF8.GetBytes("Hello"), new MessageProperties { AppId = "SmartERPTest" });
             await producer.DisposeAsync();
 
-            var source = new CancellationTokenSource(1000);
+            var source = new CancellationTokenSource(2000);
 
             var messages = new List<(MessageReceivedProperties, string?)>();
             var action = (MessageReceivedProperties properties, string? data) =>
@@ -66,7 +66,9 @@ namespace Tests.MessageQueue
                 new[] { new StringProcessor(action) },
                 Mock.Of<ILogger>()
                );
-            await consumer.ReceiveAsync(source.Token);
+            await consumer.StartAsync(source.Token);
+            await Task.Delay(1000);
+            await consumer.StopAsync(source.Token);
 
             Assert.IsTrue(messages.Any());
             Assert.IsTrue(messages.Any(m => "Hello".Equals(m.Item2)));

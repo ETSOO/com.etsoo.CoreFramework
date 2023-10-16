@@ -18,34 +18,49 @@ namespace com.etsoo.MessageQueue.GooglePubSub
             _subscriberClient = subscriberClient;
         }
 
-        public override async Task ReceiveAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Triggered when the application host is ready to start the service
+        /// 当程序准备好启动服务时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            var startTask = _subscriberClient.StartAsync(async (message, cancel) =>
+            await _subscriberClient.StartAsync(async (message, cancel) =>
             {
                 var properties = new MessageReceivedProperties();
+                using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancel);
                 try
                 {
                     properties = GooglePubSubUtils.CreatePropertiesFromMessage(message);
-                    await ProcessAsync(message.Data.ToByteArray(), properties, cancel);
+                    await ProcessAsync(message.Data.ToByteArray(), properties, cancellationTokenSource.Token);
                     return SubscriberClient.Reply.Ack;
                 }
                 catch (Exception ex)
                 {
+                    cancellationTokenSource.Cancel();
                     Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
                     return SubscriberClient.Reply.Nack;
                 }
             });
+        }
 
-            // Keep running
-            while (!cancellationToken.IsCancellationRequested)
-            {
-            }
+        /// <summary>
+        /// Triggered when the application host is performing a graceful shutdown
+        /// 当程序执行正常关闭时触发
+        /// </summary>
+        /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
+        public override async Task StopAsync(CancellationToken cancellationToken)
+        {
+            await _subscriberClient.StopAsync(cancellationToken);
+        }
 
-            // Stop
-            await _subscriberClient.StopAsync(CancellationToken.None);
-
-            // Lets make sure that the start task finished successfully after the call to stop
-            await startTask;
+        /// <summary>
+        /// Dispose of resources
+        /// 处置资源
+        /// </summary>
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }
