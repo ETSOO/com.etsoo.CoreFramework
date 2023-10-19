@@ -11,6 +11,11 @@ namespace com.etsoo.Database
     public interface IDbParameters : SqlMapper.IDynamicParameters, SqlMapper.IParameterLookup
     {
         /// <summary>
+        /// If true, the command-text is inspected and only values that are clearly used are included on the connection
+        /// </summary>
+        bool RemoveUnused { get; set; }
+
+        /// <summary>
         /// All the names of the param in the bag, use Get to yank them out
         /// </summary>
         IEnumerable<string> ParameterNames { get; }
