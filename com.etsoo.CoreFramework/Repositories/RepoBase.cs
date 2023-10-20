@@ -9,6 +9,7 @@ using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
@@ -389,12 +390,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
             where T : struct
             where M : IdItem<T>, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, logger);
 
             if (result.Ok)
             {
@@ -416,11 +418,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
             where M : IdItem, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, logger);
 
             if (result.Ok)
             {
@@ -442,8 +445,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Result</returns>
-        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
             where M : IUpdateModel
         {
             // Validate
@@ -546,18 +550,23 @@ namespace com.etsoo.CoreFramework.Repositories
             if (User != null)
                 AddSystemParameters(parameters);
 
-            var command = CreateCommand(sql.ToString(), parameters, CommandType.Text);
+            var commandText = sql.ToString();
+            var command = CreateCommand(commandText, parameters, CommandType.Text);
 
             try
             {
                 var records = await ExecuteAsync(command);
+
+                // Log
+                logger?.LogInformation("Successful update command: {commandText}", commandText);
 
                 // Success
                 return (ActionResult.Success, records);
             }
             catch (Exception ex)
             {
-                throw new Exception("Command: " + sql, ex);
+                logger?.LogError(ex, "Command update failed: {commandText}", commandText);
+                throw new Exception("Command update failed: " + commandText, ex);
             }
         }
 

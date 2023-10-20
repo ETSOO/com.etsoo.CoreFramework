@@ -64,9 +64,11 @@ namespace Tests.MessageQueue
                );
 
             // Fire and go, will keep running
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             consumer.StartAsync(source.Token);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-            await Task.Delay(2000);
+            await Task.Delay(5000);
             await consumer.StopAsync(source.Token);
 
             await subscriber.DisposeAsync();

@@ -5,6 +5,7 @@ using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Buffers;
 
 namespace com.etsoo.CoreFramework.Repositories
@@ -176,8 +177,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null)
+        ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
             where T : struct
             where M : IdItem<T>, IUpdateModel;
 
@@ -190,7 +192,8 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
+        /// <param name="logger">Logger</param>
         /// <returns>Result</returns>
-        ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null) where M : IdItem, IUpdateModel;
+        ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null) where M : IdItem, IUpdateModel;
     }
 }
