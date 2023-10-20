@@ -10,7 +10,7 @@
         /// Mappings
         /// 映射
         /// </summary>
-        public static readonly SortedDictionary<string, string> Mappings = new(StringComparer.OrdinalIgnoreCase)
+        public static readonly Dictionary<string, string> Mappings = new(StringComparer.OrdinalIgnoreCase)
         {
             {".323", "text/h323"},
             {".3g2", "video/3gpp2"},
@@ -675,10 +675,7 @@
         {
             if (string.IsNullOrEmpty(mediaType)) return null;
 
-            return Mappings.Where(m => m.Value.Equals(mediaType, StringComparison.OrdinalIgnoreCase))
-                .Select(m => m.Key)
-                .OrderBy(m => m)
-                .FirstOrDefault();
+            return Mappings.FirstOrDefault(m => m.Value.Equals(mediaType, StringComparison.OrdinalIgnoreCase)).Key;
         }
     }
 }

@@ -110,7 +110,10 @@ namespace Tests.Utils
             Assert.AreEqual(".htm", ext);
 
             ext = MimeTypeMap.TryGetExtension("IMAGE/JPEG");
-            Assert.AreEqual(".jpe", ext);
+            Assert.AreEqual(".jpg", ext);
+
+            ext = MimeTypeMap.TryGetExtension("IMAGE/.fail");
+            Assert.IsNull(ext);
         }
 
         [Test]
