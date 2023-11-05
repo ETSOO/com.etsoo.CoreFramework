@@ -50,9 +50,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> CreateAsync(object model)
+        public virtual ValueTask<IActionResult> CreateAsync(object model)
         {
-            return await Repo.CreateAsync(model);
+            return Repo.CreateAsync(model);
         }
 
         /// <summary>
@@ -61,9 +61,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="id">Entity id</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(T id)
+        public virtual ValueTask<IActionResult> DeleteAsync(T id)
         {
-            return await Repo.DeleteAsync(id);
+            return Repo.DeleteAsync(id);
         }
 
         /// <summary>
@@ -72,9 +72,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="ids">Entity ids</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
+        public virtual ValueTask<IActionResult> DeleteAsync(IEnumerable<T> ids)
         {
-            return await Repo.DeleteAsync(ids);
+            return Repo.DeleteAsync(ids);
         }
 
         /// <summary>
@@ -85,9 +85,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="queryKey">Query key</param>
         /// <returns>Task</returns>
-        public virtual async Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
+        public virtual Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null)
         {
-            await Repo.ListAsync(model, response, queryKey);
+            return Repo.ListAsync(model, response, queryKey);
         }
 
         /// <summary>
@@ -97,9 +97,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="M">Generic request data type</typeparam>
         /// <param name="rq">Request data</param>
         /// <returns>Result</returns>
-        public virtual async ValueTask<IActionResult> MergeAsync<M>(M rq) where M : MergeRQ
+        public virtual ValueTask<IActionResult> MergeAsync<M>(M rq) where M : MergeRQ
         {
-            return await Repo.MergeAsync(rq);
+            return Repo.MergeAsync(rq);
         }
 
         /// <summary>
@@ -111,9 +111,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="queryKey">Query key word, default is empty</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public virtual async Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct
+        public virtual Task QueryAsync<E>(QueryRQ<E> model, HttpResponse response, string? queryKey = null, IEnumerable<string>? collectionNames = null) where E : struct
         {
-            await Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames);
+            return Repo.QueryAsync<E, QueryRQ<E>>(model, response, queryKey, collectionNames);
         }
 
         /// <summary>
@@ -124,9 +124,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public virtual async ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
+        public virtual ValueTask<E?> ReadAsync<E>(T id, string range = "default") where E : IDataReaderParser<E>
         {
-            return await Repo.ReadAsync<E>(id, range);
+            return Repo.ReadAsync<E>(id, range);
         }
 
         /// <summary>
@@ -137,9 +137,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="id">Entity id</param>
         /// <param name="range">Limited range</param>
         /// <returns>Entity</returns>
-        public virtual async Task<E?> ReadDirectAsync<E>(T id, string range = "default")
+        public virtual Task<E?> ReadDirectAsync<E>(T id, string range = "default")
         {
-            return await Repo.ReadDirectAsync<E>(id, range);
+            return Repo.ReadDirectAsync<E>(id, range);
         }
 
         /// <summary>
@@ -151,9 +151,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="range">Range</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public virtual async Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
+        public virtual Task ReadAsync(HttpResponse response, T id, string range = "default", IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, range, collectionNames);
+            return Repo.ReadAsync(response, id, range, collectionNames);
         }
 
         /// <summary>
@@ -165,9 +165,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="modal">Condition modal</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public virtual async Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
+        public virtual Task ReportAsync(HttpResponse response, string range, object? modal = null, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReportAsync(response, range, modal, collectionNames);
+            return Repo.ReportAsync(response, range, modal, collectionNames);
         }
 
         /// <summary>
@@ -175,10 +175,12 @@ namespace com.etsoo.CoreFramework.Services
         /// 数据排序
         /// </summary>
         /// <param name="sortData">Data to sort</param>
+        /// <param name="category">Category to group data</param>
+        /// <param name="range">Sort range</param>
         /// <returns>Rows affected</returns>
-        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
+        public virtual Task<int> SortAsync(Dictionary<T, short> sortData, byte? category = null, string? range = null)
         {
-            return await Repo.SortAsync(sortData);
+            return Repo.SortAsync(sortData, category, range);
         }
 
         /// <summary>
@@ -187,9 +189,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="model">Model</param>
         /// <returns>Action result</returns>
-        public virtual async ValueTask<IActionResult> UpdateAsync(UpdateModel<T> model)
+        public virtual ValueTask<IActionResult> UpdateAsync(UpdateModel<T> model)
         {
-            return await Repo.UpdateAsync(model);
+            return Repo.UpdateAsync(model);
         }
 
         /// <summary>
@@ -200,9 +202,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="response">HTTP Response</param>
         /// <param name="collectionNames">Collection names</param>
         /// <returns>Task</returns>
-        public virtual async Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
+        public virtual Task UpdateReadAsync(T id, HttpResponse response, IEnumerable<string>? collectionNames = null)
         {
-            await Repo.ReadAsync(response, id, "update", collectionNames);
+            return Repo.ReadAsync(response, id, "update", collectionNames);
         }
 
         /// <summary>
@@ -211,9 +213,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="rq">Request data</param>
         /// <returns>Result</returns>
-        public virtual async ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq)
+        public virtual ValueTask<IActionResult> UpdateStatusAsync(UpdateStatusRQ<T> rq)
         {
-            return await Repo.UpdateStatusAsync(rq);
+            return Repo.UpdateStatusAsync(rq);
         }
     }
 }

@@ -292,9 +292,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="newDeviceId">New client device id</param>
         /// <param name="deviceId">Serverside device id</param>
         /// <returns>Task</returns>
-        protected virtual async Task InitCallUpdateAsync(string prevDeviceId, string newDeviceId, int deviceId)
+        protected virtual Task InitCallUpdateAsync(string prevDeviceId, string newDeviceId, int deviceId)
         {
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>

@@ -354,15 +354,21 @@ namespace com.etsoo.CoreFramework.Repositories
         /// 数据排序
         /// </summary>
         /// <param name="sortData">Data to sort</param>
+        /// <param name="category">Category to group data</param>
+        /// <param name="range">Sort range</param>
         /// <returns>Rows affected</returns>
-        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData)
+        public virtual async Task<int> SortAsync(Dictionary<T, short> sortData, byte? category = null, string? range = null)
         {
             var parameters = new DbParameters();
+            if (category.HasValue) parameters.Add("Category", category.Value);
             parameters.Add("Items", App.DB.DictionaryToParameter(sortData, null, null, (keyType, valueType) => SqlServerUtils.GetDicCommand(keyType, valueType, App.BuildCommandName)));
 
             AddSystemParameters(parameters);
 
-            var command = CreateCommand(GetCommandName("sort"), parameters);
+            var commandText = !string.IsNullOrEmpty(range) && FilterRange(range, false)
+                ? $"sort {range}" : "sort";
+
+            var command = CreateCommand(GetCommandName(commandText), parameters);
 
             return await ExecuteAsync(command);
         }

@@ -112,8 +112,10 @@ namespace com.etsoo.CoreFramework.Services
         /// 数据排序
         /// </summary>
         /// <param name="sortData">Data to sort</param>
+        /// <param name="category">Category to group data</param>
+        /// <param name="range">Sort range</param>
         /// <returns>Rows affected</returns>
-        Task<int> SortAsync(Dictionary<T, short> sortData);
+        Task<int> SortAsync(Dictionary<T, short> sortData, byte? category = null, string? range = null);
 
         /// <summary>
         /// Update
