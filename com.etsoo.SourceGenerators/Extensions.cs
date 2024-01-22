@@ -84,7 +84,7 @@ namespace com.etsoo.SourceGenerators
         /// <returns>UsingDirectiveSyntax</returns>
         public static UsingDirectiveSyntax GetUsingDirectiveSyntax(this SyntaxNode sn, string ns)
         {
-            return sn.SyntaxTree.GetReference(sn).SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>().FirstOrDefault((s) => s.Name.ToString().Equals(ns));
+            return sn.SyntaxTree.GetReference(sn).SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>().FirstOrDefault((s) => s.Name != null && s.Name.ToFullString().Equals(ns));
         }
 
         /// <summary>

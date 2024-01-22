@@ -286,7 +286,7 @@ namespace com.etsoo.Database
         /// <typeparam name="T">Generic return type</typeparam>
         /// <param name="command">The command to execute on this connection</param>
         /// <returns>The first cell selected as T</returns>
-        public async Task<T> ExecuteScalarAsync<T>(CommandDefinition command)
+        public async Task<T?> ExecuteScalarAsync<T>(CommandDefinition command)
         {
             return await WithConnection((connection) =>
             {

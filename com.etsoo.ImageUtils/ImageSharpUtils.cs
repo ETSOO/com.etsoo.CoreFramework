@@ -1,6 +1,9 @@
 ﻿using com.etsoo.Utils;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace com.etsoo.ImageUtils
 {
