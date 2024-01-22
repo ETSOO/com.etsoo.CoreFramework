@@ -7,10 +7,10 @@
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Company>ETSOO / 亿速思维</Company>
-    <Version>1.1.40</Version>
+    <Version>1.1.41</Version>
     <Description>ETSOO Shared Web Components
 亿速思维共享 Web 组件</Description>
-    <Copyright>Copyright © ETSOO 2004 - 2023</Copyright>
+    <Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
     <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Web</RepositoryUrl>

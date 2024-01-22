@@ -11,12 +11,12 @@
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Database</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
 	  <Company>ETSOO / 亿速思维</Company>
-	  <Copyright>Copyright © ETSOO 2004 - 2023</Copyright>
+	  <Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Description>ETSOO Database Utilities
 亿速思维数据库工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.66</Version>
+	  <Version>1.0.67</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
