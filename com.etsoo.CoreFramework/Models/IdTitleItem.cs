@@ -9,9 +9,9 @@ namespace com.etsoo.CoreFramework.Models
     public record IdTitleItem
     {
         [JsonRequired]
-        public int Id { get; set; }
+        public int Id { get; init; }
 
         [JsonRequired]
-        public string Title { get; set; } = string.Empty;
+        public required string Title { get; init; }
     }
 }
