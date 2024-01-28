@@ -1,5 +1,10 @@
-﻿using Dapper;
+﻿using com.etsoo.Utils.Models;
+using com.etsoo.Utils.Serialization;
+using Dapper;
+using System.Collections;
 using System.Data;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.Database
@@ -88,12 +93,9 @@ namespace com.etsoo.Database
         {
             if (string.IsNullOrWhiteSpace(input) || input.Length > maxLength) return false;
 
-            if (!MyRegex().IsMatch(input))
+            if (!MyRegex().IsMatch(input) && !MyRegex1().IsMatch(input))
             {
-                if (!MyRegex1().IsMatch(input))
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;
@@ -138,10 +140,172 @@ namespace com.etsoo.Database
             return null;
         }
 
+        /// <summary>
+        /// Dictionary to JSON string
+        /// 字典转化为JSON字符串
+        /// </summary>
+        /// <typeparam name="K">Generic key type</typeparam>
+        /// <typeparam name="V">Generic value type</typeparam>
+        /// <param name="dic">Dictionary</param>
+        /// <param name="keyType">Key type</param>
+        /// <param name="valueType">Value type</param>
+        /// <returns>Result</returns>
+        public static string DictionaryToJsonString<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType)
+            where K : notnull
+        {
+            JsonWriterOptions writerOptions = new() { Indented = false, SkipValidation = true };
+
+            using MemoryStream stream = new();
+            using Utf8JsonWriter writer = new(stream, writerOptions);
+
+            writer.WriteStartArray();
+
+            foreach (var item in dic)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("key");
+                WriteJsonItem(writer, item.Key, keyType);
+
+                writer.WritePropertyName("value");
+                WriteJsonItem(writer, item.Value, valueType);
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+
+            writer.Flush();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        /// <summary>
+        /// Guid items to JSON string
+        /// Guid 列表项转化为JSON字符串
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <returns>Result</returns>
+        public static string GuidItemsToJsonString(IEnumerable<GuidItem> items)
+        {
+            JsonWriterOptions writerOptions = new() { Indented = false, SkipValidation = true };
+
+            using MemoryStream stream = new();
+            using Utf8JsonWriter writer = new(stream, writerOptions);
+
+            writer.WriteStartArray();
+
+            foreach (var item in items)
+            {
+                writer.WriteStartObject();
+
+                writer.WriteString("id", item.Id);
+                writer.WriteString("label", item.Label);
+
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+
+            writer.Flush();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        /// <summary>
+        /// List items to JSON string
+        /// 列表项转化为JSON字符串
+        /// </summary>
+        /// <param name="list">List</param>
+        /// <param name="type">Item type</param>
+        /// <returns>Result</returns>
+        public static string ListItemsToJsonString(IEnumerable list, DbType type)
+        {
+            JsonWriterOptions writerOptions = new() { Indented = false, SkipValidation = true };
+
+            using MemoryStream stream = new();
+            using Utf8JsonWriter writer = new(stream, writerOptions);
+
+            writer.WriteStartArray();
+
+            foreach (var item in list)
+            {
+                WriteJsonItem(writer, item, type);
+            }
+
+            writer.WriteEndArray();
+
+            writer.Flush();
+
+            return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        private static void WriteJsonItem(Utf8JsonWriter writer, object? item, DbType type)
+        {
+            if (item == null)
+            {
+                writer.WriteNullValue();
+                return;
+            }
+
+            switch (type)
+            {
+                case DbType.Boolean:
+                    writer.WriteBooleanValue((bool)item);
+                    break;
+                case DbType.Int32:
+                    writer.WriteNumberValue((int)item);
+                    break;
+                case DbType.Int64:
+                    writer.WriteNumberValue((long)item);
+                    break;
+                case DbType.Double:
+                    writer.WriteNumberValue((double)item);
+                    break;
+                case DbType.Single:
+                    writer.WriteNumberValue((float)item);
+                    break;
+                case DbType.Decimal:
+                case DbType.Currency:
+                    writer.WriteNumberValue((decimal)item);
+                    break;
+                case DbType.Byte:
+                    writer.WriteNumberValue((byte)item);
+                    break;
+                case DbType.SByte:
+                    writer.WriteNumberValue((sbyte)item);
+                    break;
+                case DbType.Int16:
+                    writer.WriteNumberValue((short)item);
+                    break;
+                case DbType.UInt16:
+                    writer.WriteNumberValue((ushort)item);
+                    break;
+                case DbType.UInt32:
+                    writer.WriteNumberValue((uint)item);
+                    break;
+                case DbType.UInt64:
+                    writer.WriteNumberValue((ulong)item);
+                    break;
+                case DbType.VarNumeric:
+                    writer.WriteNumberValue((long)item);
+                    break;
+                case DbType.Binary:
+                    writer.WriteBase64StringValue((byte[])item);
+                    break;
+                case DbType.Object:
+                    Utils.SharedUtils.JsonSerializeAsync(writer, item, CommonJsonSerializerContext.Default.Object).Wait();
+                    break;
+                default:
+                    writer.WriteStringValue(item.ToString());
+                    break;
+            }
+        }
+
         [GeneratedRegex("(\\n|\\r\\n?|;|\\*|--|'|\"|=|sp_|xp_)")]
         private static partial Regex MyRegex();
 
-        [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase, "zh-CN")]
+        [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase)]
         private static partial Regex MyRegex1();
     }
 }

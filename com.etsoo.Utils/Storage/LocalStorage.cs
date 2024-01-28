@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace com.etsoo.Utils.Storage
 {
@@ -24,25 +25,24 @@ namespace com.etsoo.Utils.Storage
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="root">Root</param>
-        /// <param name="urlRoot">URL root</param>
-        public LocalStorage(string root, string urlRoot)
+        /// <param name="section">Configuration section</param>
+        [RequiresUnreferencedCode("LocalStorage constructor AOT configuration issue")]
+        [RequiresDynamicCode("LocalStorage constructor AOT configuration issue")]
+        public LocalStorage(IConfigurationSection section)
+            : this(section.Get<LocalStorageSettings>())
         {
-            Root = root;
-            URLRoot = urlRoot;
+
         }
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="section">Configuration section</param>
-        public LocalStorage(IConfigurationSection section) : this(
-            section.GetValue<string>("Root") ?? string.Empty,
-            section.GetValue<string>("URLRoot") ?? string.Empty
-        )
+        /// <param name="settings">Settings</param>
+        public LocalStorage(LocalStorageSettings? settings)
         {
-
+            Root = settings?.Root ?? string.Empty;
+            URLRoot = settings?.URLRoot ?? string.Empty;
         }
 
         /// <summary>

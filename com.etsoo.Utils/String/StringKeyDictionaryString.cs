@@ -10,7 +10,7 @@
         /// Constructor
         /// 构造函数
         /// </summary>
-        public StringKeyDictionaryString():base()
+        public StringKeyDictionaryString() : base()
         {
         }
 
@@ -47,7 +47,7 @@
         /// <returns>Value</returns>
         public T Get<T>(string key, T defaultValue) where T : struct
         {
-            return this.Get<T>(key).GetValueOrDefault(defaultValue);
+            return Get<T>(key) ?? defaultValue;
         }
     }
 }

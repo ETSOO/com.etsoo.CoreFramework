@@ -1,7 +1,6 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using System.Buffers;
 using System.Collections;
-using System.ComponentModel;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -136,7 +135,7 @@ namespace com.etsoo.Utils.String
             foreach (var item in items)
             {
                 var target = TryParse<T>(item);
-                if (target != null)
+                if (target.HasValue)
                     yield return target.Value;
             }
         }
@@ -151,7 +150,7 @@ namespace com.etsoo.Utils.String
         public static IEnumerable<string> AsEnumerable(string? input, char splitter = ',')
         {
             if (string.IsNullOrEmpty(input))
-                return Array.Empty<string>();
+                return [];
 
             return input.Split(splitter, StringSplitOptions.RemoveEmptyEntries);
         }
@@ -337,17 +336,28 @@ namespace com.etsoo.Utils.String
         /// <returns>Parsed result</returns>
         public static T? TryParse<T>(string? s) where T : struct
         {
-            // Null or blank content
-            if (string.IsNullOrWhiteSpace(s))
-                return null;
+            var (value, isNull) = TryParseBase<T>(s);
+            return isNull ? null : value;
+        }
 
+        private static (T?, bool) TryParseBase<T>(string? s)
+        {
             // Default value
             var value = default(T);
+
+            // Null or blank content
+            if (string.IsNullOrWhiteSpace(s))
+                return (value, true);
 
             // Switch pattern
             var parser = value switch
             {
-                Enum => new TryParseDelegate<T>(Enum.TryParse),
+                Enum => Enum.TryParse(typeof(T), s, out var e) ? (string s, out T result) =>
+                {
+                    result = (T)e;
+                    return result != null;
+                }
+                : null,
                 bool => GetBoolParser(ref s) as TryParseDelegate<T>,
                 int => new TryParseDelegate<int>(int.TryParse) as TryParseDelegate<T>,
                 long => new TryParseDelegate<long>(long.TryParse) as TryParseDelegate<T>,
@@ -365,18 +375,15 @@ namespace com.etsoo.Utils.String
                 _ => null
             };
 
-            if (parser == null)
+            // Another way to do with IParsable<TSelf> but don't work with Enum
+            // https://learn.microsoft.com/en-us/dotnet/api/system.iparsable-1?view=net-8.0
+            if (parser != null && parser(s, out T newValue))
             {
-                return null;
-            }
-
-            if (parser(s, out T newValue))
-            {
-                return newValue;
+                return (newValue, false);
             }
             else
             {
-                return null;
+                return (value, true);
             }
         }
 
@@ -403,17 +410,18 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
-        /// Try parse object to all possible type, may bear performance lost
-        /// 尝试解析对象到所有可能的类型，可能有效率损失
+        /// Try parse object to all possible type
+        /// 尝试解析对象到所有可能的类型
         /// </summary>
         /// <typeparam name="T">Generic target type</typeparam>
         /// <param name="d">Object value</param>
         /// <returns>Parsed result</returns>
-        public static T? TryParseObjectAll<T>(object? d)
+        public static T? TryParseObjectAll<T>(object? d) where T : notnull
         {
+            var dv = default(T?);
             if (d == null || d == DBNull.Value)
             {
-                return default;
+                return dv;
             }
 
             if (d is T t)
@@ -422,20 +430,15 @@ namespace com.etsoo.Utils.String
             }
 
             var s = d.ToString();
-            if (s == null) return default;
+            if (s == null) return dv;
 
             if (s is T st)
             {
                 return st;
             }
 
-            var converter = TypeDescriptor.GetConverter(typeof(T));
-            if (converter.CanConvertFrom(Types.StringType))
-            {
-                return (T?)converter.ConvertFromInvariantString(s);
-            }
-
-            return default;
+            var (value, isNull) = TryParseBase<T>(s);
+            return isNull ? dv : value;
         }
 
         /// <summary>

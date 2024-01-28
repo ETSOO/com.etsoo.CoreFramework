@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils.Crypto;
-using Microsoft.Extensions.Configuration;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -45,7 +44,7 @@ namespace com.etsoo.CoreFramework.Application
         )
         {
             // Default languages
-            Cultures = cultures ?? Array.Empty<string>();
+            Cultures = cultures ?? [];
 
             ModelValidated = modelValidated;
             WebUrl = webUrl ?? "http://localhost";
@@ -74,20 +73,22 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
         /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        public AppConfiguration(IConfigurationSection section, Func<string, string, string>? secureManager = null, bool modelValidated = false) : this(
-            CryptographyUtils.UnsealData(PrivateKeyField, section.GetValue<string>(PrivateKeyField), secureManager),
-            section.GetSection("Cultures").Get<IEnumerable<string>?>()?.ToArray(),
-            section.GetValue<string?>("Name"),
-            modelValidated,
-            section.GetValue<string?>("WebUrl"),
-            section.GetValue<string?>("ApiUrl"),
-            section.GetValue<double?>("CacheHours").GetValueOrDefault(24))
+        public AppConfiguration(AppConfigurationItems items, Func<string, string, string>? secureManager = null, bool modelValidated = false)
+            : this(
+                CryptographyUtils.UnsealData(PrivateKeyField, items.PrivateKey, secureManager),
+                items.Cultures ?? [],
+                items.Name,
+                modelValidated,
+                items.WebUrl,
+                items.ApiUrl,
+                items.CacheHours.GetValueOrDefault(24)
+            )
         {
         }
 
         /// <summary>
-        /// Supported cultures, like zh-CN, en
-        /// 支持的文化，比如zh-CN, en
+        /// Supported cultures, like zh-CN, zh-Hans-CN, en
+        /// 支持的文化，比如zh-CN, zh-Hans-CN, en
         /// </summary>
         public string[] Cultures { get; }
 

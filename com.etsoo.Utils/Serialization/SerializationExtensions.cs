@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.String;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -12,12 +13,6 @@ namespace com.etsoo.Utils.Serialization
     /// </summary>
     public static class SerializationExtensions
     {
-        /// <summary>
-        /// Mask for serialization
-        /// 序列化掩码
-        /// </summary>
-        public const string Mask = "***";
-
         /// <summary>
         /// Create Utf8 Json writer
         /// Utf8 Json创建器
@@ -98,27 +93,6 @@ namespace com.etsoo.Utils.Serialization
                 return false;
 
             return true;
-        }
-
-        /// <summary>
-        /// PII attribute masking policy
-        /// PII 属性屏蔽策略
-        /// </summary>
-        /// <param name="typeInfo">Type info</param>
-        public static void PIIAttributeMaskingPolicy(JsonTypeInfo typeInfo)
-        {
-            foreach (var propertyInfo in typeInfo.Properties)
-            {
-                var hasPII = propertyInfo.AttributeProvider?.IsDefined(typeof(PIIAttribute), true);
-                if (hasPII == true)
-                {
-                    var getProperty = propertyInfo.Get;
-                    if (getProperty is not null)
-                    {
-                        propertyInfo.Get = null;
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -226,8 +200,9 @@ namespace com.etsoo.Utils.Serialization
         /// </summary>
         /// <typeparam name="T">Generic value type</typeparam>
         /// <param name="element">Json element</param>
-        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
         /// <returns>Result</returns>
+        [RequiresDynamicCode("GetValue 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("GetValue 'T' may require dynamic access otherwise can break functionality when trimming application code")]
         public static T? GetValue<T>(this JsonElement element) where T : class
         {
             // Kind
@@ -247,6 +222,40 @@ namespace com.etsoo.Utils.Serialization
             else if (kind == JsonValueKind.Object)
             {
                 return element.Deserialize<T>(SharedUtils.JsonDefaultSerializerOptions);
+            }
+            else
+            {
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Get value with type info
+        /// 通过类型信息获取值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <returns>Result</returns>
+        public static T? GetValue<T>(this JsonElement element, JsonTypeInfo<T> typeInfo) where T : class
+        {
+            // Kind
+            var kind = element.ValueKind;
+
+            // Value
+            var type = typeof(T);
+            if (kind == JsonValueKind.String && type == Types.StringType)
+            {
+                return element.ToString() as T;
+            }
+            else if (kind == JsonValueKind.String && type == Types.ByteArrayType)
+            {
+                if (element.TryGetBytesFromBase64(out var v)) return v as T;
+                else return default;
+            }
+            else if (kind == JsonValueKind.Object)
+            {
+                return element.Deserialize(typeInfo);
             }
             else
             {
@@ -282,6 +291,8 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="element">Json element</param>
         /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
         /// <returns>Result</returns>
+        [RequiresDynamicCode("GetArray 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("GetArray 'T' may require dynamic access otherwise can break functionality when trimming application code")]
         public static IEnumerable<T?> GetArray<T>(this JsonElement element) where T : class
         {
             // When not a Array
@@ -290,6 +301,26 @@ namespace com.etsoo.Utils.Serialization
             foreach (var item in element.EnumerateArray())
             {
                 var value = item.GetValue<T>();
+                yield return value;
+            }
+        }
+
+        /// <summary>
+        /// Get array from JsonElement
+        /// 从 JsonElement 获取数组
+        /// </summary>
+        /// <typeparam name="T">Generic array type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<T?> GetArray<T>(this JsonElement element, JsonTypeInfo<T> typeInfo) where T : class
+        {
+            // When not a Array
+            if (element.ValueKind != JsonValueKind.Array) yield break;
+
+            foreach (var item in element.EnumerateArray())
+            {
+                var value = item.GetValue(typeInfo);
                 yield return value;
             }
         }

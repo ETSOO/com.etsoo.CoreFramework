@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 
 namespace com.etsoo.Utils.Crypto
@@ -12,13 +13,18 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public class RSACrypto
     {
+        [RequiresDynamicCode("IConfigurationSection may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("IConfigurationSection may require dynamic access otherwise can break functionality when trimming application code")]
         private static (string? publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string, string>? secureManager)
         {
-            var publicField = "PublicKey";
-            var privateField = "PrivateKey";
+            return Parse(section.GetValue<string?>("PublicKey"), section.GetValue<string?>("PrivateKey"), secureManager);
+        }
+
+        private static (string? publicKey, string? privateKey) Parse(string? publicKey, string? privateKey, Func<string, string, string>? secureManager)
+        {
             return (
-                CryptographyUtils.UnsealData(publicField, section.GetValue<string?>(publicField), secureManager),
-                CryptographyUtils.UnsealData(privateField, section.GetValue<string?>(privateField), secureManager)
+                CryptographyUtils.UnsealData(nameof(publicKey), publicKey, secureManager),
+                CryptographyUtils.UnsealData(nameof(privateKey), privateKey, secureManager)
             );
         }
 
@@ -59,8 +65,22 @@ namespace com.etsoo.Utils.Crypto
         /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
+        [RequiresDynamicCode("section may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("section may require dynamic access otherwise can break functionality when trimming application code")]
         public RSACrypto(IConfigurationSection section, Func<string, string, string>? secureManager = null)
             : this(Parse(section, secureManager))
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="publicKey">Public key</param>
+        /// <param name="privateKey">Public key</param>
+        /// <param name="secureManager">Secure manager</param>
+        public RSACrypto(string? publicKey, string? privateKey, Func<string, string, string>? secureManager = null)
+            : this(Parse(publicKey, privateKey, secureManager))
         {
         }
 

@@ -76,8 +76,7 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         object DictionaryToParameter<K, V>(Dictionary<K, V> dic, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct;
+            where K : notnull;
 
         /// <summary>
         /// Dictionary to Dapper parameter
@@ -93,8 +92,7 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         object DictionaryToParameter<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct;
+            where K : notnull;
 
         /// <summary>
         /// Guid items to Dapper parameters
@@ -190,7 +188,7 @@ namespace com.etsoo.Database
         /// <param name="commandType">Command type</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The first cell selected as T</returns>
-        Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
+        Task<T?> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async query command as source generated object list

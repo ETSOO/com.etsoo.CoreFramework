@@ -68,7 +68,6 @@ namespace Tests
 
         public decimal? DecimalValue { get; init; }
 
-        [PII]
         public ushort UShortValue { get; init; }
 
         [PII]

@@ -13,7 +13,7 @@ namespace com.etsoo.WebUtils
         {
             ArgumentNullException.ThrowIfNull(httpContext);
 
-            var contentLanguage = httpContext.Request.Headers["Content-Language"].FirstOrDefault();
+            var contentLanguage = httpContext.Request.Headers.ContentLanguage.FirstOrDefault();
 
             if (string.IsNullOrEmpty(contentLanguage))
             {

@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils.Crypto;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -52,67 +51,66 @@ namespace com.etsoo.CoreFramework.Authentication
         /// 构造函数
         /// </summary>
         /// <param name="services">Dependency injection services</param>
-        /// <param name="section">Configuration section</param>
+        /// <param name="settings">Settings</param>
         /// <param name="secureManager">Secure manager</param>
         /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
         /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
         /// <param name="events">Events handler</param>
         public JwtService(IServiceCollection services,
-            IConfigurationSection section,
+            JwtSettings? settings,
             Func<string, string, string>? secureManager = null,
             IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
             TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null,
             JwtBearerEvents? events = null)
         {
-            // Jwt section is required
-            if (!section.Exists())
-                throw new ArgumentNullException(nameof(section), "No Section");
+            // Jwt settings are required
+            ArgumentNullException.ThrowIfNull(settings);
 
-            defaultIssuer = section.GetValue<string?>("DefaultIssuer") ?? DefaultIssuer;
-            defaultAudience = section.GetValue<string?>("DefaultAudience") ?? "All";
+            defaultIssuer = settings.DefaultIssuer ?? DefaultIssuer;
+            defaultAudience = settings.DefaultAudience ?? "All";
 
-            validIssuer = section.GetValue<string?>("ValidIssuer");
-            validIssuers = section.GetSection("ValidIssuers").Get<IEnumerable<string>?>();
+            validIssuer = settings.ValidIssuer;
+            validIssuers = settings.ValidIssuers;
             if (string.IsNullOrEmpty(validIssuer))
             {
                 validIssuer = defaultIssuer;
             }
 
-            validAudience = section.GetValue<string?>("ValidAudience");
-            validAudiences = section.GetSection("ValidAudiences").Get<IEnumerable<string>?>();
+            validAudience = settings.ValidAudience;
+            validAudiences = settings.ValidAudiences;
             if (string.IsNullOrEmpty(validAudience) && validAudiences == null)
             {
                 validAudience = defaultAudience;
             }
 
-            var tokenUrls = section.GetSection("TokenUrls").Get<IEnumerable<string>?>();
+            var tokenUrls = settings.TokenUrls;
 
             // Whether validate audience
-            var validateAudience = section.GetValue<bool?>("ValidateAudience");
+            var validateAudience = settings.ValidateAudience;
 
             // Hash algorithms
-            securityAlgorithms = section.GetValue("SecurityAlgorithms", SecurityAlgorithms.RsaSha512Signature)!;
+            securityAlgorithms = settings.SecurityAlgorithms ?? SecurityAlgorithms.RsaSha512Signature;
 
             // Default 30 minutes
-            AccessTokenMinutes = section.GetValue("AccessTokenMinutes", 30);
+            AccessTokenMinutes = settings.AccessTokenMinutes.GetValueOrDefault(30);
 
             // Default 90 days
-            RefreshTokenDays = section.GetValue("RefreshTokenDays", 90);
+            RefreshTokenDays = settings.RefreshTokenDays.GetValueOrDefault(90);
 
             // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
             // AES256, 256 / 8 = 32 bytes
             var field = "EncryptionKey";
-            var encryptionKeyPlain = CryptographyUtils.UnsealData(field, section.GetValue<string>(field), secureManager);
+            var encryptionKeyPlain = CryptographyUtils.UnsealData(field, settings.EncryptionKey, secureManager);
 
             // RSA crypto provider
-            crypto = new RSACrypto(section, secureManager);
+            crypto = new RSACrypto(settings.PublicKey, settings.PrivateKey, secureManager);
 
             // Default signing key resolver
             this.issuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
             {
                 if (issuerSigningKeyResolver == null)
                 {
-                    return new List<RsaSecurityKey> { new RsaSecurityKey(crypto.RSA) { KeyId = kid } };
+                    return new List<RsaSecurityKey> { new(crypto.RSA) { KeyId = kid } };
                 }
 
                 var keys = issuerSigningKeyResolver(token, securityToken, kid, validationParameters);
@@ -125,7 +123,7 @@ namespace com.etsoo.CoreFramework.Authentication
             {
                 if (tokenDecryptionKeyResolver == null)
                 {
-                    return new List<SymmetricSecurityKey> { new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
+                    return new List<SymmetricSecurityKey> { new(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
                 }
 
                 var keys = tokenDecryptionKeyResolver(token, securityToken, kid, validationParameters);

@@ -74,7 +74,7 @@ namespace com.etsoo.Database
         /// <returns>Parts</returns>
         public static string[] GetListParts(SqlDbType type)
         {
-            return new[] { GetTypeName(type), "ids" };
+            return [GetTypeName(type), "ids"];
         }
 
         /// <summary>
@@ -105,10 +105,10 @@ namespace com.etsoo.Database
         {
             // Simple case, string key, example: et_int_items
             if (IsLengthSpecifiedType(keyType))
-                return new[] { GetTypeName(valueType), "items" };
+                return [GetTypeName(valueType), "items"];
 
             // Other cases, example: et_int_int_items
-            return new[] { GetTypeName(keyType), GetTypeName(valueType), "items" };
+            return [GetTypeName(keyType), GetTypeName(valueType), "items"];
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace com.etsoo.Database
         /// <returns>Parts</returns>
         public static string[] GetGuidItemParts()
         {
-            return new[] { "guid", "items" };
+            return ["guid", "items"];
         }
 
         /// <summary>
@@ -232,8 +232,7 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>TVP value</returns>
         public static object DictionaryToTVP<K, V>(Dictionary<K, V> dic, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct
+            where K : notnull
         {
             var keyType = DatabaseUtils.TypeToDbType(typeof(K)).GetValueOrDefault();
             var valueType = DatabaseUtils.TypeToDbType(typeof(V)).GetValueOrDefault();
@@ -252,8 +251,7 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>TVP value</returns>
         public static object DictionaryToTVP<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct
+            where K : notnull
         {
             var keySqlType = GetSqlType(keyType);
             var valueSqlType = GetSqlType(valueType);

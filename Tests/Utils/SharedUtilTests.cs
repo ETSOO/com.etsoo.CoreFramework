@@ -1,4 +1,6 @@
 ﻿using com.etsoo.Utils;
+using com.etsoo.Utils.Models;
+using com.etsoo.Utils.Serialization;
 using NUnit.Framework;
 using System.Text;
 using System.Text.Json;
@@ -37,7 +39,7 @@ namespace Tests.Utils
 
             // Act
             using var stream = SharedUtils.GetStream();
-            await SharedUtils.JsonSerializeAsync(data, stream, new JsonSerializerOptions
+            await SharedUtils.JsonSerializeAsync(stream, data, new JsonSerializerOptions
             {
                 WriteIndented = false,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -98,7 +100,9 @@ namespace Tests.Utils
                 Date = DateTime.UtcNow
             };
 
-            var json = await SharedUtils.JsonSerializeAsync(model, null, new[] { "Id", "name", "Valid", "Date" });
+            var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions { IncludeFields = true }, ["Id", "name", "Valid", "Date"]);
+            Assert.IsTrue(json.Contains("Name"));
+            Assert.IsTrue(json.Contains("Valid"));
             Assert.IsFalse(json.Contains("DecimalValue"));
         }
 
@@ -111,8 +115,23 @@ namespace Tests.Utils
                 Name = "Admin 1"
             };
 
-            var json = await SharedUtils.JsonSerializeAsync(model, null, new[] { "Id" });
+            var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions(), ["Id"]);
+            Assert.IsTrue(json.Contains("Id"));
             Assert.IsFalse(json.Contains("Name"));
+        }
+
+        [Test]
+        public async Task JsonSerializeAsync_TypeInfoTests()
+        {
+            var model = new GuidItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Guid Label"
+            };
+
+            var json = await SharedUtils.JsonSerializeAsync(model, CommonJsonSerializerContext.Default.GuidItem, ["Id"]);
+            Assert.IsTrue(json.Contains("Id"));
+            Assert.IsFalse(json.Contains("Label"));
         }
 
         [Test]
@@ -133,7 +152,7 @@ namespace Tests.Utils
                 Name = "Admin 2"
             };
 
-            var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, new[] { "Id", "Name" });
+            var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, ["Id", "Name"]);
             Assert.AreEqual("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}", json);
         }
     }

@@ -28,6 +28,8 @@ namespace com.etsoo.CoreFramework.Repositories
         where C : DbConnection
         where A : ICoreApplication<C>
     {
+        private static readonly char[] separators = [' ', '_'];
+
         /// <summary>
         /// Current user
         /// 当前用户
@@ -109,7 +111,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic return type</typeparam>
         /// <param name="command">The command to execute on this connection</param>
         /// <returns>The first cell selected as T</returns>
-        public async Task<T> ExecuteScalarAsync<T>(CommandDefinition command)
+        public async Task<T?> ExecuteScalarAsync<T>(CommandDefinition command)
         {
             return await App.DB.ExecuteScalarAsync<T>(command);
         }
@@ -155,7 +157,7 @@ namespace com.etsoo.CoreFramework.Repositories
             if (parts.Length == 1)
             {
                 // Only one item, support to pass blank or underscore seperated item, like "read as json" to be "read_as_json"
-                return GetCommandNameBase(parts[0].Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries));
+                return GetCommandNameBase(parts[0].Split(separators, StringSplitOptions.RemoveEmptyEntries));
             }
 
             return GetCommandNameBase(parts);

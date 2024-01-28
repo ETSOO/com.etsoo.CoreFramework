@@ -11,12 +11,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "8.x"
           include-prerelease: true
 
       # Publish com.etsoo.Utils
       - name: Publish com.etsoo.Utils on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Utils/com.etsoo.Utils.csproj
@@ -32,7 +32,7 @@ jobs:
 
       # Publish com.etsoo.Address
       - name: Publish com.etsoo.Address on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Address/com.etsoo.Address.csproj
@@ -45,7 +45,7 @@ jobs:
 
       # Publish com.etsoo.Database
       - name: Publish com.etsoo.Database on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Database/com.etsoo.Database.csproj
@@ -58,7 +58,7 @@ jobs:
 
       # Publish com.etsoo.HtmlIO
       - name: Publish com.etsoo.HtmlIO on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.HtmlIO/com.etsoo.HtmlIO.csproj
@@ -71,7 +71,7 @@ jobs:
 
       # Publish com.etsoo.HtmlUtils
       - name: Publish com.etsoo.HtmlUtils on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.HtmlUtils/com.etsoo.HtmlUtils.csproj
@@ -84,7 +84,7 @@ jobs:
 
       # Publish com.etsoo.HTTP
       - name: Publish com.etsoo.HTTP on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.HTTP/com.etsoo.HTTP.csproj
@@ -97,7 +97,7 @@ jobs:
 
       # Publish com.etsoo.ImageUtils
       - name: Publish com.etsoo.ImageUtils on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.ImageUtils/com.etsoo.ImageUtils.csproj
@@ -110,7 +110,7 @@ jobs:
 
       # Publish com.etsoo.MessageQueue
       - name: Publish com.etsoo.MessageQueue on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.MessageQueue/com.etsoo.MessageQueue.csproj
@@ -123,7 +123,7 @@ jobs:
 
       # Publish com.etsoo.SMS
       - name: Publish com.etsoo.SMS on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.SMS/com.etsoo.SMS.csproj
@@ -136,7 +136,7 @@ jobs:
 
       # Publish com.etsoo.SMTP
       - name: Publish com.etsoo.SMTP on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.SMTP/com.etsoo.SMTP.csproj
@@ -149,7 +149,7 @@ jobs:
 
       # Publish com.etsoo.Localization
       - name: Publish com.etsoo.Localization on version change
-        uses: alirezanet/publish-nuget@v3.0.4 # rohith/publish-nuget@v2
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Localization/com.etsoo.Localization.csproj
@@ -162,7 +162,7 @@ jobs:
 
       # Publish com.etsoo.SourceGenerators
       - name: Publish com.etsoo.SourceGenerators on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.SourceGenerators/com.etsoo.SourceGenerators.csproj
@@ -178,7 +178,7 @@ jobs:
 
       # Publish com.etsoo.CoreFramework
       - name: Publish com.etsoo.CoreFramework on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.CoreFramework/com.etsoo.CoreFramework.csproj
@@ -194,7 +194,7 @@ jobs:
 
       # Publish com.etsoo.Web
       - name: Publish com.etsoo.Web on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.Web/com.etsoo.Web.csproj
@@ -207,7 +207,7 @@ jobs:
 
       # Publish com.etsoo.WebUtils
       - name: Publish com.etsoo.WebUtils on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.WebUtils/com.etsoo.WebUtils.csproj
@@ -220,7 +220,7 @@ jobs:
 
       # Publish com.etsoo.DI
       - name: Publish com.etsoo.DI on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.DI/com.etsoo.DI.csproj
@@ -233,7 +233,7 @@ jobs:
 
       # Publish com.etsoo.PureIO
       - name: Publish com.etsoo.PureIO on version change
-        uses: alirezanet/publish-nuget@v3.0.4
+        uses: alirezanet/publish-nuget@v3.1.0
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: com.etsoo.PureIO/com.etsoo.PureIO.csproj

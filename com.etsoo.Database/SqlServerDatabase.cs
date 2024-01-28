@@ -76,8 +76,6 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         public override object DictionaryToParameter<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct
         {
             return SqlServerUtils.DictionaryToTVP(dic, keyType, valueType, keyMaxLength, valueMaxLength, tvpFunc);
         }

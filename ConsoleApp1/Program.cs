@@ -23,14 +23,9 @@ namespace ConsoleApp1
         public bool Bool { get; init; }
     }
 
-    internal class SimpleProcessor : IMessageQueueProcessor
+    internal class SimpleProcessor(Action<MessageReceivedProperties, SimpleData?> messageAction) : IMessageQueueProcessor
     {
-        private readonly Action<MessageReceivedProperties, SimpleData?> _messageAction;
-
-        public SimpleProcessor(Action<MessageReceivedProperties, SimpleData?> messageAction)
-        {
-            _messageAction = messageAction;
-        }
+        private readonly Action<MessageReceivedProperties, SimpleData?> _messageAction = messageAction;
 
         public bool CanDeserialize(MessageReceivedProperties properties)
         {

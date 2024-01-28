@@ -54,7 +54,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="T">Generic return type</typeparam>
         /// <param name="command">The command to execute on this connection</param>
         /// <returns>The first cell selected as T</returns>
-        Task<T> ExecuteScalarAsync<T>(CommandDefinition command);
+        Task<T?> ExecuteScalarAsync<T>(CommandDefinition command);
 
         /// <summary>
         /// Async query command as object

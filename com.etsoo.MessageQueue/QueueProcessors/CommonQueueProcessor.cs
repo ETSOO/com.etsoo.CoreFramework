@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.MessageQueue.QueueProcessors
 {
@@ -7,23 +8,25 @@ namespace com.etsoo.MessageQueue.QueueProcessors
     /// 通用队列处理器
     /// </summary>
     /// <typeparam name="T">Generic message type</typeparam>
-    public abstract class CommonQueueProcessor<T> : IMessageQueueProcessor where T : class, IMessageQueueMessage
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="logger">Logger</param>
+    /// <param name="typeInfo">Json type info</param>
+    public abstract class CommonQueueProcessor<T>(ILogger logger, JsonTypeInfo<T> typeInfo) : IMessageQueueProcessor where T : class, IMessageQueueMessage
     {
         /// <summary>
         /// Logger
         /// 日志器
         /// </summary>
-        protected readonly ILogger logger;
+        protected readonly ILogger logger = logger;
 
         /// <summary>
-        /// Constructor
-        /// 构造函数
+        /// Json type info
+        /// JSON 类型信息
         /// </summary>
-        /// <param name="logger">Logger</param>
-        public CommonQueueProcessor(ILogger logger)
-        {
-            this.logger = logger;
-        }
+        protected readonly JsonTypeInfo<T> typeInfo = typeInfo;
 
         /// <summary>
         /// Async process message
@@ -58,7 +61,7 @@ namespace com.etsoo.MessageQueue.QueueProcessors
         public virtual async Task ExecuteAsync(ReadOnlyMemory<byte> body, MessageReceivedProperties properties, CancellationToken cancellationToken)
         {
             // Mesage
-            var message = await body.ToMessageAsync<T>(cancellationToken);
+            var message = await body.ToMessageAsync(typeInfo, cancellationToken);
             if (message == null)
             {
                 logger.LogError("Convert body to {type} failed with NULL: {body}", typeof(T), body.ToJsonString());

@@ -2,9 +2,11 @@
 using com.etsoo.Utils.String;
 using Microsoft.IO;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.Unicode;
@@ -42,10 +44,7 @@ namespace com.etsoo.Utils
             options.PropertyNamingPolicy ??= JsonNamingPolicy.CamelCase;
             options.DictionaryKeyPolicy ??= JsonNamingPolicy.CamelCase;
 
-            options.TypeInfoResolver ??= new DefaultJsonTypeInfoResolver
-            {
-                Modifiers = { SerializationExtensions.PIIAttributeMaskingPolicy }
-            };
+            options.NumberHandling = JsonNumberHandling.AllowReadingFromString;
 
             return options;
         }
@@ -73,7 +72,7 @@ namespace com.etsoo.Utils
         /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream()
         {
-            return (manager.GetStream() as RecyclableMemoryStream)!;
+            return manager.GetStream();
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace com.etsoo.Utils
         /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream(byte[] bytes)
         {
-            return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
+            return manager.GetStream(bytes);
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace com.etsoo.Utils
         /// <returns>Stream</returns>
         public static RecyclableMemoryStream GetStream(ReadOnlySpan<byte> bytes)
         {
-            return (manager.GetStream(bytes) as RecyclableMemoryStream)!;
+            return manager.GetStream(bytes);
         }
 
         /// <summary>
@@ -180,17 +179,16 @@ namespace com.etsoo.Utils
         /// 序列化为Json内容
         /// </summary>
         /// <typeparam name="D">Generic data type</typeparam>
-        /// <param name="data">Data</param>
         /// <param name="stream">Stream to hold the result</param>
+        /// <param name="data">Data</param>
         /// <param name="options">Options</param>
         /// <param name="fields">Fields allowed</param>
         /// <returns>Task</returns>
-        public static async Task JsonSerializeAsync<D>(D data, RecyclableMemoryStream stream, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
+        [RequiresDynamicCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        public static async Task JsonSerializeAsync<D>(RecyclableMemoryStream stream, D data, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
         {
-            options ??= new JsonSerializerOptions
-            {
-                WriteIndented = false
-            };
+            options ??= JsonDefaultSerializerOptions;
 
             if (data is IJsonSerialization di)
             {
@@ -202,27 +200,148 @@ namespace com.etsoo.Utils
             }
             else
             {
-                // Currently no way to filter Json property by name
-                // Convert to dictionary first
-                IDictionary<string, object> dic;
-                if (data is IDictionary<string, object> dicOne)
+                // var newOptions = new JsonSerializerOptions(options);
+                await using var ms = GetStream();
+                await JsonSerializer.SerializeAsync(ms, data, options);
+                ms.Position = 0;
+                await using var newStream = await JsonKeepNodesAsync(ms, fields);
+                await newStream.CopyToAsync(stream);
+            }
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="stream">Stream to hold the result</param>
+        /// <param name="data">Data</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <returns>Task</returns>
+        public static async Task JsonSerializeAsync<D>(RecyclableMemoryStream stream, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        {
+            if (data is IJsonSerialization di)
+            {
+                await di.ToJsonAsync(stream, JsonDefaultSerializerOptions, fields);
+            }
+            else if (fields == null)
+            {
+                await JsonSerializer.SerializeAsync(stream, data, typeInfo);
+            }
+            else
+            {
+                await using var ms = GetStream();
+                await JsonSerializer.SerializeAsync(ms, data, typeInfo);
+                ms.Position = 0;
+                await using var newStream = await JsonKeepNodesAsync(ms, fields);
+                await newStream.CopyToAsync(stream);
+            }
+        }
+
+        /// <summary>
+        /// Json get node with property name or path
+        /// 获取Json节点，支持属性名或路径
+        /// </summary>
+        /// <param name="root">Root node</param>
+        /// <param name="nodeName">Node name or path</param>
+        /// <returns>Result</returns>
+        public static (JsonObject, JsonNode)? JsonGetNode(JsonObject root, string nodeName)
+        {
+            var path = nodeName.Split('.');
+            var len = path.Length;
+
+            var obj = root;
+
+            for (var i = 0; i < len; i++)
+            {
+                var p = path[i];
+
+                var item = obj.FirstOrDefault(item => item.Key.Equals(p, StringComparison.OrdinalIgnoreCase));
+
+                if (!item.Equals(default) && item.Value != null)
                 {
-                    dic = dicOne;
+                    var node = item.Value;
+                    if (i + 1 == len)
+                    {
+                        return (obj, node);
+                    }
+                    else
+                    {
+                        if (node is JsonObject o)
+                        {
+                            obj = o;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
                 else
                 {
-                    dic = await ObjectToDictionaryAsync(data);
+                    break;
                 }
-                foreach (var key in dic.Keys)
-                {
-                    var keyName = options.ConvertName(key);
-                    if (!fields.Any(field => field.Equals(key) || field.Equals(keyName)))
-                    {
-                        dic.Remove(key);
-                    }
-                }
-                await JsonSerializer.SerializeAsync(stream, dic, options);
             }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Json remove nodes
+        /// 删除Json节点
+        /// </summary>
+        /// <param name="jsonStream">Json stream</param>
+        /// <param name="nodes">Nodes of name or path</param>
+        /// <returns>Result</returns>
+        public static async Task<Stream> JsonRemoveNodesAsync(Stream jsonStream, IEnumerable<string> nodes)
+        {
+            jsonStream.Position = 0;
+
+            using var doc = await JsonDocument.ParseAsync(jsonStream);
+
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return jsonStream;
+
+            var root = JsonObject.Create(doc.RootElement);
+            if (root == null) return jsonStream;
+
+            foreach (var node in nodes)
+            {
+                var nodeInfo = JsonGetNode(root, node);
+                if (nodeInfo == null) continue;
+
+                var (parent, child) = nodeInfo.Value;
+                parent.Remove(child.GetPropertyName());
+            }
+
+            return GetStream(root.ToJsonString());
+        }
+
+        /// <summary>
+        /// Json keep nodes, only support first level names
+        /// 保留Json节点，仅支持第一级名称
+        /// </summary>
+        /// <param name="jsonStream">Json stream</param>
+        /// <param name="nodes">Nodes of name</param>
+        /// <returns>Result</returns>
+        public static async Task<Stream> JsonKeepNodesAsync(Stream jsonStream, IEnumerable<string> nodes)
+        {
+            using var doc = await JsonDocument.ParseAsync(jsonStream);
+
+            if (doc.RootElement.ValueKind != JsonValueKind.Object) return jsonStream;
+
+            var root = JsonObject.Create(doc.RootElement);
+            if (root == null) return jsonStream;
+
+            foreach (var item in root.ToList())
+            {
+                if (!nodes.Contains(item.Key, StringComparer.OrdinalIgnoreCase))
+                {
+                    root.Remove(item.Key);
+                }
+            }
+
+            return GetStream(root.ToJsonString());
         }
 
         /// <summary>
@@ -234,17 +353,73 @@ namespace com.etsoo.Utils
         /// <param name="options">Options</param>
         /// <param name="fields">Fields allowed</param>
         /// <returns>Task</returns>
+        [RequiresDynamicCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
         public static async Task<string> JsonSerializeAsync<D>(D data, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
         {
             await using var ms = GetStream();
-            await JsonSerializeAsync(data, ms, options, fields);
+            await JsonSerializeAsync(ms, data, options, fields);
             return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="data">Data</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <returns>Task</returns>
+        public static async Task<string> JsonSerializeAsync<D>(D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        {
+            await using var ms = GetStream();
+            await JsonSerializeAsync(ms, data, typeInfo, fields);
+            return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="writer">Json stream writer</param>
+        /// <param name="data">Data</param>
+        /// <param name="options">Options</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <returns>Task</returns>
+        [RequiresDynamicCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("JsonSerializeAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        public static async Task JsonSerializeAsync<D>(Utf8JsonWriter writer, D data, JsonSerializerOptions? options = null, IEnumerable<string>? fields = null)
+        {
+            await using var ms = GetStream();
+            await JsonSerializeAsync(ms, data, options, fields);
+            writer.WriteRawValue(ms.GetReadOnlySequence(), true);
+        }
+
+        /// <summary>
+        /// Serialize as Json
+        /// 序列化为Json内容
+        /// </summary>
+        /// <typeparam name="D">Generic data type</typeparam>
+        /// <param name="writer">Json stream writer</param>
+        /// <param name="data">Data</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <returns>Task</returns>
+        public static async Task JsonSerializeAsync<D>(Utf8JsonWriter writer, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        {
+            await using var ms = GetStream();
+            await JsonSerializeAsync(ms, data, typeInfo, fields);
+            writer.WriteRawValue(ms.GetReadOnlySequence(), true);
         }
 
         /// <summary>
         /// Join two data as audit Json string
         /// 合并两个数据作为审计的Json字符串
         /// </summary>
+        /// <typeparam name="O">Generic old data type</typeparam>
+        /// <typeparam name="N">Generic new data type</typeparam>
         /// <param name="oldData">Old data, object or json</param>
         /// <param name="newData">New data, object or json</param>
         /// <param name="fields">Fields allowed</param>
@@ -252,7 +427,9 @@ namespace com.etsoo.Utils
         /// <param name="oldDataName">Old data Json node name</param>
         /// <param name="newDataName">New data Json node name</param>
         /// <returns>Json string</returns>
-        public static async Task<string> JoinAsAuditJsonAsync(object oldData, object newData, IEnumerable<string> fields, JsonSerializerOptions? options = null, string? oldDataName = null, string? newDataName = null)
+        [RequiresDynamicCode("JoinAsAuditJsonAsync 'O' and 'N' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("JoinAsAuditJsonAsync 'O' and 'N' may require dynamic access otherwise can break functionality when trimming application code")]
+        public static async Task<string> JoinAsAuditJsonAsync<O, N>(O oldData, N newData, IEnumerable<string> fields, JsonSerializerOptions? options = null, string? oldDataName = null, string? newDataName = null)
         {
             // Default options
             options ??= JsonDefaultSerializerOptions;
@@ -274,7 +451,7 @@ namespace com.etsoo.Utils
             }
             else
             {
-                await JsonSerializeAsync(oldData, ms, options, fields);
+                await JsonSerializeAsync(ms, oldData, options, fields);
             }
 
             // ,
@@ -289,7 +466,65 @@ namespace com.etsoo.Utils
             }
             else
             {
-                await JsonSerializeAsync(newData, ms, options, fields);
+                await JsonSerializeAsync(ms, newData, options, fields);
+            }
+
+            // Object end }
+            ms.WriteByte(125);
+
+            return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
+        }
+
+        /// <summary>
+        /// Join two data as audit Json string
+        /// 合并两个数据作为审计的Json字符串
+        /// </summary>
+        /// <typeparam name="O">Generic old data type</typeparam>
+        /// <typeparam name="N">Generic new data type</typeparam>
+        /// <param name="oldData">Old data, object or json</param>
+        /// <param name="oldDataTypeInfo">Old data json type info</param>
+        /// <param name="newData">New data, object or json</param>
+        /// <param name="newDataTypeInfo">New data json type info</param>
+        /// <param name="fields">Fields allowed</param>
+        /// <param name="oldDataName">Old data Json node name</param>
+        /// <param name="newDataName">New data Json node name</param>
+        /// <returns>Json string</returns>
+        public static async Task<string> JoinAsAuditJsonAsync<O, N>(O oldData, JsonTypeInfo<O> oldDataTypeInfo, N newData, JsonTypeInfo<N> newDataTypeInfo, IEnumerable<string> fields, string? oldDataName = null, string? newDataName = null)
+        {
+            oldDataName ??= nameof(oldData);
+            newDataName ??= nameof(newData);
+
+            // Stream
+            await using var ms = GetStream();
+
+            // Object start {
+            ms.WriteByte(123);
+
+            // Old data
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{oldDataName}\":"));
+
+            if (oldData is string oldJson)
+            {
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(oldJson));
+            }
+            else
+            {
+                await JsonSerializeAsync(ms, oldData, oldDataTypeInfo, fields);
+            }
+
+            // ,
+            ms.WriteByte(44);
+
+            // New data
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{newDataName}\":"));
+
+            if (newData is string newJson)
+            {
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(newJson));
+            }
+            else
+            {
+                await JsonSerializeAsync(ms, newData, newDataTypeInfo, fields);
             }
 
             // Object end }
@@ -305,17 +540,40 @@ namespace com.etsoo.Utils
         /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="obj">Object</param>
         /// <returns>Result</returns>
+        [RequiresDynamicCode("ObjectToDictionaryAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("ObjectToDictionaryAsync 'D' may require dynamic access otherwise can break functionality when trimming application code")]
         public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj)
         {
             // Stream
             await using var ms = GetStream();
 
             // Serialize
-            await JsonSerializeAsync(obj, ms);
+            await JsonSerializer.SerializeAsync(ms, obj);
 
             // Deserialize
             ms.Position = 0;
-            return (await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(ms)) ?? new Dictionary<string, object>();
+            return (await JsonSerializer.DeserializeAsync<Dictionary<string, object>>(ms)) ?? [];
+        }
+
+        /// <summary>
+        /// Object to dictionary
+        /// 转换对象为字典数据
+        /// </summary>
+        /// <typeparam name="D">Generic object type</typeparam>
+        /// <param name="obj">Object</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <returns>Result</returns>
+        public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj, JsonTypeInfo<D> typeInfo)
+        {
+            // Stream
+            await using var ms = GetStream();
+
+            // Serialize
+            await JsonSerializer.SerializeAsync(ms, obj, typeInfo);
+
+            // Deserialize
+            ms.Position = 0;
+            return (await JsonSerializer.DeserializeAsync(ms, CommonJsonSerializerContext.Default.DictionaryStringObject)) ?? [];
         }
 
         /// <summary>

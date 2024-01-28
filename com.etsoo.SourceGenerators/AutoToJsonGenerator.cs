@@ -94,7 +94,8 @@ namespace com.etsoo.SourceGenerators
                         if (!itemTypeSymbol.IsSimpleType())
                         {
                             item.AppendLine($@"w.WritePropertyName({pName});");
-                            item.AppendLine($@"JsonSerializer.Serialize(w, {fieldName}, options);");
+                            item.AppendLine($@"await SharedUtils.JsonSerializeAsync(w, {fieldName}, options);");
+                            //item.AppendLine($@"JsonSerializer.Serialize(w, {fieldName}, options);");
                         }
                         else
                         {
@@ -115,7 +116,8 @@ namespace com.etsoo.SourceGenerators
                     else
                     {
                         item.AppendLine($@"w.WritePropertyName({pName});");
-                        item.AppendLine($@"JsonSerializer.Serialize(w, {fieldName}, options);");
+                        item.AppendLine($@"await SharedUtils.JsonSerializeAsync(w, {fieldName}, options);");
+                        //item.AppendLine($@"JsonSerializer.Serialize(w, {fieldName}, options);");
                     }
 
                     if (nullable)
@@ -128,7 +130,7 @@ namespace com.etsoo.SourceGenerators
                         if (options.IsWritable({isNullable}, {isField}, {isReadonly}))
                         {{
                             var {pName} = options.ConvertName(""{fieldName}"");
-                            if (fields == null || fields.Any(field => field.Equals(""{fieldName}"") || field.Equals({pName})))
+                            if (fields == null || fields.Any(field => field.Equals(""{fieldName}"", StringComparison.OrdinalIgnoreCase) || field.Equals({pName})))
                             {{
                                 {item}
                             }}
@@ -181,6 +183,7 @@ namespace com.etsoo.SourceGenerators
 
             // Source code
             var source = $@"#nullable enable
+                using com.etsoo.Utils;
                 using com.etsoo.Utils.Serialization;
                 using System;
                 using System.Text.Json;
@@ -252,12 +255,10 @@ namespace com.etsoo.SourceGenerators
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            /*
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-            */
+            //if (!System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    System.Diagnostics.Debugger.Launch();
+            //}
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoToJsonAttribute)));

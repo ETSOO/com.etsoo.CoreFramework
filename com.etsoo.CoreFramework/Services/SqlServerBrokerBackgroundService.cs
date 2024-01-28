@@ -3,8 +3,10 @@ using com.etsoo.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -12,38 +14,34 @@ namespace com.etsoo.CoreFramework.Services
     /// SQL Server service broker background service
     /// SQL Server 服务代理后台服务
     /// </summary>
-    public abstract class SqlServerBrokerBackgroundService : BackgroundService
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="logger">Logger</param>
+    /// <param name="db">Database</param>
+    /// <param name="queueName">Queue name to listen</param>
+    /// <param name="receiveRows">Rows to receive</param>
+    /// <param name="waitForTimeoutMS">Miliseconds to wait for timeout</param>
+    public abstract class SqlServerBrokerBackgroundService(ILogger logger, IDatabase<SqlConnection> db, string queueName, int receiveRows = 10, int waitForTimeoutMS = 10000) : BackgroundService
     {
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
-        protected readonly ILogger logger;
+        protected readonly ILogger logger = logger;
 
         /// <summary>
         /// Database
         /// 数据库
         /// </summary>
-        protected readonly IDatabase<SqlConnection> db;
-
-        readonly string queueCommand;
+        protected readonly IDatabase<SqlConnection> db = db;
 
         /// <summary>
-        /// Constructor
-        /// 构造函数
+        /// Query command
+        /// 数据请求命令
         /// </summary>
-        /// <param name="logger">Logger</param>
-        /// <param name="db">Database</param>
-        /// <param name="queueName">Queue name to listen</param>
-        /// <param name="receiveRows">Rows to receive</param>
-        /// <param name="waitForTimeoutMS">Miliseconds to wait for timeout</param>
-        public SqlServerBrokerBackgroundService(ILogger logger, IDatabase<SqlConnection> db, string queueName, int receiveRows = 10, int waitForTimeoutMS = 10000)
-        {
-            this.logger = logger;
-            this.db = db;
-
-            queueCommand = $"WAITFOR (RECEIVE TOP({receiveRows}) message_type_name, message_body, conversation_handle, service_name, service_contract_name FROM {queueName}), TIMEOUT {waitForTimeoutMS}";
-        }
+        readonly string queueCommand = $"WAITFOR (RECEIVE TOP({receiveRows}) message_type_name, message_body, conversation_handle, service_name, service_contract_name FROM {queueName}), TIMEOUT {waitForTimeoutMS}";
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -125,10 +123,27 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="bytes">Message bytes</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        protected async Task<T?> ToMessageAsync<T>(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken)
+        [RequiresDynamicCode("ToMessageAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("ToMessageAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        protected async Task<T?> ToMessageAsync<T>(ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken = default)
         {
             await using var stream = SharedUtils.GetStream(bytes.Span);
             return await JsonSerializer.DeserializeAsync<T>(stream, SharedUtils.JsonDefaultSerializerOptions, cancellationToken);
+        }
+
+        /// <summary>
+        /// Async to message
+        /// 异步转化为信息
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="bytes">Message bytes</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        protected async Task<T?> ToMessageAsync<T>(ReadOnlyMemory<byte> bytes, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default)
+        {
+            await using var stream = SharedUtils.GetStream(bytes.Span);
+            return await JsonSerializer.DeserializeAsync(stream, typeInfo, cancellationToken);
         }
     }
 }

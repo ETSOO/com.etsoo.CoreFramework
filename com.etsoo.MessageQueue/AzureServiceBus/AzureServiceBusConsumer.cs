@@ -8,15 +8,9 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
     /// Azure service bus message consumer
     /// Azure 服务总线消息消费者
     /// </summary>
-    public class AzureServiceBusConsumer : MessageQueueConsumer
+    public class AzureServiceBusConsumer(ServiceBusProcessor processor, IEnumerable<IMessageQueueProcessor> processors, ILogger logger) : MessageQueueConsumer(processors, logger)
     {
-        private readonly ServiceBusProcessor _processor;
-
-        public AzureServiceBusConsumer(ServiceBusProcessor processor, IEnumerable<IMessageQueueProcessor> processors, ILogger logger)
-            : base(processors, logger)
-        {
-            _processor = processor;
-        }
+        private readonly ServiceBusProcessor _processor = processor;
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {

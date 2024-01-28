@@ -1,7 +1,9 @@
 ﻿using com.etsoo.MessageQueue.QueueProcessors;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.MessageQueue
 {
@@ -16,11 +18,23 @@ namespace com.etsoo.MessageQueue
         /// 将消息队列处理器添加到服务集合
         /// </summary>
         /// <param name="services">Services</param>
-        /// <param name="options">Options</param>
         /// <returns>Result</returns>
-        public static IServiceCollection AddMessageQueueProcessor<T>(this IServiceCollection services) where T : class, IMessageQueueProcessor
+        public static IServiceCollection AddMessageQueueProcessor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this IServiceCollection services) where T : class, IMessageQueueProcessor
         {
             services.AddSingleton<IMessageQueueProcessor, T>();
+            return services;
+        }
+
+        /// <summary>
+        /// Add message queue processor to service collection
+        /// 将消息队列处理器添加到服务集合
+        /// </summary>
+        /// <param name="services">Services</param>
+        /// <param name="implementationFactory">Implementation factory</param>
+        /// <returns>Result</returns>
+        public static IServiceCollection AddMessageQueueProcessor(this IServiceCollection services, Func<IServiceProvider, IMessageQueueProcessor> implementationFactory)
+        {
+            services.AddSingleton(implementationFactory);
             return services;
         }
 
@@ -81,9 +95,25 @@ namespace com.etsoo.MessageQueue
         /// <param name="model">Model</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<ReadOnlyMemory<byte>> ToJsonBytesAsync<T>(this T model, CancellationToken cancellationToken) where T : IMessageQueueMessage
+        [RequiresDynamicCode("ToJsonBytesAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("ToJsonBytesAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        public static async Task<ReadOnlyMemory<byte>> ToJsonBytesAsync<T>(this T model, CancellationToken cancellationToken = default) where T : IMessageQueueMessage
         {
             return await MessageQueueUtils.ToJsonBytesAsync(model, cancellationToken);
+        }
+
+        /// <summary>
+        /// Async model to JSON bytes
+        /// 异步模型到 JSON 字节
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="model">Model</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public static async Task<ReadOnlyMemory<byte>> ToJsonBytesAsync<T>(this T model, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default) where T : IMessageQueueMessage
+        {
+            return await MessageQueueUtils.ToJsonBytesAsync(model, typeInfo, cancellationToken);
         }
 
         /// <summary>
@@ -105,9 +135,25 @@ namespace com.etsoo.MessageQueue
         /// <param name="bytes">JSON bytes</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public static async ValueTask<T?> ToMessageAsync<T>(this ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken) where T : class
+        [RequiresDynamicCode("ToMessageAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        [RequiresUnreferencedCode("ToMessageAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
+        public static async ValueTask<T?> ToMessageAsync<T>(this ReadOnlyMemory<byte> bytes, CancellationToken cancellationToken = default) where T : class
         {
             return await MessageQueueUtils.FromJsonBytesAsync<T>(bytes, cancellationToken);
+        }
+
+        /// <summary>
+        /// Async JSON bytes to model
+        /// 异步 JSON 字节转化为模型
+        /// </summary>
+        /// <typeparam name="T">Generic model type</typeparam>
+        /// <param name="bytes">JSON bytes</param>
+        /// <param name="typeInfo">Json type info</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
+        public static async ValueTask<T?> ToMessageAsync<T>(this ReadOnlyMemory<byte> bytes, JsonTypeInfo<T> typeInfo, CancellationToken cancellationToken = default) where T : class
+        {
+            return await MessageQueueUtils.FromJsonBytesAsync(bytes, typeInfo, cancellationToken);
         }
     }
 }

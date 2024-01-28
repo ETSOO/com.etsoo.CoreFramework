@@ -5,8 +5,6 @@ using System.Collections;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace com.etsoo.Database
 {
@@ -125,8 +123,7 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         public object DictionaryToParameter<K, V>(Dictionary<K, V> dic, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct
+            where K : notnull
         {
             return DictionaryToParameter(dic,
                 DatabaseUtils.TypeToDbType(typeof(K)).GetValueOrDefault(),
@@ -148,10 +145,9 @@ namespace com.etsoo.Database
         /// <param name="tvpFunc">TVP building function</param>
         /// <returns>Result</returns>
         public virtual object DictionaryToParameter<K, V>(Dictionary<K, V> dic, DbType keyType, DbType valueType, long? keyMaxLength = null, long? valueMaxLength = null, Func<SqlDbType, SqlDbType, string>? tvpFunc = null)
-            where K : struct
-            where V : struct
+            where K : notnull
         {
-            return JsonSerializer.Serialize(dic, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
+            return DatabaseUtils.DictionaryToJsonString(dic, keyType, valueType).ToDbStringSafe(true);
         }
 
         /// <summary>
@@ -164,7 +160,7 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public virtual object GuidItemsToParameter(IEnumerable<GuidItem> items, long? maxLength = null, Func<string>? tvpFunc = null)
         {
-            return JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
+            return DatabaseUtils.GuidItemsToJsonString(items).ToDbStringSafe(true);
         }
 
         /// <summary>
@@ -195,7 +191,7 @@ namespace com.etsoo.Database
         {
             // Default to be ANSI
             // return string.Join(';', list).ToDbStringSafe(true);
-            return JsonSerializer.Serialize(list, new JsonSerializerOptions { WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }).ToDbStringSafe(true);
+            return DatabaseUtils.ListItemsToJsonString(list, type).ToDbStringSafe(true);
         }
 
         /// <summary>
@@ -303,7 +299,7 @@ namespace com.etsoo.Database
         /// <param name="commandType">Command type</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>The first cell selected as T</returns>
-        public async Task<T> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
+        public async Task<T?> ExecuteScalarAsync<T>(string commandText, object? parameters = null, CommandType? commandType = null, CancellationToken cancellationToken = default)
         {
             commandType ??= (SupportStoredProcedure ? CommandType.StoredProcedure : CommandType.Text);
             var command = new CommandDefinition(commandText, DatabaseUtils.FormatParameters(parameters), commandType: commandType, cancellationToken: cancellationToken);
@@ -443,7 +439,7 @@ namespace com.etsoo.Database
             await reader.CloseAsync();
             await connection.CloseAsync();
 
-            return items.ToArray();
+            return [.. items];
         }
 
         /// <summary>
@@ -463,7 +459,7 @@ namespace com.etsoo.Database
             var d1 = (await D1.CreateListAsync(reader, command.CancellationToken)).ToArray();
 
             var d2Next = await reader.NextResultAsync(command.CancellationToken);
-            var d2 = d2Next ? (await D2.CreateListAsync(reader, command.CancellationToken)).ToArray() : Array.Empty<D2>();
+            var d2 = d2Next ? [.. (await D2.CreateListAsync(reader, command.CancellationToken))] : Array.Empty<D2>();
 
             await reader.CloseAsync();
             await reader.DisposeAsync();
@@ -490,16 +486,16 @@ namespace com.etsoo.Database
             var d1 = (await D1.CreateListAsync(reader, command.CancellationToken)).ToArray();
 
             var d2Next = await reader.NextResultAsync(command.CancellationToken);
-            var d2 = d2Next ? (await D2.CreateListAsync(reader, command.CancellationToken)).ToArray() : Array.Empty<D2>();
+            var d2 = d2Next ? (await D2.CreateListAsync(reader, command.CancellationToken)).ToArray() : [];
 
             D3[] d3;
             if (d2Next && await reader.NextResultAsync(command.CancellationToken))
             {
-                d3 = (await D3.CreateListAsync(reader, command.CancellationToken)).ToArray();
+                d3 = [.. (await D3.CreateListAsync(reader, command.CancellationToken))];
             }
             else
             {
-                d3 = Array.Empty<D3>();
+                d3 = [];
             }
 
             await reader.CloseAsync();

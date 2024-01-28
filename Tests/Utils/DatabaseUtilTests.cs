@@ -55,5 +55,83 @@ namespace Tests.Utils
         {
             Assert.AreEqual(isAnsi, input.IsAnsi());
         }
+
+        [Test]
+        public void ListItemsToJsonString_EmptyList_ReturnsEmptyArray()
+        {
+            // Arrange
+            List<object> emptyList = [];
+            DbType type = DbType.String;
+
+            // Act
+            string result = DatabaseUtils.ListItemsToJsonString(emptyList, type);
+
+            // Assert
+            Assert.AreEqual("[]", result);
+        }
+
+        [Test]
+        public void ListItemsToJsonString_SingleItem_ReturnsValidJsonArray()
+        {
+            // Arrange
+            List<int> singleItemList = [42];
+            DbType type = DbType.Int32;
+
+            // Act
+            var result = DatabaseUtils.ListItemsToJsonString(singleItemList, type);
+
+            // Assert
+            Assert.AreEqual("[42]", result);
+        }
+
+        [Test]
+        public void ListItemsToJsonString_MultipleItems_ReturnsValidJsonArray()
+        {
+            // Arrange
+            List<string> stringList = ["apple", "orange", "banana"];
+            DbType type = DbType.String;
+
+            // Act
+            var result = DatabaseUtils.ListItemsToJsonString(stringList, type);
+
+            // Assert
+            Assert.AreEqual("[\"apple\",\"orange\",\"banana\"]", result);
+        }
+
+        [Test]
+        public void DictionaryToJsonString_NullDictionary_ReturnsEmptyArray()
+        {
+            // Arrange
+            Dictionary<int, Guid> emptyDictionary = [];
+            DbType keyType = DbType.Int32;
+            DbType valueType = DbType.Guid;
+
+            // Act
+            var result = DatabaseUtils.DictionaryToJsonString(emptyDictionary, keyType, valueType);
+
+            // Assert
+            Assert.AreEqual("[]", result);
+        }
+
+        [Test]
+        public void DictionaryToJsonString_IntegerStringDictionary_ReturnsValidJsonArray()
+        {
+            // Arrange
+            Dictionary<int, string> intStringDictionary = new()
+            {
+                { 1, "One" },
+                { 2, "Two" },
+                { 3, "Three" }
+            };
+
+            DbType keyType = DbType.Int32;
+            DbType valueType = DbType.String;
+
+            // Act
+            string result = DatabaseUtils.DictionaryToJsonString(intStringDictionary, keyType, valueType);
+
+            // Assert
+            Assert.AreEqual("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]", result);
+        }
     }
 }

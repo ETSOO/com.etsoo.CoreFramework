@@ -173,7 +173,7 @@ namespace Tests.Utils
                 Id = 1001,
                 Name = "Admin 1",
                 Status = UserModel.StatusEnum.Deleted,
-                Friends = new int[] { 1, 2, 3 },
+                Friends = [1, 2, 3],
                 Valid = true,
                 Keys = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } }
             };

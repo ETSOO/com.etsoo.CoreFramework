@@ -262,7 +262,7 @@ namespace com.etsoo.Utils.Actions
         /// Data
         /// 数据
         /// </summary>
-        public StringKeyDictionaryObject Data { get; init; } = new StringKeyDictionaryObject();
+        public StringKeyDictionaryObject Data { get; init; } = [];
 
         /// <summary>
         /// To Json
@@ -350,7 +350,7 @@ namespace com.etsoo.Utils.Actions
                     w.WritePropertyName(dataName);
 
                     // Serialization for the Data
-                    JsonSerializer.Serialize(w, Data, options);
+                    await SharedUtils.JsonSerializeAsync(w, Data, CommonJsonSerializerContext.Default.StringKeyDictionaryObject);
                 }
             }
 

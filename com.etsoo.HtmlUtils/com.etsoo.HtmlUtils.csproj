@@ -16,11 +16,12 @@
 		<Description>ETSOO Html Utilities
 亿速思维 Html 工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.26</Version>
+		<Version>1.0.27</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>
