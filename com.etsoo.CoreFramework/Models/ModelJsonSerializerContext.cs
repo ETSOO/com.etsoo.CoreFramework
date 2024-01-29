@@ -16,14 +16,17 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(LoginRQ))]
     [JsonSerializable(typeof(MergeRQ))]
     [JsonSerializable(typeof(QueryRQ))]
-    [JsonSerializable(typeof(QueryRQ<long>))]
+    [JsonSerializable(typeof(QueryRQ<long>), TypeInfoPropertyName = "QueryLongRQ")]
+    [JsonSerializable(typeof(QueryRQ<Guid>), TypeInfoPropertyName = "QueryGuidRQ")]
     [JsonSerializable(typeof(RefreshTokenRQ))]
     [JsonSerializable(typeof(SignoutRQ))]
     [JsonSerializable(typeof(SortRQ))]
     [JsonSerializable(typeof(TiplistRQ))]
-    [JsonSerializable(typeof(TiplistRQ<long>))]
-    [JsonSerializable(typeof(UpdateStatusRQ<int>))]
-    [JsonSerializable(typeof(UpdateStatusRQ<long>))]
+    [JsonSerializable(typeof(TiplistRQ<long>), TypeInfoPropertyName = "TiplistLongRQ")]
+    [JsonSerializable(typeof(TiplistRQ<Guid>), TypeInfoPropertyName = "TiplistGuidRQ")]
+    [JsonSerializable(typeof(UpdateStatusRQ<int>), TypeInfoPropertyName = "UpdateStatusRQ")]
+    [JsonSerializable(typeof(UpdateStatusRQ<long>), TypeInfoPropertyName = "UpdateStatusLongRQ")]
+    [JsonSerializable(typeof(UpdateStatusRQ<Guid>), TypeInfoPropertyName = "UpdateStatusGuidRQ")]
     public partial class ModelJsonSerializerContext : JsonSerializerContext
     {
     }

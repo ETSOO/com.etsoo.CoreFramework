@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Id / title item
@@ -8,10 +6,8 @@ namespace com.etsoo.CoreFramework.Models
     /// </summary>
     public record IdTitleItem
     {
-        [JsonRequired]
-        public int Id { get; init; }
+        public required int Id { get; init; }
 
-        [JsonRequired]
         public required string Title { get; init; }
     }
 }

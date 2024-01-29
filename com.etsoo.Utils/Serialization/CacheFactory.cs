@@ -69,7 +69,7 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="cache">Cache interface</param>
         /// <param name="cacheHours">Cache hours, zero and negative value means disable the feature</param>
         /// <param name="keyFunc">Key generation function</param>
-        /// <param name="actionFunc">Value generaction function</param>
+        /// <param name="actionFunc">Value generaction function with Json type info</param>
         /// <param name="typeInfo">Json type info</param>
         /// <param name="options">Options</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -78,14 +78,14 @@ namespace com.etsoo.Utils.Serialization
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
-            Func<Task<T?>> actionFunc,
+            Func<JsonTypeInfo<T>, Task<T?>> actionFunc,
             JsonTypeInfo<T> typeInfo,
             DistributedCacheEntryOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             if (cacheHours <= 0)
             {
-                return await actionFunc();
+                return await actionFunc(typeInfo);
             }
 
             var key = keyFunc();
@@ -93,10 +93,10 @@ namespace com.etsoo.Utils.Serialization
             var cachedBytes = await cache.GetAsync(key, cancellationToken);
             if (cachedBytes is not null && cachedBytes.Length > 0)
             {
-                return await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes), typeInfo, cancellationToken: cancellationToken);
+                return await JsonSerializer.DeserializeAsync(SharedUtils.GetStream(cachedBytes), typeInfo, cancellationToken: cancellationToken);
             }
 
-            var newValue = await actionFunc();
+            var newValue = await actionFunc(typeInfo);
 
             if (newValue is null)
             {
