@@ -6,6 +6,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Model common JSON serializer context
     /// 通用模型 JSON 序列化器上下文
     /// </summary>
+    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
     [JsonSerializable(typeof(ChangePasswordDto))]
     [JsonSerializable(typeof(ChangePasswordRQ))]
     [JsonSerializable(typeof(ExchangeTokenRQ))]

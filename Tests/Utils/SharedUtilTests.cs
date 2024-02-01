@@ -129,9 +129,9 @@ namespace Tests.Utils
                 Label = "Guid Label"
             };
 
-            var json = await SharedUtils.JsonSerializeAsync(model, CommonJsonSerializerContext.Default.GuidItem, ["Id"]);
-            Assert.IsTrue(json.Contains("Id"));
-            Assert.IsFalse(json.Contains("Label"));
+            var json = await SharedUtils.JsonSerializeAsync(model, CommonJsonSerializerContext.Default.GuidItem, ["id"]);
+            Assert.IsTrue(json.Contains("id"));
+            Assert.IsFalse(json.Contains("label"));
         }
 
         [Test]
