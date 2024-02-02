@@ -18,7 +18,7 @@ namespace com.etsoo.Utils
         /// All items created
         /// 所有创建的项目
         /// </summary>
-        public static readonly List<Enumeration<T>> Items = new();
+        public static readonly List<Enumeration<T>> Items = [];
 
         /// <summary>
         /// Try to parse item with value
