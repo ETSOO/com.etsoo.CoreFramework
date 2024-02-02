@@ -12,6 +12,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
     [JsonSerializable(typeof(StringKeyDictionaryObject))]
     [JsonSerializable(typeof(StringKeyDictionaryString))]
+    [JsonSerializable(typeof(Dictionary<string, object>))]
     [JsonSerializable(typeof(Dictionary<string, string>))]
     [JsonSerializable(typeof(IEnumerable<GuidItem>))]
     [JsonSerializable(typeof(IEnumerable<IdItem>))]
