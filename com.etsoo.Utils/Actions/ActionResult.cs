@@ -350,6 +350,7 @@ namespace com.etsoo.Utils.Actions
                     w.WritePropertyName(dataName);
 
                     // Serialization for the Data
+                    // CommonJsonSerializerContext.Default.StringKeyDictionaryObject will be limited to the types supported
                     await SharedUtils.JsonSerializeAsync(w, Data, CommonJsonSerializerContext.Default.StringKeyDictionaryObject);
                 }
             }

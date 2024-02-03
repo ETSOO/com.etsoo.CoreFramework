@@ -17,7 +17,18 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<GuidItem>))]
     [JsonSerializable(typeof(IEnumerable<IdItem>))]
     [JsonSerializable(typeof(IEnumerable<IdLabelItem>))]
+    [JsonSerializable(typeof(IEnumerable<long>))]
+    [JsonSerializable(typeof(IEnumerable<ulong>))]
+    [JsonSerializable(typeof(IEnumerable<int>))]
+    [JsonSerializable(typeof(IEnumerable<uint>))]
+    [JsonSerializable(typeof(IEnumerable<short>))]
+    [JsonSerializable(typeof(IEnumerable<ushort>))]
+    [JsonSerializable(typeof(IEnumerable<byte>))]
+    [JsonSerializable(typeof(IEnumerable<Guid>))]
+    [JsonSerializable(typeof(IEnumerable<string>))]
     [JsonSerializable(typeof(ActionResult))]
+    [JsonSerializable(typeof(DateTime))]
+    [JsonSerializable(typeof(DateTimeOffset))]
     public partial class CommonJsonSerializerContext : JsonSerializerContext
     {
     }

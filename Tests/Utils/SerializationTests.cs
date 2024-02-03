@@ -267,5 +267,27 @@ namespace Tests.Utils
             Assert.AreEqual(1, objArray.Count());
             Assert.AreEqual("Label", objArray.First()?.Label);
         }
+
+        [Test]
+        public void GetDictionaryJsonTests()
+        {
+            // Arrange
+            var dic = new Dictionary<string, object>
+            {
+                { "a", 1 },
+                { "a1", 999L },
+                { "b", "2" },
+                //{ "c", new { id = 3, label = "Label" } },
+                { "d", false },
+                { "e", DateTime.Parse("2021-01-01") },
+                { "f", new int[] { 1, 2, 3 } }
+            };
+
+            // Act
+            var json = JsonSerializer.Serialize(dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
+
+            // Assert
+            Assert.AreEqual("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""", json);
+        }
     }
 }
