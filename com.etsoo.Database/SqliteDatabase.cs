@@ -6,18 +6,13 @@ namespace com.etsoo.Database
     /// Sqlite database
     /// Sqlite 数据库
     /// </summary>
-    public sealed class SqliteDatabase : CommonDatabase<SqliteConnection>
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="connectionString">Connection string</param>
+    public sealed class SqliteDatabase(string connectionString) : CommonDatabase<SqliteConnection>(connectionString)
     {
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="connectionString">Connection string</param>
-        /// <param name="snakeNaming">Is snake naming</param>
-        public SqliteDatabase(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
-        {
-        }
-
         /// <summary>
         /// Escape identifier
         /// 转义标识符

@@ -24,6 +24,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// virutal + override vs new: https://stackoverflow.com/questions/159978/c-sharp-keyword-usage-virtualoverride-vs-new
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
+    /// <typeparam name="A">Generic application type</typeparam>
     public abstract partial class RepoBase<C, A> : IRepoBase
         where C : DbConnection
         where A : ICoreApplication<C>

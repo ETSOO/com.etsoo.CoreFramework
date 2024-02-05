@@ -17,6 +17,7 @@ namespace com.etsoo.CoreFramework.Repositories
     /// </summary>
     /// <typeparam name="C">Generic database conneciton type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
+    /// <typeparam name="A">Generic application type</typeparam>
     public abstract class EntityRepo<C, T, A> : RepoBase<C, A>, IEntityRepo<T>
         where C : DbConnection
         where T : struct
@@ -27,6 +28,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         public const string PublicRange = "public";
 
+        /// <summary>
+        /// Constructor
+        /// 构造函数
+        /// </summary>
+        /// <param name="app">Application</param>
+        /// <param name="flag">Flag</param>
+        /// <param name="user">User</param>
         protected EntityRepo(A app, string flag, IServiceUser? user = null) :
             base(app, flag, user)
         {

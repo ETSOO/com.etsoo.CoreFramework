@@ -22,12 +22,6 @@ namespace com.etsoo.Database
         protected readonly string ConnectionString;
 
         /// <summary>
-        /// Snake naming, like user_id
-        /// 蛇形命名，如 user_id
-        /// </summary>
-        public bool SnakeNaming { get; }
-
-        /// <summary>
         /// Support stored procedure or not
         /// 是否支持存储过程
         /// </summary>
@@ -38,20 +32,15 @@ namespace com.etsoo.Database
         /// 构造函数
         /// </summary>
         /// <param name="connectionString">Connection string</param>
-        /// <param name="snakeNaming">Is snake naming</param>
-        public CommonDatabase(string connectionString, bool snakeNaming = false)
+        public CommonDatabase(string connectionString)
         {
             ConnectionString = connectionString;
-            SnakeNaming = snakeNaming;
 
             // Default settings
             SqlMapper.Settings.UseSingleResultOptimization = true;
 
             // Database snake naming
-            if (snakeNaming)
-            {
-                DefaultTypeMap.MatchNamesWithUnderscores = true;
-            }
+            DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         /// <summary>

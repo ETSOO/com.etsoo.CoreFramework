@@ -15,12 +15,6 @@ namespace com.etsoo.Database
     public interface IDatabase
     {
         /// <summary>
-        /// Snake naming, like user_id
-        /// 蛇形命名，如 user_id
-        /// </summary>
-        bool SnakeNaming { get; }
-
-        /// <summary>
         /// Support stored procedure or not
         /// 是否支持存储过程
         /// </summary>

@@ -11,23 +11,18 @@ namespace com.etsoo.Database
     /// SQL Server database
     /// SQL Server 数据库
     /// </summary>
-    public sealed class SqlServerDatabase : CommonDatabase<SqlConnection>
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="connectionString">Connection string</param>
+    public sealed class SqlServerDatabase(string connectionString) : CommonDatabase<SqlConnection>(connectionString)
     {
         /// <summary>
         /// Support stored procedure or not
         /// 是否支持存储过程
         /// </summary>
         public override bool SupportStoredProcedure => true;
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="connectionString">Connection string</param>
-        /// <param name="snakeNaming">Is snake naming</param>
-        public SqlServerDatabase(string connectionString, bool snakeNaming = false) : base(connectionString, snakeNaming)
-        {
-        }
 
         /// <summary>
         /// Escape identifier

@@ -16,7 +16,17 @@ namespace com.etsoo.CoreFramework.Services
     /// Service base for business logic
     /// 业务逻辑的基础服务
     /// </summary>
-    public abstract class ServiceBase<C, R, A> : IServiceBase
+    /// <typeparam name="C">Generic connection type</typeparam>
+    /// <typeparam name="R">Generic repository type</typeparam>
+    /// <typeparam name="A">Generic application type</typeparam>
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="app">Application</param>
+    /// <param name="repo">Repository</param>
+    /// <param name="logger">Logger</param>
+    public abstract class ServiceBase<C, R, A>(A app, R repo, ILogger logger) : IServiceBase
         where C : DbConnection
         where R : IRepoBase
         where A : ICoreApplication<C>
@@ -33,40 +43,25 @@ namespace com.etsoo.CoreFramework.Services
         /// Application
         /// 程序对象
         /// </summary>
-        protected virtual A App { get; }
+        protected virtual A App { get; } = app;
 
         /// <summary>
         /// Database repository
         /// 数据库仓库
         /// </summary>
-        protected virtual R Repo { get; }
+        protected virtual R Repo { get; } = repo;
 
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
-        protected readonly ILogger Logger;
+        protected readonly ILogger Logger = logger;
 
         /// <summary>
         /// Cancellation token, with the feature, only transient or scoped scenario can used
         /// 取消令牌，使用该功能，只能使用瞬态或范围场景
         /// </summary>
-        protected readonly CancellationToken CancellationToken;
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="app">Application</param>
-        /// <param name="repo">Repository</param>
-        /// <param name="logger">Logger</param>
-        public ServiceBase(A app, R repo, ILogger logger)
-        {
-            App = app;
-            Repo = repo;
-            Logger = logger;
-            CancellationToken = repo.CancellationToken;
-        }
+        protected readonly CancellationToken CancellationToken = repo.CancellationToken;
 
         /// <summary>
         /// Decrypt message

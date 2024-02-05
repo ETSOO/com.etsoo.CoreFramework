@@ -17,7 +17,15 @@ namespace com.etsoo.CoreFramework.Services
     /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="R">Generic repository type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
-    public abstract class EntityServiceBase<C, R, T, A> : ServiceBase<C, R, A>, IEntityServiceBase<T>
+    /// <typeparam name="A">Generic application type</typeparam>
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="app">App</param>
+    /// <param name="repo">Repository</param>
+    /// <param name="logger">Logger</param>
+    public abstract class EntityServiceBase<C, R, T, A>(A app, R repo, ILogger logger) : ServiceBase<C, R, A>(app, repo, logger), IEntityServiceBase<T>
         where C : DbConnection
         where R : IEntityRepo<T>
         where T : struct
@@ -27,22 +35,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Current user
         /// 当前用户
         /// </summary>
-        protected readonly IServiceUser? User;
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="app">App</param>
-        /// <param name="repo">Repository</param>
-        /// <param name="logger">Logger</param>
-        public EntityServiceBase(A app, R repo, ILogger logger)
-            : base(app, repo, logger)
-        {
-            // RepoBase.AddSystemParameters will check when the user login required
-            // For constructor, userAccessor.UserSafe can also check
-            User = repo.User;
-        }
+        protected readonly IServiceUser? User = repo.User;
 
         /// <summary>
         /// Create

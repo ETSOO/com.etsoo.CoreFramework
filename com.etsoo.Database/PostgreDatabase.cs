@@ -1,24 +1,18 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Npgsql;
 
 namespace com.etsoo.Database
 {
     /// <summary>
-    /// MySQL database
-    /// MySQL 数据库
+    /// Postgre (Npg) database
+    /// Postgre (Npg) 数据库
     /// </summary>
     /// <remarks>
     /// Constructor
     /// 构造函数
     /// </remarks>
     /// <param name="connectionString">Connection string</param>
-    public sealed class MySqlDatabase(string connectionString) : CommonDatabase<MySqlConnection>(connectionString)
+    public sealed class PostgreDatabase(string connectionString) : CommonDatabase<NpgsqlConnection>(connectionString)
     {
-        /// <summary>
-        /// Support stored procedure or not
-        /// 是否支持存储过程
-        /// </summary>
-        public override bool SupportStoredProcedure => true;
-
         /// <summary>
         /// Escape identifier
         /// 转义标识符
@@ -27,12 +21,11 @@ namespace com.etsoo.Database
         /// <returns>Escaped name</returns>
         public override string EscapeIdentifier(string name)
         {
-            return $"`{name}`";
+            return $"\"{name}\"";
         }
 
         /// <summary>
         /// Get exception result
-        /// https://dev.mysql.com/doc/dev/connector-net/8.0/html/T_MySql_Data_MySqlClient_MySqlErrorCode.htm
         /// 获取数据库异常结果
         /// </summary>
         /// <param name="ex">Exception</param>
@@ -44,14 +37,9 @@ namespace com.etsoo.Database
                 return new DbExceptionResult(DbExceptionType.OutOfMemory, true);
             }
 
-            if (ex is MySqlException se)
+            if (ex is NpgsqlException)
             {
-                return se.ErrorCode switch
-                {
-                    1037 or 1038 or 1041 => new DbExceptionResult(DbExceptionType.OutOfMemory, true),
-                    1040 or 1044 or 1045 or 1046 => new DbExceptionResult(DbExceptionType.OutOfMemory, true),
-                    _ => new DbExceptionResult(DbExceptionType.DataProcessingFailed, false)
-                };
+                return new DbExceptionResult(DbExceptionType.ConnectionFailed, true);
             }
 
             return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
@@ -62,7 +50,7 @@ namespace com.etsoo.Database
         /// 新数据库链接对象
         /// </summary>
         /// <returns>Connection</returns>
-        public override MySqlConnection NewConnection()
+        public override NpgsqlConnection NewConnection()
         {
             return new(ConnectionString);
         }
