@@ -37,7 +37,7 @@ namespace Tests.Services
 
         public ServiceBaseTests()
         {
-            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true", true);
+            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
 
             var config = new AppConfiguration("test");
             var app = new CoreApplication<SqlConnection>(config, db);

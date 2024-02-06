@@ -17,7 +17,7 @@ namespace com.etsoo.CoreFramework.Application
     /// 核心程序
     /// </summary>
     /// <typeparam name="C">Generic database connection type</typeparam>
-    public record CoreApplication<C> : ICoreApplication<C> where C : DbConnection
+    public class CoreApplication<C> : ICoreApplication<C> where C : DbConnection
     {
         /// <summary>
         /// Get secret data

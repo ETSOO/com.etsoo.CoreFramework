@@ -52,7 +52,7 @@ namespace Tests.Repositories
 
         public IntEntityRepositoryTests()
         {
-            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true", true);
+            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
 
             var config = new AppConfiguration("test");
             app = new CoreApplication<SqlConnection>(config, db);
