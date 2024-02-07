@@ -99,8 +99,7 @@ namespace com.etsoo.CoreFramework.Authentication
 
             // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
             // AES256, 256 / 8 = 32 bytes
-            var field = "EncryptionKey";
-            var encryptionKeyPlain = CryptographyUtils.UnsealData(field, settings.EncryptionKey, secureManager);
+            var encryptionKeyPlain = CryptographyUtils.UnsealData(nameof(settings.EncryptionKey), settings.EncryptionKey, secureManager);
 
             // RSA crypto provider
             crypto = new RSACrypto(settings.PublicKey, settings.PrivateKey, secureManager);

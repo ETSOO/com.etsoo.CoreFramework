@@ -17,7 +17,7 @@
         public string? SecurityAlgorithms { get; init; }
         public int? AccessTokenMinutes { get; init; }
         public int? RefreshTokenDays { get; init; }
-        public required string EncryptionKey { get; init; }
+        public string EncryptionKey { get; init; } = string.Empty;
         public string? PublicKey { get; init; }
         public string? PrivateKey { get; init; }
     }
