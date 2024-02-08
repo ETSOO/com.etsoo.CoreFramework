@@ -10,21 +10,25 @@ namespace com.etsoo.MessageQueue
     {
         /// <summary>
         /// Message id
+        /// 消息编号
         /// </summary>
         public string MessageId { get; set; } = string.Empty;
 
         /// <summary>
         /// Correlation id
+        /// 相关编号
         /// </summary>
         public string? CorrelationId { get; set; }
 
         /// <summary>
-        /// Application id.
+        /// Application id
+        /// 程序编号
         /// </summary>
         public string? AppId { get; set; }
 
         /// <summary>
-        /// MIME content encoding.
+        /// MIME content encoding
+        /// MIME 内容编码
         /// </summary>
         public string? ContentEncoding { get; set; }
 
@@ -35,37 +39,44 @@ namespace com.etsoo.MessageQueue
         public string? ContentType { get; set; }
 
         /// <summary>
-        /// Message priority, 0 to 9.
+        /// Message priority, 0 to 9
+        /// 消息优先级
         /// </summary>
         public byte? Priority { get; set; }
 
         /// <summary>
-        /// Destination to reply to.
+        /// Destination to reply to
+        /// 回复目标
         /// </summary>
         public string? ReplyTo { get; set; }
 
         /// <summary>
-        /// Message type name.
+        /// Message type name
+        /// 消息类型
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
         /// User id
+        /// 用户编号
         /// </summary>
         public string? UserId { get; set; }
 
         /// <summary>
         /// Timestamp
+        /// 时间戳
         /// </summary>
         public long Timestamp { get; set; }
 
         /// <summary>
-        /// Cache data for 
+        /// Cache data
+        /// 缓存数据
         /// </summary>
         public object? CacheData { get; set; }
 
         /// <summary>
         /// Message header field table
+        /// 消息头字段表
         /// </summary>
         public IDictionary<string, object>? Headers { get; set; }
 
