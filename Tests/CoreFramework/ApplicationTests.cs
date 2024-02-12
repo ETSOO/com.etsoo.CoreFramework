@@ -15,7 +15,7 @@ namespace Tests.CoreFramework
         public void MiniApplicationTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
-            var app = new CoreApplication<SqliteConnection>(AppConfiguration.Create(), db);
+            var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
             Assert.AreEqual(app.Configuration.Cultures.Length, 0);
         }
     }

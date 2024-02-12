@@ -1,21 +1,27 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
-using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.CoreFramework.Services;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.EventLog;
 using NUnit.Framework;
 using System.Data;
 
-namespace Tests.Repositories
+namespace Tests.Services
 {
     /// <summary>
-    /// Int id entity repository
+    /// Int id entity service
     /// </summary>
-    internal class IntEntityRepository : EntityRepo<SqlConnection, int, ICoreApplication<SqlConnection>>
+    internal class IntEntityService : EntityServiceBase<AppConfiguration, SqlConnection, ICoreApplication<AppConfiguration, SqlConnection>, ICurrentUser, int>
     {
-        public IntEntityRepository(ICoreApplication<SqlConnection> app, string flag) : base(app, flag, null) { }
+        public IntEntityService(ICoreApplication<AppConfiguration, SqlConnection> app, string flag, ILogger logger) : base(app, null, flag, logger, false)
+        {
+        }
+
 
         /// <summary>
         /// Get command name, concat with AppId and Flag, normally is stored procedure name, pay attention to SQL injection
@@ -45,19 +51,19 @@ namespace Tests.Repositories
     /// Int id entity repository tests
     /// </summary>
     [TestFixture]
-    public class IntEntityRepositoryTests
+    public class IntEntityServiceTests
     {
-        readonly CoreApplication<SqlConnection> app;
-        readonly IntEntityRepository repo;
+        readonly CoreApplication<AppConfiguration, SqlConnection> app;
+        readonly IntEntityService service;
 
-        public IntEntityRepositoryTests()
+        public IntEntityServiceTests()
         {
             var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
 
-            var config = new AppConfiguration("test");
-            app = new CoreApplication<SqlConnection>(config, db);
+            var config = new AppConfiguration { Name = "test" };
+            app = new CoreApplication<AppConfiguration, SqlConnection>(config, db);
 
-            repo = new IntEntityRepository(app, "user");
+            service = new IntEntityService(app, "user", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
 
             using var conn = db.NewConnection();
             conn.Execute("IF NOT EXISTS (SELECT * FROM [User] WHERE Id = 1001) BEGIN INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1') END", commandType: CommandType.Text);
@@ -72,7 +78,7 @@ namespace Tests.Repositories
         public void GetCommandName_Test()
         {
             // Arrange & Act
-            var command = repo.GetCommandName("read", DataFormat.Json.Name.ToLower());
+            var command = service.GetCommandName("read", DataFormat.Json.Name.ToLower());
 
             // Assert
             Assert.AreEqual("ep_user_read_json", command);
@@ -102,7 +108,7 @@ namespace Tests.Repositories
             };
 
             // Act
-            var result = await repo.CreateAsync(user);
+            var result = await service.CreateAsync(user);
 
             // Assert
             if (result.Ok)
@@ -114,10 +120,10 @@ namespace Tests.Repositories
         [Test]
         public async Task ReadAsync_Test()
         {
-            var data = await repo.ReadAsync<TestUserModule>(-1);
+            var data = await service.ReadAsync<TestUserModule>(-1);
             Assert.IsNull(data);
 
-            data = await repo.ReadDirectAsync<TestUserModule>(-1);
+            data = await service.ReadDirectAsync<TestUserModule>(-1);
             Assert.IsNull(data);
         }
 
@@ -135,7 +141,7 @@ namespace Tests.Repositories
             var parameters = new Dictionary<string, object> { ["Flag"] = true };
 
             // Act
-            var (result, data) = await repo.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Flag = 1, @Name + ' Flaged', @Name)", "id" }), "Id = @Id", parameters);
+            var (result, data) = await service.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Flag = 1, @Name + ' Flaged', @Name)", "id" }), "Id = @Id", parameters);
 
             // Assert
             Assert.IsTrue(result.Ok);
@@ -147,7 +153,7 @@ namespace Tests.Repositories
         public async Task DeleteAsync_Test()
         {
             // Act
-            var result = await repo.DeleteAsync(1001);
+            var result = await service.DeleteAsync(1001);
 
             // Assert
             Assert.IsTrue(result.Ok);
@@ -160,7 +166,7 @@ namespace Tests.Repositories
             var data = new Dictionary<int, short> { [1001] = 0, [1002] = 1 };
 
             // Act
-            var result = await repo.SortAsync(data);
+            var result = await service.SortAsync(data);
 
             // Assert
             Assert.LessOrEqual(1, result);
@@ -172,7 +178,7 @@ namespace Tests.Repositories
             using var stream = SharedUtils.GetStream();
             var result = Assert.ThrowsAsync<SqlException>(async () =>
             {
-                await repo.ReportAsync(stream, "default");
+                await service.ReportAsync(stream, "default");
             });
 
             Assert.AreEqual("ep_user_report_for_default_as_json", result?.Procedure);
@@ -209,7 +215,7 @@ namespace Tests.Repositories
                 JsonBooks = new List<Book> { new Book { Name = "Json Book 1", Price = 3.2M }, new Book { Name = "Json Book 2", Price = 3.6M } },
                 Books = new List<Book> { new Book { Name = "Book 1", Price = 4.2M }, new Book { Name = "Book 2", Price = 8.3M } }
             };
-            var parameters = repo.CreateStudentParameters(student);
+            var parameters = service.CreateStudentParameters(student);
             Assert.IsTrue(parameters.ParameterNames.Contains("JsonBooks"));
             Assert.IsTrue(parameters.ParameterNames.Contains("Books"));
         }

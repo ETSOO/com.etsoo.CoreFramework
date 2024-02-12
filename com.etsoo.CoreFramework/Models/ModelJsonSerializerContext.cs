@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using com.etsoo.CoreFramework.Services;
+using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -28,6 +29,11 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(UpdateStatusRQ<int>), TypeInfoPropertyName = "UpdateStatusRQ")]
     [JsonSerializable(typeof(UpdateStatusRQ<long>), TypeInfoPropertyName = "UpdateStatusLongRQ")]
     [JsonSerializable(typeof(UpdateStatusRQ<Guid>), TypeInfoPropertyName = "UpdateStatusGuidRQ")]
+
+    [JsonSerializable(typeof(UpdateResultData))]
+    [JsonSerializable(typeof(UpdateResultData<long>), TypeInfoPropertyName = "UpdateResultLongData")]
+    [JsonSerializable(typeof(UpdateResultData<Guid>), TypeInfoPropertyName = "UpdateResultGuidData")]
+    [JsonSerializable(typeof(UpdateResultData<int>), TypeInfoPropertyName = "UpdateResultIntData")]
     public partial class ModelJsonSerializerContext : JsonSerializerContext
     {
     }

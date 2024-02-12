@@ -16,8 +16,11 @@ namespace com.etsoo.CoreFramework.Application
     /// Core application
     /// 核心程序
     /// </summary>
+    /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic database connection type</typeparam>
-    public class CoreApplication<C> : ICoreApplication<C> where C : DbConnection
+    public class CoreApplication<S, C> : ICoreApplication<S, C>
+        where S : AppConfiguration
+        where C : DbConnection
     {
         /// <summary>
         /// Get secret data
@@ -58,12 +61,6 @@ namespace com.etsoo.CoreFramework.Application
                 : Encoding.UTF8.GetString(bytes);
         }
 
-        /// <summary>
-        /// Application configuration
-        /// 程序配置
-        /// </summary>
-        public virtual IAppConfiguration Configuration { get; }
-
         private JsonSerializerOptions? _defaultJsonSerializerOptions;
         /// <summary>
         /// Default Json serializer options
@@ -87,6 +84,13 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Application configuration
+        /// 程序配置
+        /// </summary>
+        public S Configuration { get; }
+        AppConfiguration ICoreApplicationBase.Configuration => Configuration;
+
+        /// <summary>
         /// Database
         /// 数据库
         /// </summary>
@@ -102,7 +106,7 @@ namespace com.etsoo.CoreFramework.Application
         /// 构造函数
         /// </summary>
         public CoreApplication(
-            IAppConfiguration configuration,
+            S configuration,
             IDatabase<C> db
         )
         {
@@ -121,7 +125,7 @@ namespace com.etsoo.CoreFramework.Application
         /// 元组的构造函数
         /// </summary>
         /// <param name="init">Init tuple</param>
-        public CoreApplication((IAppConfiguration configuration,
+        public CoreApplication((S configuration,
             IDatabase<C> db) init) : this(init.configuration, init.db)
         {
 

@@ -16,54 +16,28 @@ using System.Data.Common;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace com.etsoo.CoreFramework.Repositories
+namespace com.etsoo.CoreFramework.Services
 {
-    /// <summary>
-    /// Base repository
-    /// 基础仓库
-    /// virutal + override vs new: https://stackoverflow.com/questions/159978/c-sharp-keyword-usage-virtualoverride-vs-new
-    /// </summary>
-    /// <typeparam name="C">Generic database conneciton type</typeparam>
-    /// <typeparam name="A">Generic application type</typeparam>
-    public abstract partial class RepoBase<C, A> : IRepoBase
+    public abstract partial class ServiceBase<S, C, A, U> : IServiceBase
+        where S : AppConfiguration
         where C : DbConnection
-        where A : ICoreApplication<C>
+        where A : ICoreApplication<S, C>
+        where U : ICurrentUser
     {
-        private static readonly char[] separators = [' ', '_'];
-
         /// <summary>
-        /// Current user
-        /// 当前用户
+        /// Add system parameters
+        /// 添加系统参数
         /// </summary>
-        public virtual IServiceUser? User { get; }
-
-        /// <summary>
-        /// Cancellation token, with the feature, only transient or scoped scenario can used
-        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
-        /// </summary>
-        public CancellationToken CancellationToken { get; set; } = default;
-
-        /// <summary>
-        /// Flag
-        /// 标识
-        /// </summary>
-        public string Flag { get; }
-
-        /// <summary>
-        /// Application
-        /// 程序对象
-        /// </summary>
-        protected readonly A App;
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="app">Application</param>
-        /// <param name="flag">Flag</param>
-        /// <param name="user">Current user</param>
-        protected RepoBase(A app, string flag, IServiceUser? user = null) =>
-            (App, Flag, User) = (app, flag, user);
+        /// <param name="parameters">Parameters</param>
+        public virtual void AddSystemParameters(IDbParameters parameters)
+        {
+            // When the user is not required, there may still be an associated user
+            // 当用户不是必须的时候，仍然可能存在一个关联的用户
+            if (User != null)
+            {
+                App.AddSystemParameters(User, parameters);
+            }
+        }
 
         /// <summary>
         /// Create command, default parameters added
@@ -72,27 +46,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="name">Command text</param>
         /// <param name="parameters">Parameters</param>
         /// <param name="type">Command type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Command</returns>
-        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null)
+        protected CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default)
         {
-            var command = App.DB.CreateCommand(name, parameters, type, CancellationToken);
+            var command = App.DB.CreateCommand(name, parameters, type, cancellationToken);
             return command;
-        }
-
-        /// <summary>
-        /// Add system parameters
-        /// 添加系统参数
-        /// </summary>
-        /// <param name="parameters">Parameters</param>
-        public virtual void AddSystemParameters(IDbParameters parameters)
-        {
-            if (User == null)
-            {
-                // Make sure the repository initialized with valid user
-                throw new UnauthorizedAccessException();
-            }
-
-            App.AddSystemParameters(User, parameters);
         }
 
         /// <summary>
@@ -254,7 +213,7 @@ namespace com.etsoo.CoreFramework.Repositories
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns>Action result</returns>
-        public async ValueTask<ActionResult> QueryAsResultAsync(CommandDefinition command)
+        public async ValueTask<IActionResult> QueryAsResultAsync(CommandDefinition command)
         {
             var result = await App.DB.QueryAsResultAsync(command);
 
@@ -287,7 +246,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer);
-            }, CancellationToken);
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -304,7 +263,7 @@ namespace com.etsoo.CoreFramework.Repositories
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryToStreamAsync(command, writer, format, collectionNames);
-            }, CancellationToken);
+            }, command.CancellationToken);
         }
 
         /// <summary>
@@ -358,7 +317,7 @@ namespace com.etsoo.CoreFramework.Repositories
 
             // Write bytes
             var bytes = writer.WrittenMemory;
-            await response.BodyWriter.WriteAsync(bytes, CancellationToken);
+            await response.BodyWriter.WriteAsync(bytes, command.CancellationToken);
 
             if (!result) response.StatusCode = (int)HttpStatusCode.NoContent;
 
@@ -372,15 +331,16 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <typeparam name="E">Generic return type</typeparam>
         /// <param name="sql">SQL script</param>
         /// <param name="parameters">Parameter</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null)
+        public async Task<E> QuickReadAsync<E>(string sql, IDbParameters? parameters = null, CancellationToken cancellationToken = default)
         {
-            var command = CreateCommand(sql, parameters, CommandType.Text);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
 
             return await App.DB.WithConnection((connection) =>
             {
                 return connection.QueryFirstAsync<E>(command);
-            }, CancellationToken);
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -393,13 +353,13 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
-        /// <param name="logger">Logger</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
+        public async ValueTask<(IActionResult Result, UpdateResultData<T>? Data)> InlineUpdateAsync<T, M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, CancellationToken cancellationToken = default)
             where T : struct
             where M : IdItem<T>, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, logger);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, cancellationToken);
 
             if (result.Ok)
             {
@@ -421,12 +381,12 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
-        /// <param name="logger">Logger</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async ValueTask<(ActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
+        public async ValueTask<(IActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, CancellationToken cancellationToken = default)
             where M : IdItem, IUpdateModel
         {
-            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, logger);
+            var (result, rows) = await InlineUpdateBaseAsync(model, configs, additionalPart, additionalParams, cancellationToken);
 
             if (result.Ok)
             {
@@ -448,9 +408,9 @@ namespace com.etsoo.CoreFramework.Repositories
         /// <param name="configs">Configs</param>
         /// <param name="additionalPart">Additional SQL command part, please avoid injection</param>
         /// <param name="additionalParams">Additional parameters</param>
-        /// <param name="logger">Logger</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        private async ValueTask<(ActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, ILogger? logger = null)
+        private async ValueTask<(IActionResult Result, int Rows)> InlineUpdateBaseAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, CancellationToken cancellationToken = default)
             where M : IUpdateModel
         {
             // Validate
@@ -511,7 +471,7 @@ namespace com.etsoo.CoreFramework.Repositories
             }
 
             // Default table name
-            configs.TableName ??= StringUtils.LinuxStyleToPascalCase(Flag).ToString();
+            var tableName = configs.TableName ?? StringUtils.LinuxStyleToPascalCase(Flag).ToString();
 
             // SQL
             var fieldsSql = string.Join(", ", updateFields);
@@ -526,7 +486,7 @@ namespace com.etsoo.CoreFramework.Repositories
                 }
             }
 
-            var sql = App.DB.GetUpdateCommand(configs.TableName, "t", fieldsSql);
+            var sql = App.DB.GetUpdateCommand(tableName, "t", fieldsSql);
             sql.Append(" WHERE t.");
             sql.Append(App.DB.EscapeIdentifier(configs.IdField));
             sql.Append(" = @Id");
@@ -549,26 +509,25 @@ namespace com.etsoo.CoreFramework.Repositories
                 }
             }
 
-            // When user authorized
-            if (User != null)
-                AddSystemParameters(parameters);
+            // User data
+            AddSystemParameters(parameters);
 
             var commandText = sql.ToString();
-            var command = CreateCommand(commandText, parameters, CommandType.Text);
+            var command = CreateCommand(commandText, parameters, CommandType.Text, cancellationToken);
 
             try
             {
                 var records = await ExecuteAsync(command);
 
                 // Log
-                logger?.LogInformation("Successful update command: {commandText}", commandText);
+                Logger.LogInformation("Successful update command: {commandText}", commandText);
 
                 // Success
                 return (ActionResult.Success, records);
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, "Command update failed: {commandText}", commandText);
+                Logger.LogError(ex, "Command update failed: {commandText}", commandText);
                 throw new Exception("Command update failed: " + commandText, ex);
             }
         }

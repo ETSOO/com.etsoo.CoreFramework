@@ -1,6 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
-using com.etsoo.CoreFramework.Repositories;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Actions;
@@ -8,60 +8,97 @@ using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace com.etsoo.CoreFramework.Services
 {
     /// <summary>
     /// Service base for business logic
+    /// User is not null (default) when setting the userRequired = true
     /// 业务逻辑的基础服务
+    /// 设置 userRequired = true 时 User 不为空（默认）
     /// </summary>
+    /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic connection type</typeparam>
-    /// <typeparam name="R">Generic repository type</typeparam>
     /// <typeparam name="A">Generic application type</typeparam>
-    /// <remarks>
-    /// Constructor
-    /// 构造函数
-    /// </remarks>
-    /// <param name="app">Application</param>
-    /// <param name="repo">Repository</param>
-    /// <param name="logger">Logger</param>
-    public abstract class ServiceBase<C, R, A>(A app, R repo, ILogger logger) : IServiceBase
+    /// <typeparam name="U">Generic current user type</typeparam>
+    public abstract partial class ServiceBase<S, C, A, U> : IServiceBase
+        where S : AppConfiguration
         where C : DbConnection
-        where R : IRepoBase
-        where A : ICoreApplication<C>
+        where A : ICoreApplication<S, C>
+        where U : ICurrentUser
     {
+        private static readonly char[] separators = [' ', '_'];
+
         // Duration seconds for time span of the server side and browser/client side
         private const int DurationSeconds = 120;
-
-        /// <summary>
-        /// Init call encryption identifier
-        /// </summary>
-        protected const string InitCallEncryptionIdentifier = "InitCall";
 
         /// <summary>
         /// Application
         /// 程序对象
         /// </summary>
-        protected virtual A App { get; } = app;
+        protected virtual A App { get; }
 
         /// <summary>
-        /// Database repository
-        /// 数据库仓库
+        /// Current user
+        /// 当前用户
         /// </summary>
-        protected virtual R Repo { get; } = repo;
+        protected virtual U? User { get; }
+
+        /// <summary>
+        /// User required or not
+        /// 用户是否必须
+        /// </summary>
+        [MemberNotNullWhen(true, nameof(User))]
+        public bool UserRequired { get; }
+
+        /// <summary>
+        /// Flag
+        /// 标识
+        /// </summary>
+        public string Flag { get; }
 
         /// <summary>
         /// Logger
         /// 日志记录器
         /// </summary>
-        protected readonly ILogger Logger = logger;
+        protected readonly ILogger Logger;
 
-        /// <summary>
-        /// Cancellation token, with the feature, only transient or scoped scenario can used
-        /// 取消令牌，使用该功能，只能使用瞬态或范围场景
-        /// </summary>
-        protected readonly CancellationToken CancellationToken = repo.CancellationToken;
+        /// <remarks>
+        /// Constructor
+        /// 构造函数
+        /// </remarks>
+        /// <param name="app">Application</param>
+        /// <param name="user">Current user</param>
+        /// <param name="flag">Flag</param>
+        /// <param name="logger">Logger</param>
+        public ServiceBase(A app, U user, string flag, ILogger logger)
+            : this(app, user, flag, logger, true)
+        {
+        }
+
+        /// <remarks>
+        /// Constructor
+        /// 构造函数
+        /// </remarks>
+        /// <param name="app">Application</param>
+        /// <param name="user">Current user</param>
+        /// <param name="flag">Flag</param>
+        /// <param name="logger">Logger</param>
+        /// <param name="userRequired">User required or not</param>
+        public ServiceBase(A app, U? user, string flag, ILogger logger, bool userRequired)
+        {
+            if (userRequired && user == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            App = app;
+            User = user;
+            Flag = flag;
+            Logger = logger;
+        }
 
         /// <summary>
         /// Decrypt message
@@ -259,7 +296,7 @@ namespace com.etsoo.CoreFramework.Services
                     // Repo update
                     if (!string.IsNullOrEmpty(rq.Identifier))
                     {
-                        var source = await HashDecryptAsync(rq.Identifier, InitCallEncryptionIdentifier);
+                        var source = await HashDecryptAsync(rq.Identifier, App.Configuration.InitCallEncryptionIdentifier);
                         if (source != null && int.TryParse(source, out var deviceId))
                         {
                             await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId);
@@ -312,27 +349,17 @@ namespace com.etsoo.CoreFramework.Services
             };
 
             // Log the exception
-            LogException(ex, result.Title!, exResult.Critical);
+            if (exResult.Critical)
+            {
+                Logger.LogError(ex, "Critical error: {title}", result.Title);
+            }
+            else
+            {
+                Logger.LogWarning(ex, "Error: {title}", result.Title);
+            }
 
             // Return
             return result;
-        }
-
-        /// <summary>
-        /// Log exception
-        /// 登记异常日志
-        /// </summary>
-        /// <param name="ex">Exception</param>
-        /// <param name="message">Message</param>
-        /// <param name="critical">Is critical</param>
-        protected void LogException(Exception ex, string message, bool critical = false)
-        {
-#pragma warning disable CA2254
-            if (critical)
-                Logger.LogCritical(ex, message);
-            else
-                Logger.LogError(ex, message);
-#pragma warning restore CA2254
         }
     }
 }

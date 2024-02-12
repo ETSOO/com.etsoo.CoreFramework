@@ -6,7 +6,7 @@ namespace com.etsoo.CoreFramework.Application
     /// Application configuration
     /// 程序配置
     /// </summary>
-    public record AppConfiguration : IAppConfiguration
+    public record AppConfiguration
     {
         /// <summary>
         /// Create mini application configuration
@@ -17,115 +17,69 @@ namespace com.etsoo.CoreFramework.Application
         public static AppConfiguration Create(string? privateKey = null)
         {
             privateKey ??= CryptographyUtils.CreateRandString(RandStringKind.All, 12).ToString();
-            return new AppConfiguration(privateKey, name: "MiniApp");
-        }
-
-        private const string PrivateKeyField = "PrivateKey";
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="privateKey">Private key for encryption/decryption</param>
-        /// <param name="cultures">Supported cultures</param>
-        /// <param name="name">Unique name</param>
-        /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        /// <param name="webUrl">Web Url</param>
-        /// <param name="apiUrl">API Url</param>
-        /// <param name="cacheHours">Cache hours</param>
-        public AppConfiguration(
-            string privateKey,
-            string[]? cultures = null,
-            string? name = null,
-            bool modelValidated = false,
-            string? webUrl = null,
-            string? apiUrl = null,
-            double cacheHours = 24
-        )
-        {
-            // Default languages
-            Cultures = cultures ?? [];
-
-            ModelValidated = modelValidated;
-            WebUrl = webUrl ?? "http://localhost";
-            ApiUrl = apiUrl ?? "http://localhost/api";
-            CacheHours = cacheHours;
-
-            if (string.IsNullOrEmpty(name))
+            return new AppConfiguration
             {
-                // Default case
-                name = "SmartERP";
-            }
-            else
-            {
-                // Add variable for security
-                privateKey = name + privateKey;
-            }
-
-            Name = name;
-            PrivateKey = privateKey;
-        }
-
-        /// <summary>
-        /// Constructor with configuration
-        /// 使用配置的构造函数
-        /// </summary>
-        /// <param name="section">Configuration section</param>
-        /// <param name="secureManager">Secure manager</param>
-        /// <param name="modelValidated">Model DataAnnotations are validated or not</param>
-        public AppConfiguration(AppConfigurationItems items, Func<string, string, string>? secureManager = null, bool modelValidated = false)
-            : this(
-                CryptographyUtils.UnsealData(PrivateKeyField, items.PrivateKey, secureManager),
-                items.Cultures ?? [],
-                items.Name,
-                modelValidated,
-                items.WebUrl,
-                items.ApiUrl,
-                items.CacheHours.GetValueOrDefault(24)
-            )
-        {
+                Name = "MiniApp",
+                PrivateKey = privateKey
+            };
         }
 
         /// <summary>
         /// Supported cultures, like zh-CN, zh-Hans-CN, en
         /// 支持的文化，比如zh-CN, zh-Hans-CN, en
         /// </summary>
-        public string[] Cultures { get; }
+        public string[] Cultures { get; init; } = [];
 
         /// <summary>
         /// Model DataAnnotations are validated, true under Web API to avoid double validation
         /// 模块数据标记已验证，在Web API下可以设置为true以避免重复验证
         /// </summary>
-        public bool ModelValidated { get; }
+        public bool ModelValidated { get; init; }
 
         /// <summary>
         /// Private key for hash or simple encryption/decryption, required
         /// 哈希或简单加密/解密私匙，必填
         /// </summary>
-        public string PrivateKey { get; }
+        public string PrivateKey { get; private set; } = string.Empty;
 
         /// <summary>
         /// Unique name
         /// 唯一名称
         /// </summary>
-        public string Name { get; }
+        public string Name { get; init; } = "SmartERP";
 
         /// <summary>
         /// Web url
         /// 网页地址
         /// </summary>
-        public string WebUrl { get; }
+        public string WebUrl { get; init; } = "http://localhost";
 
         /// <summary>
         /// Api url
         /// 接口地址
         /// </summary>
-        public string ApiUrl { get; }
+        public string ApiUrl { get; init; } = "http://localhost/api";
 
         /// <summary>
         /// Cache hours
         /// 缓存小时数
         /// </summary>
-        public double CacheHours { get; }
+        public double CacheHours { get; init; } = 24D;
+
+        /// <summary>
+        /// Init call encryption identifier
+        /// 初始化调用加密标识
+        /// </summary>
+        public string InitCallEncryptionIdentifier { get; init; } = "InitCall";
+
+        /// <summary>
+        /// Unseal data
+        /// 解封数据
+        /// </summary>
+        /// <param name="secureManager">Secure manager</param>
+        public virtual void UnsealData(Func<string, string, string>? secureManager = null)
+        {
+            PrivateKey = CryptographyUtils.UnsealData(nameof(PrivateKey), PrivateKey, secureManager);
+        }
     }
 }

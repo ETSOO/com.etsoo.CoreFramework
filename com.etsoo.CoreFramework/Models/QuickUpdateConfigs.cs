@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.CoreFramework.Repositories
+﻿namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Quick update configs
@@ -22,7 +22,7 @@
         /// Table name, default is entity name
         /// 表格名称，默认为实体名称
         /// </summary>
-        public string? TableName { get; set; }
+        public string? TableName { get; init; }
 
         /// <summary>
         /// Updatable fields, should keep code side field name and table field name the same

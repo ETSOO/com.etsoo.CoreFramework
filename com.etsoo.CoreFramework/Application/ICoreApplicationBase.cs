@@ -15,7 +15,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Application configuration
         /// 程序配置
         /// </summary>
-        IAppConfiguration Configuration { get; }
+        AppConfiguration Configuration { get; }
 
         /// <summary>
         /// Database

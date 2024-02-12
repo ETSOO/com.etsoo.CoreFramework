@@ -1,20 +1,25 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
+using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
-using Microsoft.Data.SqlClient;
+using Dapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
+using Moq;
 using NUnit.Framework;
+using System.IO.Pipelines;
 using System.Runtime.Versioning;
-using Tests.Repositories;
+using System.Text;
 
 namespace Tests.Services
 {
-    internal class ServiceTest : ServiceBase<SqlConnection, IntEntityRepository, ICoreApplication<SqlConnection>>
+    internal class ServiceTest : ServiceBase<AppConfiguration, SqliteConnection, ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
     {
-        public ServiceTest(ICoreApplication<SqlConnection> app, IntEntityRepository repo, ILogger logger) : base(app, repo, logger)
+        public ServiceTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger) : base(app, null, flag, logger, false)
         {
         }
 
@@ -33,17 +38,31 @@ namespace Tests.Services
     [SupportedOSPlatform("windows")]
     internal class ServiceBaseTests
     {
+        readonly SqliteDatabase db;
         readonly ServiceTest service;
 
         public ServiceBaseTests()
         {
-            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
+            db = new SqliteDatabase("Data Source = etsoo.db;");
 
-            var config = new AppConfiguration("test");
-            var app = new CoreApplication<SqlConnection>(config, db);
+            var config = new AppConfiguration { Name = "test" };
+            var app = new CoreApplication<AppConfiguration, SqliteConnection>(config, db);
 
-            var repo = new IntEntityRepository(app, "user");
-            service = new ServiceTest(app, repo, new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+            service = new ServiceTest(app, "test", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+        }
+
+        [SetUp]
+        public async Task Setup()
+        {
+            await db.WithConnection((connection) =>
+            {
+                var sql = @"
+                    CREATE TABLE IF NOT EXISTS e_user (id int PRIMARY KEY, name nvarchar(128), status int);
+                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1002, 'Admin 2');
+                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1');
+                ";
+                return connection.ExecuteAsync(sql);
+            });
         }
 
         [Test]
@@ -92,6 +111,129 @@ namespace Tests.Services
             var rqNew = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds(), DeviceId = deviceId };
             var resultNew = await service.InitCallAsync(rqNew, "My Password");
             Assert.IsTrue(resultNew.Ok);
+        }
+
+        [Test]
+        public async Task InlineUpdateAsync_Test()
+        {
+            // Arrange
+            var user = new UserUpdateModule
+            {
+                Id = 1001,
+                Name = "Admin 21",
+                ChangedFields = new[] { "Name" }
+            };
+
+            // Act
+            var (result, data) = await service.InlineUpdateAsync<int, UserUpdateModule>(user, new(new[] { "name = IIF(@Id = 1001, t.'name', @Name)" })
+            {
+                IdField = "id",
+                TableName = "e_user"
+            });
+
+            // Assert
+            Assert.IsTrue(result.Ok);
+            Assert.IsNotNull(data);
+            Assert.AreEqual(1, data?.RowsAffected);
+        }
+
+        [Test]
+        public async Task QueryAs_Test()
+        {
+            // Arrange
+            var sql = "SELECT * FROM e_user WHERE id = 1001";
+            var command = new CommandDefinition(sql);
+
+            // Act
+            var result = await service.QueryAsAsync<TestUserModule>(command);
+
+            // Assert
+            Assert.IsTrue(result?.Name == "Admin 1");
+        }
+
+        [Test]
+        public async Task QueryAsResult_NoActionResult()
+        {
+            // Arrange
+            var sql = "SELECT * FROM e_user WHERE id = -1";
+            var command = new CommandDefinition(sql);
+
+            // Act
+            var result = await service.QueryAsResultAsync(command);
+
+            // Assert
+            var error = ApplicationErrors.NoActionResult;
+            Assert.IsFalse(result.Ok);
+            Assert.AreEqual(error.Type, result.Type);
+            Assert.AreEqual(error.Title, result.Title);
+        }
+
+        [Test]
+        public async Task QueryAsResult_NoData()
+        {
+            // Arrange
+            var sql = "SELECT 1 AS ok";
+            var command = new CommandDefinition(sql);
+
+            // Act
+            var result = await service.QueryAsResultAsync(command);
+
+            // Assert
+            Assert.IsTrue(result.Ok);
+        }
+
+        [Test]
+        public async Task ReadToStreamAsync_Test()
+        {
+            // Arrange
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3)";
+            var command = new CommandDefinition(sql);
+            using var stream = SharedUtils.GetStream();
+
+            // Act
+            var result = await service.ReadToStreamAsync(command, stream);
+            var json = Encoding.UTF8.GetString(stream.ToArray());
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(json.Contains("Admin 1"));
+        }
+
+        [Test]
+        public async Task ReadToStreamMultipleResultsAsync_Test()
+        {
+            // Arrange
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var command = new CommandDefinition(sql);
+            using var stream = SharedUtils.GetStream();
+
+            // Act
+            var result = await service.ReadToStreamAsync(command, stream, DataFormat.Json, new[] { "users" });
+            var json = Encoding.UTF8.GetString(stream.ToArray());
+
+            // Assert
+            Assert.IsTrue(result);
+            Assert.IsTrue(json.Contains("\"users\":"));
+            Assert.IsTrue(json.Contains("\"data2\":"));
+        }
+
+        [Test]
+        public async Task ReadJsonToStreamWithReturnAsync_Test()
+        {
+            // Arrange
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var command = new CommandDefinition(sql);
+            using var stream = SharedUtils.GetStream();
+
+            // Act
+            var mock = new Mock<HttpResponse>();
+            mock.Setup((o) => o.BodyWriter).Returns(PipeWriter.Create(new MemoryStream()));
+
+            var result = await service.ReadJsonToStreamWithReturnAsync(command, mock.Object, new[] { "users" });
+            var json = Encoding.UTF8.GetString(result.ToArray());
+
+            // Assert
+            Assert.IsTrue(json.Contains("id"));
         }
     }
 }

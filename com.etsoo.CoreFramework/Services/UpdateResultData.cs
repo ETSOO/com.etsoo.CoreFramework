@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.CoreFramework.Repositories
+﻿namespace com.etsoo.CoreFramework.Services
 {
     /// <summary>
     /// Update action result data
@@ -30,7 +30,7 @@
         /// Updated id
         /// 更新的编号
         /// </summary>
-        public string Id { get; init; } = default!;
+        public required string Id { get; init; }
 
         /// <summary>
         /// Rows affected
