@@ -212,8 +212,8 @@ namespace Tests.Services
             var student = new Student
             {
                 Name = "Student Name",
-                JsonBooks = new List<Book> { new Book { Name = "Json Book 1", Price = 3.2M }, new Book { Name = "Json Book 2", Price = 3.6M } },
-                Books = new List<Book> { new Book { Name = "Book 1", Price = 4.2M }, new Book { Name = "Book 2", Price = 8.3M } }
+                JsonBooks = new List<Book> { new() { Name = "Json Book 1", Price = 3.2M }, new() { Name = "Json Book 2", Price = 3.6M } },
+                Books = new List<Book> { new() { Name = "Book 1", Price = 4.2M }, new() { Name = "Book 2", Price = 8.3M } }
             };
             var parameters = service.CreateStudentParameters(student);
             Assert.IsTrue(parameters.ParameterNames.Contains("JsonBooks"));

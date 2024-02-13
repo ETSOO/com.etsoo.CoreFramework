@@ -9,7 +9,7 @@ namespace com.etsoo.CoreFramework.User
     /// Current user data
     /// 当前用户数据
     /// </summary>
-    public record CurrentUser : ServiceUser, ICurrentUser
+    public record CurrentUser : ServiceUser, ICurrentUser, IUserCreator<CurrentUser>
     {
         /// <summary>
         /// Avatar claim type
@@ -36,8 +36,10 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="claims">Claims</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(ClaimsPrincipal claims, string? connectionId = null)
+        public static new CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
+            if (claims == null) return null;
+
             var user = ServiceUser.Create(claims);
             if (user == null) return null;
 
@@ -93,10 +95,10 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? CreateFromData(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
+        public static new CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Base
-            var token = ServiceUser.CreateFromData(data, ip, language, region);
+            var token = ServiceUser.Create(data, ip, language, region);
             if (token == null) return null;
 
             // Get data
@@ -139,12 +141,6 @@ namespace com.etsoo.CoreFramework.User
         public string? OrganizationName { get; set; }
 
         /// <summary>
-        /// Connection id
-        /// 链接编号
-        /// </summary>
-        public string? ConnectionId { get; }
-
-        /// <summary>
         /// Avatar
         /// 头像
         /// </summary>
@@ -178,11 +174,10 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
         public CurrentUser(string id, string? uid, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
-            : base(id, uid, organization, roleValue, clientIp, deviceId, language, region)
+            : base(id, uid, organization, roleValue, clientIp, deviceId, language, region, connectionId)
         {
             Name = name;
             Corporate = corporate.GetValueOrDefault();
-            ConnectionId = connectionId;
         }
 
         private IEnumerable<Claim> GetClaims()

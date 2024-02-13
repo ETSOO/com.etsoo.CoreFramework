@@ -22,7 +22,7 @@ namespace com.etsoo.CoreFramework.Services
         where S : AppConfiguration
         where C : DbConnection
         where A : ICoreApplication<S, C>
-        where U : ICurrentUser
+        where U : IServiceUser
     {
         /// <summary>
         /// Add system parameters

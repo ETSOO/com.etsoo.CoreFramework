@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.Utils;
 using com.etsoo.Utils.String;
-using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
@@ -13,7 +12,7 @@ namespace com.etsoo.CoreFramework.User
     /// Service user data
     /// 服务用户数据
     /// </summary>
-    public record ServiceUser : UserToken, IServiceUser
+    public record ServiceUser : UserToken, IServiceUser, IUserCreator<ServiceUser>
     {
         /// <summary>
         /// Role value claim type
@@ -32,9 +31,12 @@ namespace com.etsoo.CoreFramework.User
         /// 从声明创建用户
         /// </summary>
         /// <param name="claims">Claims</param>
+        /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public new static ServiceUser? Create(ClaimsPrincipal claims)
+        public static ServiceUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
+            if (claims == null) return null;
+
             var token = UserToken.Create(claims);
             if (token == null) return null;
 
@@ -102,8 +104,9 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
+        /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static ServiceUser? CreateFromData(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
+        public static ServiceUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
             var (id, organization, role, deviceId, uid) = GetData(data);
@@ -121,36 +124,8 @@ namespace com.etsoo.CoreFramework.User
                 ip,
                 deviceId.Value,
                 language,
-                region);
-        }
-
-        /// <summary>
-        /// Create user
-        /// 创建用户
-        /// </summary>
-        /// <param name="context">Http context</param>
-        /// <returns>Service user</returns>
-        public static ServiceUser? Create(HttpContext? context)
-        {
-            // https://stackoverflow.com/questions/32584074/whats-the-role-of-the-claimsprincipal-why-does-it-have-multiple-identities
-            // https://andrewlock.net/introduction-to-authentication-with-asp-net-core/
-            // Only concerns the main identity
-            if (context == null || context.User == null)
-                return null;
-
-            return Create(context.User);
-        }
-
-        /// <summary>
-        /// Create non nullable user
-        /// 创建非空用户
-        /// </summary>
-        /// <param name="context">Http context</param>
-        /// <returns>Service user</returns>
-        public static ServiceUser CreateSafe(HttpContext? context)
-        {
-            var user = Create(context);
-            return user ?? throw new UnauthorizedAccessException();
+                region,
+                connectionId);
         }
 
         /// <summary>
@@ -185,6 +160,12 @@ namespace com.etsoo.CoreFramework.User
         public string? Uid { get; }
 
         /// <summary>
+        /// Connection id
+        /// 链接编号
+        /// </summary>
+        public string? ConnectionId { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
@@ -196,7 +177,8 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
-        public ServiceUser(string id, string? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region)
+        /// <param name="connectionId">Connection id</param>
+        public ServiceUser(string id, string? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, string? connectionId = null)
             : base(id, clientIp, region, deviceId, organization)
         {
             RoleValue = roleValue;
@@ -204,6 +186,8 @@ namespace com.etsoo.CoreFramework.User
 
             Language = language;
             Uid = uid;
+
+            ConnectionId = connectionId;
         }
 
         /// <summary>
