@@ -30,6 +30,12 @@ namespace com.etsoo.CoreFramework.Application
         JsonSerializerOptions DefaultJsonSerializerOptions { get; set; }
 
         /// <summary>
+        /// Model DataAnnotations are validated, true under Web API to avoid double validation
+        /// 模块数据标记已验证，在Web API下可以设置为true以避免重复验证
+        /// </summary>
+        bool ModelValidated { get; }
+
+        /// <summary>
         /// Add system parameters, override it to localize parameters' type
         /// 添加系统参数，可以重写本地化参数类型
         /// </summary>

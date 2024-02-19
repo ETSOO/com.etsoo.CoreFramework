@@ -102,21 +102,33 @@ namespace com.etsoo.CoreFramework.Application
         IDatabase ICoreApplicationBase.DB => DB;
 
         /// <summary>
+        /// Model DataAnnotations are validated, true under Web API to avoid double validation
+        /// 模块数据标记已验证，在Web API下可以设置为true以避免重复验证
+        /// </summary>
+        public bool ModelValidated { get; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
+        /// <param name="configuration">Configuration</param>
+        /// <param name="db">Database</param>
+        /// <param name="modelValidated">Model validated or not</param>
         public CoreApplication(
             S configuration,
-            IDatabase<C> db
+            IDatabase<C> db,
+            bool modelValidated = false
         )
         {
             // Update
             (
                 Configuration,
-                DB
+                DB,
+                ModelValidated
             ) = (
                 configuration,
-                db
+                db,
+                modelValidated
             );
         }
 
@@ -125,8 +137,9 @@ namespace com.etsoo.CoreFramework.Application
         /// 元组的构造函数
         /// </summary>
         /// <param name="init">Init tuple</param>
+        /// <param name="modelValidated">Model validated or not</param>
         public CoreApplication((S configuration,
-            IDatabase<C> db) init) : this(init.configuration, init.db)
+            IDatabase<C> db) init, bool modelValidated = false) : this(init.configuration, init.db, modelValidated)
         {
 
         }

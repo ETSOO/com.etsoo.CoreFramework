@@ -31,12 +31,6 @@ namespace com.etsoo.CoreFramework.Application
         public string[] Cultures { get; init; } = [];
 
         /// <summary>
-        /// Model DataAnnotations are validated, true under Web API to avoid double validation
-        /// 模块数据标记已验证，在Web API下可以设置为true以避免重复验证
-        /// </summary>
-        public bool ModelValidated { get; init; }
-
-        /// <summary>
         /// Private key for hash or simple encryption/decryption, required
         /// 哈希或简单加密/解密私匙，必填
         /// </summary>
