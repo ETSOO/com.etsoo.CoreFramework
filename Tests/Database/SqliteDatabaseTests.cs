@@ -28,7 +28,7 @@ namespace Tests.Utils
             // Connection to the DB
             using var connection = db.NewConnection();
 
-            // Create table e_user when not exists
+            // Create table 'User' when not exists
             await connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS User (Id int, Name nvarchar(128), Status int)");
         }
 

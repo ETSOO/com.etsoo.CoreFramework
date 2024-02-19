@@ -9,7 +9,7 @@ namespace com.etsoo.SourceGenerators
     /// <summary>
     /// Syntax receiver
     /// </summary>
-    public class SyntaxReceiver : ISyntaxReceiver
+    internal class SyntaxReceiver : ISyntaxReceiver
     {
         /// <summary>
         /// Applied structs

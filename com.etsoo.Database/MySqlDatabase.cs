@@ -11,7 +11,7 @@ namespace com.etsoo.Database
     /// 构造函数
     /// </remarks>
     /// <param name="connectionString">Connection string</param>
-    public sealed class MySqlDatabase(string connectionString) : CommonDatabase<MySqlConnection>(connectionString)
+    public sealed class MySqlDatabase(string connectionString) : CommonDatabase<MySqlConnection>(DatabaseName.MySQL, connectionString)
     {
         /// <summary>
         /// Support stored procedure or not
@@ -55,6 +55,24 @@ namespace com.etsoo.Database
             }
 
             return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
+        }
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="mappings">Mapping fields</param>
+        /// <param name="isObject">Is object node</param>
+        /// <returns>Result</returns>
+        public override string JoinJsonFields(Dictionary<string, string> mappings, bool isObject)
+        {
+            var items = mappings.SelectMany(m => new[] { $"'{m.Key}'", m.Value }).ToList();
+            var command = $"JSON_OBJECT({string.Join(", ", items)})";
+
+            if (isObject)
+                return command;
+            else
+                return $"JSON_ARRAYAGG({command})";
         }
 
         /// <summary>

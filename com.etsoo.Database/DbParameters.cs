@@ -23,8 +23,8 @@ namespace com.etsoo.Database
             public byte? Scale { get; set; }
         }
 
-        private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = new();
-        private readonly Dictionary<string, ParamInfo> parameters = new();
+        private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> paramReaderCache = [];
+        private readonly Dictionary<string, ParamInfo> parameters = [];
         private List<object>? templates;
 
         object? SqlMapper.IParameterLookup.this[string name] =>
@@ -76,7 +76,7 @@ namespace com.etsoo.Database
 
                 if (subDynamic.templates != null)
                 {
-                    templates ??= new List<object>();
+                    templates ??= [];
                     foreach (var t in subDynamic.templates)
                     {
                         templates.Add(t);
@@ -98,7 +98,7 @@ namespace com.etsoo.Database
                 }
                 else
                 {
-                    templates ??= new List<object>();
+                    templates ??= [];
                     templates.Add(obj);
                 }
             }

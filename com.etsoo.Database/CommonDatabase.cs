@@ -16,6 +16,12 @@ namespace com.etsoo.Database
     public abstract class CommonDatabase<C> : IDatabase<C> where C : DbConnection
     {
         /// <summary>
+        /// Database name
+        /// 数据库名称
+        /// </summary>
+        public DatabaseName Name { get; }
+
+        /// <summary>
         /// Database connection string
         /// 数据库链接字符串
         /// </summary>
@@ -31,9 +37,11 @@ namespace com.etsoo.Database
         /// Constructor
         /// 构造函数
         /// </summary>
+        /// <param name="name">Database name</param>
         /// <param name="connectionString">Connection string</param>
-        public CommonDatabase(string connectionString)
+        public CommonDatabase(DatabaseName name, string connectionString)
         {
+            Name = name;
             ConnectionString = connectionString;
 
             // Default settings
@@ -94,6 +102,44 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Create delete command definition
+        /// 创建删除命令定义
+        /// </summary>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Multiple ids</param>
+        /// <param name="idColumn">Id column name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public virtual CommandDefinition CreateDeleteCommand<T>(string tableName, IEnumerable<T> ids, string idColumn = "id", CancellationToken cancellationToken = default)
+            where T : struct
+        {
+            var sql = $"DELETE FROM {EscapeIdentifier(tableName)} WHERE {EscapeIdentifier(idColumn)} IN ({string.Join(",", ids)})";
+            return CreateCommand(sql, null, CommandType.Text, cancellationToken);
+        }
+
+        /// <summary>
+        /// Create delete command definition
+        /// 创建删除命令定义
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Multiple ids</param>
+        /// <param name="idColumn">Id column name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public virtual CommandDefinition CreateDeleteCommand(string tableName, IEnumerable<string> ids, string idColumn = "id", CancellationToken cancellationToken = default)
+        {
+            if (ids.Any(id => id.Length > 256 || id.Contains('\'') || id.Contains('"')))
+            {
+                throw new ArgumentException("Invalid id in the list");
+            }
+
+            var sql = $"DELETE FROM {EscapeIdentifier(tableName)} WHERE {EscapeIdentifier(idColumn)} IN ('{string.Join("','", ids)}')";
+
+            return CreateCommand(sql, null, CommandType.Text, cancellationToken);
+        }
+
+        /// <summary>
         /// New database connection
         /// 新数据库链接对象
         /// </summary>
@@ -151,6 +197,73 @@ namespace com.etsoo.Database
         {
             return DatabaseUtils.GuidItemsToJsonString(items).ToDbStringSafe(true);
         }
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="fields">Fields</param>
+        /// <param name="mappings">Mappings</param>
+        /// <param name="policy">Naming policy</param>
+        /// <param name="jsonPolicy">JSON Naming policy</param>
+        /// <returns>Result</returns>
+        public string JoinJsonFields(IEnumerable<string> fields, Dictionary<string, string> mappings, NamingPolicy? policy = null, NamingPolicy? jsonPolicy = null)
+        {
+            var formatted = fields.Select(item =>
+            {
+                string sField;
+                string dbField;
+                string result;
+                var (field, alias) = DatabaseUtils.SplitField(item);
+                if (string.IsNullOrEmpty(alias))
+                {
+                    // Field maybe is "Name" or "u.Name"
+                    // Should get rid of "u." to escape
+                    var index = field.IndexOf('.');
+                    if (index > 0 && index < 20)
+                    {
+                        sField = field[(index + 1)..];
+                        dbField = sField.ToNamingCase(policy);
+                        result = $"{field[..index]}.{EscapeIdentifier(dbField)}";
+                    }
+                    else
+                    {
+                        sField = field;
+                        dbField = field.ToNamingCase(policy);
+                        result = EscapeIdentifier(dbField);
+                    }
+                }
+                else
+                {
+                    // Field may support multiple databases with format: SQLServer:**^SQLite:**
+                    // Put the default one without database in the first position
+                    var parts = field.Split('^');
+                    var match = $"{Name}:";
+                    var part = parts.FirstOrDefault(p => p.StartsWith(match))?[match.Length..] ?? parts[0];
+
+                    sField = alias;
+                    dbField = alias.ToNamingCase(policy);
+
+                    result = $"{part} AS {EscapeIdentifier(dbField)}";
+                }
+
+                var jsonField = (jsonPolicy == null || jsonPolicy == policy) ? dbField : sField.ToNamingCase(jsonPolicy);
+                mappings[jsonField] = dbField;
+
+                return result;
+            });
+
+            return string.Join(", ", formatted);
+        }
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="mappings">Mapping fields</param>
+        /// <param name="isObject">Is object node</param>
+        /// <returns>Result</returns>
+        public abstract string JoinJsonFields(Dictionary<string, string> mappings, bool isObject);
 
         /// <summary>
         /// List to Dapper parameter
@@ -551,10 +664,8 @@ namespace com.etsoo.Database
         /// <returns>Command</returns>
         public virtual StringBuilder GetUpdateCommand(string tableName, string alias, string fields)
         {
-            tableName = EscapeIdentifier(tableName);
-
             var sql = new StringBuilder("UPDATE ");
-            sql.Append(tableName);
+            sql.Append(EscapeIdentifier(tableName));
             sql.Append($" AS {alias} SET ");
             sql.Append(fields);
 

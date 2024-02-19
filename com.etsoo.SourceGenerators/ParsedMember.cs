@@ -6,7 +6,7 @@ namespace com.etsoo.SourceGenerators
     /// Parsed member
     /// 解析的成员
     /// </summary>
-    public class ParsedMember
+    internal class ParsedMember
     {
         /// <summary>
         /// Member symbol
@@ -42,12 +42,12 @@ namespace com.etsoo.SourceGenerators
                 }
                 else if (typeSymbol is INamedTypeSymbol nts)
                 {
-                    if(!nts.IsGenericType)
+                    if (!nts.IsGenericType)
                     {
                         // Get the original non-generic definition, like string? => string, int[]? => int[]
                         typeSymbol = typeSymbol.OriginalDefinition;
                     }
-                    else if(nts.TypeKind == TypeKind.Struct && nts.TypeArguments.Length == 1)
+                    else if (nts.TypeKind == TypeKind.Struct && nts.TypeArguments.Length == 1)
                     {
                         // bool? => bool
                         typeSymbol = nts.TypeArguments[0];
@@ -65,7 +65,7 @@ namespace com.etsoo.SourceGenerators
         /// <param name="type">Type syntax</param>
         /// <param name="typeSymbol">Type symbol</param>
         /// <param name="nullable">Nullable</param>
-        public void Deconstruct(out ISymbol symbol, out ITypeSymbol typeSymbol, out bool nullable) => 
+        public void Deconstruct(out ISymbol symbol, out ITypeSymbol typeSymbol, out bool nullable) =>
             (symbol, typeSymbol, nullable) = (Symbol, TypeSymbol, Nullable);
     }
 }

@@ -223,5 +223,125 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         ValueTask<(IActionResult Result, UpdateResultData? Data)> InlineUpdateAsync<M>(M model, QuickUpdateConfigs configs, string? additionalPart = null, Dictionary<string, object>? additionalParams = null, CancellationToken cancellationToken = default) where M : IdItem, IUpdateModel;
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<IActionResult> SqlDeleteAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlDelete;
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Ids</param>
+        /// <param name="idColumn">Id column</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<IActionResult> SqlDeleteAsync(string tableName, IEnumerable<string> ids, string idColumn = "id", CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Ids</param>
+        /// <param name="idColumn">Id column</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<IActionResult> SqlDeleteAsync<T>(string tableName, IEnumerable<T> ids, string idColumn = "id", CancellationToken cancellationToken = default) where T : struct;
+
+
+        /// <summary>
+        /// Insert records with SQL asynchronously
+        /// SQL语句异步插入记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="I">Generic inserted data id type</typeparam>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<I?> SqlInsertAsync<T, I>(T data, CancellationToken cancellationToken = default) where T : ISqlInsert;
+
+        /// <summary>
+        /// Select records with SQL asynchronously
+        /// SQL语句异步选择记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Generic selected data id type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="fields">Fields</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, HttpResponse response, CancellationToken cancellationToken = default)
+            where T : ISqlSelect;
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Geneirc fields type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T, D>(T data, HttpResponse response, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="fields">Fields</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+            where T : ISqlSelect;
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Geneirc fields type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T, D>(T data, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Update records with SQL asynchronously
+        /// SQL语句异步更新记录
+        /// </summary>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<IActionResult> SqlUpdateAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlUpdate;
     }
 }

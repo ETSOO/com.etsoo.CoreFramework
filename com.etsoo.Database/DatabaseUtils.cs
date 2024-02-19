@@ -117,6 +117,41 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// To SQL IN clause
+        /// 转化为SQL IN子句
+        /// </summary>
+        /// <typeparam name="T">Generic item type</typeparam>
+        /// <param name="items">Items</param>
+        /// <returns>Result</returns>
+        public static string ToInClause<T>(IEnumerable<T> items) where T : struct
+        {
+            return $"({string.Join(',', items)})";
+        }
+
+        /// <summary>
+        /// String array to SQL IN string clause
+        /// 字符串数组转化为SQL IN字符串子句
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <returns>Results</returns>
+        public static string ToStringInClause(IEnumerable<string> items)
+        {
+            var safeItems = items.Select(i => i.Replace("'", "''"));
+            return $"('{string.Join("','", safeItems)}')";
+        }
+
+        /// <summary>
+        /// Array to SQL IN string items clause
+        /// 数组转化为SQL IN字符串子句
+        /// </summary>
+        /// <param name="items">Items</param>
+        /// <returns>Results</returns>
+        public static string ToStringInClause<T>(IEnumerable<T> items) where T : struct
+        {
+            return $"('{string.Join("','", items)}')";
+        }
+
+        /// <summary>
         /// Convert Type to DbType from name
         /// 从类型名称转化 Type 到 DbType
         /// </summary>
@@ -238,6 +273,25 @@ namespace com.etsoo.Database
             writer.Flush();
 
             return Encoding.UTF8.GetString(stream.ToArray());
+        }
+
+        /// <summary>
+        /// Split field and alias
+        /// 拆分字段和别名
+        /// </summary>
+        /// <param name="field">Raw field</param>
+        /// <returns>Result</returns>
+        public static (string field, string? alias) SplitField(string field)
+        {
+            var pos = field.LastIndexOf(" AS ", StringComparison.OrdinalIgnoreCase);
+            if (pos > 0)
+            {
+                return (field[..pos].Trim(), field[(pos + 4)..].Trim());
+            }
+            else
+            {
+                return (field.Trim(), null);
+            }
         }
 
         private static void WriteJsonItem(Utf8JsonWriter writer, object? item, DbType type)

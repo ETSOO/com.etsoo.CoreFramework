@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Business;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
@@ -9,7 +10,9 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using NUnit.Framework;
+using System.Buffers;
 using System.Data;
+using System.Text;
 
 namespace Tests.Services
 {
@@ -91,7 +94,7 @@ namespace Tests.Services
             {
                 Id = 1001,
                 Name = "Etsoo",
-                ChangedFields = new string[] { "Name" }
+                ChangedFields = ["Name"]
             };
 
             Assert.Throws<Exception>(() => model.AsParameters(app));
@@ -135,13 +138,13 @@ namespace Tests.Services
             {
                 Id = 1021,
                 Name = "Admin 21",
-                ChangedFields = new[] { "Name" }
+                ChangedFields = ["Name"]
             };
 
             var parameters = new Dictionary<string, object> { ["Flag"] = true };
 
             // Act
-            var (result, data) = await service.QuickUpdateAsync(user, new(new[] { "Name AS Id=IIF(@Flag = 1, @Name + ' Flaged', @Name)", "id" }), "Id = @Id", parameters);
+            var (result, data) = await service.QuickUpdateAsync(user, new(["Name AS Id=IIF(@Flag = 1, @Name + ' Flaged', @Name)", "id"]), "Id = @Id", parameters);
 
             // Assert
             Assert.IsTrue(result.Ok);
@@ -218,6 +221,34 @@ namespace Tests.Services
             var parameters = service.CreateStudentParameters(student);
             Assert.IsTrue(parameters.ParameterNames.Contains("JsonBooks"));
             Assert.IsTrue(parameters.ParameterNames.Contains("Books"));
+        }
+
+        [Test]
+        public async Task SqlModelTests()
+        {
+            await service.SqlDeleteAsync("User", [1113]);
+
+            var user = new SqlUserInsert { Id = 1113, Name = "Admin 3", Status = EntityStatus.Approved };
+
+            var id = await service.SqlInsertAsync<SqlUserInsert, int>(user);
+            Assert.AreEqual(1113, id);
+
+            var update = new SqlUserUpdate { Id = 1113, Name = "Admin 3 Updated", ChangedFields = ["Name"] };
+            var updateResult = await service.SqlUpdateAsync(update);
+            Assert.IsTrue(updateResult.Ok);
+
+            var select = new SqlUserSelect { Id = 1113, QueryPaging = new QueryData { BatchSize = 2 } };
+            var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
+            Assert.IsNotNull(selectData);
+            Assert.AreEqual("Admin 3 Updated", selectData.Name);
+
+            var writer = new ArrayBufferWriter<byte>();
+            await service.SqlSelectJsonAsync<SqlUserSelect, UserData>(select, writer);
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
+            Assert.AreEqual("[{\"id\":1113,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
+
+            var deleteResult = await service.SqlDeleteAsync("User", [1113]);
+            Assert.IsTrue(deleteResult.Ok);
         }
     }
 }

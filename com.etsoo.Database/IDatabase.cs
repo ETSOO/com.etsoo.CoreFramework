@@ -15,6 +15,12 @@ namespace com.etsoo.Database
     public interface IDatabase
     {
         /// <summary>
+        /// Database name
+        /// 数据库名称
+        /// </summary>
+        DatabaseName Name { get; }
+
+        /// <summary>
         /// Support stored procedure or not
         /// 是否支持存储过程
         /// </summary>
@@ -41,6 +47,29 @@ namespace com.etsoo.Database
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         CommandDefinition CreateCommand(string name, IDbParameters? parameters = null, CommandType? type = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Create delete command definition
+        /// 创建删除命令定义
+        /// </summary>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Multiple ids</param>
+        /// <param name="idColumn">Id column name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        CommandDefinition CreateDeleteCommand<T>(string tableName, IEnumerable<T> ids, string idColumn = "id", CancellationToken cancellationToken = default) where T : struct;
+
+        /// <summary>
+        /// Create delete command definition
+        /// 创建删除命令定义
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Multiple ids</param>
+        /// <param name="idColumn">Id column name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        CommandDefinition CreateDeleteCommand(string tableName, IEnumerable<string> ids, string idColumn = "id", CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Escape identifier
@@ -128,6 +157,26 @@ namespace com.etsoo.Database
         /// <param name="items">Condition items</param>
         /// <returns>Result</returns>
         string JoinConditions(IEnumerable<string> items);
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="fields">Fields</param>
+        /// <param name="mappings">Mappings</param>
+        /// <param name="policy">Naming policy</param>
+        /// <param name="jsonPolicy">JSON Naming policy</param>
+        /// <returns>Result</returns>
+        string JoinJsonFields(IEnumerable<string> fields, Dictionary<string, string> mappings, NamingPolicy? policy = null, NamingPolicy? jsonPolicy = null);
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="mappings">Mapping fields</param>
+        /// <param name="isObject">Is object node</param>
+        /// <returns>Result</returns>
+        string JoinJsonFields(Dictionary<string, string> mappings, bool isObject);
 
         /// <summary>
         /// Get query limit command

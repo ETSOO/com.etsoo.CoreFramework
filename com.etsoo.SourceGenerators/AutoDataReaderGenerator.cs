@@ -15,15 +15,20 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class AutoDataReaderGenerator : ISourceGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime, List<string> externalInheritances, string ns)
+        private (string, List<string>) GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime, List<string> externalInheritances, string ns)
         {
             var body = new List<string>();
+            var fields = new List<string>();
 
             var members = context.ParseMembers(tds, false, externalInheritances, out bool isPositionalRecord);
 
             if (!context.CancellationToken.IsCancellationRequested)
             {
                 var arrayPropertyType = typeof(ArrayPropertyAttribute);
+
+                var columnType = typeof(SqlSelectColumnAttribute);
+                var prefixName = nameof(SqlSelectColumnAttribute.Prefix);
+                var functionName = nameof(SqlSelectColumnAttribute.Function);
 
                 foreach (var member in members)
                 {
@@ -40,6 +45,9 @@ namespace com.etsoo.SourceGenerators
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(arrayPropertyType.FullName);
+
+                    // Column attribute data
+                    var columnAttributeData = symbol.GetAttributeData(columnType.FullName);
 
                     // Value part
                     string valuePart;
@@ -107,6 +115,23 @@ namespace com.etsoo.SourceGenerators
                         continue;
                     }
 
+                    var prefix = columnAttributeData?.GetValue<string?>(prefixName);
+                    var function = columnAttributeData?.GetValue<string?>(functionName);
+                    string oneField;
+                    if (!string.IsNullOrEmpty(function))
+                    {
+                        oneField = $"{function} AS {fieldName}";
+                    }
+                    else if (!string.IsNullOrEmpty(prefix))
+                    {
+                        oneField = $"{prefix}.{fieldName}";
+                    }
+                    else
+                    {
+                        oneField = fieldName;
+                    }
+                    fields.Add(oneField);
+
                     if (isPositionalRecord)
                         body.Add($@"{fieldName}: {valuePart}");
                     else
@@ -117,9 +142,9 @@ namespace com.etsoo.SourceGenerators
             // Limitation: When inheritanted, please keep the same style
             // Define constructor for Positional Record
             if (isPositionalRecord)
-                return "(" + string.Join(",\n", body) + ")";
+                return ("(" + string.Join(",\n", body) + ")", fields);
 
-            return "{\n" + string.Join(",\n", body) + "\n}";
+            return ("{\n" + string.Join(",\n", body) + "\n}", fields);
         }
 
         private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
@@ -151,7 +176,7 @@ namespace com.etsoo.SourceGenerators
             var externals = new List<string>();
 
             // Body
-            var body = GenerateBody(context, tds, utcDateTime.GetValueOrDefault(), externals, ns);
+            var (body, fields) = GenerateBody(context, tds, utcDateTime.GetValueOrDefault(), externals, ns);
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
@@ -173,6 +198,12 @@ namespace com.etsoo.SourceGenerators
                 {{
                     {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
+                        /// <summary>
+                        /// Parser inner fields
+                        /// 解析器内部字段
+                        /// </summary>
+                        public static IEnumerable<string> ParserInnerFields => [ ""{string.Join("\", \"", fields)}"" ];
+
                         public static async IAsyncEnumerable<{name}> CreateAsync(DbDataReader reader, [EnumeratorCancellation] CancellationToken cancellationToken = default)
                         {{
                             // Column names
@@ -235,12 +266,12 @@ namespace com.etsoo.SourceGenerators
 
         public void Initialize(GeneratorInitializationContext context)
         {
-            /*
-            if (!System.Diagnostics.Debugger.IsAttached)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-            */
+
+            //if (!System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    System.Diagnostics.Debugger.Launch();
+            //}
+
 
             // Register a factory that can create our custom syntax receiver
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoDataReaderGeneratorAttribute)));

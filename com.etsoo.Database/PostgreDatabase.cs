@@ -11,7 +11,7 @@ namespace com.etsoo.Database
     /// 构造函数
     /// </remarks>
     /// <param name="connectionString">Connection string</param>
-    public sealed class PostgreDatabase(string connectionString) : CommonDatabase<NpgsqlConnection>(connectionString)
+    public sealed class PostgreDatabase(string connectionString) : CommonDatabase<NpgsqlConnection>(DatabaseName.PostgreSQL, connectionString)
     {
         /// <summary>
         /// Escape identifier
@@ -43,6 +43,24 @@ namespace com.etsoo.Database
             }
 
             return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
+        }
+
+        /// <summary>
+        /// Join JSON fields
+        /// 链接JSON字段
+        /// </summary>
+        /// <param name="mappings">Mapping fields</param>
+        /// <param name="isObject">Is object node</param>
+        /// <returns>Result</returns>
+        public override string JoinJsonFields(Dictionary<string, string> mappings, bool isObject)
+        {
+            var items = mappings.SelectMany(m => new[] { $"'{m.Key}'", m.Value }).ToList();
+            var command = $"json_build_object({string.Join(", ", items)})";
+
+            if (isObject)
+                return command;
+            else
+                return $"json_agg({command})";
         }
 
         /// <summary>

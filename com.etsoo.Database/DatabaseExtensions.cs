@@ -115,6 +115,26 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// To specified naming case
+        /// 转化为指定命名规则格式
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <param name="namingPolicy">Naming policy</param>
+        /// <returns>Result</returns>
+        public static string ToNamingCase(this string input, NamingPolicy? namingPolicy)
+        {
+            if (namingPolicy == null || namingPolicy == NamingPolicy.PascalCase)
+                return input;
+
+            return namingPolicy switch
+            {
+                NamingPolicy.SnakeCase => input.ToSnakeCase().ToString(),
+                NamingPolicy.CamelCase => input[..1].ToLower() + input[1..],
+                _ => input
+            };
+        }
+
+        /// <summary>
         /// Async create action result
         /// 异步创建操作结果
         /// </summary>

@@ -12,7 +12,7 @@ namespace com.etsoo.SourceGenerators
     /// Source generators extension
     /// 源生成器扩展
     /// </summary>
-    public static class Extensions
+    internal static class Extensions
     {
         /// <summary>
         /// Is SyntaxList has the specific attribute

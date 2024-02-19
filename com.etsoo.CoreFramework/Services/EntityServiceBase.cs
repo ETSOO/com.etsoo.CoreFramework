@@ -118,7 +118,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Action result</returns>
         public virtual ValueTask<IActionResult> DeleteAsync(T id, string? range = null, CancellationToken cancellationToken = default)
         {
-            return DeleteAsync(new T[] { id }, range, cancellationToken);
+            return DeleteAsync([id], range, cancellationToken);
         }
 
         /// <summary>

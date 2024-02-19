@@ -452,13 +452,9 @@ namespace com.etsoo.CoreFramework.Services
                             value = $"@{value}";
                         }
                     }
-                    var matchParts = matchField.Split(" AS ", StringSplitOptions.RemoveEmptyEntries);
+
                     string? alias = null;
-                    if (matchParts.Length > 1)
-                    {
-                        matchField = matchParts[0].Trim();
-                        alias = matchParts[1].Trim();
-                    }
+                    (matchField, alias) = DatabaseUtils.SplitField(matchField);
                     return (matchField, alias, value);
                 })
                 .Where(field => model.ChangedFields.Contains(field.matchField, StringComparer.OrdinalIgnoreCase)
@@ -528,8 +524,175 @@ namespace com.etsoo.CoreFramework.Services
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Command update failed: {commandText}", commandText);
-                throw new Exception("Command update failed: " + commandText, ex);
+                throw new Exception("Command update failed", ex);
             }
+        }
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<IActionResult> SqlDeleteAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlDelete
+        {
+            var (sql, parameters) = data.CreateSqlDelete(App.DB);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            var result = await App.DB.ExecuteAsync(command);
+            return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
+        }
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Ids</param>
+        /// <param name="idColumn">Id column</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<IActionResult> SqlDeleteAsync(string tableName, IEnumerable<string> ids, string idColumn = "id", CancellationToken cancellationToken = default)
+        {
+            var command = App.DB.CreateDeleteCommand(tableName, ids, idColumn, cancellationToken);
+            var result = await App.DB.ExecuteAsync(command);
+            return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
+        }
+
+        /// <summary>
+        /// Delete records with SQL asynchronously
+        /// SQL语句异步删除记录
+        /// </summary>
+        /// <typeparam name="T">Generic id type</typeparam>
+        /// <param name="tableName">Table name</param>
+        /// <param name="ids">Ids</param>
+        /// <param name="idColumn">Id column</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<IActionResult> SqlDeleteAsync<T>(string tableName, IEnumerable<T> ids, string idColumn = "id", CancellationToken cancellationToken = default) where T : struct
+        {
+            var command = App.DB.CreateDeleteCommand(tableName, ids, idColumn, cancellationToken);
+            var result = await App.DB.ExecuteAsync(command);
+            return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
+        }
+
+        /// <summary>
+        /// Insert records with SQL asynchronously
+        /// SQL语句异步插入记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="I">Generic inserted data id type</typeparam>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<I?> SqlInsertAsync<T, I>(T data, CancellationToken cancellationToken = default) where T : ISqlInsert
+        {
+            var (sql, parameters) = data.CreateSqlInsert(App.DB);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            return await ExecuteScalarAsync<I>(command);
+        }
+
+        /// <summary>
+        /// Select records with SQL asynchronously
+        /// SQL语句异步选择记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Generic selected data id type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>
+        {
+            var (sql, parameters) = data.CreateSqlSelect(App.DB, D.ParserInnerFields);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            return await QueryAsListAsync<D>(command);
+        }
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="fields">Fields</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, HttpResponse response, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+        {
+            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            await ReadJsonToStreamAsync(command, response);
+        }
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Geneirc fields type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T, D>(T data, HttpResponse response, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>
+        {
+            await SqlSelectJsonAsync(data, D.ParserInnerFields, response, cancellationToken);
+        }
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="fields">Fields</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+        {
+            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            await ReadToStreamAsync(command, writer);
+        }
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <typeparam name="D">Geneirc fields type</typeparam>
+        /// <param name="data">Query data</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T, D>(T data, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+            where T : ISqlSelect
+            where D : IDataReaderParser<D>
+        {
+            await SqlSelectJsonAsync(data, D.ParserInnerFields, writer, cancellationToken);
+        }
+
+        /// <summary>
+        /// Update records with SQL asynchronously
+        /// SQL语句异步更新记录
+        /// </summary>
+        /// <param name="data">Related data</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task<IActionResult> SqlUpdateAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlUpdate
+        {
+            var (sql, parameters) = data.CreateSqlUpdate(App.DB);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            var result = await App.DB.ExecuteAsync(command);
+            return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
         }
 
         [GeneratedRegex("^[0-9a-zA-Z_]+$")]

@@ -9,10 +9,10 @@ namespace com.etsoo.SourceGenerators
     /// Utility extensions
     /// 工具扩展
     /// </summary>
-    public static class UtilExtensions
+    internal static class UtilExtensions
     {
         private static readonly List<string> numericTypes = new() {
-            "byte", 
+            "byte",
             "sbyte",
             "short",
             "ushort",
@@ -24,6 +24,35 @@ namespace com.etsoo.SourceGenerators
             "double",
             "decimal"
         };
+
+        /// <summary>
+        /// Database escape identifier
+        /// 数据库转义标识符
+        /// </summary>
+        /// <param name="name">Field name</param>
+        /// <param name="database">Database name</param>
+        /// <returns>Result</returns>
+        public static string DbEscape(this string name, DatabaseName database)
+        {
+            // Multiple tables, follow SQL Server escape style
+            if (name.Contains(" JOIN "))
+            {
+                return database switch
+                {
+                    DatabaseName.MySQL => name.Replace('[', '`').Replace(']', '`'),
+                    DatabaseName.PostgreSQL or DatabaseName.SQLite => name.Replace("[", "\\\"").Replace("]", "\\\""),
+                    _ => name
+                };
+            }
+
+            return database switch
+            {
+                DatabaseName.MySQL => $"`{name}`",
+                DatabaseName.PostgreSQL or DatabaseName.SQLite => $"\\\"{name}\\\"",
+                DatabaseName.SQLServer => $"[{name.Replace("[", "[[").Replace("]", "]]")}]",
+                _ => name
+            };
+        }
 
         /// <summary>
         /// Convert Pascal case name to snake case name
@@ -57,6 +86,26 @@ namespace com.etsoo.SourceGenerators
                 return "null";
 
             return input.ToString();
+        }
+
+        /// <summary>
+        /// To specified case
+        /// 转化为指定命名规则格式
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <param name="namingPolicy">Naming policy</param>
+        /// <returns>Result</returns>
+        public static string ToCase(this string input, NamingPolicy? namingPolicy)
+        {
+            if (namingPolicy == null || namingPolicy == NamingPolicy.PascalCase)
+                return input;
+
+            return namingPolicy switch
+            {
+                NamingPolicy.SnakeCase => input.ToSnakeCase(),
+                NamingPolicy.CamelCase => input.Substring(0, 1).ToLower() + input.Substring(1),
+                _ => input
+            };
         }
 
         /// <summary>
@@ -106,6 +155,21 @@ namespace com.etsoo.SourceGenerators
 
             // Default
             return "null";
+        }
+
+        public static string ToQuerySign(this SqlQuerySign sign)
+        {
+            return sign switch
+            {
+                SqlQuerySign.NotEqual => "<>",
+                SqlQuerySign.Greater => ">",
+                SqlQuerySign.GreaterOrEqual => ">=",
+                SqlQuerySign.Less => "<",
+                SqlQuerySign.LessOrEqual => "<=",
+                SqlQuerySign.Like => "LIKE",
+                SqlQuerySign.NotLike => "NOT LIKE",
+                _ => "="
+            };
         }
     }
 }

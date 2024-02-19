@@ -9,6 +9,12 @@ namespace com.etsoo.Database
     public interface IDataReaderParser<TSelf> where TSelf : IDataReaderParser<TSelf>
     {
         /// <summary>
+        /// Parser inner fields
+        /// 解析器内部字段
+        /// </summary>
+        static abstract IEnumerable<string> ParserInnerFields { get; }
+
+        /// <summary>
         /// Create object async list from DataReader
         /// 从DataReader创建异步对象列表
         /// </summary>

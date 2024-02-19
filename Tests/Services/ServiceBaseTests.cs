@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Business;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Moq;
 using NUnit.Framework;
+using System.Buffers;
 using System.IO.Pipelines;
 using System.Runtime.Versioning;
 using System.Text;
@@ -57,12 +59,40 @@ namespace Tests.Services
             await db.WithConnection((connection) =>
             {
                 var sql = @"
-                    CREATE TABLE IF NOT EXISTS e_user (id int PRIMARY KEY, name nvarchar(128), status int);
-                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1002, 'Admin 2');
-                    INSERT OR IGNORE INTO e_user (id, name) VALUES(1001, 'Admin 1');
+                    CREATE TABLE IF NOT EXISTS User (id int PRIMARY KEY, name nvarchar(128), status int) WITHOUT ROWID;
+                    INSERT OR IGNORE INTO User (id, name) VALUES(1002, 'Admin 2');
+                    INSERT OR IGNORE INTO User (id, name) VALUES(1001, 'Admin 1');
                 ";
                 return connection.ExecuteAsync(sql);
             });
+        }
+
+        [Test]
+        public async Task SqlModelTests()
+        {
+            await service.SqlDeleteAsync("User", [1003]);
+
+            var user = new SqlUserInsert { Id = 1003, Name = "Admin 3", Status = EntityStatus.Approved };
+
+            var id = await service.SqlInsertAsync<SqlUserInsert, int>(user);
+            Assert.AreEqual(1003, id);
+
+            var update = new SqlUserUpdate { Id = 1003, Name = "Admin 3 Updated", ChangedFields = ["Name"] };
+            var updateResult = await service.SqlUpdateAsync(update);
+            Assert.IsTrue(updateResult.Ok);
+
+            var select = new SqlUserSelect { Id = 1003, QueryPaging = new QueryData { BatchSize = 2 } };
+            var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
+            Assert.IsNotNull(selectData);
+            Assert.AreEqual("Admin 3 Updated", selectData.Name);
+
+            var writer = new ArrayBufferWriter<byte>();
+            await service.SqlSelectJsonAsync<SqlUserSelect, UserData>(select, writer);
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
+            Assert.AreEqual("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
+
+            var deleteResult = await service.SqlDeleteAsync("User", [1003]);
+            Assert.IsTrue(deleteResult.Ok);
         }
 
         [Test]
@@ -128,7 +158,7 @@ namespace Tests.Services
             var (result, data) = await service.InlineUpdateAsync<int, UserUpdateModule>(user, new(new[] { "name = IIF(@Id = 1001, t.'name', @Name)" })
             {
                 IdField = "id",
-                TableName = "e_user"
+                TableName = "User"
             });
 
             // Assert
@@ -141,7 +171,7 @@ namespace Tests.Services
         public async Task QueryAs_Test()
         {
             // Arrange
-            var sql = "SELECT * FROM e_user WHERE id = 1001";
+            var sql = "SELECT * FROM User WHERE id = 1001";
             var command = new CommandDefinition(sql);
 
             // Act
@@ -155,7 +185,7 @@ namespace Tests.Services
         public async Task QueryAsResult_NoActionResult()
         {
             // Arrange
-            var sql = "SELECT * FROM e_user WHERE id = -1";
+            var sql = "SELECT * FROM User WHERE id = -1";
             var command = new CommandDefinition(sql);
 
             // Act
@@ -186,7 +216,7 @@ namespace Tests.Services
         public async Task ReadToStreamAsync_Test()
         {
             // Arrange
-            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3)";
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM User WHERE id = 1001 LIMIT 3)";
             var command = new CommandDefinition(sql);
             using var stream = SharedUtils.GetStream();
 
@@ -203,7 +233,7 @@ namespace Tests.Services
         public async Task ReadToStreamMultipleResultsAsync_Test()
         {
             // Arrange
-            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM User WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM User WHERE id = 1001 LIMIT 1)";
             var command = new CommandDefinition(sql);
             using var stream = SharedUtils.GetStream();
 
@@ -221,7 +251,7 @@ namespace Tests.Services
         public async Task ReadJsonToStreamWithReturnAsync_Test()
         {
             // Arrange
-            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM e_user WHERE id = 1001 LIMIT 1)";
+            var sql = "SELECT json_group_array(json_object('id', id, 'name', name)) AS json_result FROM (SELECT id, name FROM User WHERE id = 1001 LIMIT 3); SELECT json_object('id', id, 'name', name) AS json_result FROM (SELECT id, name FROM User WHERE id = 1001 LIMIT 1)";
             var command = new CommandDefinition(sql);
             using var stream = SharedUtils.GetStream();
 
@@ -229,7 +259,7 @@ namespace Tests.Services
             var mock = new Mock<HttpResponse>();
             mock.Setup((o) => o.BodyWriter).Returns(PipeWriter.Create(new MemoryStream()));
 
-            var result = await service.ReadJsonToStreamWithReturnAsync(command, mock.Object, new[] { "users" });
+            var result = await service.ReadJsonToStreamWithReturnAsync(command, mock.Object, ["users"]);
             var json = Encoding.UTF8.GetString(result.ToArray());
 
             // Assert

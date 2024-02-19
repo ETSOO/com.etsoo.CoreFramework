@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Localization", "c
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.Web", "com.etsoo.Web\com.etsoo.Web.csproj", "{ACB910F4-E75D-4ADF-96CB-A38288EBB67E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com.etsoo.HtmlIO", "com.etsoo.HtmlIO\com.etsoo.HtmlIO.csproj", "{8B7A1FDE-0383-4F51-B41B-428315ACFD88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com.etsoo.HtmlIO", "com.etsoo.HtmlIO\com.etsoo.HtmlIO.csproj", "{8B7A1FDE-0383-4F51-B41B-428315ACFD88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
