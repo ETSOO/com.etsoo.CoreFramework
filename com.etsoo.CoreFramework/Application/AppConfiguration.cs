@@ -30,11 +30,18 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         public string[] Cultures { get; init; } = [];
 
+        // Keep 'init' only but still support 'pivate' set
+        private string _privateKey = string.Empty;
+
         /// <summary>
         /// Private key for hash or simple encryption/decryption, required
         /// 哈希或简单加密/解密私匙，必填
         /// </summary>
-        public string PrivateKey { get; private set; } = string.Empty;
+        public string PrivateKey
+        {
+            get { return _privateKey; }
+            init { _privateKey = value; }
+        }
 
         /// <summary>
         /// Unique name
@@ -73,7 +80,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="secureManager">Secure manager</param>
         public virtual void UnsealData(Func<string, string, string>? secureManager = null)
         {
-            PrivateKey = CryptographyUtils.UnsealData(nameof(PrivateKey), PrivateKey, secureManager);
+            _privateKey = CryptographyUtils.UnsealData(nameof(PrivateKey), PrivateKey, secureManager);
         }
     }
 }
