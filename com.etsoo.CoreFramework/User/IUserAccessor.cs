@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.CoreFramework.User
+﻿using System.Net;
+
+namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
     /// User accessor interface
@@ -6,6 +8,12 @@
     /// </summary>
     public interface IUserAccessor<T> where T : IUserCreator<T>
     {
+        /// <summary>
+        /// Get IP
+        /// 获取IP
+        /// </summary>
+        IPAddress Ip { get; }
+
         /// <summary>
         /// Get user
         /// 获取用户
