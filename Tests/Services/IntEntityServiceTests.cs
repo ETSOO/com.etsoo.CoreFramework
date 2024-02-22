@@ -226,7 +226,7 @@ namespace Tests.Services
         [Test]
         public async Task SqlModelTests()
         {
-            await service.SqlDeleteAsync("User", [1113]);
+            await service.SqlDeleteAsync([1113]);
 
             var user = new SqlUserInsert { Id = 1113, Name = "Admin 3", Status = EntityStatus.Approved };
 
@@ -247,7 +247,7 @@ namespace Tests.Services
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
             Assert.AreEqual("[{\"id\":1113,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
 
-            var deleteResult = await service.SqlDeleteAsync("User", [1113]);
+            var deleteResult = await service.SqlDeleteAsync([1113], "User");
             Assert.IsTrue(deleteResult.Ok);
         }
     }

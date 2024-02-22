@@ -237,24 +237,24 @@ namespace com.etsoo.CoreFramework.Services
         /// Delete records with SQL asynchronously
         /// SQL语句异步删除记录
         /// </summary>
-        /// <param name="tableName">Table name</param>
         /// <param name="ids">Ids</param>
+        /// <param name="tableName">Table name, default is the 'Flag'</param>
         /// <param name="idColumn">Id column</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<IActionResult> SqlDeleteAsync(string tableName, IEnumerable<string> ids, string idColumn = "id", CancellationToken cancellationToken = default);
+        ValueTask<IActionResult> SqlDeleteAsync(IEnumerable<string> ids, string? tableName = null, string idColumn = "id", CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete records with SQL asynchronously
         /// SQL语句异步删除记录
         /// </summary>
         /// <typeparam name="T">Generic id type</typeparam>
-        /// <param name="tableName">Table name</param>
         /// <param name="ids">Ids</param>
+        /// <param name="tableName">Table name, default is the 'Flag'</param>
         /// <param name="idColumn">Id column</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<IActionResult> SqlDeleteAsync<T>(string tableName, IEnumerable<T> ids, string idColumn = "id", CancellationToken cancellationToken = default) where T : struct;
+        ValueTask<IActionResult> SqlDeleteAsync<T>(IEnumerable<T> ids, string? tableName = null, string idColumn = "id", CancellationToken cancellationToken = default) where T : struct;
 
 
         /// <summary>

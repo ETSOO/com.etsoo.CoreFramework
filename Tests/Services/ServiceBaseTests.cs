@@ -50,7 +50,7 @@ namespace Tests.Services
             var config = new AppConfiguration { Name = "test" };
             var app = new CoreApplication<AppConfiguration, SqliteConnection>(config, db);
 
-            service = new ServiceTest(app, "test", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+            service = new ServiceTest(app, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
         }
 
         [SetUp]
@@ -70,7 +70,7 @@ namespace Tests.Services
         [Test]
         public async Task SqlModelTests()
         {
-            await service.SqlDeleteAsync("User", [1003]);
+            await service.SqlDeleteAsync([1003]);
 
             var user = new SqlUserInsert { Id = 1003, Name = "Admin 3", Status = EntityStatus.Approved };
 
@@ -91,7 +91,7 @@ namespace Tests.Services
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
             Assert.AreEqual("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
 
-            var deleteResult = await service.SqlDeleteAsync("User", [1003]);
+            var deleteResult = await service.SqlDeleteAsync([1003], "User");
             Assert.IsTrue(deleteResult.Ok);
         }
 
@@ -151,7 +151,7 @@ namespace Tests.Services
             {
                 Id = 1001,
                 Name = "Admin 21",
-                ChangedFields = new[] { "Name" }
+                ChangedFields = ["Name"]
             };
 
             // Act
