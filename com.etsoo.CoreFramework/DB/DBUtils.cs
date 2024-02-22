@@ -23,14 +23,14 @@ namespace com.etsoo.CoreFramework.DB
         }
 
         /// <summary>
-        /// Write raw JSON string
-        /// 输出原始 JSON zifc
+        /// Async write raw JSON string
+        /// 异步输出原始 JSON 字符串
         /// </summary>
         /// <param name="response">HTTP response</param>
         /// <param name="raw">Raw JSON string</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task WriteRawJson(this HttpResponse response, string? raw, CancellationToken cancellationToken = default)
+        public static async Task WriteRawJsonAsync(this HttpResponse response, string? raw, CancellationToken cancellationToken = default)
         {
             // Content type
             response.JsonContentType();
