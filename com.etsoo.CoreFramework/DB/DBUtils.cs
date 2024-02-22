@@ -2,6 +2,7 @@
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.Database;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace com.etsoo.CoreFramework.DB
 {
@@ -19,6 +20,24 @@ namespace com.etsoo.CoreFramework.DB
         public static void JsonContentType(this HttpResponse response)
         {
             response.ContentType = "application/json";
+        }
+
+        /// <summary>
+        /// Write raw JSON string
+        /// 输出原始 JSON zifc
+        /// </summary>
+        /// <param name="response">HTTP response</param>
+        /// <param name="raw">Raw JSON string</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
+        public static async Task WriteRawJson(this HttpResponse response, string raw, CancellationToken cancellationToken = default)
+        {
+            // Content type
+            response.JsonContentType();
+            if (!string.IsNullOrEmpty(raw))
+                await response.WriteAsync(raw, cancellationToken);
+            else
+                response.StatusCode = (int)HttpStatusCode.NoContent;
         }
 
         /// <summary>
