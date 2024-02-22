@@ -30,7 +30,7 @@ namespace com.etsoo.CoreFramework.DB
         /// <param name="raw">Raw JSON string</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task WriteRawJson(this HttpResponse response, string raw, CancellationToken cancellationToken = default)
+        public static async Task WriteRawJson(this HttpResponse response, string? raw, CancellationToken cancellationToken = default)
         {
             // Content type
             response.JsonContentType();
