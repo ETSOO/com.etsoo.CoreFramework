@@ -52,6 +52,7 @@
         /// <param name="path">Path</param>
         /// <param name="stream">Stream</param>
         /// <param name="writeCase">Write case</param>
-        ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew);
+        /// <param name="cancellationToken">Cancellation token</param>
+        ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default);
     }
 }

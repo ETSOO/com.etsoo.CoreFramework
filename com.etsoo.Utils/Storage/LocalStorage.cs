@@ -163,7 +163,8 @@ namespace com.etsoo.Utils.Storage
         /// <param name="path">Path</param>
         /// <param name="stream">Stream</param>
         /// <param name="writeCase">Write case</param>
-        public async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default)
         {
             var fi = GetFileInfo(path);
             if (
@@ -195,10 +196,10 @@ namespace com.etsoo.Utils.Storage
                 stream.Seek(0, SeekOrigin.Begin);
 
             // Copy the stream to the file stream
-            await stream.CopyToAsync(fileStream);
+            await stream.CopyToAsync(fileStream, cancellationToken);
 
             // Flush and close
-            await fileStream.FlushAsync();
+            await fileStream.FlushAsync(cancellationToken);
 
             // Close the stream explicitly
             fileStream.Close();
