@@ -50,22 +50,8 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="logger">Logger</param>
-        public EntityServiceBase(A app, U user, string flag, ILogger logger)
-            : this(app, user, flag, logger, true)
-        {
-        }
-
-        /// <remarks>
-        /// Constructor
-        /// 构造函数
-        /// </remarks>
-        /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
-        /// <param name="flag">Flag</param>
-        /// <param name="logger">Logger</param>
-        /// <param name="userRequired">User required or not</param>
-        public EntityServiceBase(A app, U? user, string flag, ILogger logger, bool userRequired)
-            : base(app, user, flag, logger, userRequired)
+        public EntityServiceBase(A app, U? user, string flag, ILogger logger)
+            : base(app, user, flag, logger)
         {
         }
 

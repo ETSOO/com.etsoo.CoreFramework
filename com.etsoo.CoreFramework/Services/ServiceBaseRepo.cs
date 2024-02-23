@@ -29,8 +29,15 @@ namespace com.etsoo.CoreFramework.Services
         /// 添加系统参数
         /// </summary>
         /// <param name="parameters">Parameters</param>
-        public virtual void AddSystemParameters(IDbParameters parameters)
+        /// <param name="userRequired">User required or not</param>
+        public virtual void AddSystemParameters(IDbParameters parameters, bool userRequired = true)
         {
+            // A way to check the user is required or not
+            if (userRequired && User == null)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             // When the user is not required, there may still be an associated user
             // 当用户不是必须的时候，仍然可能存在一个关联的用户
             if (User != null)

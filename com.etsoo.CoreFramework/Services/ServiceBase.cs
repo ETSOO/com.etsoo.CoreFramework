@@ -8,7 +8,6 @@ using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace com.etsoo.CoreFramework.Services
@@ -47,13 +46,6 @@ namespace com.etsoo.CoreFramework.Services
         protected virtual U? User { get; }
 
         /// <summary>
-        /// User required or not
-        /// 用户是否必须
-        /// </summary>
-        [MemberNotNullWhen(true, nameof(User))]
-        public bool UserRequired { get; }
-
-        /// <summary>
         /// Flag
         /// 标识
         /// </summary>
@@ -73,27 +65,8 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="logger">Logger</param>
-        public ServiceBase(A app, U user, string flag, ILogger logger)
-            : this(app, user, flag, logger, true)
+        public ServiceBase(A app, U? user, string flag, ILogger logger)
         {
-        }
-
-        /// <remarks>
-        /// Constructor
-        /// 构造函数
-        /// </remarks>
-        /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
-        /// <param name="flag">Flag</param>
-        /// <param name="logger">Logger</param>
-        /// <param name="userRequired">User required or not</param>
-        public ServiceBase(A app, U? user, string flag, ILogger logger, bool userRequired)
-        {
-            if (userRequired && user == null)
-            {
-                throw new UnauthorizedAccessException();
-            }
-
             App = app;
             User = user;
             Flag = flag;

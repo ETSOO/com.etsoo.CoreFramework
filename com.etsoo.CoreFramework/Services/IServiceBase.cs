@@ -21,17 +21,12 @@ namespace com.etsoo.CoreFramework.Services
         string Flag { get; }
 
         /// <summary>
-        /// User required or not
-        /// 用户是否必须
-        /// </summary>
-        bool UserRequired { get; }
-
-        /// <summary>
         /// Add system parameters
         /// 添加系统参数
         /// </summary>
         /// <param name="parameters">Parameters</param>
-        void AddSystemParameters(IDbParameters parameters);
+        /// <param name="userRequired">User required or not</param>
+        void AddSystemParameters(IDbParameters parameters, bool userRequired = true);
 
         /// <summary>
         /// Decrypt device core with user identifier for multiple decryption

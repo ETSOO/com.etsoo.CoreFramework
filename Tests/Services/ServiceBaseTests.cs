@@ -21,7 +21,11 @@ namespace Tests.Services
 {
     internal class ServiceTest : ServiceBase<AppConfiguration, SqliteConnection, ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
     {
-        public ServiceTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger) : base(app, null, flag, logger, false)
+        public ServiceTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger) : base(app, null, flag, logger)
+        {
+        }
+
+        public override void AddSystemParameters(IDbParameters parameters, bool userRequired = true)
         {
         }
 
@@ -155,7 +159,7 @@ namespace Tests.Services
             };
 
             // Act
-            var (result, data) = await service.InlineUpdateAsync<int, UserUpdateModule>(user, new(new[] { "name = IIF(@Id = 1001, t.'name', @Name)" })
+            var (result, data) = await service.InlineUpdateAsync<int, UserUpdateModule>(user, new(["name = IIF(@Id = 1001, t.'name', @Name)"])
             {
                 IdField = "id",
                 TableName = "User"
