@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.DB;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
 using com.etsoo.WebUtils;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Mime;
 using IActionResult = com.etsoo.Utils.Actions.IActionResult;
 
 namespace com.etsoo.Web
@@ -162,7 +162,7 @@ namespace com.etsoo.Web
         protected async Task WriteResultAsync(IActionResult result)
         {
             // Content type
-            Response.ContentType = MediaTypeNames.Application.Json;
+            Response.JsonContentType();
 
             // Write
             await result.ToJsonAsync(Response.BodyWriter, CoreApp.DefaultJsonSerializerOptions);

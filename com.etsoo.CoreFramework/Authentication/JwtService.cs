@@ -64,7 +64,7 @@ namespace com.etsoo.CoreFramework.Authentication
             JwtBearerEvents? events = null)
         {
             // Jwt settings are required
-            ArgumentNullException.ThrowIfNull(settings);
+            ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
             defaultIssuer = settings.DefaultIssuer ?? DefaultIssuer;
             defaultAudience = settings.DefaultAudience ?? "All";

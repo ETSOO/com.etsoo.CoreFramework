@@ -3,6 +3,7 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.Database;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Net.Mime;
 
 namespace com.etsoo.CoreFramework.DB
 {
@@ -19,7 +20,7 @@ namespace com.etsoo.CoreFramework.DB
         /// <param name="response">HTTP Response</param>
         public static void JsonContentType(this HttpResponse response)
         {
-            response.ContentType = "application/json";
+            response.ContentType = MediaTypeNames.Application.Json;
         }
 
         /// <summary>
