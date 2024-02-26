@@ -11,6 +11,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(ChangePasswordDto))]
     [JsonSerializable(typeof(ChangePasswordRQ))]
     [JsonSerializable(typeof(ExchangeTokenRQ))]
+    [JsonSerializable(typeof(ErrorLogData))]
     [JsonSerializable(typeof(IEnumerable<IdNameItem>))]
     [JsonSerializable(typeof(IEnumerable<IdTitleItem>))]
     [JsonSerializable(typeof(InitCallRQ))]

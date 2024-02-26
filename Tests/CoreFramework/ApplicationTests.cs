@@ -36,6 +36,9 @@ namespace Tests.CoreFramework
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(configurationText));
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Configuration");
 
+            var privateField = section.GetSection("PrivateKey").Value;
+            Assert.AreEqual("Etsoo", privateField);
+
             var config = section.Get<AppConfiguration>();
             Assert.IsNotNull(config);
 
