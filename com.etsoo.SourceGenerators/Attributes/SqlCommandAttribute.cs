@@ -28,6 +28,12 @@ namespace com.etsoo.SourceGenerators.Attributes
         public DatabaseName Database { get; set; }
 
         /// <summary>
+        /// Is debug
+        /// 是否调试
+        /// </summary>
+        public bool Debug { get; set; }
+
+        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>

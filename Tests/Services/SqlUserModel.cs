@@ -4,7 +4,7 @@ using com.etsoo.SourceGenerators.Attributes;
 
 namespace Tests.Services
 {
-    [SqlInsertCommand("User", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
+    [SqlInsertCommand("User", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite, Debug = true)]
     internal partial record SqlUserInsert
     {
         public int Id { get; init; }

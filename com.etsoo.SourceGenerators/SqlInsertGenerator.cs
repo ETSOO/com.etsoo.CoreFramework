@@ -35,6 +35,7 @@ namespace com.etsoo.SourceGenerators
                 var propertyType = typeof(SqlColumnAttribute);
                 var ignoreName = nameof(SqlColumnAttribute.Ignore);
                 var columnNameField = nameof(SqlColumnAttribute.ColumnName);
+                var valueCodeField = nameof(SqlColumnAttribute.ValueCode);
 
                 foreach (var member in members)
                 {
@@ -63,6 +64,9 @@ namespace com.etsoo.SourceGenerators
                         break;
                     }
 
+                    // Value code
+                    var valueCode = attributeData?.GetValue<string?>(valueCodeField);
+
                     if (columnName.Equals(pKey, StringComparison.OrdinalIgnoreCase))
                     {
                         idField = columnName;
@@ -70,28 +74,25 @@ namespace com.etsoo.SourceGenerators
 
                     columns.Add(columnName);
                     values.Add($"@{field}");
-                    body.Add($@"parameters.Add(""{field}"", {field});");
+                    body.Add($@"parameters.Add(""{field}"", {valueCode ?? field});");
                 }
             }
 
+            var sql = new StringBuilder($@"INSERT INTO {tableName.DbEscape(database)} ({string.Join(", ", columns)})");
             if (database == DatabaseName.SQLServer)
             {
-                body.Add($@"
-                    sql.Append(""INSERT INTO {tableName.DbEscape(database)} ({string.Join(", ", columns)}) OUTPUT inserted.{pKey} VALUES ({string.Join(", ", values)})"");
-                ");
+                sql.Append($@" OUTPUT inserted.{pKey} VALUES ({string.Join(", ", values)})");
             }
             else if (database == DatabaseName.MySQL)
             {
-                body.Add($@"
-                    sql.Append(""INSERT INTO {tableName.DbEscape(database)} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)}); {(idField == null ? "; SELECT LAST_INSERT_ID()" : $"SELECT {primaryKey} AS {pKey}")}"");
-                ");
+                sql.Append($@" VALUES ({string.Join(", ", values)}); {(idField == null ? "; SELECT LAST_INSERT_ID()" : $"SELECT {primaryKey} AS {pKey}")}");
             }
             else if (database == DatabaseName.PostgreSQL || database == DatabaseName.SQLite)
             {
-                body.Add($@"
-                    sql.Append(""INSERT INTO {tableName.DbEscape(database)} ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)}) RETURNING {pKey}"");
-                ");
+                sql.Append($@" VALUES ({string.Join(", ", values)}) RETURNING {pKey}");
             }
+
+            body.Add($@"sql = ""{sql}"";");
 
             return body;
         }
@@ -118,6 +119,8 @@ namespace com.etsoo.SourceGenerators
             var database = (attributeData?.GetValue<DatabaseName>(nameof(SqlInsertCommandAttribute.Database))).GetValueOrDefault();
 
             var namingPolicy = attributeData?.GetValue<NamingPolicy>(nameof(SqlInsertCommandAttribute.NamingPolicy));
+
+            var debug = attributeData?.GetValue<bool>(nameof(SqlInsertCommandAttribute.Debug)) ?? false;
 
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
@@ -178,7 +181,7 @@ namespace com.etsoo.SourceGenerators
                         public (string, IDbParameters) CreateSqlInsert(IDatabase db)
                         {{
                             var parameters = new DbParameters();
-                            var sql = new StringBuilder();
+                            string sql;
 
                             var name = db.Name;
                             {string.Join("\n", body)}
@@ -187,7 +190,9 @@ namespace com.etsoo.SourceGenerators
                                 throw new NotSupportedException($""Database {{name}} is not supported"");
                             }}
 
-                            return (sql.ToString(), parameters);
+                            {(debug ? "System.Diagnostics.Debug.WriteLine(sql);" : "")}
+
+                            return (sql, parameters);
                         }}
                     }}
                 }}

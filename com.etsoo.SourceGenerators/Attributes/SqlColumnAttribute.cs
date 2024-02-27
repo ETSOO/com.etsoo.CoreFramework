@@ -37,5 +37,11 @@ namespace com.etsoo.SourceGenerators.Attributes
         /// SQL查询符号
         /// </summary>
         public SqlQuerySign QuerySign { get; set; }
+
+        /// <summary>
+        /// Value code
+        /// 值代码
+        /// </summary>
+        public string? ValueCode { get; set; }
     }
 }
