@@ -16,7 +16,6 @@ namespace com.etsoo.CoreFramework.Services
     /// Service base for business logic
     /// User is not null (default) when setting the userRequired = true
     /// 业务逻辑的基础服务
-    /// 设置 userRequired = true 时 User 不为空（默认）
     /// </summary>
     /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic connection type</typeparam>

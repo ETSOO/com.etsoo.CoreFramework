@@ -150,7 +150,7 @@ namespace com.etsoo.ImageUtils
             var destArea = new Rectangle(source.X, source.Y, source.Width, source.Height);
             var sourceArea = new Rectangle(target.X, target.Y, target.Width, target.Height);
 
-            return Resize(sourceBM, destArea, sourceArea);
+            return Resize(sourceBM, destArea, sourceArea, blankColor);
         }
 
         /// <summary>

@@ -13,8 +13,8 @@ using System.Data.Common;
 namespace com.etsoo.CoreFramework.Services
 {
     /// <summary>
-    /// Entity service
-    /// 实体服务
+    /// User authorized entity service
+    /// 已授权用户实体服务
     /// </summary>
     /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic connection type</typeparam>
@@ -29,7 +29,16 @@ namespace com.etsoo.CoreFramework.Services
     /// <param name="user">Current user</param>
     /// <param name="flag">Flag</param>
     /// <param name="logger">Logger</param>
-    public abstract class EntityServiceBase<S, C, A, U, T> : ServiceBase<S, C, A, U>, IEntityServiceBase<T>
+    /// <remarks>
+    /// Constructor
+    /// 构造函数
+    /// </remarks>
+    /// <param name="app">Application</param>
+    /// <param name="user">Current user</param>
+    /// <param name="flag">Flag</param>
+    /// <param name="logger">Logger</param>
+    public abstract class EntityServiceBase<S, C, A, U, T>(A app, U user, string flag, ILogger logger)
+        : UserServiceBase<S, C, A, U>(app, user, flag, logger), IEntityServiceBase<T>
         where S : AppConfiguration
         where C : DbConnection
         where A : ICoreApplication<S, C>
@@ -41,19 +50,6 @@ namespace com.etsoo.CoreFramework.Services
         /// 公共数据浏览范围
         /// </summary>
         public const string PublicRange = "public";
-
-        /// <remarks>
-        /// Constructor
-        /// 构造函数
-        /// </remarks>
-        /// <param name="app">Application</param>
-        /// <param name="user">Current user</param>
-        /// <param name="flag">Flag</param>
-        /// <param name="logger">Logger</param>
-        public EntityServiceBase(A app, U? user, string flag, ILogger logger)
-            : base(app, user, flag, logger)
-        {
-        }
 
         /// <summary>
         /// Create
