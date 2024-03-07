@@ -53,7 +53,7 @@ namespace Tests.Utils
             var result = StringUtils.TryParseObject<bool>(input);
 
             // Assert
-            Assert.AreEqual(expectedResult, result);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         private static IEnumerable<TestCaseData> FormatFileSizeTestData
@@ -70,7 +70,7 @@ namespace Tests.Utils
         public void FormatFileSize_Test(long input, string expected, int fractionDigits)
         {
             var result = StringUtils.FormatFileSize(input, fractionDigits);
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [Test]
@@ -80,13 +80,13 @@ namespace Tests.Utils
             var result = StringUtils.HideData("4000609917");
 
             // Assert 1
-            Assert.AreEqual("400***917", result);
+            Assert.That(result, Is.EqualTo("400***917"));
 
             // Act 2
             result = StringUtils.HideData("+8653255579200");
 
             // Assert 2
-            Assert.AreEqual("+865***9200", result);
+            Assert.That(result, Is.EqualTo("+865***9200"));
         }
 
         [Test]
@@ -96,19 +96,19 @@ namespace Tests.Utils
             var result = StringUtils.HideEmail("info@etsoo.com");
 
             // Assert 1
-            Assert.AreEqual("in***@etsoo.com", result);
+            Assert.That(result, Is.EqualTo("in***@etsoo.com"));
 
             // Act 2
             result = StringUtils.HideEmail("helloworld@etsoo.com");
 
             // Assert 2
-            Assert.AreEqual("hel***rld@etsoo.com", result);
+            Assert.That(result, Is.EqualTo("hel***rld@etsoo.com"));
 
             // Act 3
             result = StringUtils.HideEmail("xm@etsoo.com");
 
             // Assert 3
-            Assert.AreEqual("x***@etsoo.com", result);
+            Assert.That(result, Is.EqualTo("x***@etsoo.com"));
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.AreEqual("1,2,3", result);
+            Assert.That(result, Is.EqualTo("1,2,3"));
         }
 
         /// <summary>
@@ -135,9 +135,12 @@ namespace Tests.Utils
             var result1 = StringUtils.TryParse<TestEnum>("Friday");
             var result2 = StringUtils.TryParse<TestEnum>("4");
 
-            // Assert
-            Assert.AreEqual(TestEnum.Friday, result1);
-            Assert.AreEqual(TestEnum.Friday, result2);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result1, Is.EqualTo(TestEnum.Friday));
+                Assert.That(result2, Is.EqualTo(TestEnum.Friday));
+            });
         }
 
         private static IEnumerable<TestCaseData> TryParsePerformanceBulkTestData
@@ -171,7 +174,7 @@ namespace Tests.Utils
 
             var ms = sw.ElapsedMilliseconds;
 
-            Assert.IsTrue(ms < 100, $"{input}, {ms} is more than 100 ms");
+            Assert.That(ms, Is.LessThan(100), $"{input}, {ms} is more than 100 ms");
         }
 
         private static IEnumerable<TestCaseData> PascalLinuxBulkTestData
@@ -192,7 +195,7 @@ namespace Tests.Utils
             var result = StringUtils.PascalCaseToLinuxStyle(pascal).ToString();
 
             // Assert
-            Assert.AreEqual(camel, result);
+            Assert.That(result, Is.EqualTo(camel));
         }
 
         [Test, TestCaseSource(nameof(PascalLinuxBulkTestData))]
@@ -202,7 +205,7 @@ namespace Tests.Utils
             var result = StringUtils.LinuxStyleToPascalCase(camel).ToString();
 
             // Assert
-            Assert.AreEqual(pascal, result);
+            Assert.That(result, Is.EqualTo(pascal));
         }
 
         [Test]
@@ -213,7 +216,7 @@ namespace Tests.Utils
             var result = StringUtils.LinuxStyleToPascalCase(input).ToString();
 
             // Assert
-            Assert.AreEqual("YourName", result);
+            Assert.That(result, Is.EqualTo("YourName"));
         }
 
         [Test]
@@ -226,7 +229,7 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.AreEqual("1,2", result);
+            Assert.That(result, Is.EqualTo("1,2"));
         }
 
         [Test]
@@ -239,7 +242,7 @@ namespace Tests.Utils
             var result = StringUtils.DictionaryToString(items);
 
             // Assert
-            Assert.AreEqual("1001=True&1002=False", result);
+            Assert.That(result, Is.EqualTo("1001=True&1002=False"));
         }
 
         [Test]
@@ -251,9 +254,12 @@ namespace Tests.Utils
             // Act
             var items = StringUtils.AsEnumerable<int>(input);
 
-            // Assert
-            Assert.AreEqual(2, items.Count());
-            Assert.IsTrue(items.Contains(3));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(items.Count(), Is.EqualTo(2));
+                Assert.That(items, Does.Contain(3));
+            });
         }
 
         [Test]
@@ -265,19 +271,25 @@ namespace Tests.Utils
             // Act
             var items = StringUtils.AsEnumerable(input);
 
-            // Assert
-            Assert.AreEqual(3, items.Count());
-            Assert.IsTrue(items.Contains("3"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(items.Count(), Is.EqualTo(3));
+                Assert.That(items, Does.Contain("3"));
+            });
         }
 
         [Test]
         public void IsJsonTests()
         {
-            Assert.IsFalse("1".IsJson());
-            Assert.IsFalse("false".IsJson());
-            Assert.IsTrue("{}".IsJson());
-            Assert.IsTrue("{ \"bool\": true }".IsJson());
-            Assert.IsTrue("[]".IsJson());
+            Assert.Multiple(() =>
+            {
+                Assert.That("1".IsJson(), Is.False);
+                Assert.That("false".IsJson(), Is.False);
+                Assert.That("{}".IsJson(), Is.True);
+                Assert.That("{ \"bool\": true }".IsJson(), Is.True);
+                Assert.That("[]".IsJson(), Is.True);
+            });
         }
 
         [Test]
@@ -290,7 +302,7 @@ namespace Tests.Utils
             var result = input.AsSpan().ToPascalWord();
 
             // Assert
-            Assert.AreEqual("Hello", result.ToString());
+            Assert.That(result.ToString(), Is.EqualTo("Hello"));
         }
 
         private static IEnumerable<TestCaseData> RemoveNonLettersTestData
@@ -306,7 +318,7 @@ namespace Tests.Utils
         [Test, TestCaseSource(nameof(RemoveNonLettersTestData))]
         public void RemoveNonLetters_Test(string input, string result)
         {
-            Assert.AreEqual(StringUtils.RemoveNonLetters(input), result);
+            Assert.That(result, Is.EqualTo(StringUtils.RemoveNonLetters(input)));
         }
 
         [Test]
@@ -315,9 +327,12 @@ namespace Tests.Utils
             // Arrange & act
             var (id, guid) = StringUtils.SplitIntGuid(null);
 
-            // Assert
-            Assert.IsNull(id);
-            Assert.IsNull(guid);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(id, Is.Null);
+                Assert.That(guid, Is.Null);
+            });
         }
 
         [Test]
@@ -326,9 +341,12 @@ namespace Tests.Utils
             // Arrange & act
             var (id, guid) = StringUtils.SplitIntGuid("5|700fc07c-ce7c-4af0-aed3-c83a9d30f23d");
 
-            // Assert
-            Assert.AreEqual(id, 5);
-            Assert.AreEqual(guid, Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(id, Is.EqualTo(5));
+                Assert.That(Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"), Is.EqualTo(guid));
+            });
         }
 
         [Test]
@@ -336,8 +354,11 @@ namespace Tests.Utils
         {
             var num = 1638777042242;
             var chars = StringUtils.NumberToChars(num);
-            Assert.AreEqual("QmpkdVgv", chars);
-            Assert.AreEqual(num, StringUtils.CharsToNumber(chars));
+            Assert.Multiple(() =>
+            {
+                Assert.That(chars, Is.EqualTo("QmpkdVgv"));
+                Assert.That(StringUtils.CharsToNumber(chars), Is.EqualTo(num));
+            });
         }
 
         [Test]
@@ -351,7 +372,7 @@ namespace Tests.Utils
                 writer.WriteEndObject();
             });
 
-            Assert.AreEqual("""{"test":{"Brand":"亿速"}}""", json);
+            Assert.That(json, Is.EqualTo("""{"test":{"Brand":"亿速"}}"""));
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Tests.Utils
             var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
+            Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Utc));
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Tests.Utils
             var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.AreEqual(DateTimeKind.Local, result.Kind);
+            Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Local));
         }
 
         [Test]
@@ -41,11 +41,11 @@ namespace Tests.Utils
             // Correct
             var tz = LocalizationUtils.GetTimeZone("新西兰标准时间");
 
-            Assert.AreEqual("New Zealand Standard Time", tz.Id);
+            Assert.That(tz.Id, Is.EqualTo("New Zealand Standard Time"));
 
             // Wrong
             tz = LocalizationUtils.GetTimeZone("China Time");
-            Assert.AreEqual(TimeZoneInfo.Local, tz);
+            Assert.That(tz, Is.EqualTo(TimeZoneInfo.Local));
         }
 
         [Test]
@@ -55,34 +55,46 @@ namespace Tests.Utils
             // 2021/12/6 19:35:52 UTC, 2021/12/7 8:35:52 NZ time
             var result = SharedUtils.JsMilisecondsToUTC(1638819352807);
 
-            // Assert
-            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
-            Assert.AreEqual(6, result.Day);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Utc));
+                Assert.That(result.Day, Is.EqualTo(6));
+            });
         }
 
         [Test]
         public void GetRegionsByCurrencyTests()
         {
             var (region, culture) = LocalizationUtils.GetRegionsByCurrency("CNY").FirstOrDefault(item => item.Culture.Name.StartsWith("zh-"));
-            Assert.AreEqual("CN", region?.TwoLetterISORegionName);
-            Assert.AreEqual("zh-Hans-CN", culture?.Name);
-            Assert.IsTrue(LocalizationUtils.GetRegionsByCurrency("EUR").Count() > 3);
+            Assert.Multiple(() =>
+            {
+                Assert.That(region?.TwoLetterISORegionName, Is.EqualTo("CN"));
+                Assert.That(culture?.Name, Is.EqualTo("zh-Hans-CN"));
+                Assert.That(LocalizationUtils.GetRegionsByCurrency("EUR").Count(), Is.GreaterThan(3));
+            });
         }
 
         [Test]
         public void GetCulturesByCountryTests()
         {
             var cultures = LocalizationUtils.GetCulturesByCountry("SG");
-            Assert.IsTrue(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")));
-            Assert.AreEqual(4, cultures.Count());
+            Assert.Multiple(() =>
+            {
+                Assert.That(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")), Is.True);
+                Assert.That(cultures.Count(), Is.EqualTo(4));
+            });
         }
 
         [Test]
         public void GetCurrencyDataTests()
         {
             var data = LocalizationUtils.GetCurrencyData("CNY");
-            Assert.AreEqual("¥", data?.Symbol);
-            Assert.AreEqual("Chinese Yuan", data?.EnglishName);
+            Assert.Multiple(() =>
+            {
+                Assert.That(data?.Symbol, Is.EqualTo("¥"));
+                Assert.That(data?.EnglishName, Is.EqualTo("Chinese Yuan"));
+            });
         }
     }
 }

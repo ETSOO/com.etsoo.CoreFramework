@@ -40,11 +40,11 @@ namespace Tests.Utils
         public void SqliteDatabase_Constructor_Test()
         {
             // Act & Asset
-            Assert.DoesNotThrow(() =>
+            Assert.DoesNotThrowAsync(async () =>
             {
-                using var connection = db.NewConnection();
-                connection.Open();
-                connection.Close();
+                await using var connection = db.NewConnection();
+                await connection.OpenAsync();
+                await connection.CloseAsync();
             });
         }
 
@@ -53,7 +53,7 @@ namespace Tests.Utils
         /// 异步测试执行SQL 命令
         /// </summary>
         [Test]
-        public async Task ExecuteAsync_Test()
+        public void ExecuteAsync_Test()
         {
             // Arrange
             using var connection = db.NewConnection();
@@ -66,7 +66,7 @@ namespace Tests.Utils
             var sql = "INSERT OR IGNORE INTO User (Id, Name) VALUES(@user1, @name1), (@user2, @name2)";
 
             // Result
-            await connection.ExecuteAsync(sql, paras);
+            Assert.DoesNotThrowAsync(async () => await connection.ExecuteAsync(sql, paras));
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Tests.Utils
             var result = await connection.ExecuteScalarAsync("SELECT Name FROM User WHERE Id = 1003");
 
             // Assert
-            Assert.AreEqual("Admin 3", result);
+            Assert.That(result, Is.EqualTo("Admin 3"));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Tests.Utils
             await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream);
 
             // Assert
-            Assert.IsTrue(stream.Length == "Admin 1".Length);
+            Assert.That(stream.Length, Is.EqualTo("Admin 1".Length));
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace Tests.Utils
             var json = db.ListToParameter(new int[] { 1, 3, 5 });
             if (json is DbString ds)
             {
-                Assert.AreEqual("[1,3,5]", ds.Value);
+                Assert.That(ds.Value, Is.EqualTo("[1,3,5]"));
             }
         }
 
@@ -125,28 +125,28 @@ namespace Tests.Utils
         public void SqliteUtilsToJsonBool()
         {
             var command = "@a = 1".ToJsonBool();
-            Assert.AreEqual("json(IIF(@a = 1, 'true', 'false'))", command);
+            Assert.That(command, Is.EqualTo("json(IIF(@a = 1, 'true', 'false'))"));
         }
 
         [Test]
         public void SqliteUtilsToJsonCommandTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage");
-            Assert.AreEqual("json_group_array(json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12)))", command);
+            Assert.That(command, Is.EqualTo("json_group_array(json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12)))"));
         }
 
         [Test]
         public void SqliteUtilsToJsonCommandWithoutArrayTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage", true);
-            Assert.AreEqual("json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12))", command);
+            Assert.That(command, Is.EqualTo("json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12))"));
         }
 
         [Test]
         public void SqliteUtilsToJsonCommandWithFunctionTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, json(jsonData) AS jsonData, (u.wage * 12) AS yearWage", true);
-            Assert.AreEqual("json_object('id', u.id, 'name', name, 'jsonData', json(jsonData), 'yearWage', (u.wage * 12))", command);
+            Assert.That(command, Is.EqualTo("json_object('id', u.id, 'name', name, 'jsonData', json(jsonData), 'yearWage', (u.wage * 12))"));
         }
     }
 }

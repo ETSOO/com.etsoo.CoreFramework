@@ -35,14 +35,14 @@ namespace Tests.Web
             var model = new TestModel
             {
                 Name = "ETSOO",
-                Items = new List<TestModelItem> { new TestModelItem("Item 1"), new TestModelItem("Item 2") }
+                Items = [new TestModelItem("Item 1"), new TestModelItem("Item 2")]
             };
 
             // Act
             var result = (await RazorUtils.RenderAsync("test", template, model)).Trim();
 
             // Assert
-            Assert.IsTrue(result.Equals("<p>Hello, ETSOO</p><h1>Item 1</h1><h1>Item 2</h1>"), result);
+            Assert.That(result, Is.EqualTo("<p>Hello, ETSOO</p><h1>Item 1</h1><h1>Item 2</h1>"));
         }
     }
 }

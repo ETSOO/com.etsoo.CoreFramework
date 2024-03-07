@@ -19,7 +19,7 @@ namespace Tests.Web
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace Tests.Web
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("Hello，亿速Hello，亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速Hello，亿速"));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Tests.Web
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace Tests.Web
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
         }
 
         [Test]
@@ -73,11 +73,11 @@ namespace Tests.Web
 
             // Act
             reader.ReadLine();
-            Assert.AreEqual(16, reader.CurrentPosition);
+            Assert.That(reader.CurrentPosition, Is.EqualTo(16));
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("下一行数据"));
         }
 
         [Test]
@@ -91,9 +91,12 @@ namespace Tests.Web
             var l1 = await reader.ReadLineAsync();
             var l2 = await reader.ReadLineAsync();
 
-            // Assert
-            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l1.Span));
-            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(l2.Span));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(Encoding.UTF8.GetString(l1.Span), Is.EqualTo("Hello，亿速 "));
+                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("下一行数据"));
+            });
         }
 
         [Test]
@@ -105,17 +108,20 @@ namespace Tests.Web
 
             // Read
             var r = await reader.ReadLineAsync();
-            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(r.Span));
+            Assert.That(Encoding.UTF8.GetString(r.Span), Is.EqualTo("Hello，亿速 "));
 
             // Act
             reader.ToStreamEnd();
             var l1 = await reader.BackwardReadLineAsync();
-            Assert.AreEqual(15, reader.CurrentPosition);
+            Assert.That(reader.CurrentPosition, Is.EqualTo(15));
             var l2 = await reader.BackwardReadLineAsync();
 
-            // Assert
-            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(l1.Span));
-            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l2.Span));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(Encoding.UTF8.GetString(l1.Span), Is.EqualTo("下一行数据"));
+                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("Hello，亿速 "));
+            });
         }
 
         [Test]
@@ -127,18 +133,21 @@ namespace Tests.Web
 
             // Read
             var r = await reader.ReadLineAsync(PureStreamReadWay.ReturnAll);
-            Assert.AreEqual("Hello，亿速 \r\n", Encoding.UTF8.GetString(r.Span));
+            Assert.That(Encoding.UTF8.GetString(r.Span), Is.EqualTo("Hello，亿速 \r\n"));
 
             // Act
             reader.ToStreamEnd();
             var l1 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
-            Assert.AreEqual(15, reader.CurrentPosition);
+            Assert.That(reader.CurrentPosition, Is.EqualTo(15));
             var l2 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
 
             // Assert
             var bytes = Encoding.UTF8.GetBytes("\r\n下一行数据");
-            Assert.IsTrue(l1.Span.SequenceEqual(bytes));
-            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l2.Span));
+            Assert.Multiple(() =>
+            {
+                Assert.That(l1.Span.SequenceEqual(bytes), Is.True);
+                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("Hello，亿速 "));
+            });
         }
 
         [Test]
@@ -150,11 +159,16 @@ namespace Tests.Web
 
             // Act
             var fistBytes = reader.ReadLine();
+            var len = fistBytes.Length;
             var bytes = reader.ReadLine();
+            var str = Encoding.UTF8.GetString(bytes);
 
-            // Assert
-            Assert.AreEqual(0, fistBytes.Length);
-            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(len, Is.EqualTo(0));
+                Assert.That(str, Is.EqualTo("Hello，亿速"));
+            });
         }
 
         [Test]
@@ -169,7 +183,7 @@ namespace Tests.Web
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("下一行数据"));
         }
 
         [Test]
@@ -183,7 +197,7 @@ namespace Tests.Web
             var b = reader.ReadByte();
 
             // Assert
-            Assert.AreEqual((byte)'H', b);
+            Assert.That(b, Is.EqualTo((byte)'H'));
         }
 
         [Test]
@@ -194,11 +208,15 @@ namespace Tests.Web
             using var reader = new PureStreamReader(stream);
 
             var bytes = reader.ReadBytes(4);
-            Assert.AreEqual("true", Encoding.ASCII.GetString(bytes));
-            Assert.AreEqual((byte)' ', reader.Peek());
+            var str = Encoding.ASCII.GetString(bytes);
+            Assert.Multiple(() =>
+            {
+                Assert.That(str, Is.EqualTo("true"));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)' '));
+            });
 
-            reader.ReadBytes(new byte[] { 0, 32 });
-            Assert.AreEqual((byte)'f', reader.Peek());
+            reader.ReadBytes([0, 32]);
+            Assert.That(reader.Peek(), Is.EqualTo((byte)'f'));
         }
 
         [Test]
@@ -208,9 +226,13 @@ namespace Tests.Web
             using var stream = SharedUtils.GetStream("34.>");
             using var reader = new PureStreamReader(stream);
 
-            var bytes = reader.ReadBytes(new byte[] { 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 });
-            Assert.AreEqual("34.", Encoding.ASCII.GetString(bytes));
-            Assert.AreEqual((byte)'>', reader.Peek());
+            var bytes = reader.ReadBytes([46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);
+            var str = Encoding.ASCII.GetString(bytes);
+            Assert.Multiple(() =>
+            {
+                Assert.That(str, Is.EqualTo("34."));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
+            });
         }
 
         [Test]
@@ -222,9 +244,13 @@ namespace Tests.Web
 
             reader.Discard(6);
 
-            var bytes = reader.ReadBytes(new byte[] { 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 });
-            Assert.AreEqual("734.", Encoding.ASCII.GetString(bytes));
-            Assert.AreEqual((byte)'>', reader.Peek());
+            var bytes = reader.ReadBytes([46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);
+            var str = Encoding.ASCII.GetString(bytes);
+            Assert.Multiple(() =>
+            {
+                Assert.That(str, Is.EqualTo("734."));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
+            });
         }
 
         [Test]
@@ -239,9 +265,12 @@ namespace Tests.Web
             var b = reader.ReadByte();
             var c = reader.ReadByte();
 
-            // Assert
-            Assert.AreEqual(p, b);
-            Assert.AreEqual((byte)'e', c);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(b, Is.EqualTo(p));
+                Assert.That(c, Is.EqualTo((byte)'e'));
+            });
         }
 
         [Test]
@@ -256,7 +285,7 @@ namespace Tests.Web
             var bytes = reader.ReadTo((byte)'>');
 
             // Assert
-            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello, 亿速"));
         }
 
         [Test]
@@ -271,7 +300,7 @@ namespace Tests.Web
             var bytes = reader.ReadTo((byte)'>');
 
             // Assert
-            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello, 亿速"));
         }
 
         [Test]
@@ -284,10 +313,14 @@ namespace Tests.Web
             // Act
             reader.ReadByte();
             var bytes = reader.ReadTo((byte)'>');
+            var str = Encoding.UTF8.GetString(bytes);
 
-            // Assert
-            Assert.AreEqual("Hello-", Encoding.UTF8.GetString(bytes));
-            Assert.AreEqual((byte)'0', reader.Peek());
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(str, Is.EqualTo("Hello-"));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)'0'));
+            });
         }
 
         [Test]
@@ -297,9 +330,13 @@ namespace Tests.Web
             using var stream = SharedUtils.GetStream("[<<Hello, 亿速>>]a");
             using var reader = new PureStreamReader(stream, 8);
 
-            var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, false);
-            Assert.AreEqual("[<<Hello, 亿速", Encoding.UTF8.GetString(bytes));
-            Assert.AreEqual((byte)'>', reader.Peek());
+            var bytes = reader.ReadTo([(byte)'>', (byte)']'], false);
+            var str = Encoding.UTF8.GetString(bytes);
+            Assert.Multiple(() =>
+            {
+                Assert.That(str, Is.EqualTo("[<<Hello, 亿速"));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
+            });
         }
 
         [Test]
@@ -312,9 +349,13 @@ namespace Tests.Web
             // Discard bytes
             reader.Discard(3);
 
-            var bytes = reader.ReadTo(new byte[] { (byte)'>', (byte)']' }, true);
-            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
-            Assert.AreEqual((byte)'a', reader.Peek());
+            var bytes = reader.ReadTo([(byte)'>', (byte)']'], true);
+            var str = Encoding.UTF8.GetString(bytes);
+            Assert.Multiple(() =>
+            {
+                Assert.That(str, Is.EqualTo("Hello, 亿速"));
+                Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
+            });
         }
 
         [Test]
@@ -325,16 +366,16 @@ namespace Tests.Web
             using var reader = new PureStreamReader(stream);
 
             var first = reader.Peek();
-            Assert.AreEqual((byte)'t', first);
+            Assert.That(first, Is.EqualTo((byte)'t'));
 
-            var bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
-            Assert.AreEqual("true", Encoding.UTF8.GetString(bytes));
+            var bytes = reader.ReadTo([(byte)' '], true);
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("true"));
 
             first = reader.Peek();
-            Assert.AreEqual((byte)'f', first);
+            Assert.That(first, Is.EqualTo((byte)'f'));
 
-            bytes = reader.ReadTo(new byte[] { (byte)' ' }, true);
-            Assert.AreEqual("false", Encoding.UTF8.GetString(bytes));
+            bytes = reader.ReadTo([(byte)' '], true);
+            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("false"));
         }
 
         [Test]
@@ -346,7 +387,7 @@ namespace Tests.Web
 
             reader.Discard(9);
 
-            Assert.AreEqual((byte)'0', reader.Peek());
+            Assert.That(reader.Peek(), Is.EqualTo((byte)'0'));
         }
 
         [Test]
@@ -357,9 +398,9 @@ namespace Tests.Web
             using var reader = new PureStreamReader(stream, 8);
 
             reader.Discard(7);
-            reader.Discard(new byte[] { 32, PureStreamReader.LineFeedByte, PureStreamReader.CarriageReturnByte });
+            reader.Discard([32, PureStreamReader.LineFeedByte, PureStreamReader.CarriageReturnByte]);
 
-            Assert.AreEqual((byte)'a', reader.Peek());
+            Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
         }
 
         [Test]
@@ -373,7 +414,7 @@ namespace Tests.Web
                 if (one == (byte)'+') return true;
                 return false;
             });
-            Assert.AreEqual((byte)'a', reader.Peek());
+            Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
         }
 
         [Test]
@@ -387,7 +428,7 @@ namespace Tests.Web
                 if (one == (byte)'-') return true;
                 return false;
             });
-            Assert.IsNull(reader.Peek());
+            Assert.That(reader.Peek(), Is.Null);
         }
     }
 }

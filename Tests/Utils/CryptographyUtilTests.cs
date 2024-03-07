@@ -47,7 +47,7 @@ namespace Tests.Utils
             var decriptedString = Encoding.UTF8.GetString(decryptedData!);
 
             // Assert
-            Assert.AreEqual(data, decriptedString);
+            Assert.That(decriptedString, Is.EqualTo(data));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Tests.Utils
             var actual = Encoding.UTF8.GetString(CryptographyUtils.AESDecrypt(source, passphrase)!);
 
             // Assert
-            Assert.AreEqual(data, actual);
+            Assert.That(actual, Is.EqualTo(data));
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Tests.Utils
             var result = CryptographyUtils.CreateRandString(RandStringKind.Digit, 6);
 
             // Assert
-            Assert.AreEqual(6, result.Length);
+            Assert.That(result.Length, Is.EqualTo(6));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Tests.Utils
             var base64 = Convert.ToBase64String(result);
 
             // Assert
-            Assert.AreEqual("5mzh5YCWP2t2nE2dX38A9gDYApo+GHJIxG3TdqcU9dnPwd65+02igo2x4YLY4FYYJou+wNPihiaDiYSMa4eUmw==", base64);
+            Assert.That(base64, Is.EqualTo("5mzh5YCWP2t2nE2dX38A9gDYApo+GHJIxG3TdqcU9dnPwd65+02igo2x4YLY4FYYJou+wNPihiaDiYSMa4eUmw=="));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Tests.Utils
             var hex = Convert.ToHexString(result);
 
             // Assert
-            Assert.AreEqual("E66CE1E580963F6B769C4D9D5F7F00F600D8029A3E187248C46DD376A714F5D9CFC1DEB9FB4DA2828DB1E182D8E05618268BBEC0D3E286268389848C6B87949B".ToUpper(), hex);
+            Assert.That(hex, Is.EqualTo("E66CE1E580963F6B769C4D9D5F7F00F600D8029A3E187248C46DD376A714F5D9CFC1DEB9FB4DA2828DB1E182D8E05618268BBEC0D3E286268389848C6B87949B".ToUpper()));
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Tests.Utils
             var result = await CryptographyUtils.MD5Async("info@etsoo.com");
 
             // Assert
-            Assert.AreEqual("9c7ce665e6f4f4c807912a7486244c90", Convert.ToHexString(result).ToLower());
+            Assert.That(Convert.ToHexString(result).ToLower(), Is.EqualTo("9c7ce665e6f4f4c807912a7486244c90"));
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace Tests.Utils
             var result = await CryptographyUtils.SHA1Async(input);
 
             // Assert
-            Assert.AreEqual("0f9de62fce790f9a083d5c99e95740ceb90c27ed", Convert.ToHexString(result).ToLower());
+            Assert.That(Convert.ToHexString(result).ToLower(), Is.EqualTo("0f9de62fce790f9a083d5c99e95740ceb90c27ed"));
         }
 
         [Test]
@@ -147,14 +147,14 @@ namespace Tests.Utils
             var result = await CryptographyUtils.SHA3Async("test");
 
             // Assert
-            Assert.AreEqual("EE26B0DD4AF7E749AA1A8EE3C10AE9923F618980772E473F8819A5D4940E0DB27AC185F8A0E1D5F84F88BC887FD67B143732C304CC5FA9AD8E6F57F50028A8FF", Convert.ToHexString(result));
+            Assert.That(Convert.ToHexString(result), Is.EqualTo("EE26B0DD4AF7E749AA1A8EE3C10AE9923F618980772E473F8819A5D4940E0DB27AC185F8A0E1D5F84F88BC887FD67B143732C304CC5FA9AD8E6F57F50028A8FF"));
         }
 
         [Test]
         public void UnsealData_SuccessTest()
         {
             var result = CryptographyUtils.UnsealData("ConnectionString", "10DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
-            Assert.AreEqual("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false;Min Pool Size=5;TrustServerCertificate=true", result);
+            Assert.That(result, Is.EqualTo("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false;Min Pool Size=5;TrustServerCertificate=true"));
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace Tests.Utils
             {
                 CryptographyUtils.UnsealData(field, "DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
             });
-            Assert.AreEqual(field, exception?.Message);
+            Assert.That(exception?.Message, Is.EqualTo(field));
         }
     }
 }

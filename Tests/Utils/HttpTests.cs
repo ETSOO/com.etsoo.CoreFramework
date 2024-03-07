@@ -104,88 +104,109 @@ namespace Tests.Utils
         public void MimeToExtensionTests()
         {
             var ext = MimeTypeMap.TryGetExtension("application/x-perfmon");
-            Assert.AreEqual(".pma", ext);
+            Assert.That(ext, Is.EqualTo(".pma"));
 
             ext = MimeTypeMap.TryGetExtension("text/html");
-            Assert.AreEqual(".htm", ext);
+            Assert.That(ext, Is.EqualTo(".htm"));
 
             ext = MimeTypeMap.TryGetExtension("IMAGE/JPEG");
-            Assert.AreEqual(".jpg", ext);
+            Assert.That(ext, Is.EqualTo(".jpg"));
 
             ext = MimeTypeMap.TryGetExtension("IMAGE/.fail");
-            Assert.IsNull(ext);
+            Assert.That(ext, Is.Null);
         }
 
         [Test]
         public void ExtensionToMimeTests()
         {
             var type = MimeTypeMap.TryGetMimeType(".fail");
-            Assert.IsNull(type);
+            Assert.That(type, Is.Null);
 
             type = MimeTypeMap.TryGetMimeType(".htm");
-            Assert.AreEqual("text/html", type);
+            Assert.That(type, Is.EqualTo("text/html"));
 
             type = MimeTypeMap.TryGetMimeType(".JPG");
-            Assert.AreEqual("image/jpeg", type);
+            Assert.That(type, Is.EqualTo("image/jpeg"));
         }
 
         [Test]
         public async Task DeleteAsyncTests()
         {
             var result = await service.DeleteProductAsync();
-            Assert.AreEqual(1, result?.Id);
-            Assert.IsTrue(result?.IsDeleted);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Id, Is.EqualTo(1));
+                Assert.That(result?.IsDeleted, Is.True);
+            });
         }
 
         [Test]
         public async Task DownloadAsyncTests()
         {
             var (filename, file) = await service.DownloadProductAsync();
-            Assert.AreEqual("products.json", filename);
-            Assert.IsTrue(file.Contains("\"total\":"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(filename, Is.EqualTo("products.json"));
+                Assert.That(file, Does.Contain("\"total\":"));
+            });
         }
 
         [Test]
         public async Task DownloadImageAsyncTests()
         {
             var (filename, length) = await service.DownloadImageAsync();
-            Assert.AreEqual("logo.png", filename);
-            Assert.LessOrEqual(1000, length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(filename, Is.EqualTo("logo.png"));
+                Assert.That(length, Is.GreaterThanOrEqualTo(1000));
+            });
         }
 
         [Test]
         public async Task GetAsyncTests()
         {
             var result = await service.GetProductsAsync();
-            Assert.AreEqual(100, result?.Total);
-            Assert.AreEqual(1, result?.Products.First().Id);
-            Assert.AreEqual(549M, result?.Products.First().Price);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Total, Is.EqualTo(100));
+                Assert.That(result?.Products.First().Id, Is.EqualTo(1));
+                Assert.That(result?.Products.First().Price, Is.EqualTo(549M));
+            });
         }
 
         [Test]
         public async Task GetStreamAsyncTests()
         {
             var result = await service.GetProductsStreamAsync();
-            Assert.AreEqual(100, result?.Total);
-            Assert.AreEqual(1, result?.Products.First().Id);
-            Assert.AreEqual(549M, result?.Products.First().Price);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Total, Is.EqualTo(100));
+                Assert.That(result?.Products.First().Id, Is.EqualTo(1));
+                Assert.That(result?.Products.First().Price, Is.EqualTo(549M));
+            });
         }
 
         [Test]
         public async Task PostAsyncTests()
         {
             var result = await service.AddProductAsync();
-            Assert.AreEqual(101, result?.Id);
-            Assert.AreEqual("New Product", result?.Title);
-            Assert.AreEqual(3.15M, result?.Price);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Id, Is.EqualTo(101));
+                Assert.That(result?.Title, Is.EqualTo("New Product"));
+                Assert.That(result?.Price, Is.EqualTo(3.15M));
+            });
         }
 
         [Test]
         public async Task PutAsyncTests()
         {
             var result = await service.UpdateProductAsync();
-            Assert.AreEqual("New Product 1", result?.Title);
-            Assert.AreEqual(3.16M, result?.Price);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result?.Title, Is.EqualTo("New Product 1"));
+                Assert.That(result?.Price, Is.EqualTo(3.16M));
+            });
         }
     }
 }

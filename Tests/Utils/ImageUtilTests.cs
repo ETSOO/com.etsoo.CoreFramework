@@ -25,7 +25,7 @@ namespace Tests.Utils
             var result = ImageWinUtils.GetCodecInfo(path);
 
             // Assert
-            Assert.AreEqual(result?.MimeType, mimeType);
+            Assert.That(mimeType, Is.EqualTo(result?.MimeType));
         }
 
         [Test]
@@ -38,9 +38,12 @@ namespace Tests.Utils
             using var ms = new MemoryStream();
             var ext = await ImageSharpUtils.CreateFromBase64StringAsync(base64, new SixLabors.ImageSharp.Size(900, 900), ms);
 
-            // Assert
-            Assert.AreEqual("png", ext);
-            Assert.AreEqual(1015, ms.Length);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(ext, Is.EqualTo("png"));
+                Assert.That(ms.Length, Is.EqualTo(1015));
+            });
         }
     }
 }

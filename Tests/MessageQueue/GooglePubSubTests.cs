@@ -25,7 +25,7 @@ namespace Tests.MessageQueue
             await producer.DisposeAsync();
             await client.DisposeAsync();
 
-            Assert.IsNotNull(messageId);
+            Assert.That(messageId, Is.Not.Null);
         }
 
         [Test]
@@ -74,8 +74,11 @@ namespace Tests.MessageQueue
             await subscriber.DisposeAsync();
             await client.DisposeAsync();
 
-            Assert.IsTrue(messages.Any());
-            Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages, Is.Not.Empty);
+                Assert.That(messages.Any(m => messageId.Equals(m.MessageId)), Is.True);
+            });
         }
     }
 }

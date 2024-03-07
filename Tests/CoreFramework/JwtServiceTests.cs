@@ -53,7 +53,7 @@ namespace Tests.CoreFramework
             var token = service.CreateAccessToken(user);
 
             // Assert
-            Assert.NotNull(token);
+            Assert.That(token, Is.Not.Null);
 
             // Arrange, public key verification
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
@@ -73,9 +73,12 @@ namespace Tests.CoreFramework
             // Validate refresh token
             var (claimsPrincipal, expired, kid, securityToken) = publicService.ValidateToken(refreshToken);
 
-            Assert.IsFalse(expired);
-            Assert.IsNotNull(claimsPrincipal);
-            Assert.AreEqual(kid, "service");
+            Assert.Multiple(() =>
+            {
+                Assert.That(expired, Is.False);
+                Assert.That(claimsPrincipal, Is.Not.Null);
+                Assert.That(kid, Is.EqualTo("service"));
+            });
 
             // Public service should not generate token
             Assert.Throws<InvalidOperationException>(() =>
@@ -96,7 +99,7 @@ namespace Tests.CoreFramework
             var rawData = "In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.";
             var signResult = service.SignData(rawData);
             var result = publicService.VerifyData(Encoding.UTF8.GetBytes(rawData), signResult);
-            Assert.IsTrue(result);
+            Assert.That(result);
         }
     }
 }

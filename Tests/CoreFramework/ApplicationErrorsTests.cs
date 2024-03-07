@@ -18,13 +18,13 @@ namespace Tests.CoreFramework
 
             // Action & assert
             // Resources depend on CurrentUICulture, not CurrentCulture
-            Assert.AreEqual("找不到用户", ApplicationErrors.NoUserFound.Title);
+            Assert.That(ApplicationErrors.NoUserFound.Title, Is.EqualTo("找不到用户"));
 
             // Arrange
             LocalizationUtils.SetCulture("en-US");
 
             // Action & assert
-            Assert.AreEqual("No User Found", ApplicationErrors.NoUserFound.Title);
+            Assert.That(ApplicationErrors.NoUserFound.Title, Is.EqualTo("No User Found"));
         }
     }
 }

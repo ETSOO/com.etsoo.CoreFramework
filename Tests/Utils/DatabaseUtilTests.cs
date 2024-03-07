@@ -37,7 +37,7 @@ namespace Tests.Utils
             var result = DatabaseUtils.TypeToDbType(type);
 
             // Assert
-            Assert.AreEqual(dbType, result, $"{type.Name} is not converted with {dbType}");
+            Assert.That(result, Is.EqualTo(dbType), $"{type.Name} is not converted with {dbType}");
         }
 
         private static IEnumerable<TestCaseData> IsAnsiBulkTestData
@@ -53,7 +53,7 @@ namespace Tests.Utils
         [Test, TestCaseSource(nameof(IsAnsiBulkTestData))]
         public void IsAnsi_Test(string input, bool isAnsi)
         {
-            Assert.AreEqual(isAnsi, input.IsAnsi());
+            Assert.That(input.IsAnsi(), Is.EqualTo(isAnsi));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace Tests.Utils
             string result = DatabaseUtils.ListItemsToJsonString(emptyList, type);
 
             // Assert
-            Assert.AreEqual("[]", result);
+            Assert.That(result, Is.EqualTo("[]"));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace Tests.Utils
             var result = DatabaseUtils.ListItemsToJsonString(singleItemList, type);
 
             // Assert
-            Assert.AreEqual("[42]", result);
+            Assert.That(result, Is.EqualTo("[42]"));
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace Tests.Utils
             var result = DatabaseUtils.ListItemsToJsonString(stringList, type);
 
             // Assert
-            Assert.AreEqual("[\"apple\",\"orange\",\"banana\"]", result);
+            Assert.That(result, Is.EqualTo("[\"apple\",\"orange\",\"banana\"]"));
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace Tests.Utils
             var result = DatabaseUtils.DictionaryToJsonString(emptyDictionary, keyType, valueType);
 
             // Assert
-            Assert.AreEqual("[]", result);
+            Assert.That(result, Is.EqualTo("[]"));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace Tests.Utils
             string result = DatabaseUtils.DictionaryToJsonString(intStringDictionary, keyType, valueType);
 
             // Assert
-            Assert.AreEqual("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]", result);
+            Assert.That(result, Is.EqualTo("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]"));
         }
     }
 }

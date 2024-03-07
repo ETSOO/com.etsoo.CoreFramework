@@ -24,8 +24,11 @@ namespace Tests.Utils
                 count++;
                 await Task.CompletedTask;
             });
-            Assert.AreEqual(count, 2);
-            Assert.AreEqual(htmlUpdated, doc.Body?.InnerHtml);
+            Assert.Multiple(() =>
+            {
+                Assert.That(count, Is.EqualTo(2));
+                Assert.That(doc.Body?.InnerHtml, Is.EqualTo(htmlUpdated));
+            });
         }
 
         [Test]
@@ -41,8 +44,11 @@ namespace Tests.Utils
                 count++;
                 await Task.CompletedTask;
             });
-            Assert.AreEqual(count, 2);
-            Assert.AreEqual(htmlUpdated, doc.Body?.InnerHtml);
+            Assert.Multiple(() =>
+            {
+                Assert.That(count, Is.EqualTo(2));
+                Assert.That(doc.Body?.InnerHtml, Is.EqualTo(htmlUpdated));
+            });
         }
 
         [Test]
@@ -63,10 +69,13 @@ namespace Tests.Utils
                 await Task.CompletedTask;
             }, true);
 
-            Assert.AreEqual(3, widths.Count);
-            Assert.AreEqual(device.RenderWidth * 0.1, widths[0]);
-            Assert.AreEqual(120, widths[1]);
-            Assert.AreEqual(133.33, Math.Round(widths[2], 2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(widths, Has.Count.EqualTo(3));
+                Assert.That(widths[0], Is.EqualTo(device.RenderWidth * 0.1));
+                Assert.That(widths[1], Is.EqualTo(120));
+                Assert.That(Math.Round(widths[2], 2), Is.EqualTo(133.33));
+            });
         }
 
         [Test]
@@ -80,7 +89,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, null, true);
 
             // Assert
-            Assert.AreEqual("This is a sample HTML string. It contains some content.", introduction);
+            Assert.That(introduction, Is.EqualTo("This is a sample HTML string. It contains some content."));
         }
 
         [Test]
@@ -94,7 +103,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, null, true);
 
             // Assert
-            Assert.AreEqual("This is a...", introduction);
+            Assert.That(introduction, Is.EqualTo("This is a..."));
         }
 
         [Test]
@@ -109,7 +118,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText, true);
 
             // Assert
-            Assert.AreEqual("This is a sample...", introduction);
+            Assert.That(introduction, Is.EqualTo("This is a sample..."));
         }
 
         [Test]
@@ -124,7 +133,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText, true);
 
             // Assert
-            Assert.AreEqual("...is a sample HTML...", introduction);
+            Assert.That(introduction, Is.EqualTo("...is a sample HTML..."));
         }
 
         [Test]
@@ -139,7 +148,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText);
 
             // Assert
-            Assert.AreEqual("这是样本HTML字符...", introduction);
+            Assert.That(introduction, Is.EqualTo("这是样本HTML字符..."));
         }
 
         [Test]
@@ -154,7 +163,7 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText);
 
             // Assert
-            Assert.AreEqual("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==", introduction);
+            Assert.That(introduction, Is.EqualTo("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw=="));
         }
 
         [Test]
@@ -170,12 +179,15 @@ namespace Tests.Utils
                 await Task.CompletedTask;
             }, true);
 
-            Assert.AreEqual(3, sizes.Count);
-            Assert.AreEqual((device.RenderWidth * 0.1, device.RenderHeight * 0.2), sizes[0]);
-            Assert.AreEqual(120, sizes[1].width);
-            Assert.IsNull(sizes[1].height);
-            Assert.IsNull(sizes[2].width);
-            Assert.AreEqual(133.33, Math.Round(sizes[2].height.GetValueOrDefault(), 2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(sizes, Has.Count.EqualTo(3));
+                Assert.That(sizes[0], Is.EqualTo((device.RenderWidth * 0.1, device.RenderHeight * 0.2)));
+                Assert.That(sizes[1].width, Is.EqualTo(120));
+                Assert.That(sizes[1].height, Is.Null);
+                Assert.That(sizes[2].width, Is.Null);
+                Assert.That(Math.Round(sizes[2].height.GetValueOrDefault(), 2), Is.EqualTo(133.33));
+            });
         }
 
         [Test]
@@ -183,7 +195,7 @@ namespace Tests.Utils
         {
             var html = " Hello, world! ";
             var result = HtmlIOUtils.MakeStartHtmlTag(html);
-            Assert.AreEqual("<p>Hello, world!</p>", result);
+            Assert.That(result, Is.EqualTo("<p>Hello, world!</p>"));
         }
 
         [Test]
@@ -191,7 +203,7 @@ namespace Tests.Utils
         {
             var html = " Hello, world! <p>Facilities Offered:</p><hr>";
             var result = HtmlIOUtils.MakeStartHtmlTag(html);
-            Assert.AreEqual("<p>Hello, world! </p><p>Facilities Offered:</p><hr>", result);
+            Assert.That(result, Is.EqualTo("<p>Hello, world! </p><p>Facilities Offered:</p><hr>"));
         }
 
         [Test]
@@ -199,7 +211,7 @@ namespace Tests.Utils
         {
             var html = "<p><br></p><ul><li>Guest laundry facility</li></ul><p><br></p><p><br></p><p><br></p>";
             var result = HtmlIOUtils.ClearTags(html);
-            Assert.AreEqual("<ul><li>Guest laundry facility</li></ul>", result);
+            Assert.That(result, Is.EqualTo("<ul><li>Guest laundry facility</li></ul>"));
         }
     }
 }

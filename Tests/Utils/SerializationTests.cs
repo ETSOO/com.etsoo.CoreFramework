@@ -46,8 +46,8 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.AreEqual(value, result);
-            Assert.AreEqual(value, cache.GetString(key));
+            Assert.That(result, Is.EqualTo(value));
+            Assert.That(cache.GetString(key), Is.EqualTo(value));
         }
 
         [Test]
@@ -65,9 +65,12 @@ namespace Tests.Utils
                 return value;
             });
 
-            // Assert
-            Assert.AreEqual(value, result);
-            Assert.IsTrue(string.IsNullOrEmpty(cache.GetString(key)));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result, Is.EqualTo(value));
+                Assert.That(string.IsNullOrEmpty(cache.GetString(key)), Is.True);
+            });
         }
 
         [Test]
@@ -91,7 +94,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.AreEqual(value, result);
+            Assert.That(result, Is.EqualTo(value));
 
             // Act
             var resultCached = await CacheFactory.DoAsync(cache, 1, () => key, async () =>
@@ -102,7 +105,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.AreNotEqual(value, resultCached);
+            Assert.That(resultCached, Is.Not.EqualTo(value));
         }
 
         [Test]
@@ -121,7 +124,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsTrue(cached);
+            Assert.That(cached, Is.True);
 
             // Act
             var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
@@ -132,7 +135,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsFalse(cached1);
+            Assert.That(cached1, Is.False);
         }
 
         [Test]
@@ -151,7 +154,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsTrue(cached);
+            Assert.That(cached, Is.True);
 
             // Act
             var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
@@ -161,7 +164,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsTrue(cached1);
+            Assert.That(cached1, Is.True);
         }
 
         [Test]
@@ -185,19 +188,25 @@ namespace Tests.Utils
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
             // Assert
-            Assert.IsTrue(json.Contains("keys"));
+            Assert.That(json, Does.Contain("keys"));
         }
 
         [Test]
         public void DataFormatParseTests()
         {
             var result = DataFormat.TryParse<DataFormat>(1, out var item);
-            Assert.IsTrue(result);
-            Assert.AreEqual(DataFormat.Json, item);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.True);
+                Assert.That(item, Is.EqualTo(DataFormat.Json));
+            });
 
             var result1 = DataFormat.TryParse<DataFormat>(2, out var item1);
-            Assert.IsFalse(result1);
-            Assert.IsNull(item1);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result1, Is.False);
+                Assert.That(item1, Is.Null);
+            });
         }
 
         [Test]
@@ -206,7 +215,7 @@ namespace Tests.Utils
             var json = """{"contactTemplate": "abc"}""";
             var doc = JsonDocument.Parse(json);
             var template = doc.RootElement.GetPropertyCaseInsensitive("ContactTemplate");
-            Assert.AreEqual("abc", template?.GetString());
+            Assert.That(template?.GetString(), Is.EqualTo("abc"));
         }
 
         [Test]
@@ -216,14 +225,17 @@ namespace Tests.Utils
             var root = JsonDocument.Parse(json).RootElement;
 
             var boolItem1 = root.GetProperty("boolItem1");
-            Assert.IsNull(boolItem1.GetValue<bool>());
-            Assert.IsTrue(boolItem1.GetValue<bool>(true));
+            Assert.Multiple(() =>
+            {
+                Assert.That(boolItem1.GetValue<bool>(), Is.Null);
+                Assert.That(boolItem1.GetValue<bool>(true), Is.True);
+            });
 
             var boolItem2 = root.GetProperty("boolItem2");
-            Assert.IsTrue(boolItem2.GetValue<bool>());
+            Assert.That(boolItem2.GetValue<bool>(), Is.True);
 
             var intItem = root.GetProperty("intItem");
-            Assert.IsNull(intItem.GetValue<int>());
+            Assert.That(intItem.GetValue<int>(), Is.Null);
         }
 
         [Test]
@@ -232,12 +244,12 @@ namespace Tests.Utils
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
             var json = """{"format":1}""";
             var result = JsonSerializer.Deserialize<FormatTest>(json, options);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(DataFormat.Json, result?.Format);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result?.Format, Is.EqualTo(DataFormat.Json));
 
             var jsonResult = JsonSerializer.Serialize(result, options);
-            Assert.IsNotNull(jsonResult);
-            Assert.AreEqual(json, jsonResult);
+            Assert.That(jsonResult, Is.Not.Null);
+            Assert.That(jsonResult, Is.EqualTo(json));
         }
 
         [Test]
@@ -248,24 +260,36 @@ namespace Tests.Utils
 
             var stringItem = doc.RootElement.GetProperty("stringItem");
             var testArray = stringItem.GetArray<string>();
-            Assert.AreEqual(0, testArray.Count());
+            Assert.That(testArray.Count(), Is.EqualTo(0));
 
             var stringArray = doc.RootElement.GetProperty("stringArray").GetArray<string>();
-            Assert.AreEqual(3, stringArray.Count());
-            Assert.AreEqual("c", stringArray.Last());
+            Assert.Multiple(() =>
+            {
+                Assert.That(stringArray.Count(), Is.EqualTo(3));
+                Assert.That(stringArray.Last(), Is.EqualTo("c"));
+            });
 
             var intArray = doc.RootElement.GetProperty("intArray").GetArray<int>();
-            Assert.AreEqual(4, intArray.Count());
-            Assert.AreEqual(1, intArray.First());
-            Assert.IsNull(intArray.ElementAt(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(intArray.Count(), Is.EqualTo(4));
+                Assert.That(intArray.First(), Is.EqualTo(1));
+                Assert.That(intArray.ElementAt(2), Is.Null);
+            });
 
             var intArrayNotNull = doc.RootElement.GetProperty("intArray").GetArray<int>(true).WhereNotNull();
-            Assert.AreEqual(3, intArrayNotNull.Count());
-            Assert.AreEqual(3, intArrayNotNull.ElementAt(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(intArrayNotNull.Count(), Is.EqualTo(3));
+                Assert.That(intArrayNotNull.ElementAt(2), Is.EqualTo(3));
+            });
 
             var objArray = doc.RootElement.GetProperty("object").GetArray<IdLabelItem>();
-            Assert.AreEqual(1, objArray.Count());
-            Assert.AreEqual("Label", objArray.First()?.Label);
+            Assert.Multiple(() =>
+            {
+                Assert.That(objArray.Count(), Is.EqualTo(1));
+                Assert.That(objArray.First()?.Label, Is.EqualTo("Label"));
+            });
         }
 
         [Test]
@@ -287,7 +311,7 @@ namespace Tests.Utils
             var json = JsonSerializer.Serialize(dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
 
             // Assert
-            Assert.AreEqual("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""", json);
+            Assert.That(json, Is.EqualTo("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}"""));
         }
     }
 }

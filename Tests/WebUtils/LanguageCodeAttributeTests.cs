@@ -10,13 +10,16 @@ namespace Tests.WebUtils
         public void IsValidTests()
         {
             var attribute = new LanguageCodeAttribute();
-            Assert.IsTrue(attribute.IsValid("zh"));
-            Assert.IsTrue(attribute.IsValid("zh-CN"));
-            Assert.IsTrue(attribute.IsValid("zh-Hans"));
-            Assert.IsTrue(attribute.IsValid("zh-Hans-CN"));
-            Assert.IsTrue(attribute.IsValid("zh-Hans-HK"));
-            Assert.IsTrue(attribute.IsValid("zh-Hant-HK"));
-            Assert.IsTrue(attribute.IsValid("en"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(attribute.IsValid("zh"), Is.True);
+                Assert.That(attribute.IsValid("zh-CN"), Is.True);
+                Assert.That(attribute.IsValid("zh-Hans"), Is.True);
+                Assert.That(attribute.IsValid("zh-Hans-CN"), Is.True);
+                Assert.That(attribute.IsValid("zh-Hans-HK"), Is.True);
+                Assert.That(attribute.IsValid("zh-Hant-HK"), Is.True);
+                Assert.That(attribute.IsValid("en"), Is.True);
+            });
         }
     }
 }

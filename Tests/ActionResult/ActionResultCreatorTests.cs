@@ -36,7 +36,7 @@ namespace Tests.ActionResult
             var result = await connection.QueryAsResultAsync(new("SELECT TOP 0 NULL"));
 
             // Assert
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -48,10 +48,13 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 'NoId/Organization' AS [type]"));
 
-            // Assert
-            Assert.IsFalse(result!.Ok);
-            Assert.AreEqual(result!.Type, "NoId");
-            Assert.AreEqual(result!.Field, "Organization");
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result?.Ok, Is.False);
+                Assert.That(result?.Type, Is.EqualTo("NoId"));
+                Assert.That(result?.Field, Is.EqualTo("Organization"));
+            });
         }
 
         [Test]
@@ -63,18 +66,24 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 90900 as traceId, 1234 AS id, 44.3 AS amount, CAST(0 AS bit) AS ok"));
 
-            // Assert
-            Assert.IsNull(result?.Type);
-            Assert.IsTrue(result!.Ok);
-            Assert.AreEqual(result.TraceId, "90900");
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result?.Type, Is.Null);
+                Assert.That(result?.Ok, Is.True);
+                Assert.That(result?.TraceId, Is.EqualTo("90900"));
+            });
 
             var data = result.Data.As<ActionResultTestData>("id", "ok");
-            Assert.AreEqual(data?.Id, 1234);
-            Assert.AreEqual(data?.Amount, 44.3M);
+            Assert.Multiple(() =>
+            {
+                Assert.That(data?.Id, Is.EqualTo(1234));
+                Assert.That(data?.Amount, Is.EqualTo(44.3M));
 
-            // Support same name property
-            // Should after all ActionResult fields
-            Assert.IsFalse(data?.Ok);
+                // Support same name property
+                // Should after all ActionResult fields
+                Assert.That(data?.Ok, Is.False);
+            });
         }
 
         [Test]
@@ -86,12 +95,15 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
 
-            // Assert
-            Assert.IsTrue(result!.Ok);
-            Assert.AreEqual(result?.Field, "test");
-            Assert.AreEqual(result?.Data?.Count, 2);
-            Assert.IsTrue(result?.Data?.ContainsValue(1234));
-            Assert.IsTrue(result?.Data?.ContainsKey("amount"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result?.Ok, Is.True);
+                Assert.That(result?.Field, Is.EqualTo("test"));
+                Assert.That(result?.Data?.Count, Is.EqualTo(2));
+                Assert.That(result?.Data?.ContainsValue(1234), Is.True);
+                Assert.That(result?.Data?.ContainsKey("amount"), Is.True);
+            });
         }
     }
 

@@ -79,24 +79,24 @@ namespace Tests.Services
             var user = new SqlUserInsert { Id = 1003, Name = "Admin 3", Status = EntityStatus.Approved };
 
             var id = await service.SqlInsertAsync<SqlUserInsert, int>(user);
-            Assert.AreEqual(1003, id);
+            Assert.That(id, Is.EqualTo(1003));
 
             var update = new SqlUserUpdate { Id = 1003, Name = "Admin 3 Updated", ChangedFields = ["Name"] };
             var updateResult = await service.SqlUpdateAsync(update);
-            Assert.IsTrue(updateResult.Ok);
+            Assert.That(updateResult.Ok, Is.True);
 
             var select = new SqlUserSelect { Id = 1003, QueryPaging = new QueryData { BatchSize = 2 } };
             var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
-            Assert.IsNotNull(selectData);
-            Assert.AreEqual("Admin 3 Updated", selectData.Name);
+            Assert.That(selectData, Is.Not.Null);
+            Assert.That(selectData.Name, Is.EqualTo("Admin 3 Updated"));
 
             var writer = new ArrayBufferWriter<byte>();
             await service.SqlSelectJsonAsync<SqlUserSelect, UserData>(select, writer);
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
-            Assert.AreEqual("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
+            Assert.That(json, Is.EqualTo("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]"));
 
             var deleteResult = await service.SqlDeleteAsync([1003], "User");
-            Assert.IsTrue(deleteResult.Ok);
+            Assert.That(deleteResult.Ok, Is.True);
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace Tests.Services
             var plainText = service.Decrypt(encrypted, passphrase, 120);
 
             // Assert
-            Assert.AreEqual(input, plainText);
+            Assert.That(plainText, Is.EqualTo(input));
         }
 
         [Test]
@@ -126,9 +126,12 @@ namespace Tests.Services
             var plainText = service.Decrypt(encrypted, passphrase, 120, true);
             var plainTextLong = service.Decrypt(encrypted, passphrase, null, true);
 
-            // Assert
-            Assert.IsNull(plainText);
-            Assert.AreEqual(input, plainTextLong);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(plainText, Is.Null);
+                Assert.That(plainTextLong, Is.EqualTo(input));
+            });
         }
 
         [Test]
@@ -137,14 +140,14 @@ namespace Tests.Services
             // Arrange
             var rq = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds() };
             var result = await service.InitCallAsync(rq, "My Password");
-            Assert.IsTrue(result.Ok);
+            Assert.That(result.Ok, Is.True);
 
             var deviceId = result.Data.Get("DeviceId");
-            Assert.IsNotNull(deviceId);
+            Assert.That(deviceId, Is.Not.Null);
 
             var rqNew = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds(), DeviceId = deviceId };
             var resultNew = await service.InitCallAsync(rqNew, "My Password");
-            Assert.IsTrue(resultNew.Ok);
+            Assert.That(resultNew.Ok, Is.True);
         }
 
         [Test]
@@ -165,10 +168,13 @@ namespace Tests.Services
                 TableName = "User"
             });
 
-            // Assert
-            Assert.IsTrue(result.Ok);
-            Assert.IsNotNull(data);
-            Assert.AreEqual(1, data?.RowsAffected);
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result.Ok, Is.True);
+                Assert.That(data, Is.Not.Null);
+                Assert.That(data?.RowsAffected, Is.EqualTo(1));
+            });
         }
 
         [Test]
@@ -182,7 +188,7 @@ namespace Tests.Services
             var result = await service.QueryAsAsync<TestUserModule>(command);
 
             // Assert
-            Assert.IsTrue(result?.Name == "Admin 1");
+            Assert.That(result?.Name, Is.EqualTo("Admin 1"));
         }
 
         [Test]
@@ -197,9 +203,12 @@ namespace Tests.Services
 
             // Assert
             var error = ApplicationErrors.NoActionResult;
-            Assert.IsFalse(result.Ok);
-            Assert.AreEqual(error.Type, result.Type);
-            Assert.AreEqual(error.Title, result.Title);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Ok, Is.False);
+                Assert.That(result.Type, Is.EqualTo(error.Type));
+                Assert.That(result.Title, Is.EqualTo(error.Title));
+            });
         }
 
         [Test]
@@ -213,7 +222,7 @@ namespace Tests.Services
             var result = await service.QueryAsResultAsync(command);
 
             // Assert
-            Assert.IsTrue(result.Ok);
+            Assert.That(result.Ok, Is.True);
         }
 
         [Test]
@@ -228,9 +237,12 @@ namespace Tests.Services
             var result = await service.ReadToStreamAsync(command, stream);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
-            // Assert
-            Assert.IsTrue(result);
-            Assert.IsTrue(json.Contains("Admin 1"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result, Is.True);
+                Assert.That(json, Does.Contain("Admin 1"));
+            });
         }
 
         [Test]
@@ -245,10 +257,13 @@ namespace Tests.Services
             var result = await service.ReadToStreamAsync(command, stream, DataFormat.Json, new[] { "users" });
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
-            // Assert
-            Assert.IsTrue(result);
-            Assert.IsTrue(json.Contains("\"users\":"));
-            Assert.IsTrue(json.Contains("\"data2\":"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(result, Is.True);
+                Assert.That(json, Does.Contain("\"users\":"));
+                Assert.That(json, Does.Contain("\"data2\":"));
+            });
         }
 
         [Test]
@@ -267,7 +282,7 @@ namespace Tests.Services
             var json = Encoding.UTF8.GetString(result.ToArray());
 
             // Assert
-            Assert.IsTrue(json.Contains("id"));
+            Assert.That(json, Does.Contain("id"));
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Tests.Utils
             var fields = new List<string> { "日期", "美元", "欧元", "日元", "港元", "英镑", "林吉特", "卢布", "澳元", "加元", "新西兰元", "新加坡元", "瑞士法郎", "兰特", "韩元", "迪拉姆", "里亚尔", "福林", "兹罗提", "丹麦克朗", "瑞典克朗", "挪威克朗", "里拉", "比索", "泰铢" };
             var values = new List<string> { "2022-02-24", "632.8", "715.14", "5.5079", "81.079", "856.99", "66.144", "1283.55", "457.16", "496.96", "428.31", "470.01", "689.73", "239.05", "18889.0", "58.039", "59.287", "5046.66", "64.149", "104.02", "148.4", "140.58", "218.486", "319.98", "509.91" };
             var value = SharedUtils.GetAccordingValue<decimal>(fields, values, "港元", 4);
-            Assert.AreEqual(81.079, value);
+            Assert.That(value, Is.EqualTo(81.079));
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace Tests.Utils
             var result = Encoding.UTF8.GetString(stream.GetReadOnlySequence());
 
             // Assert
-            Assert.AreEqual("""{"id":0,"name":"Etsoo"}""", result);
+            Assert.That(result, Is.EqualTo("""{"id":0,"name":"Etsoo"}"""));
         }
 
         [Test]
@@ -59,9 +59,12 @@ namespace Tests.Utils
             // Act
             var dic = await SharedUtils.ObjectToDictionaryAsync(data);
 
-            // Assert
-            Assert.AreEqual(dic.Keys.Count, 2);
-            Assert.IsTrue(dic.ContainsKey("Name"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(dic.Keys.Count, Is.EqualTo(2));
+                Assert.That(dic.ContainsKey("Name"), Is.True);
+            });
         }
 
         [Test]
@@ -72,7 +75,7 @@ namespace Tests.Utils
             var stream = SharedUtils.GetStream(source);
             var result = await SharedUtils.StreamToStringAsync(stream);
 
-            Assert.AreEqual(source, result);
+            Assert.That(result, Is.EqualTo(source));
         }
 
         [Test]
@@ -80,12 +83,15 @@ namespace Tests.Utils
         {
             var now = DateTime.Now;
             var now1 = SharedUtils.TruncateDateTime(now);
-            Assert.AreEqual(0, now1.Millisecond);
+            Assert.That(now1.Millisecond, Is.EqualTo(0));
 
             var utc = DateTime.UtcNow;
             var utc1 = SharedUtils.TruncateDateTime(utc);
-            Assert.AreEqual(0, utc1.Millisecond);
-            Assert.AreEqual(DateTimeKind.Utc, utc1.Kind);
+            Assert.Multiple(() =>
+            {
+                Assert.That(utc1.Millisecond, Is.EqualTo(0));
+                Assert.That(utc1.Kind, Is.EqualTo(DateTimeKind.Utc));
+            });
         }
 
         [Test]
@@ -101,9 +107,9 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions { IncludeFields = true }, ["Id", "name", "Valid", "Date"]);
-            Assert.IsTrue(json.Contains("Name"));
-            Assert.IsTrue(json.Contains("Valid"));
-            Assert.IsFalse(json.Contains("DecimalValue"));
+            Assert.That(json, Does.Contain("Name"));
+            Assert.That(json, Does.Contain("Valid"));
+            Assert.That(json, Does.Not.Contain("DecimalValue"));
         }
 
         [Test]
@@ -116,8 +122,8 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions(), ["Id"]);
-            Assert.IsTrue(json.Contains("Id"));
-            Assert.IsFalse(json.Contains("Name"));
+            Assert.That(json, Does.Contain("Id"));
+            Assert.That(json, Does.Not.Contain("Name"));
         }
 
         [Test]
@@ -130,8 +136,8 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, CommonJsonSerializerContext.Default.GuidItem, ["id"]);
-            Assert.IsTrue(json.Contains("id"));
-            Assert.IsFalse(json.Contains("label"));
+            Assert.That(json, Does.Contain("id"));
+            Assert.That(json, Does.Not.Contain("label"));
         }
 
         [Test]
@@ -153,7 +159,7 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, ["Id", "Name"]);
-            Assert.AreEqual("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}", json);
+            Assert.That(json, Is.EqualTo("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}"));
         }
     }
 }

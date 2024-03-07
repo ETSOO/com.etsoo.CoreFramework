@@ -16,7 +16,7 @@ namespace Tests.MessageQueue
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP" });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
-            Assert.IsNotNull(messageId);
+            Assert.That(messageId, Is.Not.Null);
         }
 
         [Test]
@@ -41,9 +41,12 @@ namespace Tests.MessageQueue
             await Task.Delay(1000);
             await consumer.StopAsync(default);
 
-            Assert.IsTrue(messages.Any());
-            Assert.IsTrue(messages.Any(m => "GUID".Equals(m.UserId)));
-            Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages, Is.Not.Empty);
+                Assert.That(messages.Any(m => "GUID".Equals(m.UserId)), Is.True);
+                Assert.That(messages.Any(m => messageId.Equals(m.MessageId)), Is.True);
+            });
         }
 
         [Test]
@@ -70,9 +73,12 @@ namespace Tests.MessageQueue
             await Task.Delay(1000);
             await consumer.StopAsync(source.Token);
 
-            Assert.IsTrue(messages.Any());
-            Assert.IsTrue(messages.Any(m => "Hello".Equals(m.Item2)));
-            Assert.IsTrue(messages.Any(m => messageId.Equals(m.Item1.MessageId)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages, Is.Not.Empty);
+                Assert.That(messages.Any(m => "Hello".Equals(m.Item2)), Is.True);
+                Assert.That(messages.Any(m => messageId.Equals(m.Item1.MessageId)), Is.True);
+            });
         }
     }
 }

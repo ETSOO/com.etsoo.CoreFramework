@@ -37,7 +37,7 @@ namespace Tests.Utils
             var result = SqlServerUtils.GetSqlType(type);
 
             // Assert
-            Assert.AreEqual(sqlType, result, $"{type} is not converted with {sqlType}");
+            Assert.That(result, Is.EqualTo(sqlType), $"{type} is not converted with {sqlType}");
         }
 
         private static IEnumerable<TestCaseData> ToSqlDateTimeBulkTestData
@@ -64,7 +64,7 @@ namespace Tests.Utils
             var date = DateTime.Parse(input).ToSqlDateTime();
 
             // Assert
-            Assert.AreEqual(date.Millisecond, milliseconds, "No match for milliseconds");
+            Assert.That(milliseconds, Is.EqualTo(date.Millisecond), "No match for milliseconds");
         }
     }
 }

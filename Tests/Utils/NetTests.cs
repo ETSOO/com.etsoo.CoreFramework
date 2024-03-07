@@ -11,17 +11,12 @@ namespace Tests.Utils
     [TestFixture]
     public class NetTests
     {
-        readonly MimeMessage message;
-
-        public NetTests()
+        MimeMessage message => new MimeMessage
         {
-            message = new MimeMessage
-            {
-                Subject = "Hello from ETSOO",
-                Body = new TextPart(TextFormat.Html) { Text = "<h1>Hello, world!</h1>" }
-            };
-            message.To.Add(MailboxAddress.Parse("xz@etsoo.com"));
-        }
+            Subject = "Hello from ETSOO",
+            Body = new TextPart(TextFormat.Html) { Text = "<h1>Hello, world!</h1>" },
+            To = { MailboxAddress.Parse("xz@etsoo.com") }
+        };
 
         [Test]
         public void EmailUtilSend_Test()
@@ -36,7 +31,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsTrue(result?.Message.StartsWith("535:"));
+            Assert.That(result?.Message.StartsWith("535:"), Is.True);
         }
 
         [Test]
@@ -62,7 +57,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.IsTrue(result?.Message.StartsWith("535:"));
+            Assert.That(result?.Message.StartsWith("535:"), Is.True);
         }
     }
 }

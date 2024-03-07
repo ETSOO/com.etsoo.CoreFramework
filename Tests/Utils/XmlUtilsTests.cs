@@ -26,9 +26,12 @@ namespace Tests.Utils
             var dic = await XmlUtils.ParseXmlAsync(input);
 
             // Assert
-            Assert.AreEqual(7, dic.Count);
-            Assert.AreEqual("scancode_push", dic["Event"]);
-            Assert.AreEqual("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[条形码1]]></ScanResult>", dic["ScanCodeInfo"]);
+            Assert.Multiple(() =>
+            {
+                Assert.That(dic, Has.Count.EqualTo(7));
+                Assert.That(dic["Event"], Is.EqualTo("scancode_push"));
+                Assert.That(dic["ScanCodeInfo"], Is.EqualTo("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[条形码1]]></ScanResult>"));
+            });
         }
 
         [Test]
@@ -42,19 +45,19 @@ namespace Tests.Utils
             };
 
             var v1 = XmlUtils.GetValue<bool>(dic, "boolean");
-            Assert.AreEqual(true, v1);
+            Assert.That(v1, Is.EqualTo(true));
 
             var v2 = XmlUtils.GetValue<int>(dic, "int");
-            Assert.AreEqual(123, v2);
+            Assert.That(v2, Is.EqualTo(123));
 
             var v3 = XmlUtils.GetValue<DateTime>(dic, "int1");
-            Assert.IsNull(v3);
+            Assert.That(v3, Is.Null);
 
             var v4 = XmlUtils.GetValue<DateTime>(dic, "nofield");
-            Assert.IsNull(v4);
+            Assert.That(v4, Is.Null);
 
             var v5 = XmlUtils.GetValue(dic, "boolean");
-            Assert.AreEqual("true", v5);
+            Assert.That(v5, Is.EqualTo("true"));
         }
 
         [Test]
@@ -63,9 +66,12 @@ namespace Tests.Utils
             // Arrage & act
             var items = XmlUtils.GetList("<item><field1>1</field1><field2><![CDATA[a1]]></field2></item><item><field1>2</field1><field2><![CDATA[亿速]]></field2></item>");
 
-            // Assert
-            Assert.AreEqual(2, items.Count());
-            Assert.IsTrue(items.Any(item => item.ContainsKey("field2") && item["field2"] == "亿速"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(items.Count(), Is.EqualTo(2));
+                Assert.That(items.Any(item => item.ContainsKey("field2") && item["field2"] == "亿速"), Is.True);
+            });
         }
     }
 }

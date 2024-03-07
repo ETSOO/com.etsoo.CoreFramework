@@ -15,8 +15,8 @@ namespace Tests.WebUtils
             var role = (short)(UserRole.Finance | UserRole.Operator);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, "Etsoo"),
-                new Claim(ClaimTypes.Role, role.ToString())
+                new(ClaimTypes.Name, "Etsoo"),
+                new(ClaimTypes.Role, role.ToString())
             };
             var identity = new ClaimsIdentity(claims);
             var principal = new ClaimsPrincipal(identity);
@@ -25,8 +25,8 @@ namespace Tests.WebUtils
             var roleValue = principal.GetEnumClaim<UserRole>(ClaimTypes.Role);
 
             // Assert
-            Assert.NotNull(roleValue);
-            Assert.IsTrue(roleValue.GetValueOrDefault().HasFlag(UserRole.Operator));
+            Assert.That(roleValue, Is.Not.Null);
+            Assert.That(roleValue.GetValueOrDefault().HasFlag(UserRole.Operator), Is.True);
         }
     }
 }

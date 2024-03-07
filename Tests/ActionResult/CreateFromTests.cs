@@ -12,8 +12,11 @@ namespace Tests.ActionResult
             var exception = new SystemException(message);
             exception.Data.Add("HasData", true);
             var result = com.etsoo.Utils.Actions.ActionResult.From(exception);
-            Assert.AreEqual(message, result.Title);
-            Assert.IsTrue(result.Data.Get<bool>("HasData"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Title, Is.EqualTo(message));
+                Assert.That(result.Data.Get<bool>("HasData"), Is.True);
+            });
         }
     }
 }

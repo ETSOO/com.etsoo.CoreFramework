@@ -1,10 +1,6 @@
 ﻿using com.etsoo.Utils.SpanMemory;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Tests.Utils
 {
@@ -23,11 +19,11 @@ namespace Tests.Utils
             var bytes2 = base64.AsSpan().ToBase64Bytes().ToArray();
 
             // Assert
-            Assert.AreEqual(bytes1, bytes2);
+            Assert.That(bytes2, Is.EqualTo(bytes1));
 
             // Invalid Base64 string
             var bytes3 = "Hello, world!".AsSpan().ToBase64Bytes().ToArray();
-            Assert.AreEqual(0, bytes3.Length);
+            Assert.That(bytes3, Is.Empty);
         }
     }
 }

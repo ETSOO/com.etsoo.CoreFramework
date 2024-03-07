@@ -81,7 +81,7 @@ namespace com.etsoo.ImageUtils
             // Return
             return new EncoderParameters
             {
-                Param = pItems.ToArray()
+                Param = [.. pItems]
             };
         }
 

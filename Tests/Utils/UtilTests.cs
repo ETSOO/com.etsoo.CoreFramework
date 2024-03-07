@@ -10,10 +10,10 @@ namespace Tests.Utils
         public void ValueToEnumTests()
         {
             var item = (UserRole)0;
-            Assert.IsFalse(com.etsoo.Utils.SharedUtils.EnumIsDefined(item));
+            Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.False);
 
             item = (UserRole)3;
-            Assert.IsTrue(com.etsoo.Utils.SharedUtils.EnumIsDefined(item));
+            Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.True);
         }
     }
 }

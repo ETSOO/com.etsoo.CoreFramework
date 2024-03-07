@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.String;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace Tests.Utils
 {
@@ -16,12 +15,15 @@ namespace Tests.Utils
             // Arrange
             var dic = new StringKeyDictionary<string>(new Dictionary<string, string?>() { { "null", null }, { "ok", "ok" } });
 
-            // Act & assert
-            Assert.IsNull(dic.GetItem("null"));
-            Assert.IsNotNull(dic.GetItem("ok"));
+            Assert.Multiple(() =>
+            {
+                // Act & assert
+                Assert.That(dic.GetItem("null"), Is.Null);
+                Assert.That(dic.GetItem("ok"), Is.Not.Null);
+            });
 
             var key = dic.GetItem("key");
-            Assert.IsNull(key);
+            Assert.That(key, Is.Null);
         }
 
         /// <summary>
@@ -33,16 +35,19 @@ namespace Tests.Utils
             // Arrange
             var dic = new StringKeyDictionary<int?>(new Dictionary<string, int?>() { { "null", null }, { "ok", 123 } });
 
-            // Act & assert
-            Assert.IsNull(dic.GetItem("null"));
-            Assert.IsNotNull(dic.GetItem("ok"));
+            Assert.Multiple(() =>
+            {
+                // Act & assert
+                Assert.That(dic.GetItem("null"), Is.Null);
+                Assert.That(dic.GetItem("ok"), Is.Not.Null);
+            });
 
             var key = dic.GetItem("key");
-            Assert.IsNull(key);
+            Assert.That(key, Is.Null);
         }
 
         // Arrange
-        private readonly StringKeyDictionaryObject dic = new (new Dictionary<string, object?>()
+        private readonly StringKeyDictionaryObject dic = new(new Dictionary<string, object?>()
             {
                 { "null", null },
                 { "bool", true },
@@ -56,8 +61,11 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetNull_Test()
         {
-            Assert.IsNull(dic.Get("null"));
-            Assert.IsNull(dic.Get<bool>("null"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dic.Get("null"), Is.Null);
+                Assert.That(dic.Get<bool>("null"), Is.Null);
+            });
         }
 
         /// <summary>
@@ -66,7 +74,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetBool_Test()
         {
-            Assert.AreEqual(true, dic.Get<bool>("bool"));
+            Assert.That(dic.Get<bool>("bool"), Is.EqualTo(true));
         }
 
         /// <summary>
@@ -75,7 +83,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetDecimal_Test()
         {
-            Assert.AreEqual(12.8M, dic.Get<decimal>("money"));
+            Assert.That(dic.Get<decimal>("money"), Is.EqualTo(12.8M));
         }
 
         /// <summary>
@@ -84,7 +92,7 @@ namespace Tests.Utils
         [Test]
         public void DictionaryDynamic_GetDecimalFromString_Test()
         {
-            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
+            Assert.That(dic.Get<decimal>("string"), Is.EqualTo(12.8M));
         }
 
         /// <summary>
@@ -100,9 +108,12 @@ namespace Tests.Utils
                 { "string", "12.8" }
             });
 
-            Assert.IsNull(dic.GetItem("null"));
-            Assert.IsNull(dic.Get<bool>("null"));
-            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(dic.GetItem("null"), Is.Null);
+                Assert.That(dic.Get<bool>("null"), Is.Null);
+                Assert.That(dic.Get<decimal>("string"), Is.EqualTo(12.8M));
+            });
         }
     }
 }

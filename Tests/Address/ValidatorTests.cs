@@ -10,19 +10,25 @@ namespace Tests.Address
         public void ChinaPinValidatorFalseTests()
         {
             var validator = new ChinaPinValidator("430124198812081876");
-            Assert.IsFalse(validator.Valid);
-            Assert.AreEqual("M", validator.Gender);
-            Assert.AreEqual(12, validator.Birthday?.Month);
-            Assert.AreEqual(8, validator.Birthday?.Day);
+            Assert.Multiple(() =>
+            {
+                Assert.That(validator.Valid, Is.False);
+                Assert.That(validator.Gender, Is.EqualTo("M"));
+                Assert.That(validator.Birthday?.Month, Is.EqualTo(12));
+                Assert.That(validator.Birthday?.Day, Is.EqualTo(8));
+            });
         }
 
         [Test]
         public void ChinaPinValidatorTrueTests()
         {
             var validator = new ChinaPinValidator("53010219200508011x");
-            Assert.IsTrue(validator.Valid);
-            Assert.AreEqual("M", validator.Gender);
-            Assert.AreEqual(5, validator.Birthday?.Month);
+            Assert.Multiple(() =>
+            {
+                Assert.That(validator.Valid);
+                Assert.That(validator.Gender, Is.EqualTo("M"));
+                Assert.That(validator.Birthday?.Month, Is.EqualTo(5));
+            });
         }
     }
 }

@@ -25,10 +25,13 @@ namespace Tests.ActionResult
             // Act
             var json = JsonSerializer.Serialize(modal, SharedUtils.JsonDefaultSerializerOptions);
 
-            // Assert
-            Assert.IsTrue(json.Contains("secret"));
-            Assert.IsTrue(json.Contains("***"));
-            Assert.IsTrue(json.Contains("uShortValue"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(json, Does.Contain("secret"));
+                Assert.That(json, Does.Contain("***"));
+                Assert.That(json, Does.Contain("uShortValue"));
+            });
         }
 
         [Test]
@@ -50,9 +53,12 @@ namespace Tests.ActionResult
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
-            // Assert
-            Assert.IsFalse(json.Contains("secret"));
-            Assert.IsTrue(json.Contains("uShortValue"));
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(json, Does.Not.Contain("secret"));
+                Assert.That(json, Does.Contain("uShortValue"));
+            });
         }
     }
 }

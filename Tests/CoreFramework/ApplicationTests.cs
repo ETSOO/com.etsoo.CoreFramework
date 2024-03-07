@@ -26,7 +26,7 @@ namespace Tests.CoreFramework
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
             var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
-            Assert.AreEqual(app.Configuration.Cultures.Length, 0);
+            Assert.That(app.Configuration.Cultures.Length, Is.EqualTo(0));
         }
 
         [Test]
@@ -37,17 +37,20 @@ namespace Tests.CoreFramework
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Configuration");
 
             var privateField = section.GetSection("PrivateKey").Value;
-            Assert.AreEqual("Etsoo", privateField);
+            Assert.That(privateField, Is.EqualTo("Etsoo"));
 
             var config = section.Get<AppConfiguration>();
-            Assert.IsNotNull(config);
 
-            Assert.AreEqual("Etsoo", config?.PrivateKey);
-            Assert.AreEqual("TestApp", config?.Name);
-            Assert.AreEqual("zh-Hans-CN", config?.Cultures[1]);
+            Assert.Multiple(() =>
+            {
+                Assert.That(config, Is.Not.Null);
+                Assert.That(config?.PrivateKey, Is.EqualTo("Etsoo"));
+                Assert.That(config?.Name, Is.EqualTo("TestApp"));
+                Assert.That(config?.Cultures[1], Is.EqualTo("zh-Hans-CN"));
+            });
 
             config?.UnsealData((field, input) => new string(input.Reverse().ToArray()));
-            Assert.AreEqual("oostE", config?.PrivateKey);
+            Assert.That(config?.PrivateKey, Is.EqualTo("oostE"));
         }
     }
 }

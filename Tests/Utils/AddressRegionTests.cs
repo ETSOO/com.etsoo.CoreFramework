@@ -16,7 +16,7 @@ namespace Tests.Utils
             var country = AddressRegion.GetById("CN");
 
             // Assert
-            Assert.IsTrue(country?.Currency == "CNY");
+            Assert.That(country?.Currency, Is.EqualTo("CNY"));
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace Tests.Utils
             var country = AddressRegion.GetByIdd("64");
 
             // Assert
-            Assert.IsTrue(country?.Id == "NZ");
+            Assert.That(country?.Id, Is.EqualTo("NZ"));
         }
 
         private static IEnumerable<TestCaseData> CreatePhoneBulkTestData
@@ -44,9 +44,12 @@ namespace Tests.Utils
             // Arrange & act
             var phone = AddressRegion.CreatePhone(phoneNumber);
 
-            Assert.AreEqual(region, phone?.Region);
-            Assert.AreEqual(formatedNumber, phone?.PhoneNumber);
-            Assert.AreEqual(isMobile, phone?.IsMobile);
+            Assert.Multiple(() =>
+            {
+                Assert.That(phone?.Region, Is.EqualTo(region));
+                Assert.That(phone?.PhoneNumber, Is.EqualTo(formatedNumber));
+                Assert.That(phone?.IsMobile, Is.EqualTo(isMobile));
+            });
         }
 
         [Test]
@@ -62,7 +65,7 @@ namespace Tests.Utils
             var phones = AddressRegion.CreatePhones(phoneNumbers, "CN");
 
             // Assert
-            Assert.AreEqual(1, phones.Count());
+            Assert.That(phones.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -75,23 +78,23 @@ namespace Tests.Utils
             var result1 = phone?.ToInternationalFormat();
 
             // Assert 1
-            Assert.AreEqual("+64210722065", result1);
+            Assert.That(result1, Is.EqualTo("+64210722065"));
 
             // Act 2
             var result2 = phone?.ToInternationalFormat("00");
 
             // Assert 2
-            Assert.AreEqual("0064210722065", result2);
+            Assert.That(result2, Is.EqualTo("0064210722065"));
         }
 
         [Test]
         public void Extensions_UniquePhones_Tests()
         {
             // Arrange
-            var phones = AddressRegion.CreatePhones(new[] { "13853259135", "+64210722065", "+8613853259135" }, "CN");
+            var phones = AddressRegion.CreatePhones(["13853259135", "+64210722065", "+8613853259135"], "CN");
 
             // Act & assert
-            Assert.AreEqual(2, phones.UniquePhones().Count());
+            Assert.That(phones.UniquePhones().Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -108,7 +111,7 @@ namespace Tests.Utils
             var result = data.JoinAsString(",", ";");
 
             // Assert
-            Assert.AreEqual("a,1;b,2;", result);
+            Assert.That(result, Is.EqualTo("a,1;b,2;"));
         }
 
         [Test]
@@ -125,7 +128,7 @@ namespace Tests.Utils
             var result = data.JoinAsQuery();
 
             // Assert
-            Assert.AreEqual("a=1%3d2&b=2%263&", result);
+            Assert.That(result, Is.EqualTo("a=1%3d2&b=2%263&"));
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Tests.Utils
         public RSACryptoTests()
         {
             var rsa = RSA.Create(2048);
-            
+
             privateKey = Convert.ToBase64String(rsa.ExportRSAPrivateKey());
             publicKey = Convert.ToBase64String(rsa.ExportRSAPublicKey());
         }
@@ -37,13 +37,13 @@ namespace Tests.Utils
             var crypto = new RSACrypto(section);
 
             var input = "Hello, Etsoo";
-            
+
             // Act
             var result = crypto.Encrypt(input);
             var decryptResult = Encoding.UTF8.GetString(crypto.Decrypt(result));
 
             // Assert
-            Assert.AreEqual(input, decryptResult);
+            Assert.That(decryptResult, Is.EqualTo(input));
         }
     }
 }

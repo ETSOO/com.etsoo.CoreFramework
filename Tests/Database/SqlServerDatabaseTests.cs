@@ -35,11 +35,11 @@ namespace Tests.Utils
         public void SqliteDatabase_Constructor_Test()
         {
             // Act & Asset
-            Assert.DoesNotThrow(() =>
+            Assert.DoesNotThrowAsync(async () =>
             {
-                using var connection = db.NewConnection();
-                connection.Open();
-                connection.Close();
+                await using var connection = db.NewConnection();
+                await connection.OpenAsync();
+                await connection.CloseAsync();
             });
         }
 
@@ -48,7 +48,7 @@ namespace Tests.Utils
         /// 异步测试执行SQL 命令
         /// </summary>
         [Test]
-        public async Task ExecuteAsync_Test()
+        public void ExecuteAsync_Test()
         {
             // Arrange
             using var connection = db.NewConnection();
@@ -61,7 +61,10 @@ namespace Tests.Utils
             var sql = "IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user1) INSERT INTO [User] (Id, Name) VALUES(@user1, @name1); IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user2) INSERT INTO [User] (Id, Name) VALUES(@user2, @name2)";
 
             // Result
-            await connection.ExecuteAsync(sql, paras);
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                await connection.ExecuteAsync(sql, paras);
+            });
         }
 
         [Test]
@@ -85,10 +88,10 @@ namespace Tests.Utils
             await connection.ExecuteAsync("ep_user_return", parameters, commandType: CommandType.StoredProcedure);
 
             var result = parameters.Get<int>(name);
-            Assert.AreEqual(value, result);
+            Assert.That(result, Is.EqualTo(value));
 
             var outputValue = parameters.Get<short>(output);
-            Assert.AreEqual(outputValue, 2 * result);
+            Assert.That(outputValue, Is.EqualTo(2 * result));
         }
 
         [Test]
@@ -105,9 +108,9 @@ namespace Tests.Utils
             var users = await TestUserModule.CreateListAsync(reader);
 
             // Assert
-            Assert.IsTrue(users.Count == 1);
-            Assert.IsTrue(users[0].Id == 1001);
-            Assert.IsTrue(users[0].Friends?.Length == 3);
+            Assert.That(users.Count, Is.EqualTo(1));
+            Assert.That(users[0].Id, Is.EqualTo(1001));
+            Assert.That(users[0].Friends?.Length, Is.EqualTo(3));
         }
 
         /// <summary>
@@ -124,7 +127,7 @@ namespace Tests.Utils
             var result = await connection.ExecuteScalarAsync("SELECT Name FROM [User] WHERE Id = 1001");
 
             // Assert
-            Assert.AreEqual("Admin 1", result);
+            Assert.That(result, Is.EqualTo("Admin 1"));
         }
 
         [Test]
@@ -140,7 +143,7 @@ namespace Tests.Utils
             var result = await connection.ExecuteScalarAsync("SELECT @Prefix + Name FROM [User] WHERE Id = @Id", parameters);
 
             // Assert
-            Assert.AreEqual("DynamicAdmin 1", result);
+            Assert.That(result, Is.EqualTo("DynamicAdmin 1"));
         }
 
         /// <summary>
@@ -159,7 +162,7 @@ namespace Tests.Utils
             await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
 
             // Assert
-            Assert.IsTrue(stream.Length == "{\"Name\":\"Admin 1\"}".Length);
+            Assert.That(stream.Length, Is.EqualTo("{\"Name\":\"Admin 1\"}".Length));
         }
 
         [Test]
@@ -174,7 +177,7 @@ namespace Tests.Utils
             var result = await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 0 FOR JSON PATH"), stream);
 
             // Assert
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
     }
 }

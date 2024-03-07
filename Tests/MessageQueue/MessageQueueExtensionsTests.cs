@@ -12,12 +12,15 @@ namespace Tests.MessageQueue
             var data = new SimpleData { Num = 1, Bool = true };
             var bytes = await MessageQueueUtils.ToJsonBytesAsync(data, default);
             var json = bytes.ToJsonString();
-            Assert.AreEqual("""{"num":1,"bool":true}""", json);
+            Assert.That(json, Is.EqualTo("""{"num":1,"bool":true}"""));
 
             var message = await bytes.ToMessageAsync<SimpleData>(default);
-            Assert.IsNotNull(message);
-            Assert.AreEqual(data.Num, message?.Num);
-            Assert.AreEqual(data.Bool, message?.Bool);
+            Assert.Multiple(() =>
+            {
+                Assert.That(message, Is.Not.Null);
+                Assert.That(message?.Num, Is.EqualTo(data.Num));
+                Assert.That(message?.Bool, Is.EqualTo(data.Bool));
+            });
         }
     }
 }
