@@ -4,7 +4,6 @@ using com.etsoo.ImageUtils;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Storage;
 using Microsoft.Extensions.Logging;
-using SixLabors.ImageSharp;
 
 namespace com.etsoo.HtmlIO
 {
@@ -45,7 +44,10 @@ namespace com.etsoo.HtmlIO
             content = MakeStartHtmlTag(content);
 
             await using var stream = SharedUtils.GetStream(content);
-            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
+
+            var (parser, device) = HtmlSharedUtils.CreateDefaultParser();
+
+            var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
             {
                 var source = img.Source;
                 if (string.IsNullOrEmpty(source)) return;
@@ -53,27 +55,12 @@ namespace com.etsoo.HtmlIO
                 try
                 {
                     // Size
-                    var width = img.DisplayWidth;
-                    var height = img.DisplayHeight;
-
-                    if (width == 0 && height == 0)
-                    {
-                        var (styleWidth, styleHeight) = HtmlSharedUtils.GetStyleSize(img);
-                        if (styleWidth.HasValue && styleWidth.Value > 0) width = (int)styleWidth.Value;
-                        if (styleHeight.HasValue && styleHeight.Value > 0) height = (int)styleHeight.Value;
-                    }
-
-                    if (width == 0 && height == 0)
-                    {
-                        // Make sure all implicit large pictures processed
-                        width = HtmlSharedUtils.DefaultRenderDevice.DeviceWidth / 2;
-                    }
-
-                    var size = new Size(width, height);
+                    var size = img.GetSize(device, true);
+                    var sharpSize = new SixLabors.ImageSharp.Size((int)size.Width, (int)size.Height);
 
                     await using var stream = SharedUtils.GetStream();
-                    var extension = await ImageSharpUtils.CreateFromBase64StringAsync(source, size, stream, cancellationToken);
-                    if (!extension.StartsWith(".")) extension = "." + extension;
+                    var extension = await ImageSharpUtils.CreateFromBase64StringAsync(source, sharpSize, stream, cancellationToken);
+                    if (!extension.StartsWith('.')) extension = "." + extension;
                     var filePath = path + Path.GetRandomFileName() + extension;
 
                     var saveResult = await storage.WriteAsync(filePath, stream, WriteCase.CreateNew);
@@ -86,7 +73,7 @@ namespace com.etsoo.HtmlIO
                 {
                     logger?.LogWarning(ex, "Image {source} failed", source);
                 }
-            }, true, cancellationToken);
+            }, cancellationToken);
             return doc.Body?.InnerHtml ?? content;
         }
 

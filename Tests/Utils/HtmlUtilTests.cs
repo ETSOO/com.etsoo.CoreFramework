@@ -1,7 +1,4 @@
-﻿using AngleSharp.Css;
-using AngleSharp.Css.Dom;
-using AngleSharp.Css.Values;
-using AngleSharp.Html.Dom;
+﻿using AngleSharp.Html.Dom;
 using com.etsoo.HtmlIO;
 using com.etsoo.HtmlUtils;
 using com.etsoo.Utils;
@@ -18,7 +15,8 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var doc = await HtmlSharedUtils.ManipulateElementsAsync(stream, "span.eo-lock", async (IHtmlElement element) =>
+            var (parser, device) = HtmlSharedUtils.CreateDefaultParser(false);
+            var doc = await parser.ManipulateElementsAsync(stream, "span.eo-lock", async (IHtmlElement element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
                 count++;
@@ -38,7 +36,8 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlSpanElement>(stream, "span.eo-lock", async (element) =>
+            var (parser, device) = HtmlSharedUtils.CreateDefaultParser(false);
+            var doc = await parser.ManipulateElementsAsync<IHtmlSpanElement>(stream, "span.eo-lock", async (element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
                 count++;
@@ -48,33 +47,6 @@ namespace Tests.Utils
             {
                 Assert.That(count, Is.EqualTo(2));
                 Assert.That(doc.Body?.InnerHtml, Is.EqualTo(htmlUpdated));
-            });
-        }
-
-        [Test]
-        public async Task ManipulateElementsWithStyleAsyncGenericTests()
-        {
-            var html = """<p><img src="a.jpg" style="width: 10%;"/><img src="b.png" style="width: 120px"/><img src="c.bmp" style="width: 100pt;"/></p>""";
-            await using var stream = SharedUtils.GetStream(html);
-            var widths = new List<double>();
-            var device = HtmlSharedUtils.DefaultRenderDevice;
-            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
-            {
-                var style = img.GetStyle();
-                if (Length.TryParse(style.GetWidth(), out var width))
-                {
-                    widths.Add(width.AsPx(device, RenderMode.Horizontal));
-                }
-
-                await Task.CompletedTask;
-            }, true);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(widths, Has.Count.EqualTo(3));
-                Assert.That(widths[0], Is.EqualTo(device.RenderWidth * 0.1));
-                Assert.That(widths[1], Is.EqualTo(120));
-                Assert.That(Math.Round(widths[2], 2), Is.EqualTo(133.33));
             });
         }
 
@@ -169,24 +141,26 @@ namespace Tests.Utils
         [Test]
         public async Task GetStyleSizeTests()
         {
-            var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" style="width: 120px"/><img src="c.bmp" style="height: 100pt;"/></p>""";
+            var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" height="240" style="width: 120px"/><img src="c.bmp" width="200" style="height: 100pt;"/></p>""";
             await using var stream = SharedUtils.GetStream(html);
-            var sizes = new List<(double? width, double? height)>();
-            var device = HtmlSharedUtils.DefaultRenderDevice;
-            var doc = await HtmlSharedUtils.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
+            var sizes = new List<HtmlSize>();
+            var (parser, device) = HtmlSharedUtils.CreateDefaultParser();
+            var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
             {
-                sizes.Add(HtmlSharedUtils.GetStyleSize(img, device));
+                var size = HtmlSharedUtils.GetSize(img, device);
+                sizes.Add(size);
                 await Task.CompletedTask;
-            }, true);
+            });
 
             Assert.Multiple(() =>
             {
                 Assert.That(sizes, Has.Count.EqualTo(3));
-                Assert.That(sizes[0], Is.EqualTo((device.RenderWidth * 0.1, device.RenderHeight * 0.2)));
-                Assert.That(sizes[1].width, Is.EqualTo(120));
-                Assert.That(sizes[1].height, Is.Null);
-                Assert.That(sizes[2].width, Is.Null);
-                Assert.That(Math.Round(sizes[2].height.GetValueOrDefault(), 2), Is.EqualTo(133.33));
+                Assert.That(sizes[0].Width, Is.EqualTo(device.RenderWidth * 0.1));
+                Assert.That(sizes[0].Height, Is.EqualTo(device.RenderHeight * 0.2));
+                Assert.That(sizes[1].Width, Is.EqualTo(120));
+                Assert.That(sizes[1].Height, Is.EqualTo(240));
+                Assert.That(sizes[2].Width, Is.EqualTo(200));
+                Assert.That(Math.Round(sizes[2].Height, 2), Is.EqualTo(133.33));
             });
         }
 

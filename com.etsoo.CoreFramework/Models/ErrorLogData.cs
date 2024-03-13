@@ -13,10 +13,10 @@
         public required string Type { get; init; }
 
         /// <summary>
-        /// Event type
-        /// 事件类型
+        /// Sub type
+        /// 下级分类
         /// </summary>
-        public string? EventType { get; init; }
+        public string? SubType { get; init; }
 
         /// <summary>
         /// Message

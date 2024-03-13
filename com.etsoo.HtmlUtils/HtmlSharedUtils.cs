@@ -1,7 +1,6 @@
 ﻿using AngleSharp;
 using AngleSharp.Css;
 using AngleSharp.Css.Dom;
-using AngleSharp.Css.Values;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -16,32 +15,65 @@ namespace com.etsoo.HtmlUtils
     public static partial class HtmlSharedUtils
     {
         /// <summary>
-        /// Default render device
-        /// 默认渲染设备
+        /// Create render device
+        /// 创建渲染设备
         /// </summary>
-        public readonly static DefaultRenderDevice DefaultRenderDevice = new()
+        /// <param name="width">Width</param>
+        /// <param name="height">Height</param>
+        /// <param name="fontSize">Default font size</param>
+        /// <returns>Result</returns>
+        public static DefaultRenderDevice CreateRenderDevice(int width, int height, double fontSize = 16)
         {
-            DeviceHeight = 1080,
-            DeviceWidth = 1920,
-            Resolution = 72,
-            ViewPortWidth = 1000,
-            ViewPortHeight = 1800
-        };
+            return new DefaultRenderDevice
+            {
+                DeviceHeight = height,
+                DeviceWidth = width,
+                ViewPortWidth = width,
+                ViewPortHeight = height,
+                FontSize = fontSize
+            };
+        }
 
         /// <summary>
-        /// Create default CSS parser
-        /// 创建默认 CSS 解析器
+        /// Create default browsing context
+        /// 创建默认的浏览上下文
         /// </summary>
-        /// <returns></returns>
-        public static HtmlParser CreateDefaultCssParser()
+        /// <param name="supportCss">Does support CSS parse</param>
+        /// <param name="width">Device width</param>
+        /// <param name="height">Devie height</param>
+        /// <param name="fontSize">Default font size</param>
+        /// <returns>Parser & Render Device</returns>
+        public static (IBrowsingContext Context, IRenderDevice RenderDevice) CreateDefaultContext(bool supportCss = true, int width = 1920, int height = 1080, double fontSize = 16)
         {
-            var config = Configuration.Default
-                .WithRenderDevice(DefaultRenderDevice)
-                .WithCss();
+            var device = CreateRenderDevice(width, height, fontSize);
 
-            var context = BrowsingContext.New(config);
+            if (supportCss)
+            {
+                var config = Configuration.Default
+                    .WithRenderDevice(device)
+                    .WithCss();
 
-            return new HtmlParser(new HtmlParserOptions(), context);
+                return (BrowsingContext.New(config), device);
+            }
+            else
+            {
+                return (BrowsingContext.New(Configuration.Default.WithRenderDevice(device)), device);
+            }
+        }
+
+        /// <summary>
+        /// Create default parser with or without CSS support
+        /// 创建默认的解析器，支持CSS或不支持
+        /// </summary>
+        /// <param name="supportCss">Does support CSS parse</param>
+        /// <param name="width">Device width</param>
+        /// <param name="height">Devie height</param>
+        /// <param name="fontSize">Default font size</param>
+        /// <returns>Parser & Render Device</returns>
+        public static (HtmlParser Parser, IRenderDevice RenderDevice) CreateDefaultParser(bool supportCss = true, int width = 1920, int height = 1080, double fontSize = 16)
+        {
+            var (context, renderDevice) = CreateDefaultContext(supportCss, width, height, fontSize);
+            return (new HtmlParser(new HtmlParserOptions(), context), renderDevice);
         }
 
         /// <summary>
@@ -175,98 +207,88 @@ namespace com.etsoo.HtmlUtils
         /// 获取元素的样式大小
         /// </summary>
         /// <param name="element">Element</param>
-        /// <param name="dimensions">Dimensions</param>
+        /// <param name="dimensions">Device's dimension</param>
         /// <param name="currentView">Current view or static style</param>
         /// <returns>Result</returns>
-        public static (double? width, double? height) GetStyleSize(IElement element, IRenderDimensions? dimensions = null, bool currentView = false)
+        public static HtmlSize GetStyleSize(this IElement element, IRenderDimensions dimension, bool currentView = false)
         {
             var style = currentView ? element.ComputeCurrentStyle() : element.GetStyle();
+            if (style == null) return new HtmlSize();
 
-            dimensions ??= DefaultRenderDevice;
+            var width = style.GetProperty(PropertyNames.Width).RawValue?.AsPx(dimension, RenderMode.Horizontal);
+            var height = style.GetProperty(PropertyNames.Height).RawValue?.AsPx(dimension, RenderMode.Vertical);
 
-            double? widthValue = null;
-            double? heightValue = null;
+            return new HtmlSize { Width = width.GetValueOrDefault(), Height = height.GetValueOrDefault() };
+        }
 
-            var widthText = style.GetWidth();
-            if (!string.IsNullOrEmpty(widthText) && Length.TryParse(widthText, out Length width))
+        /// <summary>
+        /// Get image size
+        /// 获取图片大小
+        /// </summary>
+        /// <param name="img">Image element</param>
+        /// <param name="dimensions">Device's dimension</param>
+        /// <param name="currentView">Current view or static style</param>
+        /// <returns>Result</returns>
+        public static HtmlSize GetSize(this IHtmlImageElement img, IRenderDimensions dimension, bool currentView = false)
+        {
+            // Size, with property "width" and "height"
+            double width = img.DisplayWidth;
+            double height = img.DisplayHeight;
+
+            // Style settings are in priority
+            var size = GetStyleSize(img, dimension, currentView);
+            if (size.Width > 0) width = size.Width;
+            if (size.Height > 0) height = size.Height;
+
+            if (width == 0)
             {
-                widthValue = width.AsPx(dimensions, RenderMode.Horizontal);
+                // Make sure all implicit large pictures processed
+                width = dimension.RenderWidth / 2;
             }
 
-            var heightText = style.GetHeight();
-            if (!string.IsNullOrEmpty(heightText) && Length.TryParse(heightText, out Length height))
+            if (height == 0)
             {
-                heightValue = height.AsPx(dimensions, RenderMode.Vertical);
+                height = dimension.RenderHeight / 2;
             }
 
-            return (widthValue, heightValue);
+            return new HtmlSize { Width = width, Height = height };
         }
 
         /// <summary>
         /// Manipulate HTML elements
         /// 操作HTML元素
         /// </summary>
+        /// <param name="parser">HTML parser</param>
         /// <param name="stream">HTML stream</param>
         /// <param name="selector">Selector</param>
         /// <param name="action">Action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
+        public static Task<IHtmlDocument> ManipulateElementsAsync(this HtmlParser parser, Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
         {
-            return ManipulateElementsAsync(stream, selector, action, false, cancellationToken);
-        }
-
-        /// <summary>
-        /// Manipulate HTML elements with CSS
-        /// 操作HTML元素并解析样式
-        /// </summary>
-        /// <param name="stream">HTML stream</param>
-        /// <param name="selector">Selector</param>
-        /// <param name="action">Action</param>
-        /// <param name="parseStyle">Parse style or not</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Document</returns>
-        public static Task<IHtmlDocument> ManipulateElementsAsync(Stream stream, string selector, Func<IHtmlElement, Task> action, bool parseStyle, CancellationToken cancellationToken = default)
-        {
-            return ManipulateElementsAsync<IHtmlElement>(stream, selector, action, parseStyle, cancellationToken);
+            return ManipulateElementsAsync<IHtmlElement>(parser, stream, selector, action, cancellationToken);
         }
 
         /// <summary>
         /// Manipulate HTML elements
         /// 操作HTML元素
         /// </summary>
+        /// <param name="parser">HTML parser</param>
         /// <param name="stream">HTML stream</param>
         /// <param name="selector">Selector</param>
         /// <param name="action">Action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
+        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(this HtmlParser parser, Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
             where T : IHtmlElement
         {
-            return ManipulateElementsAsync(stream, selector, action, false, cancellationToken);
-        }
-
-        /// <summary>
-        /// Manipulate HTML elements
-        /// 操作HTML元素
-        /// </summary>
-        /// <param name="stream">HTML stream</param>
-        /// <param name="selector">Selector</param>
-        /// <param name="action">Action</param>
-        /// <param name="parseStyle">Parse style or not</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Document</returns>
-        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(Stream stream, string selector, Func<T, Task> action, bool parseStyle, CancellationToken cancellationToken = default)
-            where T : IHtmlElement
-        {
-            var parser = parseStyle ? CreateDefaultCssParser() : new HtmlParser();
-
             var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
             var elements = doc.QuerySelectorAll<T>(selector);
             foreach (var element in elements)
             {
                 await action(element);
             }
+
             return doc;
         }
 
