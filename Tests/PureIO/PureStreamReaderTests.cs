@@ -430,5 +430,67 @@ namespace Tests.Web
             });
             Assert.That(reader.Peek(), Is.Null);
         }
+
+        [Test]
+        public void ReadUintTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream([0, 0, 17, 14]);
+            using var reader = new PureStreamReader(stream);
+
+            // Act
+            var value = reader.ReadUint();
+
+            // Assert
+            Assert.That(value, Is.EqualTo(4366));
+        }
+
+        [Test]
+        public void ReadUintBETest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream([14, 17, 0, 0, 0, 0, 17, 14]);
+
+            // Default is BE
+            using var reader = new PureStreamReader(stream) { IsLittleEndian = false };
+
+            // Act
+            var value1 = reader.ReadUint();
+            var value2 = reader.ReadUint(true);
+
+            // Assert
+            Assert.That(value1, Is.EqualTo(4366));
+            Assert.That(value2, Is.EqualTo(4366));
+        }
+
+        [Test]
+        public void ReadLongTest()
+        {
+            // Arrange
+            long actualLong = 1;
+            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualLong));
+            using var reader = new PureStreamReader(stream);
+
+            // Act
+            var value = reader.ReadLong();
+
+            // Assert
+            Assert.That(value, Is.EqualTo(actualLong));
+        }
+
+        [Test]
+        public void ReadDoubleTest()
+        {
+            // Arrange
+            double actualDouble = 12345678901.12345892;
+            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualDouble));
+            using var reader = new PureStreamReader(stream);
+
+            // Act
+            var value = reader.ReadDouble();
+
+            // Assert
+            Assert.That(value, Is.EqualTo(actualDouble));
+        }
     }
 }

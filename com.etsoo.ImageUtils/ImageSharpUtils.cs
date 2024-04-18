@@ -101,7 +101,7 @@ namespace com.etsoo.ImageUtils
             }
 
             // Source image
-            using var image = Image.Load(imageStream);
+            using var image = await Image.LoadAsync(imageStream, cancellationToken);
 
             // Image format
             var format = defaultFormat ?? image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;
@@ -150,7 +150,7 @@ namespace com.etsoo.ImageUtils
         public static async Task<IImageFormat> ResizeImageStreamAsync(Stream imageStream, Size targetSize, Stream targetStream, bool cropSource = true, Color? blankColor = null, IImageFormat? defaultFormat = null, CancellationToken cancellationToken = default)
         {
             // Source image
-            using var image = Image.Load(imageStream);
+            using var image = await Image.LoadAsync(imageStream, cancellationToken);
 
             // Image format
             var format = defaultFormat ?? image.Metadata.DecodedImageFormat ?? JpegFormat.Instance;

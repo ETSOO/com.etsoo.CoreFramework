@@ -1153,6 +1153,23 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
+        /// Skip bytes with unsigned integer
+        /// 跳过字节
+        /// </summary>
+        /// <param name="count">Bytes count</param>
+        public void Skip(uint count)
+        {
+            if (count > int.MaxValue)
+            {
+                var more = (int)(count - int.MaxValue);
+                Discard(more);
+                count = int.MaxValue;
+            }
+
+            Discard((int)count);
+        }
+
+        /// <summary>
         /// To stream end
         /// 到流尾端
         /// </summary>
