@@ -1,10 +1,11 @@
 ﻿using System.Buffers;
+using System.Text;
 
 namespace com.etsoo.PureIO
 {
     /// <summary>
     /// Pure stream read way
-    /// 纯流阅读方式
+    /// 纯流读取方式
     /// </summary>
     [Flags]
     public enum PureStreamReadWay : byte
@@ -52,6 +53,12 @@ namespace com.etsoo.PureIO
         /// 基础流对象
         /// </summary>
         public Stream BaseStream { get; init; }
+
+        /// <summary>
+        /// Is little-endian (LE) or big-endian (BE) for digital data
+        /// https://en.wikipedia.org/wiki/Endianness
+        /// </summary>
+        public bool IsLittleEndian { get; init; } = BitConverter.IsLittleEndian;
 
         /// <summary>
         /// true if the current stream position is at the end of the stream; otherwise false
@@ -104,7 +111,7 @@ namespace com.etsoo.PureIO
                 {
                     // Reading completed
                     EndOfStream = true;
-                    return Array.Empty<byte>();
+                    return [];
                 }
 
                 backward = false;
@@ -602,7 +609,7 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Discard coming bytes
+        /// Discard coming bytes (same as Skip)
         /// 丢弃将读取的字节
         /// </summary>
         /// <param name="count">Bytes count</param>
@@ -782,6 +789,268 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
+        /// Read boolean
+        /// 读取布尔值
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public bool ReadBoolean()
+        {
+            var oneByte = ReadByte();
+            if (!oneByte.HasValue)
+            {
+                throw new EndOfStreamException();
+            }
+            return oneByte.Value != 0;
+        }
+
+        /// <summary>
+        /// Read two bytes
+        /// 读取两个字节
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public ReadOnlySpan<byte> ReadTwoBytes()
+        {
+            var bytes = ReadBytes(2);
+            if (bytes.Length < 2)
+            {
+                throw new EndOfStreamException();
+            }
+            return bytes;
+        }
+
+        private int ReadTwoBytesValue()
+        {
+            var bytes = ReadTwoBytes();
+            return (bytes[0] << 8) + bytes[1];
+        }
+
+        private int ReadTwoBytesValue(bool reverse)
+        {
+            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
+            return (bytes[0] << 8) + bytes[1];
+        }
+
+        /// <summary>
+        /// Read four bytes
+        /// 读取四个字节
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public ReadOnlySpan<byte> ReadFourBytes()
+        {
+            var bytes = ReadBytes(4);
+            if (bytes.Length < 4)
+            {
+                throw new EndOfStreamException();
+            }
+            return bytes;
+        }
+
+        /// <summary>
+        /// Reverse bytes
+        /// 反转字节数组
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <returns>Result</returns>
+        public ReadOnlySpan<byte> ReverseBytes(ReadOnlySpan<byte> bytes)
+        {
+            return bytes.ToArray().Reverse().ToArray();
+        }
+
+        /// <summary>
+        /// Reverse bytes with check
+        /// 反转字节数组并检查
+        /// </summary>
+        /// <param name="bytes">Bytes</param>
+        /// <param name="reverse">Reverse</param>
+        /// <returns>Result</returns>
+        public ReadOnlySpan<byte> ReverseBytes(ReadOnlySpan<byte> bytes, bool reverse)
+        {
+            if (IsLittleEndian == reverse)
+            {
+                return ReverseBytes(bytes);
+            }
+            else
+            {
+                return bytes;
+            }
+        }
+
+        private long ReadFourBytesValue(bool reverse)
+        {
+            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            return (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3];
+        }
+
+        /// <summary>
+        /// Read eight bytes
+        /// 读取八个字节
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public ReadOnlySpan<byte> ReadEightBytes()
+        {
+            var bytes = ReadBytes(8);
+            if (bytes.Length < 8)
+            {
+                throw new EndOfStreamException();
+            }
+            return bytes;
+        }
+
+        /// <summary>
+        /// Read char (2 bytes)
+        /// 读取字符（2字节）
+        /// </summary>
+        /// <returns>Result</returns>
+        public char ReadChar()
+        {
+            return (char)ReadTwoBytesValue();
+        }
+
+        /// <summary>
+        /// Read short (2 bytes)
+        /// 读取短整数（2字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public short ReadShort(bool reverse = false)
+        {
+            return (short)ReadTwoBytesValue(reverse);
+        }
+
+        /// <summary>
+        /// Read ushort (2 bytes)
+        /// 读取无符号短整数（2字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public ushort ReadUshort(bool reverse = false)
+        {
+            return (ushort)ReadTwoBytesValue(reverse);
+        }
+
+        /// <summary>
+        /// Read int (4 bytes)
+        /// 读取整数（4字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public int ReadInt(bool reverse = false)
+        {
+            return (int)ReadFourBytesValue(reverse);
+        }
+
+        /// <summary>
+        /// Read uint (4 bytes)
+        /// 读取无符号整数（4字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public uint ReadUint(bool reverse = false)
+        {
+            return (uint)ReadFourBytesValue(reverse);
+        }
+
+        /// <summary>
+        /// Read float (4 bytes)
+        /// 读取单精度浮点数（4字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public float ReadFloat(bool reverse = false)
+        {
+            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            return BitConverter.ToSingle(bytes);
+        }
+
+        /// <summary>
+        /// Read long (8 bytes)
+        /// 读取长整数（8字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public long ReadLong(bool reverse = false)
+        {
+            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            return BitConverter.ToInt64(bytes);
+        }
+
+        /// <summary>
+        /// Read ulong (8 bytes)
+        /// 读取无符号长整数（8字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public ulong ReadUlong(bool reverse = false)
+        {
+            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            return BitConverter.ToUInt64(bytes);
+        }
+
+        /// <summary>
+        /// Read double (8 bytes)
+        /// 读取双精度浮点数（8字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        public double ReadDouble(bool reverse = false)
+        {
+            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            return BitConverter.ToDouble(bytes);
+        }
+
+        /// <summary>
+        /// Read decimal (16 bytes)
+        /// 读取十进制数（16字节）
+        /// </summary>
+        /// <param name="reverse">Reverse bytes</param>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public decimal ReadDecimal(bool reverse = false)
+        {
+            var bytes = ReverseBytes(ReadBytes(16), reverse).ToArray();
+            if (bytes.Length < 16)
+            {
+                throw new EndOfStreamException();
+            }
+
+            return new decimal(
+                BitConverter.ToInt32(bytes, 0),
+                BitConverter.ToInt32(bytes, 4),
+                BitConverter.ToInt32(bytes, 8),
+                bytes[15] == 128,
+                bytes[14]
+            );
+        }
+
+        /// <summary>
+        /// Read string
+        /// 读取字符串
+        /// </summary>
+        /// <param name="count">Bytes to read</param>
+        /// <param name="encoding">Encoding</param>
+        /// <returns>Result</returns>
+        public string ReadString(int count, Encoding? encoding = null)
+        {
+            var bytes = ReadBytes(count);
+            return (encoding ?? Encoding.ASCII).GetString(bytes);
+        }
+
+        /// <summary>
+        /// Read UTF-8 string
+        /// 读取UTF-8字符串
+        /// </summary>
+        /// <param name="count">Bytes to read</param>
+        /// <returns>Result</returns>
+        public string ReadUTFString(int count)
+        {
+            return ReadString(count, Encoding.UTF8);
+        }
+
+        /// <summary>
         /// Read all bytes until to the target byte, after reading will move over the target byte.
         /// 读取所有字节直到目标字节，读取后将移过目标字节
         /// </summary>
@@ -860,6 +1129,27 @@ namespace com.etsoo.PureIO
                     if (callback(span[i])) return;
                 }
             } while (!EndOfStream);
+        }
+
+        /// <summary>
+        /// Seek from the start
+        /// 从开始位置定位
+        /// </summary>
+        /// <param name="offset">Offet</param>
+        public void Seek(long offset)
+        {
+            ClearBuffer();
+            BaseStream.Seek(offset, SeekOrigin.Begin);
+        }
+
+        /// <summary>
+        /// Skip bytes (same as Discard)
+        /// 跳过字节
+        /// </summary>
+        /// <param name="count">Bytes count</param>
+        public void Skip(int count)
+        {
+            Discard(count);
         }
 
         /// <summary>
