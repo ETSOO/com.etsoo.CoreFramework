@@ -556,13 +556,13 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Read full bytes
+        /// Read bytes
         /// 读取多个字节
         /// </summary>
         /// <param name="count">Bytes count</param>
         /// <param name="reverse">Reverse the bytes</param>
         /// <returns>Result</returns>
-        public ReadOnlySpan<byte> ReadFullBytes(uint count, bool reverse = false)
+        public ReadOnlySpan<byte> ReadBytes(uint count, bool reverse = false)
         {
             if (count > int.MaxValue)
             {

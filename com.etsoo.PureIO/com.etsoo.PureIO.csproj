@@ -16,7 +16,7 @@
 		<Description>ETSOO Pure IO Utilities
 亿速思维底层输入输出工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.26</Version>
+		<Version>1.0.27</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>
@@ -29,10 +29,6 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
 </Project>
