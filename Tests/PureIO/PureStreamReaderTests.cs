@@ -452,9 +452,12 @@ namespace Tests.Web
         {
             // Arrange
             var negativeInt = -4366;
-            var bytes = BitConverter.GetBytes(negativeInt);
+            var bytes = BitConverter.GetBytes(negativeInt).Reverse().ToArray();
             using var stream = SharedUtils.GetStream(bytes);
-            using var reader = new PureStreamReader(stream);
+            using var reader = new PureStreamReader(stream)
+            {
+                IsLittleEndian = false
+            };
 
             // Act
             var value = reader.ReadInt();
@@ -468,7 +471,7 @@ namespace Tests.Web
         {
             // Arrange
             uint uintValue = 4366;
-            var bytes = BitConverter.GetBytes(uintValue);
+            var bytes = BitConverter.GetBytes(uintValue).Reverse().ToArray();
             using var stream = SharedUtils.GetStream(bytes);
             using var reader = new PureStreamReader(stream);
 
@@ -487,7 +490,7 @@ namespace Tests.Web
             using var stream = SharedUtils.GetStream([0, 0, 17, 14, 14, 17, 0, 0]);
 
             // Default is BE
-            using var reader = new PureStreamReader(stream) { IsLittleEndian = false };
+            using var reader = new PureStreamReader(stream);
 
             // Act
             var value1 = reader.ReadUint();
@@ -504,7 +507,10 @@ namespace Tests.Web
             // Arrange
             long actualLong = 1;
             using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualLong));
-            using var reader = new PureStreamReader(stream);
+            using var reader = new PureStreamReader(stream)
+            {
+                IsLittleEndian = true
+            };
 
             // Act
             var value = reader.ReadLong();
@@ -519,7 +525,10 @@ namespace Tests.Web
             // Arrange
             double actualDouble = 12345678901.12345892;
             using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualDouble));
-            using var reader = new PureStreamReader(stream);
+            using var reader = new PureStreamReader(stream)
+            {
+                IsLittleEndian = true
+            };
 
             // Act
             var value = reader.ReadDouble();

@@ -56,9 +56,10 @@ namespace com.etsoo.PureIO
 
         /// <summary>
         /// Is little-endian (LE) or big-endian (BE) for digital data
+        /// BitConverter.IsLittleEndian = true in Windows, but for PDF and PNG parsing, it is big-endian
         /// https://en.wikipedia.org/wiki/Endianness
         /// </summary>
-        public bool IsLittleEndian { get; init; } = BitConverter.IsLittleEndian;
+        public bool IsLittleEndian { get; init; } = false;
 
         /// <summary>
         /// true if the current stream position is at the end of the stream; otherwise false
@@ -558,11 +559,15 @@ namespace com.etsoo.PureIO
         /// 读取多个字节
         /// </summary>
         /// <param name="count">Bytes count</param>
+        /// <param name="reverse">Reverse the bytes</param>
         /// <returns>Result</returns>
-        public ReadOnlySpan<byte> ReadBytes(int count)
+        /// <exception cref="EndOfStreamException"></exception>
+        public ReadOnlySpan<byte> ReadBytes(int count, bool reverse = false)
         {
-            var w = new ArrayBufferWriter<byte>(count);
+            // Validate
+            ArgumentOutOfRangeException.ThrowIfLessThan(count, 1);
 
+            var w = new ArrayBufferWriter<byte>();
             while (count > 0)
             {
                 // Read buffer, make sure one byte at least is ready
@@ -585,7 +590,19 @@ namespace com.etsoo.PureIO
                 w.Write(span);
             }
 
-            return w.WrittenSpan;
+            if (w.WrittenCount != count)
+            {
+                throw new EndOfStreamException();
+            }
+
+            if (reverse)
+            {
+                return ReverseBytes(w.WrittenSpan);
+            }
+            else
+            {
+                return w.WrittenSpan;
+            }
         }
 
         /// <summary>
@@ -829,38 +846,6 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Read two bytes
-        /// 读取两个字节
-        /// </summary>
-        /// <returns>Result</returns>
-        /// <exception cref="EndOfStreamException"></exception>
-        public ReadOnlySpan<byte> ReadTwoBytes()
-        {
-            var bytes = ReadBytes(2);
-            if (bytes.Length < 2)
-            {
-                throw new EndOfStreamException();
-            }
-            return bytes;
-        }
-
-        /// <summary>
-        /// Read four bytes
-        /// 读取四个字节
-        /// </summary>
-        /// <returns>Result</returns>
-        /// <exception cref="EndOfStreamException"></exception>
-        public ReadOnlySpan<byte> ReadFourBytes()
-        {
-            var bytes = ReadBytes(4);
-            if (bytes.Length < 4)
-            {
-                throw new EndOfStreamException();
-            }
-            return bytes;
-        }
-
-        /// <summary>
         /// Reverse bytes
         /// 反转字节数组
         /// </summary>
@@ -872,48 +857,13 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Reverse bytes with check
-        /// 反转字节数组并检查
-        /// </summary>
-        /// <param name="bytes">Bytes</param>
-        /// <param name="reverse">Reverse</param>
-        /// <returns>Result</returns>
-        public ReadOnlySpan<byte> ReverseBytes(ReadOnlySpan<byte> bytes, bool reverse)
-        {
-            if (IsLittleEndian == reverse)
-            {
-                return ReverseBytes(bytes);
-            }
-            else
-            {
-                return bytes;
-            }
-        }
-
-        /// <summary>
-        /// Read eight bytes
-        /// 读取八个字节
-        /// </summary>
-        /// <returns>Result</returns>
-        /// <exception cref="EndOfStreamException"></exception>
-        public ReadOnlySpan<byte> ReadEightBytes()
-        {
-            var bytes = ReadBytes(8);
-            if (bytes.Length < 8)
-            {
-                throw new EndOfStreamException();
-            }
-            return bytes;
-        }
-
-        /// <summary>
         /// Read char (2 bytes)
         /// 读取字符（2字节）
         /// </summary>
         /// <returns>Result</returns>
         public char ReadChar()
         {
-            var bytes = ReadTwoBytes();
+            var bytes = ReadBytes(2);
             return BitConverter.ToChar(bytes);
         }
 
@@ -925,7 +875,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public short ReadShort(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
+            var bytes = ReadBytes(2, reverse == IsLittleEndian);
             return BitConverter.ToInt16(bytes);
         }
 
@@ -937,7 +887,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public ushort ReadUshort(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
+            var bytes = ReadBytes(2, reverse == IsLittleEndian);
             return BitConverter.ToUInt16(bytes);
         }
 
@@ -949,7 +899,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public int ReadInt(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            var bytes = ReadBytes(4, reverse == IsLittleEndian);
             return BitConverter.ToInt32(bytes);
         }
 
@@ -961,7 +911,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public uint ReadUint(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            var bytes = ReadBytes(4, reverse == IsLittleEndian);
             return BitConverter.ToUInt32(bytes);
         }
 
@@ -973,7 +923,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public float ReadFloat(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            var bytes = ReadBytes(4, reverse == IsLittleEndian);
             return BitConverter.ToSingle(bytes);
         }
 
@@ -985,7 +935,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public long ReadLong(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            var bytes = ReadBytes(8, reverse == IsLittleEndian);
             return BitConverter.ToInt64(bytes);
         }
 
@@ -997,7 +947,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public ulong ReadUlong(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            var bytes = ReadBytes(8, reverse == IsLittleEndian);
             return BitConverter.ToUInt64(bytes);
         }
 
@@ -1009,7 +959,7 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public double ReadDouble(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadEightBytes(), reverse);
+            var bytes = ReadBytes(8, reverse == IsLittleEndian);
             return BitConverter.ToDouble(bytes);
         }
 
@@ -1022,12 +972,7 @@ namespace com.etsoo.PureIO
         /// <exception cref="EndOfStreamException"></exception>
         public decimal ReadDecimal(bool reverse = false)
         {
-            var bytes = ReverseBytes(ReadBytes(16), reverse).ToArray();
-            if (bytes.Length < 16)
-            {
-                throw new EndOfStreamException();
-            }
-
+            var bytes = ReadBytes(16, reverse == IsLittleEndian).ToArray();
             return new decimal(
                 BitConverter.ToInt32(bytes, 0),
                 BitConverter.ToInt32(bytes, 4),
