@@ -502,6 +502,46 @@ namespace Tests.Web
         }
 
         [Test]
+        public void SeekAndCurrentPositionTest()
+        {
+            // Arrange
+            byte[] bytes = [116, 116, 99, 102, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 32, 0, 0, 1, 188, 68, 83, 73, 71, 0, 0, 37, 192, 1, 44, 121, 116, 0, 1, 0, 0, 0, 25, 1, 0, 0, 4, 0, 144, 71, 68, 69, 70, 224, 155];
+            using var stream = SharedUtils.GetStream(bytes);
+            using var sr = new PureStreamReader(stream);
+
+            // Act
+            var mainTag = sr.ReadString(4);
+            sr.Skip(4);
+            var numFonts = sr.ReadUint();
+
+            var offsets = new uint[numFonts];
+            for (var f = 0; f < numFonts; f++)
+            {
+                offsets[f] = sr.ReadUint();
+            }
+
+            var currentPos = sr.CurrentPosition;
+            sr.Seek(offsets[0]);
+            var newPos = sr.CurrentPosition;
+
+            var ttId = sr.ReadInt();
+            var tableCount = sr.ReadUshort();
+            sr.Skip(6);
+            var tag = sr.ReadString(4);
+
+            var a = Encoding.ASCII.GetString(bytes);
+
+            // Assert
+            Assert.That(mainTag, Is.EqualTo("ttcf"));
+            Assert.That(numFonts, Is.EqualTo(2));
+            Assert.That(currentPos, Is.EqualTo(20));
+            Assert.That(newPos, Is.EqualTo(32));
+            Assert.That(ttId, Is.EqualTo(0x00010000));
+            Assert.That(tableCount, Is.EqualTo(25));
+            Assert.That(tag, Is.EqualTo("GDEF"));
+        }
+
+        [Test]
         public void ReadLongTest()
         {
             // Arrange

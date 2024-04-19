@@ -512,6 +512,7 @@ namespace com.etsoo.PureIO
         public void ClearBuffer()
         {
             lastPos = -1;
+            lastCount = -1;
             bufferBytes.Span.Clear();
         }
 
@@ -561,13 +562,68 @@ namespace com.etsoo.PureIO
         /// <param name="count">Bytes count</param>
         /// <param name="reverse">Reverse the bytes</param>
         /// <returns>Result</returns>
-        /// <exception cref="EndOfStreamException"></exception>
+        public ReadOnlySpan<byte> ReadBytes(uint count, bool reverse = false)
+        {
+            if (count > int.MaxValue)
+            {
+                var more = (int)(count - int.MaxValue);
+
+                var w = new ArrayBufferWriter<byte>();
+                ReadBytesToBuffer(w, more);
+
+                var left = int.MaxValue;
+                ReadBytesToBuffer(w, left);
+
+                if (reverse)
+                {
+                    return ReverseBytes(w.WrittenSpan);
+                }
+                else
+                {
+                    return w.WrittenSpan;
+                }
+            }
+            else
+            {
+                return ReadBytes((int)count, reverse);
+            }
+        }
+
+        /// <summary>
+        /// Read bytes
+        /// 读取多个字节
+        /// </summary>
+        /// <param name="count">Bytes count</param>
+        /// <param name="reverse">Reverse the bytes</param>
+        /// <returns>Result</returns>
         public ReadOnlySpan<byte> ReadBytes(int count, bool reverse = false)
+        {
+            var w = new ArrayBufferWriter<byte>();
+            ReadBytesToBuffer(w, count);
+
+            if (reverse)
+            {
+                return ReverseBytes(w.WrittenSpan);
+            }
+            else
+            {
+                return w.WrittenSpan;
+            }
+        }
+
+        /// <summary>
+        /// Read bytes to buffer
+        /// 读取多个字节到缓存
+        /// </summary>
+        /// <param name="w">Writer</param>
+        /// <param name="count">Bytes count</param>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public void ReadBytesToBuffer(ArrayBufferWriter<byte> w, int count)
         {
             // Validate
             ArgumentOutOfRangeException.ThrowIfLessThan(count, 1);
 
-            var w = new ArrayBufferWriter<byte>();
             while (count > 0)
             {
                 // Read buffer, make sure one byte at least is ready
@@ -581,6 +637,7 @@ namespace com.etsoo.PureIO
                 {
                     lastPos += count;
                     w.Write(span[..count]);
+                    count = 0;
                     break;
                 }
 
@@ -590,18 +647,9 @@ namespace com.etsoo.PureIO
                 w.Write(span);
             }
 
-            if (w.WrittenCount != count)
+            if (count > 0)
             {
                 throw new EndOfStreamException();
-            }
-
-            if (reverse)
-            {
-                return ReverseBytes(w.WrittenSpan);
-            }
-            else
-            {
-                return w.WrittenSpan;
             }
         }
 
@@ -649,43 +697,16 @@ namespace com.etsoo.PureIO
         /// 丢弃将读取的字节
         /// </summary>
         /// <param name="count">Bytes count</param>
-        public void Discard(int count)
+        public void Discard(uint count)
         {
-            var span = ReadBuffer();
-            if (EndOfStream) return;
-
-            if (count <= span.Length)
+            if (count > int.MaxValue)
             {
-                // Within the buffer range
-                lastPos += count;
+                var more = (int)(count - int.MaxValue);
+                Skip(more);
+                count = int.MaxValue;
             }
-            else
-            {
-                count -= span.Length;
 
-                // If the base stream can seek
-                if (BaseStream.CanSeek)
-                {
-                    if (BaseStream.Position + count < BaseStream.Length)
-                        BaseStream.Position += count;
-                    else
-                        BaseStream.Seek(0, SeekOrigin.End);
-                }
-                else
-                {
-                    do
-                    {
-                        var buffer = new byte[Math.Min(count, DefaultBufferSize)];
-                        var bytesRead = BaseStream.Read(buffer);
-                        if (bytesRead == 0) break;
-                        count -= bytesRead;
-                    }
-                    while (count > 0);
-                }
-
-                // Back to ready reading status
-                lastPos = -1;
-            }
+            Skip((int)count);
         }
 
         /// <summary>
@@ -700,7 +721,7 @@ namespace com.etsoo.PureIO
             {
                 if (bytes.Contains(peek.Value))
                 {
-                    Discard(1);
+                    Skip(1);
                 }
                 else
                 {
@@ -1099,30 +1120,47 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
-        /// Skip bytes (same as Discard)
+        /// Skip bytes with unsigned integer
         /// 跳过字节
         /// </summary>
         /// <param name="count">Bytes count</param>
         public void Skip(int count)
         {
-            Discard(count);
-        }
+            var span = ReadBuffer();
+            if (EndOfStream) return;
 
-        /// <summary>
-        /// Skip bytes with unsigned integer
-        /// 跳过字节
-        /// </summary>
-        /// <param name="count">Bytes count</param>
-        public void Skip(uint count)
-        {
-            if (count > int.MaxValue)
+            if (count <= span.Length)
             {
-                var more = (int)(count - int.MaxValue);
-                Discard(more);
-                count = int.MaxValue;
+                // Within the buffer range
+                lastPos += count;
             }
+            else
+            {
+                count -= span.Length;
 
-            Discard((int)count);
+                // If the base stream can seek
+                if (BaseStream.CanSeek)
+                {
+                    if (BaseStream.Position + count < BaseStream.Length)
+                        BaseStream.Position += count;
+                    else
+                        BaseStream.Seek(0, SeekOrigin.End);
+                }
+                else
+                {
+                    do
+                    {
+                        var buffer = new byte[Math.Min(count, DefaultBufferSize)];
+                        var bytesRead = BaseStream.Read(buffer);
+                        if (bytesRead == 0) break;
+                        count -= bytesRead;
+                    }
+                    while (count > 0);
+                }
+
+                // Back to ready reading status
+                lastPos = -1;
+            }
         }
 
         /// <summary>
