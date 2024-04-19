@@ -535,6 +535,25 @@ namespace com.etsoo.PureIO
         }
 
         /// <summary>
+        /// Read one byte
+        /// 读取一个字节
+        /// </summary>
+        /// <returns>Result</returns>
+        /// <exception cref="EndOfStreamException"></exception>
+        public byte ReadOne()
+        {
+            var one = ReadByte();
+            if (!one.HasValue)
+            {
+                throw new EndOfStreamException();
+            }
+            else
+            {
+                return one.Value;
+            }
+        }
+
+        /// <summary>
         /// Read bytes
         /// 读取多个字节
         /// </summary>
@@ -796,12 +815,17 @@ namespace com.etsoo.PureIO
         /// <exception cref="EndOfStreamException"></exception>
         public bool ReadBoolean()
         {
-            var oneByte = ReadByte();
-            if (!oneByte.HasValue)
-            {
-                throw new EndOfStreamException();
-            }
-            return oneByte.Value != 0;
+            return ReadOne() != 0;
+        }
+
+        /// <summary>
+        /// Read sbyte
+        /// 读取有符号字节
+        /// </summary>
+        /// <returns>Result</returns>
+        public sbyte ReadSbyte()
+        {
+            return (sbyte)(0xff & ReadOne());
         }
 
         /// <summary>
@@ -818,18 +842,6 @@ namespace com.etsoo.PureIO
                 throw new EndOfStreamException();
             }
             return bytes;
-        }
-
-        private int ReadTwoBytesValue()
-        {
-            var bytes = ReadTwoBytes();
-            return (bytes[0] << 8) + bytes[1];
-        }
-
-        private int ReadTwoBytesValue(bool reverse)
-        {
-            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
-            return (bytes[0] << 8) + bytes[1];
         }
 
         /// <summary>
@@ -878,12 +890,6 @@ namespace com.etsoo.PureIO
             }
         }
 
-        private long ReadFourBytesValue(bool reverse)
-        {
-            var bytes = ReverseBytes(ReadFourBytes(), reverse);
-            return (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3];
-        }
-
         /// <summary>
         /// Read eight bytes
         /// 读取八个字节
@@ -907,7 +913,8 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public char ReadChar()
         {
-            return (char)ReadTwoBytesValue();
+            var bytes = ReadTwoBytes();
+            return BitConverter.ToChar(bytes);
         }
 
         /// <summary>
@@ -918,7 +925,8 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public short ReadShort(bool reverse = false)
         {
-            return (short)ReadTwoBytesValue(reverse);
+            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
+            return BitConverter.ToInt16(bytes);
         }
 
         /// <summary>
@@ -929,7 +937,8 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public ushort ReadUshort(bool reverse = false)
         {
-            return (ushort)ReadTwoBytesValue(reverse);
+            var bytes = ReverseBytes(ReadTwoBytes(), reverse);
+            return BitConverter.ToUInt16(bytes);
         }
 
         /// <summary>
@@ -940,7 +949,8 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public int ReadInt(bool reverse = false)
         {
-            return (int)ReadFourBytesValue(reverse);
+            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            return BitConverter.ToInt32(bytes);
         }
 
         /// <summary>
@@ -951,7 +961,8 @@ namespace com.etsoo.PureIO
         /// <returns>Result</returns>
         public uint ReadUint(bool reverse = false)
         {
-            return (uint)ReadFourBytesValue(reverse);
+            var bytes = ReverseBytes(ReadFourBytes(), reverse);
+            return BitConverter.ToUInt32(bytes);
         }
 
         /// <summary>

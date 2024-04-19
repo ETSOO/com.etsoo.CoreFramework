@@ -432,16 +432,51 @@ namespace Tests.Web
         }
 
         [Test]
+        public void ReadByteAndSbyteTest()
+        {
+            // Arrange
+            using var stream = SharedUtils.GetStream([128, 128]);
+            using var reader = new PureStreamReader(stream);
+
+            // Act
+            var value1 = reader.ReadOne();
+            var value2 = reader.ReadSbyte();
+
+            // Assert
+            Assert.That(value1, Is.EqualTo(128));
+            Assert.That(value2, Is.EqualTo(-128));
+        }
+
+        [Test]
+        public void ReadNegativeIntTest()
+        {
+            // Arrange
+            var negativeInt = -4366;
+            var bytes = BitConverter.GetBytes(negativeInt);
+            using var stream = SharedUtils.GetStream(bytes);
+            using var reader = new PureStreamReader(stream);
+
+            // Act
+            var value = reader.ReadInt();
+
+            // Assert
+            Assert.That(value, Is.EqualTo(negativeInt));
+        }
+
+        [Test]
         public void ReadUintTest()
         {
             // Arrange
-            using var stream = SharedUtils.GetStream([0, 0, 17, 14]);
+            uint uintValue = 4366;
+            var bytes = BitConverter.GetBytes(uintValue);
+            using var stream = SharedUtils.GetStream(bytes);
             using var reader = new PureStreamReader(stream);
 
             // Act
             var value = reader.ReadUint();
 
             // Assert
+            bytes.SequenceEqual<byte>([14, 17, 0, 0]);
             Assert.That(value, Is.EqualTo(4366));
         }
 
@@ -449,7 +484,7 @@ namespace Tests.Web
         public void ReadUintBETest()
         {
             // Arrange
-            using var stream = SharedUtils.GetStream([14, 17, 0, 0, 0, 0, 17, 14]);
+            using var stream = SharedUtils.GetStream([0, 0, 17, 14, 14, 17, 0, 0]);
 
             // Default is BE
             using var reader = new PureStreamReader(stream) { IsLittleEndian = false };
