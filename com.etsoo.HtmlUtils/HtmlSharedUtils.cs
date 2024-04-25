@@ -4,6 +4,7 @@ using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
+using AngleSharp.Io;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.HtmlUtils
@@ -74,6 +75,27 @@ namespace com.etsoo.HtmlUtils
         {
             var (context, renderDevice) = CreateDefaultContext(supportCss, width, height, fontSize);
             return (new HtmlParser(new HtmlParserOptions(), context), renderDevice);
+        }
+
+        /// <summary>
+        /// Create default parser with CSS and resource download support
+        /// 创建默认的解析器，支持CSS和资源下载
+        /// </summary>
+        /// <param name="width">Device width</param>
+        /// <param name="height">Devie height</param>
+        /// <param name="fontSize">Default font size</param>
+        /// <returns>Parser & Render Device</returns>
+        public static HtmlParser CreateDefaultParser(int width = 1920, int height = 1080, double fontSize = 16)
+        {
+            var device = CreateRenderDevice(width, height, fontSize);
+
+            var config = Configuration.Default
+                .WithRenderDevice(device)
+                .WithCss()
+                .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
+            ;
+
+            return new HtmlParser(new HtmlParserOptions(), BrowsingContext.New(config));
         }
 
         /// <summary>
