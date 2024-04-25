@@ -1,10 +1,7 @@
-﻿using AngleSharp;
-using AngleSharp.Css;
-using AngleSharp.Css.Dom;
+﻿using AngleSharp.Css;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using AngleSharp.Io;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.HtmlUtils
@@ -33,69 +30,6 @@ namespace com.etsoo.HtmlUtils
                 ViewPortHeight = height,
                 FontSize = fontSize
             };
-        }
-
-        /// <summary>
-        /// Create default browsing context
-        /// 创建默认的浏览上下文
-        /// </summary>
-        /// <param name="supportCss">Does support CSS parse</param>
-        /// <param name="width">Device width</param>
-        /// <param name="height">Devie height</param>
-        /// <param name="fontSize">Default font size</param>
-        /// <returns>Parser & Render Device</returns>
-        public static (IBrowsingContext Context, IRenderDevice RenderDevice) CreateDefaultContext(bool supportCss = true, int width = 1920, int height = 1080, double fontSize = 16)
-        {
-            var device = CreateRenderDevice(width, height, fontSize);
-
-            if (supportCss)
-            {
-                var config = Configuration.Default
-                    .WithRenderDevice(device)
-                    .WithCss();
-
-                return (BrowsingContext.New(config), device);
-            }
-            else
-            {
-                return (BrowsingContext.New(Configuration.Default.WithRenderDevice(device)), device);
-            }
-        }
-
-        /// <summary>
-        /// Create default parser with or without CSS support
-        /// 创建默认的解析器，支持CSS或不支持
-        /// </summary>
-        /// <param name="supportCss">Does support CSS parse</param>
-        /// <param name="width">Device width</param>
-        /// <param name="height">Devie height</param>
-        /// <param name="fontSize">Default font size</param>
-        /// <returns>Parser & Render Device</returns>
-        public static (HtmlParser Parser, IRenderDevice RenderDevice) CreateDefaultParser(bool supportCss = true, int width = 1920, int height = 1080, double fontSize = 16)
-        {
-            var (context, renderDevice) = CreateDefaultContext(supportCss, width, height, fontSize);
-            return (new HtmlParser(new HtmlParserOptions(), context), renderDevice);
-        }
-
-        /// <summary>
-        /// Create default parser with CSS and resource download support
-        /// 创建默认的解析器，支持CSS和资源下载
-        /// </summary>
-        /// <param name="width">Device width</param>
-        /// <param name="height">Devie height</param>
-        /// <param name="fontSize">Default font size</param>
-        /// <returns>Parser & Render Device</returns>
-        public static HtmlParser CreateDefaultParser(int width = 1920, int height = 1080, double fontSize = 16)
-        {
-            var device = CreateRenderDevice(width, height, fontSize);
-
-            var config = Configuration.Default
-                .WithRenderDevice(device)
-                .WithCss()
-                .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
-            ;
-
-            return new HtmlParser(new HtmlParserOptions(), BrowsingContext.New(config));
         }
 
         /// <summary>
@@ -222,58 +156,6 @@ namespace com.etsoo.HtmlUtils
 
             var part = content[left..right];
             return (left > 0 ? "..." : string.Empty) + part + (right < len ? "..." : string.Empty);
-        }
-
-        /// <summary>
-        /// Get element's style size
-        /// 获取元素的样式大小
-        /// </summary>
-        /// <param name="element">Element</param>
-        /// <param name="dimensions">Device's dimension</param>
-        /// <param name="currentView">Current view or static style</param>
-        /// <returns>Result</returns>
-        public static HtmlSize GetStyleSize(this IElement element, IRenderDimensions dimension, bool currentView = false)
-        {
-            var style = currentView ? element.ComputeCurrentStyle() : element.GetStyle();
-            if (style == null) return new HtmlSize();
-
-            var width = style.GetProperty(PropertyNames.Width).RawValue?.AsPx(dimension, RenderMode.Horizontal);
-            var height = style.GetProperty(PropertyNames.Height).RawValue?.AsPx(dimension, RenderMode.Vertical);
-
-            return new HtmlSize { Width = width.GetValueOrDefault(), Height = height.GetValueOrDefault() };
-        }
-
-        /// <summary>
-        /// Get image size
-        /// 获取图片大小
-        /// </summary>
-        /// <param name="img">Image element</param>
-        /// <param name="dimensions">Device's dimension</param>
-        /// <param name="currentView">Current view or static style</param>
-        /// <returns>Result</returns>
-        public static HtmlSize GetSize(this IHtmlImageElement img, IRenderDimensions dimension, bool currentView = false)
-        {
-            // Size, with property "width" and "height"
-            double width = img.DisplayWidth;
-            double height = img.DisplayHeight;
-
-            // Style settings are in priority
-            var size = GetStyleSize(img, dimension, currentView);
-            if (size.Width > 0) width = size.Width;
-            if (size.Height > 0) height = size.Height;
-
-            if (width == 0)
-            {
-                // Make sure all implicit large pictures processed
-                width = dimension.RenderWidth / 2;
-            }
-
-            if (height == 0)
-            {
-                height = dimension.RenderHeight / 2;
-            }
-
-            return new HtmlSize { Width = width, Height = height };
         }
 
         /// <summary>

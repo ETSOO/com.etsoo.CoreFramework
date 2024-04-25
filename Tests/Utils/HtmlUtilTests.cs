@@ -1,4 +1,6 @@
-﻿using AngleSharp.Html.Dom;
+﻿using AngleSharp.Css;
+using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using com.etsoo.HtmlIO;
 using com.etsoo.HtmlUtils;
 using com.etsoo.Utils;
@@ -15,7 +17,7 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var (parser, device) = HtmlSharedUtils.CreateDefaultParser(false);
+            var parser = HtmlParserExtended.Create();
             var doc = await parser.ManipulateElementsAsync(stream, "span.eo-lock", async (IHtmlElement element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
@@ -36,7 +38,7 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var (parser, device) = HtmlSharedUtils.CreateDefaultParser(false);
+            var parser = HtmlParserExtended.Create();
             var doc = await parser.ManipulateElementsAsync<IHtmlSpanElement>(stream, "span.eo-lock", async (element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
@@ -144,10 +146,10 @@ namespace Tests.Utils
             var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" height="240" style="width: 120px"/><img src="c.bmp" width="200" style="height: 100pt;"/></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var sizes = new List<HtmlSize>();
-            var (parser, device) = HtmlSharedUtils.CreateDefaultParser();
+            var parser = HtmlParserExtended.CreateWithCss();
             var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
             {
-                var size = HtmlSharedUtils.GetSize(img, device);
+                var size = parser.GetImageSize(img);
                 sizes.Add(size);
                 await Task.CompletedTask;
             });
@@ -155,12 +157,32 @@ namespace Tests.Utils
             Assert.Multiple(() =>
             {
                 Assert.That(sizes, Has.Count.EqualTo(3));
-                Assert.That(sizes[0].Width, Is.EqualTo(device.RenderWidth * 0.1));
-                Assert.That(sizes[0].Height, Is.EqualTo(device.RenderHeight * 0.2));
+                Assert.That(sizes[0].Width, Is.EqualTo(parser.RenderDevice.RenderWidth * 0.1));
+                Assert.That(sizes[0].Height, Is.EqualTo(parser.RenderDevice.RenderHeight * 0.2));
                 Assert.That(sizes[1].Width, Is.EqualTo(120));
                 Assert.That(sizes[1].Height, Is.EqualTo(240));
                 Assert.That(sizes[2].Width, Is.EqualTo(200));
                 Assert.That(Math.Round(sizes[2].Height, 2), Is.EqualTo(133.33));
+            });
+        }
+
+        [Test]
+        public async Task SizeUnitTests()
+        {
+            var html = """<style>img { width: 10%; height: 50em;}</style><p><img src="a.jpg"/></p>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var parser = HtmlParserExtended.CreateWithCss();
+            var doc = await parser.ParseDocumentAsync(stream, default);
+            var img = doc.GetElementsByTagName("img").First() as IHtmlImageElement;
+            var css = img.ComputeCurrentStyle();
+            Assert.Multiple(() =>
+            {
+                var width = $"{parser.RenderDevice.DeviceWidth * 0.1}px";
+                Assert.That(css.GetPropertyValue("width"), Is.EqualTo(width));
+                Assert.That(parser.GetPixel(css, PropertyNames.Width), Is.EqualTo(parser.RenderDevice.DeviceWidth * 0.1));
+                Assert.That(css.GetPropertyValue("height"), Is.EqualTo("800px"));
+                Assert.That(parser.GetPixel(css, PropertyNames.Height), Is.EqualTo(800));
+                Assert.That(parser.GetPoint(css, PropertyNames.Height), Is.EqualTo(600));
             });
         }
 

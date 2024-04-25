@@ -45,7 +45,7 @@ namespace com.etsoo.HtmlIO
 
             await using var stream = SharedUtils.GetStream(content);
 
-            var (parser, device) = HtmlSharedUtils.CreateDefaultParser();
+            var parser = HtmlParserExtended.CreateWithCss();
 
             var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
             {
@@ -55,7 +55,7 @@ namespace com.etsoo.HtmlIO
                 try
                 {
                     // Size
-                    var size = img.GetSize(device, true);
+                    var size = parser.GetImageSize(img, true);
                     var sharpSize = new SixLabors.ImageSharp.Size((int)size.Width, (int)size.Height);
 
                     await using var stream = SharedUtils.GetStream();
