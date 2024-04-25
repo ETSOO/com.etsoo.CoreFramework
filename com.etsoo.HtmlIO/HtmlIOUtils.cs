@@ -55,7 +55,7 @@ namespace com.etsoo.HtmlIO
                 try
                 {
                     // Size
-                    var size = parser.GetImageSize(img, true);
+                    var size = parser.GetImageSize(img);
                     var sharpSize = new SixLabors.ImageSharp.Size((int)size.Width, (int)size.Height);
 
                     await using var stream = SharedUtils.GetStream();

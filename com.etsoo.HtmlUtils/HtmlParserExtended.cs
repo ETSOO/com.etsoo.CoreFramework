@@ -1,6 +1,5 @@
 ﻿using AngleSharp;
 using AngleSharp.Css;
-using AngleSharp.Css.Dom;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -87,16 +86,15 @@ namespace com.etsoo.HtmlUtils
         /// 获取图片大小
         /// </summary>
         /// <param name="img">Image element</param>
-        /// <param name="currentView">Current view or static style</param>
         /// <returns>Result</returns>
-        public HtmlSize GetImageSize(IHtmlImageElement img, bool currentView = false)
+        public HtmlSize GetImageSize(IHtmlImageElement img)
         {
             // Size, with property "width" and "height"
             double width = img.DisplayWidth;
             double height = img.DisplayHeight;
 
             // Style settings are in priority
-            var size = GetStyleSize(img, currentView);
+            var size = GetStyleSize(img);
             if (size.Width > 0) width = size.Width;
             if (size.Height > 0) height = size.Height;
 
@@ -119,99 +117,15 @@ namespace com.etsoo.HtmlUtils
         /// 获取元素的样式大小
         /// </summary>
         /// <param name="element">Element</param>
-        /// <param name="currentView">Current view or static style</param>
         /// <returns>Result</returns>
-        public HtmlSize GetStyleSize(IElement element, bool currentView = false)
+        public HtmlSize GetStyleSize(IElement element)
         {
-            var style = currentView ? element.ComputeCurrentStyle() : element.GetStyle();
-            if (style == null) return new HtmlSize();
+            var css = element.ComputeCurrentStyle();
 
-            var width = GetPixel(style, PropertyNames.Width);
-            var height = GetPixel(style, PropertyNames.Height);
+            var width = css.GetPixel(PropertyNames.Width);
+            var height = css.GetPixel(PropertyNames.Height);
 
             return new HtmlSize { Width = width.GetValueOrDefault(), Height = height.GetValueOrDefault() };
-        }
-
-        private RenderMode NameToRenderMode(string name)
-        {
-            if (name == PropertyNames.Width
-                || name == PropertyNames.MaxWidth
-                || name == PropertyNames.MinWidth
-                || name == PropertyNames.Left
-                || name == PropertyNames.Right
-                || name == PropertyNames.MarginLeft
-                || name == PropertyNames.MarginRight
-                || name == PropertyNames.PaddingLeft
-                || name == PropertyNames.PaddingRight
-                || name.EndsWith("-x")) return RenderMode.Horizontal;
-
-            return RenderMode.Vertical;
-        }
-
-        /// <summary>
-        /// Get pixel value
-        /// 获取像素值
-        /// </summary>
-        /// <param name="css">Css declaration</param>
-        /// <param name="name">Property name</param>
-        /// <param name="mode">Render mode</param>
-        /// <returns>Result</returns>
-        public double? GetPixel(ICssStyleDeclaration css, string name, RenderMode mode = RenderMode.Undefined)
-        {
-            var value = css.GetProperty(name)?.RawValue;
-            if (value == null) return null;
-
-            if (mode == RenderMode.Undefined)
-            {
-                mode = NameToRenderMode(name);
-            }
-
-            return value.AsPx(RenderDevice, mode);
-        }
-
-        /// <summary>
-        /// Get pixel float value
-        /// 获取像素浮点值
-        /// </summary>
-        /// <param name="css">Css declaration</param>
-        /// <param name="name">Property name</param>
-        /// <param name="mode">Render mode</param>
-        /// <returns>Result</returns>
-        public float? GetPixelF(ICssStyleDeclaration css, string name, RenderMode mode = RenderMode.Undefined)
-        {
-            var pixel = GetPixel(css, name, mode);
-            if (pixel == null) return null;
-            return (float)pixel.Value;
-        }
-
-        /// <summary>
-        /// Get point value
-        /// 获取点值
-        /// </summary>
-        /// <param name="css">Css declaration</param>
-        /// <param name="name">Property name</param>
-        /// <param name="mode">Render mode</param>
-        /// <returns>Result</returns>
-        public double? GetPoint(ICssStyleDeclaration css, string name, RenderMode mode = RenderMode.Undefined)
-        {
-            var pixel = GetPixel(css, name, mode);
-            if (pixel == null) return null;
-            return pixel.Value * 0.75;
-        }
-
-        /// <summary>
-        /// Get point float value
-        /// 获取点浮点值
-        /// </summary>
-        /// <param name="css">Css declaration</param>
-        /// <param name="name">Property name</param>
-        /// <param name="mode">Render mode</param>
-        /// <returns>Result</returns>
-        public float? GetPointF(ICssStyleDeclaration css, string name, RenderMode mode = RenderMode.Undefined)
-        {
-            var point = GetPoint(css, name, mode);
-            if (point == null) return null;
-            return (float)point.Value;
         }
     }
 }

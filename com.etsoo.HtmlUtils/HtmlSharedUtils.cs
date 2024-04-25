@@ -1,4 +1,6 @@
 ﻿using AngleSharp.Css;
+using AngleSharp.Css.Dom;
+using AngleSharp.Css.Values;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -26,10 +28,77 @@ namespace com.etsoo.HtmlUtils
             {
                 DeviceHeight = height,
                 DeviceWidth = width,
-                ViewPortWidth = width,
                 ViewPortHeight = height,
+                ViewPortWidth = width,
                 FontSize = fontSize
             };
+        }
+
+        /// <summary>
+        /// Get pixel value
+        /// For computed current style, the value is in px
+        /// 获取像素值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <returns>Result</returns>
+        public static double? GetPixel(this ICssStyleDeclaration css, string name)
+        {
+            var value = css.GetProperty(name)?.RawValue;
+
+            if (value is CssLengthValue l && l.Type == CssLengthValue.Unit.Px)
+            {
+                return l.Value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get pixel float value
+        /// 获取像素浮点值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <param name="mode">Render mode</param>
+        /// <returns>Result</returns>
+        public static float? GetPixelF(this ICssStyleDeclaration css, string name)
+        {
+            var pixel = css.GetPixel(name);
+            if (pixel == null) return null;
+            return (float)pixel.Value;
+        }
+
+        /// <summary>
+        /// Get point value
+        /// 获取点值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <param name="mode">Render mode</param>
+        /// <returns>Result</returns>
+        public static double? GetPoint(this ICssStyleDeclaration css, string name)
+        {
+            var pixel = css.GetPixel(name);
+            if (pixel == null) return null;
+            return pixel.Value * 0.75;
+        }
+
+        /// <summary>
+        /// Get point float value
+        /// 获取点浮点值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <param name="mode">Render mode</param>
+        /// <returns>Result</returns>
+        public static float? GetPointF(this ICssStyleDeclaration css, string name)
+        {
+            var point = css.GetPoint(name);
+            if (point == null) return null;
+            return (float)point.Value;
         }
 
         /// <summary>
