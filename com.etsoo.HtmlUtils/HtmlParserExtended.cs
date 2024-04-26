@@ -46,16 +46,19 @@ namespace com.etsoo.HtmlUtils
         /// Create HTML parser with CSS and download
         /// 创建带CSS和下载的HTML解析器
         /// </summary>
+        /// <param name="root">Root path</param>
         /// <param name="width">Device width</param>
         /// <param name="height">Device height</param>
         /// <param name="fontSize">Font size</param>
         /// <returns>Result</returns>
-        public static HtmlParserExtended CreateWithCssAndDownload(int width = 1920, int height = 1080, double fontSize = 16)
+        public static HtmlParserExtended CreateWithCssAndDownload(string root = "", int width = 1920, int height = 1080, double fontSize = 16)
         {
             var device = HtmlSharedUtils.CreateRenderDevice(width, height, fontSize);
 
             var config = Configuration.Default
                 .WithCss()
+                .With(new HtmlParserRequester(root))
+                .With(new DefaultHttpRequester())
                 .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
             ;
 

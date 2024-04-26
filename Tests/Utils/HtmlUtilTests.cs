@@ -53,6 +53,65 @@ namespace Tests.Utils
         }
 
         [Test]
+        public async Task ExternalLinkLoadTests()
+        {
+            var html = """<html><head><title>External Link Test</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /></head><body><h1>Hello, world!</h1></body></html>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var parser = HtmlParserExtended.CreateWithCssAndDownload();
+            var doc = await parser.ParseDocumentAsync(stream, default);
+            await doc.WaitForReadyAsync();
+            var downloads = doc.GetDownloads();
+            var link = doc.Head?.GetElementsByTagName("link").First() as IHtmlLinkElement;
+            var h1 = doc.GetElementsByTagName("h1").First() as IHtmlHeadingElement;
+            var h1Style = h1.ComputeCurrentStyle();
+            Assert.Multiple(() =>
+            {
+                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
+                Assert.That(downloads.Count(), Is.EqualTo(1));
+                Assert.That(h1Style.Count, Is.AtLeast(10));
+                Assert.That(doc.Title, Is.EqualTo("External Link Test"));
+                Assert.That(link, Is.Not.Null);
+                Assert.That(h1, Is.Not.Null);
+            });
+        }
+
+        [Test]
+        public async Task ExternalLocalLinkLoadTests()
+        {
+            var html = """<html><head><link href="file:///D:/Etsoo/com.etsoo.EasyPdf/com.etsoo.EasyPdf.Tests/Resources/html/etsoo.css" rel="stylesheet" /></head><body></body></html>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var parser = HtmlParserExtended.CreateWithCssAndDownload();
+            var doc = await parser.ParseDocumentAsync(stream, default);
+            await doc.WaitForReadyAsync();
+            var downloads = doc.GetDownloads();
+            var docStyle = doc.DocumentElement.ComputeCurrentStyle();
+            Assert.Multiple(() =>
+            {
+                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
+                Assert.That(downloads.Count(), Is.EqualTo(1));
+                Assert.That(docStyle.Count, Is.AtLeast(10));
+            });
+        }
+
+        [Test]
+        public async Task ExternalLocalAboutLinkLoadTests()
+        {
+            var html = """<html><head><link href="etsoo.css" rel="stylesheet" /></head><body></body></html>""";
+            await using var stream = SharedUtils.GetStream(html);
+            var parser = HtmlParserExtended.CreateWithCssAndDownload("D:\\Etsoo\\com.etsoo.EasyPdf\\com.etsoo.EasyPdf.Tests\\Resources\\html\\");
+            var doc = await parser.ParseDocumentAsync(stream, default);
+            await doc.WaitForReadyAsync();
+            var downloads = doc.GetDownloads();
+            var docStyle = doc.DocumentElement.ComputeCurrentStyle();
+            Assert.Multiple(() =>
+            {
+                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
+                Assert.That(downloads.Count(), Is.EqualTo(1));
+                Assert.That(docStyle.Count, Is.AtLeast(10));
+            });
+        }
+
+        [Test]
         public void GetIntroduction_NoLookupText_ReturnsIntroductionWithinMaxChars()
         {
             // Arrange
