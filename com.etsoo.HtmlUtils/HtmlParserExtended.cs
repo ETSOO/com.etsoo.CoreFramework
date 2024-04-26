@@ -43,7 +43,7 @@ namespace com.etsoo.HtmlUtils
         }
 
         /// <summary>
-        /// Create HTML parser with CSS and download
+        /// Create HTML parser with CSS and download support
         /// 创建带CSS和下载的HTML解析器
         /// </summary>
         /// <param name="root">Root path</param>
@@ -63,6 +63,31 @@ namespace com.etsoo.HtmlUtils
             ;
 
             return new HtmlParserExtended(config, device);
+        }
+
+        /// <summary>
+        /// Create document from URL with CSS and download support
+        /// </summary>
+        /// <param name="uri">URL</param>
+        /// <param name="width">Device width</param>
+        /// <param name="height">Device height</param>
+        /// <param name="fontSize">Font size</param>
+        /// <param name="cancellationToken">Cancellation</param>
+        /// <returns>Result</returns>
+        public static async Task<IDocument> CreateUrlDocumentAsync(string uri, int width = 1920, int height = 1080, double fontSize = 16, CancellationToken cancellationToken = default)
+        {
+            var device = HtmlSharedUtils.CreateRenderDevice(width, height, fontSize);
+
+            var config = Configuration.Default
+                .WithCss()
+                .WithRenderDevice(device)
+                .With(new DefaultHttpRequester())
+                .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
+            ;
+
+            var context = BrowsingContext.New(config);
+
+            return await context.OpenAsync(uri, cancellationToken);
         }
 
         /// <summary>

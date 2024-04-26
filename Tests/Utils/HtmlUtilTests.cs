@@ -112,6 +112,17 @@ namespace Tests.Utils
         }
 
         [Test]
+        public async Task LoadExternalUrlTests()
+        {
+            var doc = await HtmlParserExtended.CreateUrlDocumentAsync("https://www.etsoo.com/");
+            Assert.Multiple(() =>
+            {
+                Assert.That(doc.ContentType, Is.EqualTo("text/html"));
+                Assert.That(doc.StyleSheets.Length, Is.AtLeast(1));
+            });
+        }
+
+        [Test]
         public void GetIntroduction_NoLookupText_ReturnsIntroductionWithinMaxChars()
         {
             // Arrange
