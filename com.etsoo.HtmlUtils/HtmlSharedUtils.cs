@@ -3,7 +3,6 @@ using AngleSharp.Css.Dom;
 using AngleSharp.Css.Values;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using AngleSharp.Html.Parser;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.HtmlUtils
@@ -15,6 +14,24 @@ namespace com.etsoo.HtmlUtils
     public static partial class HtmlSharedUtils
     {
         /// <summary>
+        /// Default device height
+        /// 默认设备高度
+        /// </summary>
+        public const int DefaultDeviceHeight = 1080;
+
+        /// <summary>
+        /// Default device width
+        /// 默认设备宽度
+        /// </summary>
+        public const int DefaultDeviceWidth = 1920;
+
+        /// <summary>
+        /// Default font size
+        /// 默认字体大小
+        /// </summary>
+        public const double DefaultFontSize = 16;
+
+        /// <summary>
         /// Create render device
         /// 创建渲染设备
         /// </summary>
@@ -22,7 +39,7 @@ namespace com.etsoo.HtmlUtils
         /// <param name="height">Height</param>
         /// <param name="fontSize">Default font size</param>
         /// <returns>Result</returns>
-        public static DefaultRenderDevice CreateRenderDevice(int width, int height, double fontSize = 16)
+        public static DefaultRenderDevice CreateRenderDevice(int width = DefaultDeviceWidth, int height = DefaultDeviceHeight, double fontSize = DefaultFontSize)
         {
             return new DefaultRenderDevice
             {
@@ -99,6 +116,47 @@ namespace com.etsoo.HtmlUtils
             var point = css.GetPoint(name);
             if (point == null) return null;
             return (float)point.Value;
+        }
+
+        /// <summary>
+        /// Get image size
+        /// 获取图片大小
+        /// </summary>
+        /// <param name="img">Image element</param>
+        /// <returns>Result</returns>
+        public static HtmlSize GetSize(this IHtmlImageElement img)
+        {
+            // Size, with property "width" and "height"
+            double width = img.DisplayWidth;
+            double height = img.DisplayHeight;
+
+            // Style settings are in priority
+            var size = GetStyleSize(img);
+            if (size.Width > 0) width = size.Width;
+            if (size.Height > 0) height = size.Height;
+
+            if (width == 0)
+            {
+                width = 800;
+            }
+
+            return new HtmlSize { Width = width, Height = height };
+        }
+
+        /// <summary>
+        /// Get element's style size
+        /// 获取元素的样式大小
+        /// </summary>
+        /// <param name="element">Element</param>
+        /// <returns>Result</returns>
+        public static HtmlSize GetStyleSize(this IElement element)
+        {
+            var css = element.ComputeCurrentStyle();
+
+            var width = css.GetPixel(PropertyNames.Width);
+            var height = css.GetPixel(PropertyNames.Height);
+
+            return new HtmlSize { Width = width.GetValueOrDefault(), Height = height.GetValueOrDefault() };
         }
 
         /// <summary>
@@ -231,38 +289,31 @@ namespace com.etsoo.HtmlUtils
         /// Manipulate HTML elements
         /// 操作HTML元素
         /// </summary>
-        /// <param name="parser">HTML parser</param>
-        /// <param name="stream">HTML stream</param>
+        /// <param name="document">HTML Document</param>
         /// <param name="selector">Selector</param>
         /// <param name="action">Action</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public static Task<IHtmlDocument> ManipulateElementsAsync(this HtmlParser parser, Stream stream, string selector, Func<IHtmlElement, Task> action, CancellationToken cancellationToken = default)
+        public static Task ManipulateElementsAsync(this IDocument document, string selector, Func<IHtmlElement, Task> action)
         {
-            return ManipulateElementsAsync<IHtmlElement>(parser, stream, selector, action, cancellationToken);
+            return ManipulateElementsAsync<IHtmlElement>(document, selector, action);
         }
 
         /// <summary>
         /// Manipulate HTML elements
         /// 操作HTML元素
         /// </summary>
-        /// <param name="parser">HTML parser</param>
-        /// <param name="stream">HTML stream</param>
+        /// <param name="document">HTML Document</param>
         /// <param name="selector">Selector</param>
         /// <param name="action">Action</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Document</returns>
-        public async static Task<IHtmlDocument> ManipulateElementsAsync<T>(this HtmlParser parser, Stream stream, string selector, Func<T, Task> action, CancellationToken cancellationToken = default)
+        public static async Task ManipulateElementsAsync<T>(this IDocument document, string selector, Func<T, Task> action)
             where T : IHtmlElement
         {
-            var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
-            var elements = doc.QuerySelectorAll<T>(selector);
+            var elements = document.QuerySelectorAll<T>(selector);
             foreach (var element in elements)
             {
                 await action(element);
             }
-
-            return doc;
         }
 
         /// <summary>
@@ -270,19 +321,16 @@ namespace com.etsoo.HtmlUtils
         /// 解析表格数据
         /// </summary>
         /// <typeparam name="T">Row data</typeparam>
-        /// <param name="stream">HTML stream</param>
-        /// <param name="selector">Table selector</param>
+        /// <param name="document">HTML Document</param>
+        /// <param name="selector">Selector</param>
         /// <param name="creator">Row data creator</param>
         /// <param name="titleRowIndex">Title row index, -1 means no titles</param>
-        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Parsed data and continue or not</returns>
-        public async static Task<List<T>> ParseTable<T>(Stream stream, string selector, Func<List<string>?, List<string>, int, (T?, bool)> creator, int titleRowIndex = 0, CancellationToken cancellationToken = default)
+        public static List<T> ParseTable<T>(this IDocument document, string selector, Func<List<string>?, List<string>, int, (T?, bool)> creator, int titleRowIndex = 0)
         {
             var items = new List<T>();
 
-            var parser = new HtmlParser();
-            var doc = await parser.ParseDocumentAsync(stream, cancellationToken);
-            var element = doc.QuerySelector(selector);
+            var element = document.QuerySelector(selector);
 
             var startIndex = titleRowIndex + 1;
             if (element is IHtmlTableElement table && table.Rows.Length > startIndex)

@@ -17,8 +17,8 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var parser = HtmlParserExtended.Create();
-            var doc = await parser.ManipulateElementsAsync(stream, "span.eo-lock", async (IHtmlElement element) =>
+            var doc = await HtmlParserExtended.CreateAsync(stream);
+            await doc.ManipulateElementsAsync("span.eo-lock", async (IHtmlElement element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
                 count++;
@@ -38,8 +38,8 @@ namespace Tests.Utils
             var htmlUpdated = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock updated</span></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var count = 0;
-            var parser = HtmlParserExtended.Create();
-            var doc = await parser.ManipulateElementsAsync<IHtmlSpanElement>(stream, "span.eo-lock", async (element) =>
+            var doc = await HtmlParserExtended.CreateAsync(stream);
+            await doc.ManipulateElementsAsync<IHtmlSpanElement>("span.eo-lock", async (element) =>
             {
                 if (element.TextContent == "Lock 2") element.TextContent = "Lock updated";
                 count++;
@@ -57,8 +57,7 @@ namespace Tests.Utils
         {
             var html = """<html><head><title>External Link Test</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /></head><body><h1>Hello, world!</h1></body></html>""";
             await using var stream = SharedUtils.GetStream(html);
-            var parser = HtmlParserExtended.CreateWithCssAndDownload();
-            var doc = await parser.ParseDocumentAsync(stream, default);
+            var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream);
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var link = doc.Head?.GetElementsByTagName("link").First() as IHtmlLinkElement;
@@ -80,8 +79,7 @@ namespace Tests.Utils
         {
             var html = """<html><head><link href="file:///D:/Etsoo/com.etsoo.EasyPdf/com.etsoo.EasyPdf.Tests/Resources/html/etsoo.css" rel="stylesheet" /></head><body></body></html>""";
             await using var stream = SharedUtils.GetStream(html);
-            var parser = HtmlParserExtended.CreateWithCssAndDownload();
-            var doc = await parser.ParseDocumentAsync(stream, default);
+            var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream);
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var docStyle = doc.DocumentElement.ComputeCurrentStyle();
@@ -98,8 +96,7 @@ namespace Tests.Utils
         {
             var html = """<html><head><link href="etsoo.css" rel="stylesheet" /></head><body></body></html>""";
             await using var stream = SharedUtils.GetStream(html);
-            var parser = HtmlParserExtended.CreateWithCssAndDownload("D:\\Etsoo\\com.etsoo.EasyPdf\\com.etsoo.EasyPdf.Tests\\Resources\\html\\");
-            var doc = await parser.ParseDocumentAsync(stream, default);
+            var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream, "D:\\Etsoo\\com.etsoo.EasyPdf\\com.etsoo.EasyPdf.Tests\\Resources\\html\\");
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var docStyle = doc.DocumentElement.ComputeCurrentStyle();
@@ -114,11 +111,11 @@ namespace Tests.Utils
         [Test]
         public async Task LoadExternalUrlTests()
         {
-            var doc = await HtmlParserExtended.CreateUrlDocumentAsync("https://www.etsoo.com/");
+            var doc = await HtmlParserExtended.CreateAsync("https://www.etsoo.com/");
             Assert.Multiple(() =>
             {
                 Assert.That(doc.ContentType, Is.EqualTo("text/html"));
-                Assert.That(doc.StyleSheets.Length, Is.AtLeast(1));
+                Assert.That(doc.Title?.Contains("亿速"), Is.True);
             });
         }
 
@@ -216,19 +213,21 @@ namespace Tests.Utils
             var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" height="240" style="width: 120px"/><img src="c.bmp" width="200" style="height: 100pt;"/></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var sizes = new List<HtmlSize>();
-            var parser = HtmlParserExtended.CreateWithCss();
-            var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img", async (img) =>
+            var doc = await HtmlParserExtended.CreateWithCssAsync(stream);
+            await doc.ManipulateElementsAsync<IHtmlImageElement>("img", async (img) =>
             {
-                var size = parser.GetImageSize(img);
+                var size = img.GetSize();
                 sizes.Add(size);
                 await Task.CompletedTask;
             });
 
+            var width = HtmlSharedUtils.DefaultDeviceWidth;
+
             Assert.Multiple(() =>
             {
                 Assert.That(sizes, Has.Count.EqualTo(3));
-                Assert.That(sizes[0].Width, Is.EqualTo(parser.RenderDevice.RenderWidth * 0.1));
-                //Assert.That(sizes[0].Height, Is.EqualTo(parser.RenderDevice.RenderHeight * 0.2));
+                Assert.That(sizes[0].Width, Is.EqualTo(width * 0.1));
+                Assert.That(sizes[0].Height, Is.EqualTo(width * 0.2));
                 Assert.That(sizes[1].Width, Is.EqualTo(120));
                 Assert.That(sizes[1].Height, Is.EqualTo(240));
                 Assert.That(sizes[2].Width, Is.EqualTo(200));
@@ -241,15 +240,14 @@ namespace Tests.Utils
         {
             var html = """<style>img { width: 10%; height: 50em;}</style><p><img src="a.jpg"/></p>""";
             await using var stream = SharedUtils.GetStream(html);
-            var parser = HtmlParserExtended.CreateWithCss();
-            var doc = await parser.ParseDocumentAsync(stream, default);
+            var doc = await HtmlParserExtended.CreateWithCssAsync(stream);
             var img = doc.GetElementsByTagName("img").First() as IHtmlImageElement;
             var css = img.ComputeCurrentStyle();
+            var width = HtmlSharedUtils.DefaultDeviceWidth;
             Assert.Multiple(() =>
             {
-                var width = $"{parser.RenderDevice.DeviceWidth * 0.1}px";
-                Assert.That(css.GetPropertyValue("width"), Is.EqualTo(width));
-                Assert.That(css.GetPixel(PropertyNames.Width), Is.EqualTo(parser.RenderDevice.DeviceWidth * 0.1));
+                Assert.That(css.GetPropertyValue("width"), Is.EqualTo($"{width * 0.1}px"));
+                Assert.That(css.GetPixel(PropertyNames.Width), Is.EqualTo(width * 0.1));
                 Assert.That(css.GetPropertyValue("height"), Is.EqualTo("800px"));
                 Assert.That(css.GetPixel(PropertyNames.Height), Is.EqualTo(800));
                 Assert.That(css.GetPoint(PropertyNames.Height), Is.EqualTo(600));

@@ -45,9 +45,9 @@ namespace com.etsoo.HtmlIO
 
             await using var stream = SharedUtils.GetStream(content);
 
-            var parser = HtmlParserExtended.CreateWithCss();
+            var doc = await HtmlParserExtended.CreateWithCssAsync(stream, cancellationToken: cancellationToken);
 
-            var doc = await parser.ManipulateElementsAsync<IHtmlImageElement>(stream, "img[src^='data:image/']", async (img) =>
+            await doc.ManipulateElementsAsync<IHtmlImageElement>("img[src^='data:image/']", async (img) =>
             {
                 var source = img.Source;
                 if (string.IsNullOrEmpty(source)) return;
@@ -55,7 +55,7 @@ namespace com.etsoo.HtmlIO
                 try
                 {
                     // Size
-                    var size = parser.GetImageSize(img);
+                    var size = img.GetSize();
                     var sharpSize = new SixLabors.ImageSharp.Size((int)size.Width, (int)size.Height);
 
                     await using var stream = SharedUtils.GetStream();
@@ -73,7 +73,7 @@ namespace com.etsoo.HtmlIO
                 {
                     logger?.LogWarning(ex, "Image {source} failed", source);
                 }
-            }, cancellationToken);
+            });
             return doc.Body?.InnerHtml ?? content;
         }
 
