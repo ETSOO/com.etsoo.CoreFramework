@@ -1,6 +1,7 @@
 ﻿using AngleSharp;
 using AngleSharp.Css;
 using AngleSharp.Dom;
+using AngleSharp.Dom.Events;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using AngleSharp.Io;
@@ -71,21 +72,38 @@ namespace com.etsoo.HtmlUtils
         /// </summary>
         /// <param name="htmlStream">HTML stream</param>
         /// <param name="root">Root path for resource downloading</param>
+        /// <param name="onRequested">On resource requested callback</param>
         /// <param name="options">Parse options</param>
         /// <param name="device">Render device</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<IHtmlDocument> CreateWithCssAndDownloadAsync(Stream htmlStream, string root = "", HtmlParserOptions options = new HtmlParserOptions(), IRenderDevice? device = null, CancellationToken cancellationToken = default)
+        public static async Task<IHtmlDocument> CreateWithCssAndDownloadAsync(Stream htmlStream, string root = "", Action<RequestEvent>? onRequested = null, HtmlParserOptions options = new HtmlParserOptions(), IRenderDevice? device = null, CancellationToken cancellationToken = default)
         {
+            var localRequester = new HtmlParserRequester(root);
+            var defaultRequester = new DefaultHttpRequester();
+
+            if (onRequested != null)
+            {
+                localRequester.AddEventListener(EventNames.Requested, (obj, env) =>
+                {
+                    onRequested((RequestEvent)env);
+                });
+                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) =>
+                {
+                    onRequested((RequestEvent)env);
+                });
+            }
+
             device ??= HtmlSharedUtils.CreateRenderDevice();
             var config = Configuration.Default
                 .WithRenderDevice(device)
                 .WithCss()
-                .With(new HtmlParserRequester(root))
-                .With(new DefaultHttpRequester())
+                .With(localRequester)
+                .With(defaultRequester)
                 .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
             ;
             var parser = new HtmlParser(options, BrowsingContext.New(config));
+
             return await parser.ParseDocumentAsync(htmlStream, cancellationToken);
         }
 
@@ -95,15 +113,26 @@ namespace com.etsoo.HtmlUtils
         /// </summary>
         /// <param name="url">HTML URL</param>
         /// <param name="device">Render device</param>
+        /// <param name="onRequested">On resource requested callback</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<IDocument> CreateWithCssAndDownloadAsync(string url, IRenderDevice? device = null, CancellationToken cancellationToken = default)
+        public static async Task<IDocument> CreateWithCssAndDownloadAsync(string url, IRenderDevice? device = null, Action<RequestEvent>? onRequested = null, CancellationToken cancellationToken = default)
         {
+            var defaultRequester = new DefaultHttpRequester();
+
+            if (onRequested != null)
+            {
+                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) =>
+                {
+                    onRequested((RequestEvent)env);
+                });
+            }
+
             device ??= HtmlSharedUtils.CreateRenderDevice();
             var config = Configuration.Default
                 .WithRenderDevice(device)
                 .WithCss()
-                .With(new DefaultHttpRequester())
+                .With(defaultRequester)
                 .WithDefaultLoader(new LoaderOptions { IsResourceLoadingEnabled = true })
             ;
 
