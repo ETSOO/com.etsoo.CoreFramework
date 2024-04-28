@@ -57,7 +57,11 @@ namespace Tests.Utils
         {
             var html = """<html><head><title>External Link Test</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /></head><body><h1>Hello, world!</h1></body></html>""";
             await using var stream = SharedUtils.GetStream(html);
-            var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream);
+            var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream, "", (evt) =>
+            {
+                Assert.That(evt.Response?.Address.Href.Contains("bootstrap.min.css"), Is.True);
+                return Task.CompletedTask;
+            });
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var link = doc.Head?.GetElementsByTagName("link").First() as IHtmlLinkElement;

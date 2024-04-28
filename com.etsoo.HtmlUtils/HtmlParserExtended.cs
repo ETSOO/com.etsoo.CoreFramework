@@ -77,21 +77,15 @@ namespace com.etsoo.HtmlUtils
         /// <param name="device">Render device</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<IHtmlDocument> CreateWithCssAndDownloadAsync(Stream htmlStream, string root = "", Action<RequestEvent>? onRequested = null, HtmlParserOptions options = new HtmlParserOptions(), IRenderDevice? device = null, CancellationToken cancellationToken = default)
+        public static async Task<IHtmlDocument> CreateWithCssAndDownloadAsync(Stream htmlStream, string root = "", Func<RequestEvent, Task>? onRequested = null, HtmlParserOptions options = new HtmlParserOptions(), IRenderDevice? device = null, CancellationToken cancellationToken = default)
         {
             var localRequester = new HtmlParserRequester(root);
             var defaultRequester = new DefaultHttpRequester();
 
             if (onRequested != null)
             {
-                localRequester.AddEventListener(EventNames.Requested, (obj, env) =>
-                {
-                    onRequested((RequestEvent)env);
-                });
-                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) =>
-                {
-                    onRequested((RequestEvent)env);
-                });
+                localRequester.AddEventListener(EventNames.Requested, (obj, env) => onRequested((RequestEvent)env));
+                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) => onRequested((RequestEvent)env));
             }
 
             device ??= HtmlSharedUtils.CreateRenderDevice();
@@ -116,16 +110,13 @@ namespace com.etsoo.HtmlUtils
         /// <param name="onRequested">On resource requested callback</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<IDocument> CreateWithCssAndDownloadAsync(string url, IRenderDevice? device = null, Action<RequestEvent>? onRequested = null, CancellationToken cancellationToken = default)
+        public static async Task<IDocument> CreateWithCssAndDownloadAsync(string url, IRenderDevice? device = null, Func<RequestEvent, Task>? onRequested = null, CancellationToken cancellationToken = default)
         {
             var defaultRequester = new DefaultHttpRequester();
 
             if (onRequested != null)
             {
-                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) =>
-                {
-                    onRequested((RequestEvent)env);
-                });
+                defaultRequester.AddEventListener(EventNames.Requested, (obj, env) => onRequested((RequestEvent)env));
             }
 
             device ??= HtmlSharedUtils.CreateRenderDevice();
