@@ -242,7 +242,7 @@ namespace Tests.Utils
         [Test]
         public async Task SizeUnitTests()
         {
-            var html = """<style>img { width: 10%; height: 50em;}</style><p><img src="a.jpg"/></p>""";
+            var html = """<style>img { width: 10%; height: 50em; opacity: 0.85}</style><p><img src="a.jpg"/></p>""";
             await using var stream = SharedUtils.GetStream(html);
             var doc = await HtmlParserExtended.CreateWithCssAsync(stream);
             var img = doc.GetElementsByTagName("img").First() as IHtmlImageElement;
@@ -250,6 +250,8 @@ namespace Tests.Utils
             var width = HtmlSharedUtils.DefaultDeviceWidth;
             Assert.Multiple(() =>
             {
+                Assert.That(css.GetFloatValue(PropertyNames.Opacity), Is.EqualTo(0.85f));
+
                 Assert.That(css.GetPropertyValue("width"), Is.EqualTo($"{width * 0.1}px"));
                 Assert.That(css.GetPixel(PropertyNames.Width), Is.EqualTo(width * 0.1));
                 Assert.That(css.GetPropertyValue("height"), Is.EqualTo("800px"));

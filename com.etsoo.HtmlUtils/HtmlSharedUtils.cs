@@ -52,6 +52,64 @@ namespace com.etsoo.HtmlUtils
         }
 
         /// <summary>
+        /// Get double value
+        /// 获取双精度值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <returns>Result</returns>
+        public static double? GetDoubleValue(this ICssStyleDeclaration css, string name)
+        {
+            var value = css.GetProperty(name)?.RawValue;
+
+            if (value is CssNumberValue n)
+            {
+                return n.Value;
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Get float value
+        /// 获取浮点值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <returns>Result</returns>
+        public static float? GetFloatValue(this ICssStyleDeclaration css, string name)
+        {
+            var value = css.GetDoubleValue(name);
+            if (value.HasValue)
+            {
+                return (float)value.Value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get integer value
+        /// 获取整数值
+        /// </summary>
+        /// <param name="css">Css declaration</param>
+        /// <param name="name">Property name</param>
+        /// <returns>Result</returns>
+        public static int? GetIntValue(this ICssStyleDeclaration css, string name)
+        {
+            var value = css.GetProperty(name)?.RawValue;
+
+            if (value is CssIntegerValue n)
+            {
+                return n.IntValue;
+            }
+
+            return default;
+        }
+
+        /// <summary>
         /// Get pixel value
         /// For computed current style, the value is in px
         /// 获取像素值
