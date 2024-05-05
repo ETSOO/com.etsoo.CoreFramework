@@ -15,6 +15,18 @@ namespace com.etsoo.SourceGenerators.Attributes
         public string? Prefix { get; set; }
 
         /// <summary>
+        /// 'AS' name
+        /// 别名
+        /// </summary>
+        public string? AsName { get; set; }
+
+        /// <summary>
+        /// JSON name
+        /// JSON 名称
+        /// </summary>
+        public string? JsonName { get; set; }
+
+        /// <summary>
         /// Column calculated function
         /// 列计算函数
         /// </summary>

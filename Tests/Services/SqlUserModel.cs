@@ -34,4 +34,12 @@ namespace Tests.Services
         public required string Name { get; init; }
         public EntityStatus? Status { get; init; }
     }
+
+    [SqlSelectGenericCommand("User", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
+    [SqlSelectResult(typeof(UserData))]
+    internal partial record UserQuery
+    {
+        public int? Id { get; init; }
+        public string? Name { get; init; }
+    }
 }

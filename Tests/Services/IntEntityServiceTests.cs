@@ -250,9 +250,18 @@ namespace Tests.Services
             Assert.That(selectData, Is.Not.Null);
             Assert.That(selectData.Name, Is.EqualTo("Admin 3 Updated"));
 
+            var query = new UserQuery { Id = 1113 };
+            var selectResult = (await service.SqlSelectAsync(query.Default.UserData)).FirstOrDefault();
+            Assert.That(selectResult?.Name, Is.EqualTo("Admin 3 Updated"));
+
             var writer = new ArrayBufferWriter<byte>();
             await service.SqlSelectJsonAsync<SqlUserSelect, UserData>(select, writer);
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
+            Assert.That(json, Is.EqualTo("[{\"id\":1113,\"name\":\"Admin 3 Updated\",\"status\":100}]"));
+
+            writer.Clear();
+            await service.SqlSelectJsonAsync(query.Default.UserData, writer);
+            json = Encoding.UTF8.GetString(writer.WrittenSpan);
             Assert.That(json, Is.EqualTo("[{\"id\":1113,\"name\":\"Admin 3 Updated\",\"status\":100}]"));
 
             var deleteResult = await service.SqlDeleteAsync([1113], "User");

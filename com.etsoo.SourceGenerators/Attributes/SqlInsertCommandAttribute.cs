@@ -4,7 +4,7 @@
     /// SQL insert command attribute
     /// SQL 插入命令属性
     /// </summary>
-    public class SqlInsertCommandAttribute : SqlCommandAttribute
+    public sealed class SqlInsertCommandAttribute : SqlCommandAttribute
     {
         /// <summary>
         /// Primary key column name, default is 'Id'

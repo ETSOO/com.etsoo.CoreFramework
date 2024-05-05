@@ -7,7 +7,7 @@ namespace com.etsoo.SourceGenerators.Attributes
     /// 自动Dictionary对象创建者支持属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class AutoDictionaryGeneratorAttribute : Attribute
+    public sealed class AutoDictionaryGeneratorAttribute : Attribute
     {
         /// <summary>
         /// Data field name is snake case

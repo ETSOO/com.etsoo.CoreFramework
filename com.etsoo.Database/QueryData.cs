@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace com.etsoo.CoreFramework.Models
+namespace com.etsoo.Database
 {
     /// <summary>
     /// Query data

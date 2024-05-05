@@ -1,6 +1,4 @@
-﻿using com.etsoo.Database;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.Database
 {
     /// <summary>
     /// SQL delete interface
@@ -15,5 +13,14 @@ namespace com.etsoo.CoreFramework.Models
         /// <param name="db">Database</param>
         /// <returns>Result</returns>
         (string, IDbParameters) CreateSqlDelete(IDatabase db);
+
+        /// <summary>
+        /// Do SQL delete
+        /// 执行SQL删除
+        /// </summary>
+        /// <param name="db">Database</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Rows affected</returns>
+        Task<int> DoSqlDeleteAsync(IDatabase db, CancellationToken cancellationToken = default);
     }
 }

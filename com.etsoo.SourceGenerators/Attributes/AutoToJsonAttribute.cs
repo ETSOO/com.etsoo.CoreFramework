@@ -7,7 +7,7 @@ namespace com.etsoo.SourceGenerators.Attributes
     /// 自动输出Json属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class AutoToJsonAttribute : Attribute
+    public sealed class AutoToJsonAttribute : Attribute
     {
     }
 }

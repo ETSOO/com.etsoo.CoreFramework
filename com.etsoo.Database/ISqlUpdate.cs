@@ -1,6 +1,4 @@
-﻿using com.etsoo.Database;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.Database
 {
     /// <summary>
     /// SQL update interface
@@ -15,5 +13,14 @@ namespace com.etsoo.CoreFramework.Models
         /// <param name="db">Database</param>
         /// <returns>Result</returns>
         (string, IDbParameters) CreateSqlUpdate(IDatabase db);
+
+        /// <summary>
+        /// Do SQL update
+        /// 执行SQL更新
+        /// </summary>
+        /// <param name="db">Database</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Rows affected</returns>
+        Task<int> DoSqlUpdateAsync(IDatabase db, CancellationToken cancellationToken = default);
     }
 }

@@ -244,6 +244,9 @@ namespace com.etsoo.Database
                     sField = alias;
                     dbField = alias.ToNamingCase(policy);
 
+                    // Replace the field
+                    part = part.Replace("{F}", dbField);
+
                     result = $"{part} AS {EscapeIdentifier(dbField)}";
                 }
 

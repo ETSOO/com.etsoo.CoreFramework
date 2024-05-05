@@ -223,6 +223,7 @@ namespace com.etsoo.CoreFramework.Services
         /// Delete records with SQL asynchronously
         /// SQL语句异步删除记录
         /// </summary>
+        /// <typeparam name="T">Generic query data type</typeparam>
         /// <param name="data">Related data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
@@ -257,7 +258,7 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步插入记录
         /// </summary>
         /// <typeparam name="T">Generic data type</typeparam>
-        /// <typeparam name="I">Generic inserted data id type</typeparam>
+        /// <typeparam name="I">Generic inserted data type</typeparam>
         /// <param name="data">Related data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
@@ -268,13 +269,23 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步选择记录
         /// </summary>
         /// <typeparam name="T">Generic data type</typeparam>
-        /// <typeparam name="D">Generic selected data id type</typeparam>
+        /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="data">Query data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Select records with SQL asynchronously
+        /// SQL语句异步选择记录
+        /// </summary>
+        /// <typeparam name="D">Generic selected data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<D[]> SqlSelectAsync<D>(ISqlSelectResult<D> result, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Select records as JSON with SQL asynchronously
@@ -329,6 +340,28 @@ namespace com.etsoo.CoreFramework.Services
         Task SqlSelectJsonAsync<T, D>(T data, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>;
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, HttpResponse response, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, IBufferWriter<byte> writer, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Update records with SQL asynchronously

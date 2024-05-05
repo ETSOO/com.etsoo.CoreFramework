@@ -539,14 +539,13 @@ namespace com.etsoo.CoreFramework.Services
         /// Delete records with SQL asynchronously
         /// SQL语句异步删除记录
         /// </summary>
+        /// <typeparam name="T">Generic query data type</typeparam>
         /// <param name="data">Related data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
         public async Task<IActionResult> SqlDeleteAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlDelete
         {
-            var (sql, parameters) = data.CreateSqlDelete(App.DB);
-            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
-            var result = await App.DB.ExecuteAsync(command);
+            var result = await data.DoSqlDeleteAsync(App.DB, cancellationToken);
             return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
         }
 
@@ -592,15 +591,13 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步插入记录
         /// </summary>
         /// <typeparam name="T">Generic data type</typeparam>
-        /// <typeparam name="I">Generic inserted data id type</typeparam>
+        /// <typeparam name="I">Generic inserted data type</typeparam>
         /// <param name="data">Related data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<I?> SqlInsertAsync<T, I>(T data, CancellationToken cancellationToken = default) where T : ISqlInsert
+        public Task<I?> SqlInsertAsync<T, I>(T data, CancellationToken cancellationToken = default) where T : ISqlInsert
         {
-            var (sql, parameters) = data.CreateSqlInsert(App.DB);
-            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
-            return await ExecuteScalarAsync<I>(command);
+            return data.DoSqlInsertAsync<I>(App.DB, cancellationToken);
         }
 
         /// <summary>
@@ -608,17 +605,28 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步选择记录
         /// </summary>
         /// <typeparam name="T">Generic data type</typeparam>
-        /// <typeparam name="D">Generic selected data id type</typeparam>
+        /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="data">Query data</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
+        public Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>
         {
-            var (sql, parameters) = data.CreateSqlSelect(App.DB, D.ParserInnerFields);
-            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
-            return await QueryAsListAsync<D>(command);
+            return data.DoSqlSelectAsync<D>(App.DB, cancellationToken);
+        }
+
+        /// <summary>
+        /// Select records with SQL asynchronously
+        /// SQL语句异步选择记录
+        /// </summary>
+        /// <typeparam name="D">Generic selected data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public Task<D[]> SqlSelectAsync<D>(ISqlSelectResult<D> result, CancellationToken cancellationToken = default)
+        {
+            return result.DoSqlSelectAsync(App.DB, cancellationToken);
         }
 
         /// <summary>
@@ -661,6 +669,22 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步选择为JSON记录
         /// </summary>
         /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="response">HTTP response</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, HttpResponse response, CancellationToken cancellationToken = default)
+        {
+            var (sql, parameters) = result.CreateSqlSelectJson(App.DB);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            await ReadJsonToStreamAsync(command, response);
+        }
+
+        /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
         /// <param name="data">Query data</param>
         /// <param name="fields">Fields</param>
         /// <param name="writer">Buffer writer</param>
@@ -692,6 +716,22 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Select records as JSON with SQL asynchronously
+        /// SQL语句异步选择为JSON记录
+        /// </summary>
+        /// <typeparam name="T">Generic data type</typeparam>
+        /// <param name="result">Select result type</param>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+        {
+            var (sql, parameters) = result.CreateSqlSelectJson(App.DB);
+            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+            await ReadToStreamAsync(command, writer);
+        }
+
+        /// <summary>
         /// Update records with SQL asynchronously
         /// SQL语句异步更新记录
         /// </summary>
@@ -700,9 +740,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <returns>Result</returns>
         public async Task<IActionResult> SqlUpdateAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlUpdate
         {
-            var (sql, parameters) = data.CreateSqlUpdate(App.DB);
-            var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
-            var result = await App.DB.ExecuteAsync(command);
+            var result = await data.DoSqlUpdateAsync(App.DB, cancellationToken);
             return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
         }
 

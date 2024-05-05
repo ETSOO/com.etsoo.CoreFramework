@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.SourceGenerators
@@ -52,6 +53,128 @@ namespace com.etsoo.SourceGenerators
                 DatabaseName.SQLServer => $"[{name.Replace("[", "[[").Replace("]", "]]")}]",
                 _ => name
             };
+        }
+
+        /// <summary>
+        /// Setup conditions
+        /// 设置条件
+        /// </summary>
+        /// <param name="db">Database name</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<DatabaseName> GetAllNames(this DatabaseName db)
+        {
+            foreach (DatabaseName item in Enum.GetValues(typeof(DatabaseName)))
+            {
+                if (db.HasFlag(item))
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Setup conditions
+        /// 设置条件
+        /// </summary>
+        /// <param name="db">Database name</param>
+        /// <returns>Result</returns>
+        public static Dictionary<DatabaseName, List<string>> SetupConditions(this DatabaseName db)
+        {
+            var conditions = new Dictionary<DatabaseName, List<string>>();
+
+            foreach (var item in db.GetAllNames())
+            {
+                conditions[item] = new List<string>();
+            }
+
+            return conditions;
+        }
+
+        /// <summary>
+        /// Setup JSON results
+        /// 设置JSON结果
+        /// </summary>
+        /// <param name="db">Database name</param>
+        /// <returns>Result</returns>
+        public static Dictionary<DatabaseName, List<(string, string, string)>> SetupJsonResults(this DatabaseName db)
+        {
+            var conditions = new Dictionary<DatabaseName, List<(string, string, string)>>();
+
+            foreach (var item in db.GetAllNames())
+            {
+                conditions[item] = new List<(string, string, string)>();
+            }
+
+            return conditions;
+        }
+
+        /// <summary>
+        /// To select fields
+        /// 转化为查询字段
+        /// </summary>
+        /// <param name="source">Source fields</param>
+        /// <returns>Result</returns>
+        public static string ToSelectFields(this List<(string, string, string)> source)
+        {
+            var items = source.Select(s =>
+            {
+                if (s.Item1.Equals(s.Item2)) return s.Item1;
+                else return $"{s.Item1} AS {s.Item2}";
+            });
+
+            return string.Join(", ", items);
+        }
+
+        /// <summary>
+        /// To JSON select fields
+        /// 转化为JSON查询字段
+        /// </summary>
+        /// <param name="source">Source fields</param>
+        /// <param name="db">Database type</param>
+        /// <param name="isObject">Is object</param>
+        /// <returns>Result</returns>
+        public static string ToJsonSelectFields(this List<(string, string, string)> source, DatabaseName db, bool isObject)
+        {
+            var items = source.Select(s =>
+            {
+                if (db == DatabaseName.SQLServer)
+                {
+                    return s.Item2.Equals(s.Item3) ? s.Item3 : $"{s.Item2} AS {s.Item3}";
+                }
+                else
+                {
+                    return $"'{s.Item2}', {s.Item3}";
+                }
+            });
+
+            var fields = string.Join(", ", items);
+
+            // SQL Server
+            if (db == DatabaseName.SQLServer)
+            {
+                return fields;
+            }
+
+            var sql = db switch
+            {
+                DatabaseName.MySQL => $"JSON_OBJECT({fields})",
+                DatabaseName.PostgreSQL => $"json_build_object({fields})",
+                DatabaseName.SQLite => $"json_object({fields})",
+                _ => fields
+            };
+
+            if (!isObject)
+            {
+                sql = db switch
+                {
+                    DatabaseName.MySQL => $"JSON_ARRAYAGG({sql})",
+                    DatabaseName.PostgreSQL => $"json_agg({sql})",
+                    DatabaseName.SQLite => $"json_group_array({sql})",
+                    _ => sql
+                };
+            }
+
+            return sql;
         }
 
         /// <summary>
@@ -157,6 +280,12 @@ namespace com.etsoo.SourceGenerators
             return "null";
         }
 
+        /// <summary>
+        /// To query sign
+        /// 转化为查询符号
+        /// </summary>
+        /// <param name="sign">Query sign</param>
+        /// <returns>Result</returns>
         public static string ToQuerySign(this SqlQuerySign sign)
         {
             return sign switch

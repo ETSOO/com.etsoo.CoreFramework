@@ -7,7 +7,7 @@ namespace com.etsoo.SourceGenerators.Attributes
     /// 自动支持输出Dapper参数属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class AutoToParametersAttribute : Attribute
+    public sealed class AutoToParametersAttribute : Attribute
     {
         /// <summary>
         /// Ignore null fields

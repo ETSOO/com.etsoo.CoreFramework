@@ -24,6 +24,9 @@ namespace com.etsoo.SourceGenerators
             // Avoid duplicate inheritances
             var list = externalInheritances.Count == 0 ? externalInheritances : new List<string>();
 
+            // Conditions
+            var conditions = new List<string>();
+
             var members = context.ParseMembers(tds, true, list, out _);
             if (!context.CancellationToken.IsCancellationRequested)
             {
@@ -62,7 +65,8 @@ namespace com.etsoo.SourceGenerators
                     var sign = querySign.ToQuerySign();
 
                     var value = field;
-                    var cvalue = $"@{field}";
+                    var cvalueSource = $"@{field}";
+                    var cvalue = cvalueSource;
                     if (typeSymbol.TypeKind == TypeKind.Array || typeSymbol.IsList())
                     {
                         // Type
@@ -93,35 +97,34 @@ namespace com.etsoo.SourceGenerators
                         }
                     }
 
+                    body.Add($@"parameters.Add(""{field}"", {value});");
+
                     if (nullable)
                     {
-                        body.Add($@"
-                            if({field} != null)
-                            {{
-                                parameters.Add(""{field}"", {value});
-                                conditions.Add(""{columnName} {sign} {cvalue}"");
-                            }}
-                        {(keepNull ? $@"
-                            else
-                            {{
-                                conditions.Add(""{columnName} IS NULL"");
-                            }}
-                        " : "")}
-                        ");
+                        if (keepNull)
+                        {
+                            conditions.Add($@"(({cvalueSource} IS NULL AND {columnName} IS NULL) OR {columnName} {sign} {cvalue})");
+                        }
+                        else
+                        {
+                            conditions.Add($@"({cvalueSource} IS NULL OR {columnName} {sign} {cvalue})");
+                        }
                     }
                     else
                     {
-                        body.Add($@"
-                            parameters.Add(""{field}"", {value});
-                            conditions.Add(""{columnName} {sign} {cvalue}"");
-                        ");
+                        conditions.Add($@"{columnName} {sign} {cvalue}");
                     }
                 }
             }
 
-            body.Add($@"
-                sql.Append(""DELETE FROM {tableName.DbEscape(database)} WHERE "");
-            ");
+            if (conditions.Count == 0)
+            {
+                context.ReportDiagnostic(Diagnostic.Create("ETSG003", "SourceGenerators", $"No conditions for delete", DiagnosticSeverity.Error, DiagnosticSeverity.Error, true, 0, true));
+                throw new Exception("No conditions for delete");
+            }
+
+            var sql = new StringBuilder($@"DELETE FROM {tableName.DbEscape(database)} WHERE {string.Join(" AND ", conditions)}");
+            body.Add($@"sql = ""{sql}"";");
 
             return body;
         }
@@ -146,6 +149,8 @@ namespace com.etsoo.SourceGenerators
             var database = (attributeData?.GetValue<DatabaseName>(nameof(SqlDeleteCommandAttribute.Database))).GetValueOrDefault();
 
             var namingPolicy = attributeData?.GetValue<NamingPolicy>(nameof(SqlDeleteCommandAttribute.NamingPolicy));
+
+            var debug = attributeData?.GetValue<bool>(nameof(SqlDeleteCommandAttribute.Debug)) ?? false;
 
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
@@ -185,12 +190,13 @@ namespace com.etsoo.SourceGenerators
                 }}
             ");
 
-            externals.Add("com.etsoo.CoreFramework.Models.ISqlDelete");
+            externals.Add("ISqlDelete");
 
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
                 using System;
+                using System.Data;
                 using System.Text;
 
                 namespace {ns}
@@ -206,8 +212,7 @@ namespace com.etsoo.SourceGenerators
                         public (string, IDbParameters) CreateSqlDelete(IDatabase db)
                         {{
                             var parameters = new DbParameters();
-                            var conditions = new List<string>();
-                            var sql = new StringBuilder();
+                            string sql;
 
                             var name = db.Name;
                             {string.Join("\n", body)}
@@ -216,14 +221,23 @@ namespace com.etsoo.SourceGenerators
                                 throw new NotSupportedException($""Database {{name}} is not supported"");
                             }}
 
-                            if(conditions.Count == 0)
-                            {{
-                                throw new InvalidOperationException(""No conditions for delete"");
-                            }}
+                            {(debug ? "System.Diagnostics.Debug.WriteLine(sql);" : "")}
 
-                            sql.Append(string.Join("" AND "", conditions));
+                            return (sql, parameters);
+                        }}
 
-                            return (sql.ToString(), parameters);
+                        /// <summary>
+                        /// Do SQL delete
+                        /// 执行SQL删除
+                        /// </summary>
+                        /// <param name=""db"">Database</param>
+                        /// <param name=""cancellationToken"">Cancellation token</param>
+                        /// <returns>Rows affected</returns>
+                        public Task<int> DoSqlDeleteAsync(IDatabase db, CancellationToken cancellationToken = default)
+                        {{
+                            var (sql, parameters) = CreateSqlDelete(db);
+                            var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+                            return db.ExecuteAsync(command);
                         }}
                     }}
                 }}

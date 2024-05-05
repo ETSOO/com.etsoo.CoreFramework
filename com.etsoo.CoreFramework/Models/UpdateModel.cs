@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.Models;
+﻿using com.etsoo.Database;
+using com.etsoo.Utils.Models;
 
 namespace com.etsoo.CoreFramework.Models
 {

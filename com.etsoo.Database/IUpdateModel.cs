@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.Database
 {
     /// <summary>
     /// Update model interface

@@ -145,15 +145,49 @@ namespace com.etsoo.SourceGenerators
         /// <returns>Attribute data</returns>
         public static AttributeData? GetAttributeData(this ISymbol symbol, string type)
         {
-            return symbol.GetAttributes().SingleOrDefault(a =>
-            {
-                if (a.AttributeClass != null)
-                {
-                    return a.AttributeClass.ToDisplayString().Equals(type);
-                }
+            return symbol.GetAttributes().SingleOrDefault(a => type.Equals(a.AttributeClass?.ToDisplayString()));
+        }
 
-                return false;
-            });
+        /// <summary>
+        /// Get all attribute data
+        /// 获取全部属性数据
+        /// </summary>
+        /// <param name="symbol">Symbol</param>
+        /// <param name="type">Type full name</param>
+        /// <returns>Attribute data</returns>
+        public static IEnumerable<AttributeData> GetAllAttributeData(this ISymbol symbol, string type)
+        {
+            return symbol.GetAttributes().Where(a => type.Equals(a.AttributeClass?.ToDisplayString()));
+        }
+
+        /// <summary>
+        /// Get symbol full name
+        /// 获取符号全名
+        /// </summary>
+        /// <param name="symbol">Symbol</param>
+        /// <returns>Result</returns>
+        public static string GetFullName(this ISymbol symbol)
+        {
+            var symbolDisplayFormat = new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces);
+            return symbol.ToDisplayString(symbolDisplayFormat);
+        }
+
+        /// <summary>
+        /// Get self and base types
+        /// 获取自身和基类类型
+        /// </summary>
+        /// <param name="type">Type</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<(ITypeSymbol Symbol, int Index)> GetSelfAndBaseTypes(this INamedTypeSymbol type)
+        {
+            var current = type;
+            var index = 0;
+            while (current != null)
+            {
+                yield return (current, index);
+                current = current.BaseType;
+                index++;
+            }
         }
 
         /// <summary>
@@ -357,6 +391,41 @@ namespace com.etsoo.SourceGenerators
                         }
                     }
                 }
+            }
+
+            return items;
+        }
+
+        public static IEnumerable<ParsedMember> ParseMembers(this INamedTypeSymbol symbol, bool isRead, List<string> externalInheritances, out bool isPositionalRecord)
+        {
+            isPositionalRecord = symbol.IsRecord && symbol.Constructors.Length == 1 && symbol.Constructors[0].Parameters.Length > 0;
+
+            var types = symbol.GetSelfAndBaseTypes();
+            foreach (var (type, index) in types)
+            {
+                if (index == 1)
+                {
+                    externalInheritances.Add(type.ToString());
+                }
+            }
+
+            var members = types.SelectMany(t => t.Symbol.GetMembers());
+
+            var items = new List<ParsedMember>();
+            foreach (var member in members)
+            {
+                if (member.DeclaredAccessibility != Accessibility.Public) continue;
+
+                if (member is IPropertySymbol pSymbol && ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly)))
+                {
+                    continue;
+                }
+                else if (member is IFieldSymbol fs && !isRead && fs.IsReadOnly)
+                {
+                    continue;
+                }
+
+                ParseMember(member, items);
             }
 
             return items;

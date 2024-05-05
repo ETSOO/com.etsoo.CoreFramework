@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.CoreFramework.Models
+﻿using com.etsoo.Database;
+
+namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Search request data

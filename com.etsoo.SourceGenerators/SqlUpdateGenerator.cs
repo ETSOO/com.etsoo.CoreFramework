@@ -36,7 +36,7 @@ namespace com.etsoo.SourceGenerators
 
                 foreach (var member in members)
                 {
-                    var (symbol, typeSymbol, nullable) = member;
+                    var (symbol, typeSymbol, _) = member;
 
                     // Ignore static field
                     if (symbol.IsStatic) continue;
@@ -121,6 +121,8 @@ namespace com.etsoo.SourceGenerators
 
             var namingPolicy = attributeData?.GetValue<NamingPolicy>(nameof(SqlUpdateCommandAttribute.NamingPolicy));
 
+            var debug = attributeData?.GetValue<bool>(nameof(SqlUpdateCommandAttribute.Debug)) ?? false;
+
             // Name space and class name
             var (ns, className) = (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
 
@@ -159,12 +161,13 @@ namespace com.etsoo.SourceGenerators
                 }}
             ");
 
-            externals.Add("com.etsoo.CoreFramework.Models.ISqlUpdate");
+            externals.Add("ISqlUpdate");
 
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
                 using System;
+                using System.Data;
                 using System.Text;
 
                 namespace {ns}
@@ -198,7 +201,23 @@ namespace com.etsoo.SourceGenerators
 
                             sql = sql.Replace(""{{0}}"", string.Join("", "", values));
 
+                            {(debug ? "System.Diagnostics.Debug.WriteLine(sql);" : "")}
+
                             return (sql.ToString(), parameters);
+                        }}
+
+                        /// <summary>
+                        /// Do SQL update
+                        /// 执行SQL更新
+                        /// </summary>
+                        /// <param name=""db"">Database</param>
+                        /// <param name=""cancellationToken"">Cancellation token</param>
+                        /// <returns>Rows affected</returns>
+                        public Task<int> DoSqlUpdateAsync(IDatabase db, CancellationToken cancellationToken = default)
+                        {{
+                            var (sql, parameters) = CreateSqlUpdate(db);
+                            var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+                            return db.ExecuteAsync(command);
                         }}
                     }}
                 }}

@@ -4,7 +4,7 @@
     /// SQL select command attribute
     /// SQL 选择命令属性
     /// </summary>
-    public sealed class SqlSelectCommandAttribute : SqlCommandAttribute
+    public sealed class SqlSelectGenericCommandAttribute : SqlCommandAttribute
     {
         /// <summary>
         /// JSON naming policy
@@ -12,13 +12,7 @@
         /// </summary>
         public NamingPolicy JsonNamingPolicy { get; set; } = NamingPolicy.CamelCase;
 
-        /// <summary>
-        /// Is JSON object
-        /// 是否为JSON对象
-        /// </summary>
-        public bool IsObject { get; set; }
-
-        public SqlSelectCommandAttribute(string tableName, NamingPolicy namingPolicy) : base(tableName, namingPolicy)
+        public SqlSelectGenericCommandAttribute(string tableName, NamingPolicy namingPolicy) : base(tableName, namingPolicy)
         {
         }
     }

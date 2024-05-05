@@ -7,7 +7,7 @@ namespace com.etsoo.SourceGenerators.Attributes
     /// 自动DbDataReader对象创建者支持属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-    public class AutoDataReaderGeneratorAttribute : Attribute
+    public sealed class AutoDataReaderGeneratorAttribute : Attribute
     {
         /// <summary>
         /// Is auto set datetime to Utc kind

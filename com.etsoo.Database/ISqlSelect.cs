@@ -1,6 +1,4 @@
-﻿using com.etsoo.Database;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.Database
 {
     /// <summary>
     /// SQL select interface
@@ -31,5 +29,16 @@ namespace com.etsoo.CoreFramework.Models
         /// <param name="fields">Fields to select</param>
         /// <returns>Result</returns>
         (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields);
+
+        /// <summary>
+        /// Do SQL select
+        /// 执行SQL选择
+        /// </summary>
+        /// <typeparam name="D">Generic selected data type</typeparam>
+        /// <param name="db">Database</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        Task<D[]> DoSqlSelectAsync<D>(IDatabase db, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
+
     }
 }

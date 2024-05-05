@@ -215,13 +215,13 @@ namespace com.etsoo.SourceGenerators
                 }}
             ");
 
-            externals.Add("com.etsoo.CoreFramework.Models.ISqlSelect");
+            externals.Add("ISqlSelect");
 
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
-                using com.etsoo.CoreFramework.Models;
                 using System;
+                using System.Data;
                 using System.Text;
 
                 namespace {ns}
@@ -309,6 +309,21 @@ namespace com.etsoo.SourceGenerators
                             }}
 
                             return (sql.ToString(), parameters);
+                        }}
+
+                        /// <summary>
+                        /// Do SQL select
+                        /// 执行SQL选择
+                        /// </summary>
+                        /// <typeparam name=""D"">Generic selected data type</typeparam>
+                        /// <param name=""db"">Database</param>
+                        /// <param name=""cancellationToken"">Cancellation token</param>
+                        /// <returns>Result</returns>
+                        public Task<D[]> DoSqlSelectAsync<D>(IDatabase db, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>
+                        {{
+                            var (sql, parameters) = CreateSqlSelect(db, D.ParserInnerFields);
+                            var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+                            return db.QueryListAsync<D>(command);
                         }}
                     }}
                 }}

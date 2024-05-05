@@ -160,12 +160,13 @@ namespace com.etsoo.SourceGenerators
                 }}
             ");
 
-            externals.Add("com.etsoo.CoreFramework.Models.ISqlInsert");
+            externals.Add("ISqlInsert");
 
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
                 using System;
+                using System.Data;
                 using System.Text;
 
                 namespace {ns}
@@ -193,6 +194,21 @@ namespace com.etsoo.SourceGenerators
                             {(debug ? "System.Diagnostics.Debug.WriteLine(sql);" : "")}
 
                             return (sql, parameters);
+                        }}
+
+                        /// <summary>
+                        /// Do SQL insert
+                        /// 执行SQL插入
+                        /// </summary>
+                        /// <typeparam name=""T"">Generic return id type</typeparam>
+                        /// <param name=""db"">Database</param>
+                        /// <param name=""cancellationToken"">Cancellation token</param>
+                        /// <returns>Rows affected</returns>
+                        public Task<T?> DoSqlInsertAsync<T>(IDatabase db, CancellationToken cancellationToken = default)
+                        {{
+                            var (sql, parameters) = CreateSqlInsert(db);
+                            var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
+                            return db.ExecuteScalarAsync<T>(command);
                         }}
                     }}
                 }}
