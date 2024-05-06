@@ -22,7 +22,7 @@ namespace Tests.Services
     /// </summary>
     internal class IntEntityService : EntityServiceBase<AppConfiguration, SqlConnection, ICoreApplication<AppConfiguration, SqlConnection>, ICurrentUser, int>
     {
-        public IntEntityService(ICoreApplication<AppConfiguration, SqlConnection> app, string flag, ILogger logger) : base(app, null, flag, logger)
+        public IntEntityService(ICoreApplication<AppConfiguration, SqlConnection> app, string flag, ILogger logger) : base(app, null!, flag, logger)
         {
         }
 
@@ -45,6 +45,12 @@ namespace Tests.Services
         }
 
         public IDbParameters CreateStudentParameters(Student student)
+        {
+            var parameters = FormatParameters(student);
+            return parameters;
+        }
+
+        public IDbParameters QueryStudentParameters(StudentQuery student)
         {
             var parameters = FormatParameters(student);
             return parameters;
@@ -232,6 +238,25 @@ namespace Tests.Services
         }
 
         [Test]
+        public void CreateStudentQueryParametersTest()
+        {
+            var student = new StudentQuery
+            {
+                Name = "Student Name",
+                QueryPaging = new QueryPagingData { BatchSize = 10, CurrentPage = 2 }
+            };
+
+            var parameters = service.QueryStudentParameters(student);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(parameters.ParameterNames, Does.Contain("Name"));
+                Assert.That(parameters.ParameterNames, Does.Contain("BatchSize"));
+                Assert.That(parameters.ParameterNames, Does.Contain("CurrentPage"));
+            });
+        }
+
+        [Test]
         public async Task SqlModelTests()
         {
             await service.SqlDeleteAsync([1113]);
@@ -245,7 +270,7 @@ namespace Tests.Services
             var updateResult = await service.SqlUpdateAsync(update);
             Assert.That(updateResult.Ok, Is.True);
 
-            var select = new SqlUserSelect { Id = 1113, QueryPaging = new QueryData { BatchSize = 2 } };
+            var select = new SqlUserSelect { Id = 1113, QueryPaging = new QueryPagingData { BatchSize = 2 } };
             var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
             Assert.That(selectData, Is.Not.Null);
             Assert.That(selectData.Name, Is.EqualTo("Admin 3 Updated"));

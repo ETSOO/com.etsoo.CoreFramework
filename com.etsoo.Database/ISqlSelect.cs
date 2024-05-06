@@ -10,7 +10,7 @@
         /// Query paging data
         /// 查询分页数据
         /// </summary>
-        QueryData? QueryPaging { get; set; }
+        QueryPagingData? QueryPaging { get; set; }
 
         /// <summary>
         /// Create SQL select command

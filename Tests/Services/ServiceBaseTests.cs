@@ -85,7 +85,7 @@ namespace Tests.Services
             var updateResult = await service.SqlUpdateAsync(update);
             Assert.That(updateResult.Ok, Is.True);
 
-            var select = new SqlUserSelect { Id = 1003, QueryPaging = new QueryData { BatchSize = 2 } };
+            var select = new SqlUserSelect { Id = 1003, QueryPaging = new QueryPagingData { BatchSize = 2 } };
             var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
             Assert.That(selectData, Is.Not.Null);
             Assert.That(selectData.Name, Is.EqualTo("Admin 3 Updated"));

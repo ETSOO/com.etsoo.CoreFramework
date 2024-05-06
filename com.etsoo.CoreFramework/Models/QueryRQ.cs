@@ -7,13 +7,19 @@ namespace com.etsoo.CoreFramework.Models
     /// 查询请求数据
     /// </summary>
     /// <typeparam name="T">Generic id type</typeparam>
-    public partial record QueryRQ<T> : QueryData where T : struct
+    public partial record QueryRQ<T> where T : struct
     {
         /// <summary>
         /// Id
         /// 编号
         /// </summary>
         public T? Id { get; set; }
+
+        /// <summary>
+        /// Query paging data
+        /// 查询分页数据
+        /// </summary>
+        public QueryPagingData? QueryPaging { get; set; }
     }
 
     /// <summary>

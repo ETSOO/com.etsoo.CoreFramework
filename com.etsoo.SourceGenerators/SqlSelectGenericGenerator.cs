@@ -139,7 +139,7 @@ namespace com.etsoo.SourceGenerators
                     var (symbol, typeSymbol, nullable) = member;
 
                     // Ignore static field
-                    if (symbol.IsStatic) continue;
+                    if (symbol.IsStatic || symbol.Name.Equals("QueryPaging", StringComparison.OrdinalIgnoreCase)) continue;
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(propertyType.FullName);
@@ -452,7 +452,7 @@ namespace com.etsoo.SourceGenerators
                         /// Query paging data
                         /// 查询分页数据
                         /// </summary>
-                        public QueryData? QueryPaging {{ get; set; }}
+                        public QueryPagingData? QueryPaging {{ get; set; }}
 
                         private (StringBuilder, IDbParameters) CreateCommand(IDatabase db, string fields)
                         {{

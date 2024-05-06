@@ -4,10 +4,10 @@ using System.Text.RegularExpressions;
 namespace com.etsoo.Database
 {
     /// <summary>
-    /// Query data
-    /// 查询数据
+    /// Query paging data
+    /// 查询分页数据
     /// </summary>
-    public partial record QueryData
+    public partial record QueryPagingData
     {
         /// <summary>
         /// Current page

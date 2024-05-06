@@ -1,4 +1,5 @@
-﻿using com.etsoo.Database;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.Database;
 using com.etsoo.SourceGenerators.Attributes;
 using Microsoft.Data.SqlClient.Server;
 using System.ComponentModel.DataAnnotations;
@@ -38,5 +39,11 @@ namespace Tests
         public IEnumerable<Book>? JsonBooks { get; init; }
 
         public IEnumerable<Book>? Books { get; init; }
+    }
+
+    [AutoToParameters]
+    public partial record StudentQuery : QueryRQ
+    {
+        public string? Name { get; init; }
     }
 }

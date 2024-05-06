@@ -199,6 +199,25 @@ namespace com.etsoo.SourceGenerators
                             valuePart = $"SqlServerUtils.DictionaryToRecords({fieldName}, {keyDbType}, {itemDbType}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
+                    else if (typeSymbol is INamedTypeSymbol nSymbol && nSymbol.GetFullName() == "com.etsoo.Database.QueryPagingData")
+                    {
+                        // Query paging data
+                        var qmembers = nSymbol.ParseMembers(true, new List<string>(), out _);
+                        var queryParameters = new StringBuilder("");
+                        queryParameters.AppendLine($"if({fieldName} != null)\n{{");
+                        foreach (var qmember in qmembers)
+                        {
+                            var (qSymbol, _, _) = qmember;
+                            var qfield = qSymbol.Name;
+                            var qname = snakeCase ? qSymbol.Name.ToSnakeCase() : qSymbol.Name;
+                            queryParameters.AppendLine($"parameters.Add(\"{qname}\", {fieldName}.{qfield});");
+                        }
+                        queryParameters.AppendLine("}");
+
+                        body.Add(queryParameters.ToString());
+
+                        continue;
+                    }
                     else
                     {
                         continue;
