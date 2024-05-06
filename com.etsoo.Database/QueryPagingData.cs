@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace com.etsoo.Database
 {
@@ -33,31 +32,5 @@ namespace com.etsoo.Database
         /// 升序或降序排列
         /// </summary>
         public bool? OrderByAsc { get; set; }
-
-        /// <summary>
-        /// Get order command
-        /// 获取排序命令
-        /// </summary>
-        /// <returns>Command</returns>
-        public string? GetOrderCommand()
-        {
-            if (string.IsNullOrEmpty(OrderBy)) return null;
-            if (MyRegex().IsMatch(OrderBy))
-            {
-                var byText = OrderByAsc.GetValueOrDefault(true) ? "ASC" : "DESC";
-                if (OrderBy.EndsWith(" ASC", StringComparison.OrdinalIgnoreCase) || OrderBy.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"ORDER BY {OrderBy}";
-                }
-                else
-                {
-                    return $"ORDER BY {OrderBy} {byText}";
-                }
-            }
-            return null;
-        }
-
-        [GeneratedRegex("^[0-9a-zA-Z_\\s,]+$")]
-        private static partial Regex MyRegex();
     }
 }

@@ -188,6 +188,14 @@ namespace com.etsoo.Database
         string QueryLimit(uint size, uint page = 0);
 
         /// <summary>
+        /// Get query limit command
+        /// 获取查询限制命令
+        /// </summary>
+        /// <param name="data">Query paging data</param>
+        /// <returns>Result</returns>
+        string QueryLimit(QueryPagingData? data);
+
+        /// <summary>
         /// Get update command
         /// 获取更新命令
         /// </summary>

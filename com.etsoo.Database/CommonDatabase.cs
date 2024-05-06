@@ -657,6 +657,17 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Get query limit command
+        /// 获取查询限制命令
+        /// </summary>
+        /// <param name="data">Query paging data</param>
+        /// <returns>Result</returns>
+        public string QueryLimit(QueryPagingData? data)
+        {
+            return QueryLimit(data?.BatchSize ?? 8, data?.CurrentPage ?? 0);
+        }
+
+        /// <summary>
         /// Get update command
         /// 获取更新命令
         /// https://www.sqlite.org/lang_update.html

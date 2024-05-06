@@ -16,6 +16,32 @@ namespace com.etsoo.Database
     public static partial class DatabaseUtils
     {
         /// <summary>
+        /// Get order command
+        /// 获取排序命令
+        /// </summary>
+        /// <returns>Command</returns>
+        public static string? GetOrderCommand(this QueryPagingData? data)
+        {
+            var orderBy = data?.OrderBy;
+            if (string.IsNullOrEmpty(orderBy)) return null;
+
+            if (GetOrderCommandRegex().IsMatch(orderBy))
+            {
+                var byText = data!.OrderByAsc.GetValueOrDefault(true) ? "ASC" : "DESC";
+                if (orderBy.EndsWith(" ASC", StringComparison.OrdinalIgnoreCase) || orderBy.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
+                {
+                    return $"ORDER BY {orderBy}";
+                }
+                else
+                {
+                    return $"ORDER BY {orderBy} {byText}";
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Is the string only ansii characters
         /// 字符串是唯一的ASCII字符吗
         /// </summary>
@@ -361,5 +387,8 @@ namespace com.etsoo.Database
 
         [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase)]
         private static partial Regex MyRegex1();
+
+        [GeneratedRegex("^[0-9a-zA-Z_\\s,]+$")]
+        private static partial Regex GetOrderCommandRegex();
     }
 }
