@@ -116,7 +116,7 @@ namespace com.etsoo.SourceGenerators
             return codeLines;
         }
 
-        private (Dictionary<DatabaseName, List<string>> Condtions, IEnumerable<string> Parameters) GenerateConditions(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, NamingPolicy? namingPlicy, DatabaseName database)
+        private (Dictionary<DatabaseName, List<string>> Condtions, IEnumerable<string> Parameters) GenerateConditions(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, NamingPolicy? namingPlicy, DatabaseName database, ref bool hasPagingData)
         {
             // Conditions
             var parameters = new List<string>();
@@ -139,7 +139,17 @@ namespace com.etsoo.SourceGenerators
                     var (symbol, typeSymbol, nullable) = member;
 
                     // Ignore static field
-                    if (symbol.IsStatic || symbol.Name.Equals("QueryPaging", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (symbol.IsStatic) continue;
+
+                    // Field name
+                    var field = symbol.Name;
+
+                    // Paging data
+                    if (field.Equals("QueryPaging", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasPagingData = true;
+                        continue;
+                    }
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(propertyType.FullName);
@@ -154,9 +164,6 @@ namespace com.etsoo.SourceGenerators
 
                     // Prefix
                     var prefix = columnAttributeData?.GetValue<string?>(prefixName);
-
-                    // Field name
-                    var field = symbol.Name;
 
                     // Keep null
                     var keepNull = attributeData?.GetValue<bool?>(keepNullName) ?? false;
@@ -287,7 +294,8 @@ namespace com.etsoo.SourceGenerators
             var tableNamesDeclaration = tableNames.Select(item => $"[DatabaseName.{item.Key}] = \"{item.Value}\"");
 
             // Conditions
-            var (conditions, parameters) = GenerateConditions(context, tds, externals, namingPolicy, database);
+            var hasPagingData = false;
+            var (conditions, parameters) = GenerateConditions(context, tds, externals, namingPolicy, database, ref hasPagingData);
 
             var body = conditions.Select((b, index) => @$"
                 {(index > 0 ? "else " : "")}if(name == DatabaseName.{b.Key})
@@ -410,6 +418,15 @@ namespace com.etsoo.SourceGenerators
             var resultInterface = instances.Select(item => $"{item.Interface} {item.Name} {{ get; }}");
             var resultClass = instances.Select(item => $"public {item.Interface} {item.Name} => new {item.ClassName}(obj);");
 
+            var pagingDataPart = hasPagingData ? "" : $@"
+                        /// <summary>
+                        /// Query paging data
+                        /// 查询分页数据
+                        /// </summary>
+                        public QueryPagingData? QueryPaging {{ get; set; }}
+
+            ";
+
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
@@ -448,12 +465,7 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         public IDefaultClass Default => new DefaultClass(this);
 
-                        /// <summary>
-                        /// Query paging data
-                        /// 查询分页数据
-                        /// </summary>
-                        public QueryPagingData? QueryPaging {{ get; set; }}
-
+                        {pagingDataPart}
                         private (StringBuilder, IDbParameters) CreateCommand(IDatabase db, string fields)
                         {{
                             var parameters = new DbParameters();

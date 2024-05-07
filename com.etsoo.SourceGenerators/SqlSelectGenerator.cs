@@ -17,7 +17,7 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class SqlSelectGenerator : ISourceGenerator
     {
-        private IEnumerable<string> GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, NamingPolicy? namingPlicy, DatabaseName database, NamingPolicy? jsonNamingPolicy)
+        private IEnumerable<string> GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, NamingPolicy? namingPlicy, DatabaseName database, NamingPolicy? jsonNamingPolicy, ref bool hasPagingData)
         {
             var body = new List<string>();
 
@@ -41,7 +41,17 @@ namespace com.etsoo.SourceGenerators
                     var (symbol, typeSymbol, nullable) = member;
 
                     // Ignore static field
-                    if (symbol.IsStatic || symbol.Name.Equals("QueryPaging", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (symbol.IsStatic) continue;
+
+                    // Field name
+                    var field = symbol.Name;
+
+                    // Paging data
+                    if (field.Equals("QueryPaging", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasPagingData = true;
+                        continue;
+                    }
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(propertyType.FullName);
@@ -56,9 +66,6 @@ namespace com.etsoo.SourceGenerators
 
                     // Prefix
                     var prefix = columnAttributeData?.GetValue<string?>(prefixName);
-
-                    // Field name
-                    var field = symbol.Name;
 
                     // Table column name
                     var columnName = (attributeData?.GetValue<string?>(columnNameField) ?? field.ToCase(namingPlicy)).DbEscape(database);
@@ -191,21 +198,22 @@ namespace com.etsoo.SourceGenerators
 
             // Generate body
             var bodies = new Dictionary<DatabaseName, IEnumerable<string>>();
+            var hasPagingData = false;
             if (database.HasFlag(DatabaseName.SQLServer))
             {
-                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.SQLServer, jsonNamingPolicy));
+                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.SQLServer, jsonNamingPolicy, ref hasPagingData));
             }
             if (database.HasFlag(DatabaseName.MySQL))
             {
-                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.MySQL, jsonNamingPolicy));
+                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.MySQL, jsonNamingPolicy, ref hasPagingData));
             }
             if (database.HasFlag(DatabaseName.PostgreSQL))
             {
-                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.PostgreSQL, jsonNamingPolicy));
+                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.PostgreSQL, jsonNamingPolicy, ref hasPagingData));
             }
             if (database.HasFlag(DatabaseName.SQLite))
             {
-                bodies.Add(DatabaseName.SQLite, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.SQLite, jsonNamingPolicy));
+                bodies.Add(DatabaseName.SQLite, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.SQLite, jsonNamingPolicy, ref hasPagingData));
             }
 
             var body = bodies.Select((b, index) => @$"
@@ -216,6 +224,15 @@ namespace com.etsoo.SourceGenerators
             ");
 
             externals.Add("ISqlSelect");
+
+            var pagingDataPart = hasPagingData ? "" : $@"
+                        /// <summary>
+                        /// Query paging data
+                        /// 查询分页数据
+                        /// </summary>
+                        public QueryPagingData? QueryPaging {{ get; set; }}
+
+            ";
 
             // Source code
             var source = $@"#nullable enable
@@ -228,12 +245,7 @@ namespace com.etsoo.SourceGenerators
                 {{
                     {(isPublic ? "public" : "internal")} partial {keyword} {className} : {string.Join(", ", externals)}
                     {{
-                        /// <summary>
-                        /// Query paging data
-                        /// 查询分页数据
-                        /// </summary>
-                        public QueryPagingData? QueryPaging {{ get; set; }}
-
+                        {pagingDataPart}
                         private (StringBuilder, IDbParameters, Dictionary<string, string>) CreateCommand(IDatabase db, IEnumerable<string> fields)
                         {{
                             var parameters = new DbParameters();
