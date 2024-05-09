@@ -19,7 +19,7 @@ namespace com.etsoo.Database
         /// 批量请求数量
         /// </summary>
         [Range(1, 1000)]
-        public ushort BatchSize { get; set; }
+        public ushort BatchSize { get; set; } = 10;
 
         /// <summary>
         /// Order by field
