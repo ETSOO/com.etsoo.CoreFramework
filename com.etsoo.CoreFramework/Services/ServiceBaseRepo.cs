@@ -667,7 +667,7 @@ namespace com.etsoo.CoreFramework.Services
         public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, HttpResponse response, bool? addSystemParameters = null, SqlMappingDelegate? mappingDelegate = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
         {
-            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields);
+            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields, mappingDelegate);
 
             var callback = CreateCommandDelegate(addSystemParameters);
             callback?.Invoke(sql, parameters);
