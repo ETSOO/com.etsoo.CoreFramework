@@ -52,7 +52,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="queryKey">Query key</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null, CancellationToken cancellationToken = default);
+        Task ListAsync(IModelParameters model, HttpResponse response, string? queryKey = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Merge

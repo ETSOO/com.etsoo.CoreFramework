@@ -131,7 +131,7 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="queryKey">Query key</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public virtual Task ListAsync(TiplistRQ<T> model, HttpResponse response, string? queryKey = null, CancellationToken cancellationToken = default)
+        public virtual Task ListAsync(IModelParameters model, HttpResponse response, string? queryKey = null, CancellationToken cancellationToken = default)
         {
             var parameters = FormatParameters(model);
 
