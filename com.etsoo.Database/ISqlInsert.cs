@@ -20,8 +20,9 @@
         /// </summary>
         /// <typeparam name="T">Generic return id type</typeparam>
         /// <param name="db">Database</param>
+        /// <param name="callback">Callback before execution</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rows affected</returns>
-        Task<T?> DoSqlInsertAsync<T>(IDatabase db, CancellationToken cancellationToken = default);
+        Task<T?> DoSqlInsertAsync<T>(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default);
     }
 }

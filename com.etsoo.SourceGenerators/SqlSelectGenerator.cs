@@ -305,10 +305,14 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <param name=""db"">Database</param>
                         /// <param name=""fields"">Fields to select</param>
+                        /// <param name=""mappingDelegate"">Query fields mapping delegate</param>
                         /// <returns>Sql command text and parameters</returns>
-                        public (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields)
+                        public (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields, SqlMappingDelegate? mappingDelegate = null)
                         {{
                             var (sql, parameters, mappings) = CreateCommand(db, fields);
+
+                            // Mapping
+                            mappingDelegate?.Invoke(mappings);
 
                             // Sub query, otherwise Sqlite 'order by' fails
                             sql.Insert(0, $""SELECT {{db.JoinJsonFields(mappings, {isObject.ToCode()})}} FROM ("");
@@ -329,11 +333,13 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <typeparam name=""D"">Generic selected data type</typeparam>
                         /// <param name=""db"">Database</param>
+                        /// <param name=""callback"">Callback before execution</param>
                         /// <param name=""cancellationToken"">Cancellation token</param>
                         /// <returns>Result</returns>
-                        public Task<D[]> DoSqlSelectAsync<D>(IDatabase db, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>
+                        public Task<D[]> DoSqlSelectAsync<D>(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>
                         {{
                             var (sql, parameters) = CreateSqlSelect(db, D.ParserInnerFields);
+                            callback?.Invoke(sql, parameters);
                             var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                             return db.QueryListAsync<D>(command);
                         }}

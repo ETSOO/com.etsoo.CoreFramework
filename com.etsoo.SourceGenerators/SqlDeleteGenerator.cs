@@ -231,11 +231,13 @@ namespace com.etsoo.SourceGenerators
                         /// 执行SQL删除
                         /// </summary>
                         /// <param name=""db"">Database</param>
+                        /// <param name=""callback"">Callback before execution</param>
                         /// <param name=""cancellationToken"">Cancellation token</param>
                         /// <returns>Rows affected</returns>
-                        public Task<int> DoSqlDeleteAsync(IDatabase db, CancellationToken cancellationToken = default)
+                        public Task<int> DoSqlDeleteAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default)
                         {{
                             var (sql, parameters) = CreateSqlDelete(db);
+                            callback?.Invoke(sql, parameters);
                             var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                             return db.ExecuteAsync(command);
                         }}

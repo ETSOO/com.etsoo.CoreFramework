@@ -375,11 +375,13 @@ namespace com.etsoo.SourceGenerators
                             /// 执行 SQL选择命令
                             /// </summary>
                             /// <param name=""db"">Database</param>
+                            /// <param name=""callback"">Callback before execution</param>
                             /// <param name=""cancellationToken"">Cancellation token</param>
                             /// <returns>Result</returns>
-                            public async Task<{fullName}[]> DoSqlSelectAsync(IDatabase db, CancellationToken cancellationToken = default)
+                            public async Task<{fullName}[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default)
                             {{
                                 var (sql, parameters) = CreateSqlSelect(db);
+                                callback?.Invoke(sql, parameters);
                                 var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                                 return {(isInherit ? $"await db.QueryListAsync<{fullName}>(command)" : $"(await db.QueryAsync<{fullName}>(command)).ToArray()")};
                             }}

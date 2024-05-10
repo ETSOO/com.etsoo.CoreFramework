@@ -27,8 +27,9 @@
         /// </summary>
         /// <param name="db">Database</param>
         /// <param name="fields">Fields to select</param>
+        /// <param name="mappingDelegate">Query fields mapping delegate</param>
         /// <returns>Result</returns>
-        (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields);
+        (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields, SqlMappingDelegate? mappingDelegate = null);
 
         /// <summary>
         /// Do SQL select
@@ -36,9 +37,10 @@
         /// </summary>
         /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="db">Database</param>
+        /// <param name="callback">Callback before execution</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<D[]> DoSqlSelectAsync<D>(IDatabase db, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
+        Task<D[]> DoSqlSelectAsync<D>(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
 
     }
 }

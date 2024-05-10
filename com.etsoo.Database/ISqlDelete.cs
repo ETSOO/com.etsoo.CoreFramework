@@ -19,8 +19,9 @@
         /// 执行SQL删除
         /// </summary>
         /// <param name="db">Database</param>
+        /// <param name="callback">Callback before execution</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rows affected</returns>
-        Task<int> DoSqlDeleteAsync(IDatabase db, CancellationToken cancellationToken = default);
+        Task<int> DoSqlDeleteAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default);
     }
 }

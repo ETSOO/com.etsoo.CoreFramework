@@ -202,11 +202,13 @@ namespace com.etsoo.SourceGenerators
                         /// </summary>
                         /// <typeparam name=""T"">Generic return id type</typeparam>
                         /// <param name=""db"">Database</param>
+                        /// <param name=""callback"">Callback before execution</param>
                         /// <param name=""cancellationToken"">Cancellation token</param>
                         /// <returns>Rows affected</returns>
-                        public Task<T?> DoSqlInsertAsync<T>(IDatabase db, CancellationToken cancellationToken = default)
+                        public Task<T?> DoSqlInsertAsync<T>(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default)
                         {{
                             var (sql, parameters) = CreateSqlInsert(db);
+                            callback?.Invoke(sql, parameters);
                             var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                             return db.ExecuteScalarAsync<T>(command);
                         }}

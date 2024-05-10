@@ -19,8 +19,9 @@
         /// 执行SQL更新
         /// </summary>
         /// <param name="db">Database</param>
+        /// <param name="callback">Callback before execution</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Rows affected</returns>
-        Task<int> DoSqlUpdateAsync(IDatabase db, CancellationToken cancellationToken = default);
+        Task<int> DoSqlUpdateAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default);
     }
 }

@@ -211,11 +211,13 @@ namespace com.etsoo.SourceGenerators
                         /// 执行SQL更新
                         /// </summary>
                         /// <param name=""db"">Database</param>
+                        /// <param name=""callback"">Callback before execution</param>
                         /// <param name=""cancellationToken"">Cancellation token</param>
                         /// <returns>Rows affected</returns>
-                        public Task<int> DoSqlUpdateAsync(IDatabase db, CancellationToken cancellationToken = default)
+                        public Task<int> DoSqlUpdateAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default)
                         {{
                             var (sql, parameters) = CreateSqlUpdate(db);
+                            callback?.Invoke(sql, parameters);
                             var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                             return db.ExecuteAsync(command);
                         }}

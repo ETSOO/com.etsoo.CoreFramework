@@ -47,6 +47,25 @@ namespace com.etsoo.CoreFramework.Services
         }
 
         /// <summary>
+        /// Create SQL command delegate
+        /// 创建SQL命令委托
+        /// </summary>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
+        /// <returns>Result</returns>
+        protected SqlCommandDelegate? CreateCommandDelegate(bool? addSystemParameters)
+        {
+            if (addSystemParameters == null)
+            {
+                return null;
+            }
+
+            return (sql, parameters) =>
+            {
+                AddSystemParameters(parameters, addSystemParameters.Value);
+            };
+        }
+
+        /// <summary>
         /// Create command, default parameters added
         /// 创建命令，附加默认参数
         /// </summary>
@@ -541,11 +560,12 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <typeparam name="T">Generic query data type</typeparam>
         /// <param name="data">Related data</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<IActionResult> SqlDeleteAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlDelete
+        public async Task<IActionResult> SqlDeleteAsync<T>(T data, bool? addSystemParameters = null, CancellationToken cancellationToken = default) where T : ISqlDelete
         {
-            var result = await data.DoSqlDeleteAsync(App.DB, cancellationToken);
+            var result = await data.DoSqlDeleteAsync(App.DB, CreateCommandDelegate(addSystemParameters), cancellationToken);
             return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
         }
 
@@ -593,11 +613,12 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="T">Generic data type</typeparam>
         /// <typeparam name="I">Generic inserted data type</typeparam>
         /// <param name="data">Related data</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public Task<I?> SqlInsertAsync<T, I>(T data, CancellationToken cancellationToken = default) where T : ISqlInsert
+        public Task<I?> SqlInsertAsync<T, I>(T data, bool? addSystemParameters = null, CancellationToken cancellationToken = default) where T : ISqlInsert
         {
-            return data.DoSqlInsertAsync<I>(App.DB, cancellationToken);
+            return data.DoSqlInsertAsync<I>(App.DB, CreateCommandDelegate(addSystemParameters), cancellationToken);
         }
 
         /// <summary>
@@ -607,13 +628,14 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="T">Generic data type</typeparam>
         /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="data">Query data</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public Task<D[]> SqlSelectAsync<T, D>(T data, CancellationToken cancellationToken = default)
+        public Task<D[]> SqlSelectAsync<T, D>(T data, bool? addSystemParameters = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>
         {
-            return data.DoSqlSelectAsync<D>(App.DB, cancellationToken);
+            return data.DoSqlSelectAsync<D>(App.DB, CreateCommandDelegate(addSystemParameters), cancellationToken);
         }
 
         /// <summary>
@@ -622,11 +644,12 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="result">Select result type</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public Task<D[]> SqlSelectAsync<D>(ISqlSelectResult<D> result, CancellationToken cancellationToken = default)
+        public Task<D[]> SqlSelectAsync<D>(ISqlSelectResult<D> result, bool? addSystemParameters = null, CancellationToken cancellationToken = default)
         {
-            return result.DoSqlSelectAsync(App.DB, cancellationToken);
+            return result.DoSqlSelectAsync(App.DB, CreateCommandDelegate(addSystemParameters), cancellationToken);
         }
 
         /// <summary>
@@ -637,12 +660,18 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="data">Query data</param>
         /// <param name="fields">Fields</param>
         /// <param name="response">HTTP response</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
+        /// <param name="mappingDelegate">Query fields mapping delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, HttpResponse response, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, HttpResponse response, bool? addSystemParameters = null, SqlMappingDelegate? mappingDelegate = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
         {
             var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields);
+
+            var callback = CreateCommandDelegate(addSystemParameters);
+            callback?.Invoke(sql, parameters);
+
             var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
             await ReadJsonToStreamAsync(command, response);
         }
@@ -655,13 +684,15 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="D">Geneirc fields type</typeparam>
         /// <param name="data">Query data</param>
         /// <param name="response">HTTP response</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
+        /// <param name="mappingDelegate">Query fields mapping delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T, D>(T data, HttpResponse response, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T, D>(T data, HttpResponse response, bool? addSystemParameters = null, SqlMappingDelegate? mappingDelegate = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>
         {
-            await SqlSelectJsonAsync(data, D.ParserInnerFields, response, cancellationToken);
+            await SqlSelectJsonAsync(data, D.ParserInnerFields, response, addSystemParameters, mappingDelegate, cancellationToken);
         }
 
         /// <summary>
@@ -671,11 +702,16 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="T">Generic data type</typeparam>
         /// <param name="result">Select result type</param>
         /// <param name="response">HTTP response</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, HttpResponse response, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, HttpResponse response, bool? addSystemParameters = null, CancellationToken cancellationToken = default)
         {
             var (sql, parameters) = result.CreateSqlSelectJson(App.DB);
+
+            var callback = CreateCommandDelegate(addSystemParameters);
+            callback?.Invoke(sql, parameters);
+
             var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
             await ReadJsonToStreamAsync(command, response);
         }
@@ -688,12 +724,18 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="data">Query data</param>
         /// <param name="fields">Fields</param>
         /// <param name="writer">Buffer writer</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
+        /// <param name="mappingDelegate">Query fields mapping delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T>(T data, IEnumerable<string> fields, IBufferWriter<byte> writer, bool? addSystemParameters = null, SqlMappingDelegate? mappingDelegate = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
         {
-            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields);
+            var (sql, parameters) = data.CreateSqlSelectJson(App.DB, fields, mappingDelegate);
+
+            var callback = CreateCommandDelegate(addSystemParameters);
+            callback?.Invoke(sql, parameters);
+
             var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
             await ReadToStreamAsync(command, writer);
         }
@@ -706,13 +748,15 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="D">Geneirc fields type</typeparam>
         /// <param name="data">Query data</param>
         /// <param name="writer">Buffer writer</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
+        /// <param name="mappingDelegate">Query fields mapping delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T, D>(T data, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T, D>(T data, IBufferWriter<byte> writer, bool? addSystemParameters = null, SqlMappingDelegate? mappingDelegate = null, CancellationToken cancellationToken = default)
             where T : ISqlSelect
             where D : IDataReaderParser<D>
         {
-            await SqlSelectJsonAsync(data, D.ParserInnerFields, writer, cancellationToken);
+            await SqlSelectJsonAsync(data, D.ParserInnerFields, writer, addSystemParameters, mappingDelegate, cancellationToken);
         }
 
         /// <summary>
@@ -722,11 +766,16 @@ namespace com.etsoo.CoreFramework.Services
         /// <typeparam name="T">Generic data type</typeparam>
         /// <param name="result">Select result type</param>
         /// <param name="writer">Buffer writer</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, IBufferWriter<byte> writer, CancellationToken cancellationToken = default)
+        public async Task SqlSelectJsonAsync<T>(ISqlSelectResult<T> result, IBufferWriter<byte> writer, bool? addSystemParameters = null, CancellationToken cancellationToken = default)
         {
             var (sql, parameters) = result.CreateSqlSelectJson(App.DB);
+
+            var callback = CreateCommandDelegate(addSystemParameters);
+            callback?.Invoke(sql, parameters);
+
             var command = CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
             await ReadToStreamAsync(command, writer);
         }
@@ -736,11 +785,12 @@ namespace com.etsoo.CoreFramework.Services
         /// SQL语句异步更新记录
         /// </summary>
         /// <param name="data">Related data</param>
+        /// <param name="addSystemParameters">Auto add system parameters or not, null means no action</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async Task<IActionResult> SqlUpdateAsync<T>(T data, CancellationToken cancellationToken = default) where T : ISqlUpdate
+        public async Task<IActionResult> SqlUpdateAsync<T>(T data, bool? addSystemParameters = null, CancellationToken cancellationToken = default) where T : ISqlUpdate
         {
-            var result = await data.DoSqlUpdateAsync(App.DB, cancellationToken);
+            var result = await data.DoSqlUpdateAsync(App.DB, CreateCommandDelegate(addSystemParameters), cancellationToken);
             return result == 0 ? ApplicationErrors.NoId.AsResult() : ActionResult.Success;
         }
 

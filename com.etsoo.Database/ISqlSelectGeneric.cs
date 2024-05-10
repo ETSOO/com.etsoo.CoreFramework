@@ -41,8 +41,9 @@
         /// 执行 SQL选择命令
         /// </summary>
         /// <param name="db">Database</param>
+        /// <param name="callback">Callback before execution</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<D[]> DoSqlSelectAsync(IDatabase db, CancellationToken cancellationToken = default);
+        Task<D[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default);
     }
 }
