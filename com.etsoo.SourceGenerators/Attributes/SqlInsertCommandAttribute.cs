@@ -12,6 +12,12 @@
         /// </summary>
         public string? PrimaryKey { get; set; }
 
+        /// <summary>
+        /// Ignore to insert when id exists, default is false
+        /// 当 Id 存在时忽略插入，默认为 false
+        /// </summary>
+        public bool IgnoreExists { get; set; }
+
         public SqlInsertCommandAttribute(string tableName, NamingPolicy namingPolicy) : base(tableName, namingPolicy)
         {
         }

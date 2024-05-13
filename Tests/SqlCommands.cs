@@ -44,6 +44,21 @@ namespace Tests
         public DateTime Creation { get; init; } = new DateTime(2024, 2, 17);
     }
 
+    [SqlInsertCommand("customer", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite, IgnoreExists = true, PrimaryKey = "id")]
+    public partial record InsertIgnoreTest
+    {
+        public required string Id { get; init; }
+
+        public required string Name { get; init; }
+
+        [SqlColumn(ColumnName = "entityStatus")]
+        public EntityStatus Status { get; init; }
+
+        public bool? IsDeleted { get; init; }
+
+        public DateTime Creation { get; init; } = new DateTime(2024, 2, 17);
+    }
+
     [SqlUpdateCommand("customer", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
     public partial record UpdateTest
     {

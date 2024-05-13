@@ -65,6 +65,30 @@ namespace Tests.Services
         }
 
         [Test]
+        public void InsertIgnoreModelSqliteTest()
+        {
+            var model = new InsertIgnoreTest { Id = "1001", Name = "ABC", Status = EntityStatus.Completed, IsDeleted = true };
+            var result = model.CreateSqlInsert(db);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("INSERT OR IGNORE INTO \"customer\" (\"id\", \"name\", \"entityStatus\", \"isDeleted\", \"creation\") VALUES (@Id, @Name, @Status, @IsDeleted, @Creation) RETURNING \"id\""));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(5));
+            });
+        }
+
+        [Test]
+        public void InsertIgnoreModelSqlServerTest()
+        {
+            var model = new InsertIgnoreTest { Id = "1001", Name = "ABC", Status = EntityStatus.Completed, IsDeleted = true };
+            var result = model.CreateSqlInsert(new SqlServerDatabase(""));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("INSERT INTO [customer] ([id], [name], [entityStatus], [isDeleted], [creation]) OUTPUT inserted.[id] VALUES (@Id, @Name, @Status, @IsDeleted, @Creation) WHERE NOT EXISTS (SELECT * FROM [customer] WHERE [id] = @Id)"));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(5));
+            });
+        }
+
+        [Test]
         public void UpdateModelTest()
         {
             // Achieve update a field while the field is also a query field

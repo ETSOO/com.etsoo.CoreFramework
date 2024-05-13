@@ -17,7 +17,7 @@ namespace com.etsoo.SourceGenerators
     [Generator]
     public class SqlInsertGenerator : ISourceGenerator
     {
-        private IEnumerable<string> GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, string primaryKey, NamingPolicy? namingPlicy, DatabaseName database)
+        private IEnumerable<string> GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, string primaryKey, bool ignoreExists, NamingPolicy? namingPlicy, DatabaseName database)
         {
             var body = new List<string>();
             var columns = new List<string>();
@@ -28,6 +28,7 @@ namespace com.etsoo.SourceGenerators
 
             var pKey = primaryKey.ToCase(namingPlicy).DbEscape(database);
             string? idField = null;
+            string? idParameter = null;
 
             var members = context.ParseMembers(tds, true, list, out _);
             if (!context.CancellationToken.IsCancellationRequested)
@@ -67,29 +68,55 @@ namespace com.etsoo.SourceGenerators
                     // Value code
                     var valueCode = attributeData?.GetValue<string?>(valueCodeField);
 
+                    var fieldParameter = $"@{field}";
                     if (columnName.Equals(pKey, StringComparison.OrdinalIgnoreCase))
                     {
                         idField = columnName;
+                        idParameter = fieldParameter;
                     }
 
                     columns.Add(columnName);
-                    values.Add($"@{field}");
+                    values.Add(fieldParameter);
                     body.Add($@"parameters.Add(""{field}"", {valueCode ?? field});");
                 }
             }
 
-            var sql = new StringBuilder($@"INSERT INTO {tableName.DbEscape(database)} ({string.Join(", ", columns)})");
+            var tableNameEscaped = tableName.DbEscape(database);
+            var sql = new StringBuilder($@"INSERT INTO {tableNameEscaped} ({string.Join(", ", columns)})");
             if (database == DatabaseName.SQLServer)
             {
                 sql.Append($@" OUTPUT inserted.{pKey} VALUES ({string.Join(", ", values)})");
+
+                if (ignoreExists && idParameter != null)
+                {
+                    sql.Append($" WHERE NOT EXISTS (SELECT * FROM {tableNameEscaped} WHERE {pKey} = {idParameter})");
+                }
             }
             else if (database == DatabaseName.MySQL)
             {
                 sql.Append($@" VALUES ({string.Join(", ", values)}); {(idField == null ? "; SELECT LAST_INSERT_ID()" : $"SELECT {primaryKey} AS {pKey}")}");
+
+                if (ignoreExists)
+                {
+                    // INSERT = 6
+                    sql.Insert(6, " IGNORE");
+                }
             }
             else if (database == DatabaseName.PostgreSQL || database == DatabaseName.SQLite)
             {
                 sql.Append($@" VALUES ({string.Join(", ", values)}) RETURNING {pKey}");
+
+                if (ignoreExists)
+                {
+                    if (database == DatabaseName.SQLite)
+                    {
+                        sql.Insert(6, " OR IGNORE");
+                    }
+                    else
+                    {
+                        sql.Append($" ON CONFLICT ({pKey}) DO NOTHING");
+                    }
+                }
             }
 
             body.Add($@"sql = ""{sql}"";");
@@ -115,6 +142,7 @@ namespace com.etsoo.SourceGenerators
             }
 
             var primaryKey = attributeData?.GetValue<string?>(nameof(SqlInsertCommandAttribute.PrimaryKey)) ?? "Id";
+            var ignoreExists = attributeData?.GetValue<bool>(nameof(SqlInsertCommandAttribute.IgnoreExists)) ?? false;
 
             var database = (attributeData?.GetValue<DatabaseName>(nameof(SqlInsertCommandAttribute.Database))).GetValueOrDefault();
 
@@ -138,19 +166,19 @@ namespace com.etsoo.SourceGenerators
             var bodies = new Dictionary<DatabaseName, IEnumerable<string>>();
             if (database.HasFlag(DatabaseName.SQLServer))
             {
-                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, primaryKey, namingPolicy, DatabaseName.SQLServer));
+                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLServer));
             }
             if (database.HasFlag(DatabaseName.MySQL))
             {
-                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, primaryKey, namingPolicy, DatabaseName.MySQL));
+                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.MySQL));
             }
             if (database.HasFlag(DatabaseName.PostgreSQL))
             {
-                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, primaryKey, namingPolicy, DatabaseName.PostgreSQL));
+                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.PostgreSQL));
             }
             if (database.HasFlag(DatabaseName.SQLite))
             {
-                bodies.Add(DatabaseName.SQLite, GenerateBody(context, tds, externals, tableName, primaryKey, namingPolicy, DatabaseName.SQLite));
+                bodies.Add(DatabaseName.SQLite, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLite));
             }
 
             var body = bodies.Select((b, index) => @$"
