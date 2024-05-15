@@ -32,6 +32,7 @@ namespace Tests
     }
 
     [SqlInsertCommand("customer", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
+    [AutoDataReaderGenerator]
     public partial record InsertTest
     {
         public required string Name { get; init; }

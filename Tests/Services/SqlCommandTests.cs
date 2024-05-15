@@ -168,5 +168,15 @@ namespace Tests.Services
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(7));
             });
         }
+
+        [Test]
+        public void ParserInnerFieldsTest()
+        {
+            var fields = InsertTest.ParserInnerFields;
+            Assert.Multiple(() =>
+            {
+                Assert.That(fields.ToArray()[1], Is.EqualTo("entityStatus AS Status"));
+            });
+        }
     }
 }

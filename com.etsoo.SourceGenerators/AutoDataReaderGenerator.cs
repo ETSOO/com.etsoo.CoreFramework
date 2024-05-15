@@ -31,6 +31,7 @@ namespace com.etsoo.SourceGenerators
                 var functionName = nameof(SqlSelectColumnAttribute.Function);
 
                 var propertyType = typeof(SqlColumnAttribute);
+                var columnNameName = nameof(SqlColumnAttribute.ColumnName);
                 var ignoreName = nameof(SqlColumnAttribute.Ignore);
 
                 string? lastPrefix = null;
@@ -128,6 +129,8 @@ namespace com.etsoo.SourceGenerators
                         continue;
                     }
 
+                    var columnName = propertyData?.GetValue<string?>(columnNameName) ?? fieldName;
+
                     var prefix = columnAttributeData?.GetValue<string?>(prefixName);
                     if (!string.IsNullOrEmpty(prefix))
                     {
@@ -135,19 +138,26 @@ namespace com.etsoo.SourceGenerators
                     }
 
                     var function = columnAttributeData?.GetValue<string?>(functionName);
+
                     string oneField;
                     if (!string.IsNullOrEmpty(function))
                     {
-                        oneField = $"{function} AS {fieldName}";
-                    }
-                    else if (!string.IsNullOrEmpty(lastPrefix))
-                    {
-                        oneField = $"{lastPrefix}.{fieldName}";
+                        oneField = $"{function} AS {columnName}";
                     }
                     else
                     {
-                        oneField = fieldName;
+                        var columnNameWithPrefix = string.IsNullOrEmpty(lastPrefix) ? columnName : $"{lastPrefix}.{columnName}";
+
+                        if (columnName.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            oneField = columnNameWithPrefix;
+                        }
+                        else
+                        {
+                            oneField = $"{columnNameWithPrefix} AS {fieldName}";
+                        }
                     }
+
                     fields.Add(oneField);
 
                     if (isPositionalRecord)
