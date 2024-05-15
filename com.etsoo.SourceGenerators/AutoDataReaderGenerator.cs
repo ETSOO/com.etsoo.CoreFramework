@@ -30,12 +30,28 @@ namespace com.etsoo.SourceGenerators
                 var prefixName = nameof(SqlSelectColumnAttribute.Prefix);
                 var functionName = nameof(SqlSelectColumnAttribute.Function);
 
+                var propertyType = typeof(SqlColumnAttribute);
+                var ignoreName = nameof(SqlColumnAttribute.Ignore);
+
+                string? lastPrefix = null;
+
                 foreach (var member in members)
                 {
                     var (symbol, typeSymbol, nullable) = member;
 
                     // Ignore static field
                     if (symbol.IsStatic) continue;
+
+                    // Property data
+                    var propertyData = symbol.GetAttributeData(propertyType.FullName);
+
+                    // Ignore it?
+                    var ignore = propertyData?.GetValue<bool?>(ignoreName) ?? false;
+                    if (ignore)
+                        continue;
+
+                    // Column attribute data
+                    var columnAttributeData = symbol.GetAttributeData(columnType.FullName);
 
                     // Object field name
                     var fieldName = symbol.Name;
@@ -45,9 +61,6 @@ namespace com.etsoo.SourceGenerators
 
                     // Attribute data
                     var attributeData = symbol.GetAttributeData(arrayPropertyType.FullName);
-
-                    // Column attribute data
-                    var columnAttributeData = symbol.GetAttributeData(columnType.FullName);
 
                     // Value part
                     string valuePart;
@@ -116,15 +129,20 @@ namespace com.etsoo.SourceGenerators
                     }
 
                     var prefix = columnAttributeData?.GetValue<string?>(prefixName);
+                    if (!string.IsNullOrEmpty(prefix))
+                    {
+                        lastPrefix = prefix;
+                    }
+
                     var function = columnAttributeData?.GetValue<string?>(functionName);
                     string oneField;
                     if (!string.IsNullOrEmpty(function))
                     {
                         oneField = $"{function} AS {fieldName}";
                     }
-                    else if (!string.IsNullOrEmpty(prefix))
+                    else if (!string.IsNullOrEmpty(lastPrefix))
                     {
-                        oneField = $"{prefix}.{fieldName}";
+                        oneField = $"{lastPrefix}.{fieldName}";
                     }
                     else
                     {

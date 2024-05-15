@@ -300,5 +300,34 @@ namespace com.etsoo.SourceGenerators
                 _ => "="
             };
         }
+
+        /// <summary>
+        /// To value code
+        /// 转化为值代码
+        /// </summary>
+        /// <param name="valueCode">Value code</param>
+        /// <param name="field">Current object field</param>
+        /// <returns>Result</returns>
+        public static string? ToValueCode(this string? valueCode, string field)
+        {
+            if (valueCode == null) return valueCode;
+
+            if (valueCode == "{LIKE}")
+            {
+                return $"\"%\" + {field} + \"%\"";
+            }
+            else if (valueCode == "{LIKESTART}")
+            {
+                return $"\"%\" + {field}";
+            }
+            else if (valueCode == "{LIKEEND}")
+            {
+                return $"{field} + \"%\"";
+            }
+            else
+            {
+                return valueCode.Replace("{F}", field);
+            }
+        }
     }
 }

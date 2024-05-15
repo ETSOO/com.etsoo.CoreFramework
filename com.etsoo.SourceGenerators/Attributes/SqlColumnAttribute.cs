@@ -9,10 +9,16 @@ namespace com.etsoo.SourceGenerators.Attributes
     public class SqlColumnAttribute : Attribute
     {
         /// <summary>
-        /// Tabl column name
+        /// Table column name
         /// 表格列名
         /// </summary>
         public string? ColumnName { get; set; }
+
+        /// <summary>
+        /// Table column names
+        /// 表格多列名
+        /// </summary>
+        public string[]? ColumnNames { get; set; }
 
         /// <summary>
         /// Ignore the property

@@ -33,8 +33,10 @@ namespace com.etsoo.SourceGenerators
                 var propertyType = typeof(SqlColumnAttribute);
                 var ignoreName = nameof(SqlColumnAttribute.Ignore);
                 var columnNameField = nameof(SqlColumnAttribute.ColumnName);
+                var columnNamesField = nameof(SqlColumnAttribute.ColumnNames);
                 var keepNullName = nameof(SqlColumnAttribute.KeepNull);
                 var querySignName = nameof(SqlColumnAttribute.QuerySign);
+                var valueCodeField = nameof(SqlColumnAttribute.ValueCode);
 
                 foreach (var member in members)
                 {
@@ -56,6 +58,9 @@ namespace com.etsoo.SourceGenerators
 
                     // Table column name
                     var columnName = (attributeData?.GetValue<string?>(columnNameField) ?? field.ToCase(namingPlicy)).DbEscape(database);
+
+                    // Table column names
+                    var columnNames = attributeData?.GetValues<string>(columnNamesField);
 
                     // Keep null
                     var keepNull = attributeData?.GetValue<bool?>(keepNullName) ?? false;
@@ -97,22 +102,49 @@ namespace com.etsoo.SourceGenerators
                         }
                     }
 
-                    body.Add($@"parameters.Add(""{field}"", {value});");
+                    // Value code
+                    var valueCode = attributeData?.GetValue<string?>(valueCodeField);
+                    if (querySign == SqlQuerySign.Like) valueCode = "{LIKE}";
+                    valueCode = valueCode.ToValueCode(field) ?? value;
 
-                    if (nullable)
+                    body.Add($@"parameters.Add(""{field}"", {valueCode});");
+
+                    if (columnNames?.Any() is true)
                     {
-                        if (keepNull)
+                        var columnNamesSql = string.Join(" OR ", columnNames.Select(c => $"{c.ToCase(namingPlicy).DbEscape(database)} {sign} {cvalue}"));
+                        if (nullable)
                         {
-                            conditions.Add($@"(({cvalueSource} IS NULL AND {columnName} IS NULL) OR {columnName} {sign} {cvalue})");
+                            if (keepNull)
+                            {
+                                conditions.Add($@"(({cvalueSource} IS NULL AND {columnName} IS NULL) OR {columnNamesSql})");
+                            }
+                            else
+                            {
+                                conditions.Add($@"({cvalueSource} IS NULL OR {columnNamesSql})");
+                            }
                         }
                         else
                         {
-                            conditions.Add($@"({cvalueSource} IS NULL OR {columnName} {sign} {cvalue})");
+                            conditions.Add($@"({columnNamesSql})");
                         }
                     }
                     else
                     {
-                        conditions.Add($@"{columnName} {sign} {cvalue}");
+                        if (nullable)
+                        {
+                            if (keepNull)
+                            {
+                                conditions.Add($@"(({cvalueSource} IS NULL AND {columnName} IS NULL) OR {columnName} {sign} {cvalue})");
+                            }
+                            else
+                            {
+                                conditions.Add($@"({cvalueSource} IS NULL OR {columnName} {sign} {cvalue})");
+                            }
+                        }
+                        else
+                        {
+                            conditions.Add($@"{columnName} {sign} {cvalue}");
+                        }
                     }
                 }
             }

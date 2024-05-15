@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Data;
 using System.Linq;
 
@@ -201,6 +202,7 @@ namespace com.etsoo.SourceGenerators
         public static T? GetValue<T>(this AttributeData data, string name)
         {
             var kv = data.NamedArguments.FirstOrDefault(a => a.Key.Equals(name));
+
             var value = kv.Value.Value;
             // kv == default(KeyValuePair<string, TypedConstant>)
             if (kv.Key == null && data.AttributeConstructor != null)
@@ -222,6 +224,48 @@ namespace com.etsoo.SourceGenerators
             }
 
             return (T?)value;
+        }
+
+        private static ImmutableArray<TypedConstant>? GetTypedValues(this AttributeData data, string name)
+        {
+            var kv = data.NamedArguments.FirstOrDefault(a => a.Key.Equals(name));
+            if (kv.Key == null && data.AttributeConstructor != null)
+            {
+                var parameters = data.AttributeConstructor.Parameters;
+                for (var p = 0; p < parameters.Length; p++)
+                {
+                    if (parameters[p].Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return data.ConstructorArguments[p].Values;
+                    }
+                }
+            }
+            else if (kv.Value.Kind == TypedConstantKind.Array)
+            {
+                return kv.Value.Values;
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Get attribute data values
+        /// 获取属性数据字段值数组
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="data">Attribute data</param>
+        /// <param name="name">Field name</param>
+        /// <returns>Field value</returns>
+        public static T[]? GetValues<T>(this AttributeData data, string name)
+        {
+            var values = GetTypedValues(data, name);
+
+            if (values.HasValue)
+            {
+                return values.Value.Where(v => v.Value != null).Select(v => (T)v.Value!).ToArray();
+            }
+
+            return default;
         }
 
         /// <summary>

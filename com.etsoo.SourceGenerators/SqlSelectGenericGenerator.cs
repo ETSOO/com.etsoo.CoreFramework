@@ -33,6 +33,8 @@ namespace com.etsoo.SourceGenerators
             var asNameName = nameof(SqlSelectColumnAttribute.AsName);
             var jsonNameName = nameof(SqlSelectColumnAttribute.JsonName);
 
+            string? lastPrefix = null;
+
             foreach (var member in members)
             {
                 var (symbol, typeSymbol, nullable) = member;
@@ -53,6 +55,10 @@ namespace com.etsoo.SourceGenerators
 
                 // Prefix
                 var prefix = columnAttributeData?.GetValue<string?>(prefixName);
+                if (!string.IsNullOrEmpty(prefix))
+                {
+                    lastPrefix = prefix;
+                }
 
                 // Function
                 var function = columnAttributeData?.GetValue<string?>(functionName);
@@ -97,9 +103,9 @@ namespace com.etsoo.SourceGenerators
                         sqlName = columnName.DbEscape(item.Key);
 
                         // Add prefix
-                        if (!string.IsNullOrEmpty(prefix))
+                        if (!string.IsNullOrEmpty(lastPrefix))
                         {
-                            sqlName = $"{prefix}.{sqlName}";
+                            sqlName = $"{lastPrefix}.{sqlName}";
                         }
                     }
 
@@ -128,11 +134,15 @@ namespace com.etsoo.SourceGenerators
                 var propertyType = typeof(SqlColumnAttribute);
                 var ignoreName = nameof(SqlColumnAttribute.Ignore);
                 var columnNameField = nameof(SqlColumnAttribute.ColumnName);
+                var columnNamesField = nameof(SqlColumnAttribute.ColumnNames);
                 var keepNullName = nameof(SqlColumnAttribute.KeepNull);
                 var querySignName = nameof(SqlColumnAttribute.QuerySign);
+                var valueCodeField = nameof(SqlColumnAttribute.ValueCode);
 
                 var columnType = typeof(SqlSelectColumnAttribute);
                 var prefixName = nameof(SqlSelectColumnAttribute.Prefix);
+
+                string? lastPrefix = null;
 
                 foreach (var member in members)
                 {
@@ -164,6 +174,10 @@ namespace com.etsoo.SourceGenerators
 
                     // Prefix
                     var prefix = columnAttributeData?.GetValue<string?>(prefixName);
+                    if (!string.IsNullOrEmpty(prefix))
+                    {
+                        lastPrefix = prefix;
+                    }
 
                     // Keep null
                     var keepNull = attributeData?.GetValue<bool?>(keepNullName) ?? false;
@@ -204,39 +218,87 @@ namespace com.etsoo.SourceGenerators
                         }
                     }
 
-                    parameters.Add($@"parameters.Add(""{field}"", {value});");
+                    // Value code
+                    var valueCode = attributeData?.GetValue<string?>(valueCodeField);
+                    if (querySign == SqlQuerySign.Like) valueCode = "{LIKE}";
+                    valueCode = valueCode.ToValueCode(field) ?? value;
+
+                    parameters.Add($@"parameters.Add(""{field}"", {valueCode});");
 
                     foreach (var item in conditions)
                     {
                         // Table column name
                         var columnName = (attributeData?.GetValue<string?>(columnNameField) ?? field.ToCase(namingPlicy)).DbEscape(item.Key);
 
-                        // Add prefix
-                        if (!string.IsNullOrEmpty(prefix))
-                        {
-                            columnName = $"{prefix}.{columnName}";
-                        }
+                        // Table column names
+                        var columnNames = attributeData?.GetValues<string>(columnNamesField);
 
-                        if (nullable)
+                        if (columnNames?.Any() is true)
                         {
-                            item.Value.Add($@"
-                            if({field} != null)
-                            {{
-                                conditions.Add(""{columnName} {sign} {cvalue}"");
-                            }}
-                        {(keepNull ? $@"
+                            var columnNamesSql = string.Join(" OR ", columnNames.Select(c =>
+                            {
+                                c = c.ToCase(namingPlicy).DbEscape(database);
+
+                                // Add prefix
+                                if (!string.IsNullOrEmpty(lastPrefix))
+                                {
+                                    c = $"{lastPrefix}.{c}";
+                                }
+
+                                return $"{c} {sign} {cvalue}";
+                            }));
+
+                            if (nullable)
+                            {
+                                item.Value.Add($@"
+                                if({field} != null)
+                                {{
+                                    conditions.Add(""({columnNamesSql})"");
+                                }}
+                                {(keepNull ? $@"
+                                else
+                                {{
+                                    conditions.Add(""{columnName} IS NULL"");
+                                }}
+                                " : "")}
+                                ");
+                            }
                             else
-                            {{
-                                conditions.Add(""{columnName} IS NULL"");
-                            }}
-                        " : "")}
-                        ");
+                            {
+                                item.Value.Add($@"
+                                conditions.Add(""({columnNamesSql})"");
+                                ");
+                            }
                         }
                         else
                         {
-                            item.Value.Add($@"
-                            conditions.Add(""{columnName} {sign} {cvalue}"");
-                        ");
+                            // Add prefix
+                            if (!string.IsNullOrEmpty(lastPrefix))
+                            {
+                                columnName = $"{lastPrefix}.{columnName}";
+                            }
+
+                            if (nullable)
+                            {
+                                item.Value.Add($@"
+                                if({field} != null)
+                                {{
+                                    conditions.Add(""{columnName} {sign} {cvalue}"");
+                                }}
+                                {(keepNull ? $@"
+                                else
+                                {{
+                                    conditions.Add(""{columnName} IS NULL"");
+                                }}
+                                " : "")}
+                                ");
+                            }
+                            else
+                            {
+                                item.Value.Add($@"
+                                conditions.Add(""{columnName} {sign} {cvalue}"");
+                                ");
+                            }
                         }
                     }
                 }

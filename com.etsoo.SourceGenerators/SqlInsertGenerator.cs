@@ -66,7 +66,7 @@ namespace com.etsoo.SourceGenerators
                     }
 
                     // Value code
-                    var valueCode = attributeData?.GetValue<string?>(valueCodeField);
+                    var valueCode = attributeData?.GetValue<string?>(valueCodeField).ToValueCode(field) ?? field;
 
                     var fieldParameter = $"@{field}";
                     if (columnName.Equals(pKey, StringComparison.OrdinalIgnoreCase))
@@ -77,7 +77,7 @@ namespace com.etsoo.SourceGenerators
 
                     columns.Add(columnName);
                     values.Add(fieldParameter);
-                    body.Add($@"parameters.Add(""{field}"", {valueCode ?? field});");
+                    body.Add($@"parameters.Add(""{field}"", {valueCode});");
                 }
             }
 

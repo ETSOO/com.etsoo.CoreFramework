@@ -106,6 +106,18 @@ namespace Tests
         public IEnumerable<int>? Ranges { get; init; }
     }
 
+    [SqlSelectCommand("User", NamingPolicy.SnakeCase, Database = DatabaseName.SQLite)]
+    public partial record SelectTestMore
+    {
+        public int? Id { get; init; }
+
+        [SqlColumn(QuerySign = SqlQuerySign.Like, ColumnNames = ["Name", "Description"])]
+        public string? Name { get; init; }
+
+        [SqlColumn(QuerySign = SqlQuerySign.Like, ValueCode = "{LIKEEND}")]
+        public string? Cid { get; init; }
+    }
+
     public interface ISelectResult
     {
         int Id { get; }
