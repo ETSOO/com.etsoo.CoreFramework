@@ -425,10 +425,11 @@ namespace com.etsoo.SourceGenerators
                             /// 创建 SQL选择命令
                             /// </summary>
                             /// <param name=""db"">Database</param>
+                            /// <param name=""conditionDelegate"">Query condition delegate</param>
                             /// <returns>Sql command text and parameters</returns>
-                            public (string, IDbParameters) CreateSqlSelect(IDatabase db)
+                            public (string, IDbParameters) CreateSqlSelect(IDatabase db, SqlConditionDelegate? conditionDelegate = null)
                             {{
-                                var (sql, parameters) = obj.CreateCommand(db, allFields[db.Name]);
+                                var (sql, parameters) = obj.CreateCommand(db, allFields[db.Name], conditionDelegate);
                                 return (sql.ToString(), parameters);
                             }}
 
@@ -438,11 +439,12 @@ namespace com.etsoo.SourceGenerators
                             /// </summary>
                             /// <param name=""db"">Database</param>
                             /// <param name=""callback"">Callback before execution</param>
+                            /// <param name=""conditionDelegate"">Query condition delegate</param>
                             /// <param name=""cancellationToken"">Cancellation token</param>
                             /// <returns>Result</returns>
-                            public async Task<{fullName}[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default)
+                            public async Task<{fullName}[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, SqlConditionDelegate? conditionDelegate = null, CancellationToken cancellationToken = default)
                             {{
-                                var (sql, parameters) = CreateSqlSelect(db);
+                                var (sql, parameters) = CreateSqlSelect(db, conditionDelegate);
                                 callback?.Invoke(sql, parameters);
                                 var command = db.CreateCommand(sql, parameters, CommandType.Text, cancellationToken);
                                 return {(isInherit ? $"await db.QueryListAsync<{fullName}>(command)" : $"(await db.QueryAsync<{fullName}>(command)).ToArray()")};
@@ -453,10 +455,11 @@ namespace com.etsoo.SourceGenerators
                             /// 创建 SQL选择为JSON命令
                             /// </summary>
                             /// <param name=""db"">Database</param>
+                            /// <param name=""conditionDelegate"">Query condition delegate</param>
                             /// <returns>Sql command text and parameters</returns>
-                            public (string, IDbParameters) CreateSqlSelectJson(IDatabase db)
+                            public (string, IDbParameters) CreateSqlSelectJson(IDatabase db, SqlConditionDelegate? conditionDelegate = null)
                             {{
-                                var (sql, parameters) = obj.CreateCommand(db, allFields[db.Name]);
+                                var (sql, parameters) = obj.CreateCommand(db, allFields[db.Name], conditionDelegate);
 
                                 // Sub query, otherwise Sqlite 'order by' fails
                                 sql.Insert(0, $""SELECT {{allJsonFields[db.Name]}} FROM ("");
@@ -530,7 +533,7 @@ namespace com.etsoo.SourceGenerators
                         public IDefaultClass Default => new DefaultClass(this);
 
                         {pagingDataPart}
-                        private (StringBuilder, IDbParameters) CreateCommand(IDatabase db, string fields)
+                        private (StringBuilder, IDbParameters) CreateCommand(IDatabase db, string fields, SqlConditionDelegate? conditionDelegate)
                         {{
                             var parameters = new DbParameters();
                             var conditions = new List<string>();
@@ -551,6 +554,9 @@ namespace com.etsoo.SourceGenerators
                             sql.Append(fields);
 
                             sql.Append($"" FROM {{tableNames[db.Name]}}"");
+
+                            // Condition delegate
+                            conditionDelegate?.Invoke(conditions);
 
                             if (conditions.Count > 0)
                             {{

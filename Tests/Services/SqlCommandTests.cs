@@ -133,6 +133,42 @@ namespace Tests.Services
             });
         }
 
+        private void AddEnabledCondition(List<string> conditions, bool? enabled)
+        {
+            if (!enabled.HasValue) return;
+
+            if (enabled.Value)
+            {
+                conditions.Add("status < 200");
+            }
+            else
+            {
+                conditions.Add("status >= 200");
+            }
+        }
+
+        public void SelectModelTestMoreEnabledTrue()
+        {
+            var model = new SelectTestMore { Id = 1, Name = "Name", Cid = "ABC", Enabled = true };
+            var result = model.CreateSqlSelect(db, ["Id", "Name"], (conditions) => AddEnabledCondition(conditions, model.Enabled));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\" FROM \"User\" WHERE \"id\" = @Id AND (\"name\" LIKE @Name OR \"description\" LIKE @Name) AND \"cid\" LIKE @Cid AND status < 200"));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(3));
+            });
+        }
+
+        public void SelectModelTestMoreEnabledFalse()
+        {
+            var model = new SelectTestMore { Id = 1, Name = "Name", Cid = "ABC", Enabled = false };
+            var result = model.CreateSqlSelect(db, ["Id", "Name"], (conditions) => AddEnabledCondition(conditions, model.Enabled));
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\" FROM \"User\" WHERE \"id\" = @Id AND (\"name\" LIKE @Name OR \"description\" LIKE @Name) AND \"cid\" LIKE @Cid AND status >= 200"));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(3));
+            });
+        }
+
         [Test]
         public void SelectJsonModelTest()
         {

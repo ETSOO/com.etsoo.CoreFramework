@@ -25,16 +25,18 @@
         /// 创建SQL选择命令
         /// </summary>
         /// <param name="db">Database</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <returns>Sql command text and parameters</returns>
-        (string, IDbParameters) CreateSqlSelect(IDatabase db);
+        (string, IDbParameters) CreateSqlSelect(IDatabase db, SqlConditionDelegate? conditionDelegate = null);
 
         /// <summary>
         /// Create SQL select as JSON command
         /// 创建SQL选择为JSON命令
         /// </summary>
         /// <param name="db">Database</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <returns>Sql command text and parameters</returns>
-        (string, IDbParameters) CreateSqlSelectJson(IDatabase db);
+        (string, IDbParameters) CreateSqlSelectJson(IDatabase db, SqlConditionDelegate? conditionDelegate = null);
 
         /// <summary>
         /// Do SQL select command
@@ -42,8 +44,9 @@
         /// </summary>
         /// <param name="db">Database</param>
         /// <param name="callback">Callback before execution</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<D[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default);
+        Task<D[]> DoSqlSelectAsync(IDatabase db, SqlCommandDelegate? callback = null, SqlConditionDelegate? conditionDelegate = null, CancellationToken cancellationToken = default);
     }
 }

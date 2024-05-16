@@ -18,8 +18,9 @@
         /// </summary>
         /// <param name="db">Database</param>
         /// <param name="fields">Fields to select</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <returns>Result</returns>
-        (string, IDbParameters) CreateSqlSelect(IDatabase db, IEnumerable<string> fields);
+        (string, IDbParameters) CreateSqlSelect(IDatabase db, IEnumerable<string> fields, SqlConditionDelegate? conditionDelegate = null);
 
         /// <summary>
         /// Create SQL select as JSON command
@@ -28,8 +29,9 @@
         /// <param name="db">Database</param>
         /// <param name="fields">Fields to select</param>
         /// <param name="mappingDelegate">Query fields mapping delegate</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <returns>Result</returns>
-        (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields, SqlMappingDelegate? mappingDelegate = null);
+        (string, IDbParameters) CreateSqlSelectJson(IDatabase db, IEnumerable<string> fields, SqlMappingDelegate? mappingDelegate = null, SqlConditionDelegate? conditionDelegate = null);
 
         /// <summary>
         /// Do SQL select
@@ -38,9 +40,10 @@
         /// <typeparam name="D">Generic selected data type</typeparam>
         /// <param name="db">Database</param>
         /// <param name="callback">Callback before execution</param>
+        /// <param name="conditionDelegate">Query condition delegate</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        Task<D[]> DoSqlSelectAsync<D>(IDatabase db, SqlCommandDelegate? callback = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
+        Task<D[]> DoSqlSelectAsync<D>(IDatabase db, SqlCommandDelegate? callback = null, SqlConditionDelegate? conditionDelegate = null, CancellationToken cancellationToken = default) where D : IDataReaderParser<D>;
 
     }
 }

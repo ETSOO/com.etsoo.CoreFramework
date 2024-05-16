@@ -117,6 +117,9 @@ namespace Tests
 
         [SqlColumn(QuerySign = SqlQuerySign.Like, ValueCode = "{LIKEEND}")]
         public string? Cid { get; init; }
+
+        [SqlColumn(Ignore = true)]
+        public bool? Enabled { get; init; }
     }
 
     public interface ISelectResult
