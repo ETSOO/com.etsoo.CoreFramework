@@ -12,12 +12,12 @@ namespace com.etsoo.CoreFramework.Models
         /// Search keyword
         /// 查询关键词
         /// </summary>
-        public abstract string Keyword { get; set; }
+        public abstract string? Keyword { get; set; }
 
         /// <summary>
         /// Query paging data
         /// 查询分页数据
         /// </summary>
-        public QueryPagingData QueryPaging { get; } = new();
+        public QueryPagingData QueryPaging { get; set; } = new();
     }
 }
