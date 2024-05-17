@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Business;
-using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
@@ -202,9 +201,7 @@ namespace Tests.Services
         public async Task ListAsyn_ModelTest()
         {
             // Arrange
-            var rq = new TiplistRQ<int>() { Items = 2 };
-            var parameters = rq.AsParameters(app);
-            parameters.ClearNulls();
+            var parameters = new DbParameters();
             var command = new CommandDefinition("ep_user_list_as_json", parameters, commandType: CommandType.StoredProcedure);
 
             using var stream = SharedUtils.GetStream();
