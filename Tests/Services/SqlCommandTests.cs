@@ -182,6 +182,18 @@ namespace Tests.Services
         }
 
         [Test]
+        public void SqlUserTiplistTest()
+        {
+            var model = new SqlUserTiplist { Id = 1, ExcludedIds = [2, 4, 8], Keyword = "ABC" };
+            var result = model.CreateSqlSelectJson(db, ["id", "name AS label"]);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("SELECT json_group_array(json_object('id', id, 'label', label)) FROM (SELECT \"id\", name AS \"label\" FROM \"User\" WHERE \"id\" = @Id AND \"id\" NOT IN (2,4,8) AND \"name\" LIKE @Keyword LIMIT 10)"));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(3));
+            });
+        }
+
+        [Test]
         public void SelectGenericModelTest()
         {
             var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = "Name ASC, Id DESC" } };

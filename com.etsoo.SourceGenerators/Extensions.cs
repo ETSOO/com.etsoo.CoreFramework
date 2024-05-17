@@ -348,8 +348,8 @@ namespace com.etsoo.SourceGenerators
                 isPositionalRecord = false;
                 foreach (var member in tds.Members)
                 {
-                    // Only public
-                    if (!member.HasToken(SyntaxKind.PublicKeyword))
+                    // Only public but not abstract members
+                    if (!member.HasToken(SyntaxKind.PublicKeyword) || member.HasToken(SyntaxKind.AbstractKeyword))
                     {
                         continue;
                     }
@@ -493,7 +493,7 @@ namespace com.etsoo.SourceGenerators
             foreach (var member in members)
             {
                 // Public properties only
-                if (member.DeclaredAccessibility != Accessibility.Public) continue;
+                if (member.DeclaredAccessibility != Accessibility.Public || member.IsAbstract) continue;
 
                 if (member is IPropertySymbol pSymbol && ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly)))
                 {

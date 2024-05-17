@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Business;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.SourceGenerators;
 using com.etsoo.SourceGenerators.Attributes;
 
@@ -25,6 +26,18 @@ namespace Tests.Services
     internal partial record SqlUserSelect
     {
         public int Id { get; init; }
+    }
+
+    [SqlSelectCommand("User", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
+    internal partial record SqlUserTiplist : TiplistRQ
+    {
+        public int? Id { get; init; }
+
+        [SqlColumn(ColumnName = "id", QuerySign = SqlQuerySign.NotEqual)]
+        public IEnumerable<int>? ExcludedIds { get; init; }
+
+        [SqlColumn(ColumnName = "name", QuerySign = SqlQuerySign.Like)]
+        public override string? Keyword { get; set; }
     }
 
     [AutoDataReaderGenerator(UtcDateTime = true)]
