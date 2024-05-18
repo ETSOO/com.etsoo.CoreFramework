@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Services;
+using com.etsoo.Utils.Actions;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
@@ -7,9 +8,18 @@ namespace com.etsoo.CoreFramework.Models
     /// Model common JSON serializer context
     /// 通用模型 JSON 序列化器上下文
     /// </summary>
-    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
+    [JsonSourceGenerationOptions(
+        PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+        DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    )]
+
+    [JsonSerializable(typeof(ActionResult))]
     [JsonSerializable(typeof(ChangePasswordDto))]
     [JsonSerializable(typeof(ChangePasswordRQ))]
+    [JsonSerializable(typeof(DateTime))]
+    [JsonSerializable(typeof(DateTimeOffset))]
     [JsonSerializable(typeof(ExchangeTokenRQ))]
     [JsonSerializable(typeof(ErrorLogData))]
     [JsonSerializable(typeof(IEnumerable<IdNameItem>))]

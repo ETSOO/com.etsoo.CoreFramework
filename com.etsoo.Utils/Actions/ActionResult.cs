@@ -4,6 +4,7 @@ using System.Buffers;
 using System.Collections;
 using System.Data.Common;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -360,6 +361,18 @@ namespace com.etsoo.Utils.Actions
 
             // Flush & dispose
             await w.DisposeAsync();
+        }
+
+        /// <summary>
+        /// To Json
+        /// 转化为 Json
+        /// </summary>
+        /// <param name="utf8Stream">Stream to writer</param>
+        /// <param name="typeInfo">JSON type info</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public async Task ToJsonAsync(Stream utf8Stream, JsonTypeInfo<ActionResult> typeInfo, CancellationToken cancellationToken = default)
+        {
+            await JsonSerializer.SerializeAsync(utf8Stream, this, typeInfo, cancellationToken);
         }
     }
 }
