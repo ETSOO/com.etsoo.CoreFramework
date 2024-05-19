@@ -3,7 +3,7 @@ using com.etsoo.Utils;
 using NUnit.Framework;
 using System.Text;
 
-namespace Tests.Web
+namespace Tests.PureIO
 {
     [TestFixture]
     public class PureStreamReaderTests

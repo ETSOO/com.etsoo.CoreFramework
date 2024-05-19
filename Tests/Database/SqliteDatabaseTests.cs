@@ -3,7 +3,7 @@ using com.etsoo.Utils;
 using Dapper;
 using NUnit.Framework;
 
-namespace Tests.Utils
+namespace Tests.Database
 {
     [TestFixture]
     public class SqliteDatabaseTests
@@ -45,6 +45,34 @@ namespace Tests.Utils
                 await using var connection = db.NewConnection();
                 await connection.OpenAsync();
                 await connection.CloseAsync();
+            });
+        }
+
+        [Test]
+        public void JoinJsonFieldsBoolTest()
+        {
+            var mapping = new Dictionary<string, string>();
+            var result = db.JoinJsonFields(["u.Id", "u.Shared:boolean"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
+            var json = db.JoinJsonFields(mapping, true);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.EqualTo("u.\"id\", u.\"shared\""));
+                Assert.That(mapping, Does.ContainKey("shared").WithValue("shared:boolean"));
+                Assert.That(json, Is.EqualTo("json_object('id', id, 'shared', json(IIF(shared, 'true', 'false')))"));
+            });
+        }
+
+        [Test]
+        public void JoinJsonFieldsEqualTest()
+        {
+            var mapping = new Dictionary<string, string>();
+            var result = db.JoinJsonFields(["Author", "IIF(u.id = @UserId, TRUE, FALSE):boolean AS isSelf"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
+            var json = db.JoinJsonFields(mapping, false);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.EqualTo("\"author\", IIF(u.id = @UserId, TRUE, FALSE) AS \"isSelf\""));
+                Assert.That(mapping, Does.ContainKey("isSelf").WithValue("isSelf:boolean"));
+                Assert.That(json, Is.EqualTo("json_group_array(json_object('author', author, 'isSelf', json(IIF(isSelf, 'true', 'false'))))"));
             });
         }
 

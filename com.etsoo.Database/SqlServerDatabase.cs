@@ -153,6 +153,23 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Do field suffix
+        /// 处理字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        {
+            if (field.StartsWith("IIF("))
+            {
+                // Format: IIF(CONDITION, TRUE, FALSE)
+                field = $"CAST({field.Replace("TRUE", "1").Replace("FALSE", "0")} AS bit)";
+            }
+
+            suffix = string.Empty;
+        }
+
+        /// <summary>
         /// Join JSON fields
         /// 链接JSON字段
         /// </summary>

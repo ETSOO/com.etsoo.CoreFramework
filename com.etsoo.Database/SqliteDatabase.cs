@@ -47,6 +47,16 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Do field suffix
+        /// 处理字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        {
+        }
+
+        /// <summary>
         /// Join JSON fields
         /// 链接JSON字段
         /// </summary>
@@ -55,7 +65,24 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public override string JoinJsonFields(Dictionary<string, string> mappings, bool isObject)
         {
-            var items = mappings.SelectMany(m => new[] { $"'{m.Key}'", m.Value }).ToList();
+            var items = mappings.SelectMany(m =>
+            {
+                var v = m.Value;
+                if (v.EndsWith(BooleanSuffix))
+                {
+                    v = v[..^BooleanSuffix.Length];
+                    if (v.StartsWith("IIF("))
+                    {
+                        v = v.Replace("TRUE", "'true'").Replace("FALSE", "'false'");
+                        v = $"json({v})";
+                    }
+                    else
+                    {
+                        v = SqliteUtils.ToJsonBool(v);
+                    }
+                }
+                return new[] { $"'{m.Key}'", v };
+            }).ToList();
             var command = $"json_object({string.Join(", ", items)})";
 
             if (isObject)

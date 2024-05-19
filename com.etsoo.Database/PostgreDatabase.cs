@@ -46,6 +46,18 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Do field suffix
+        /// 处理字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        {
+            field = PostgreUtils.ConvertIIFToCaseWhen(field);
+            suffix = string.Empty;
+        }
+
+        /// <summary>
         /// Join JSON fields
         /// 链接JSON字段
         /// </summary>

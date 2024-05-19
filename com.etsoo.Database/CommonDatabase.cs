@@ -16,6 +16,12 @@ namespace com.etsoo.Database
     public abstract class CommonDatabase<C> : IDatabase<C> where C : DbConnection
     {
         /// <summary>
+        /// Boolean suffix
+        /// 逻辑值后缀
+        /// </summary>
+        protected const string BooleanSuffix = ":boolean";
+
+        /// <summary>
         /// Database name
         /// 数据库名称
         /// </summary>
@@ -214,7 +220,21 @@ namespace com.etsoo.Database
                 string sField;
                 string dbField;
                 string result;
+                string suffix;
+
                 var (field, alias) = DatabaseUtils.SplitField(item);
+
+                if (field.EndsWith(BooleanSuffix))
+                {
+                    suffix = BooleanSuffix;
+                    field = field[..^BooleanSuffix.Length];
+                    DoFieldSuffix(ref field, ref suffix);
+                }
+                else
+                {
+                    suffix = string.Empty;
+                }
+
                 if (string.IsNullOrEmpty(alias))
                 {
                     // Field maybe is "Name" or "u.Name"
@@ -251,13 +271,21 @@ namespace com.etsoo.Database
                 }
 
                 var jsonField = (jsonPolicy == null || jsonPolicy == policy) ? dbField : sField.ToNamingCase(jsonPolicy);
-                mappings[jsonField] = dbField;
+                mappings[jsonField] = dbField + suffix;
 
                 return result;
             });
 
             return string.Join(", ", formatted);
         }
+
+        /// <summary>
+        /// Do field suffix
+        /// 处理字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected abstract void DoFieldSuffix(ref string field, ref string suffix);
 
         /// <summary>
         /// Join JSON fields

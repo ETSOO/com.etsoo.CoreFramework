@@ -246,6 +246,29 @@ namespace Tests.Services
         }
 
         [Test]
+        public async Task ReadToStreamAsync_JoinFields_Test()
+        {
+            // Arrange
+            var mapping = new Dictionary<string, string>();
+            var fields = db.JoinJsonFields(["Id", "IIF(Name = 'Admin 2', TRUE, FALSE):boolean AS isAdmin2"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
+            var jsonSql = db.JoinJsonFields(mapping, false);
+
+            var sql = $"SELECT {jsonSql} FROM (SELECT {fields} FROM User LIMIT 3)";
+            var command = new CommandDefinition(sql);
+            using var stream = SharedUtils.GetStream();
+
+            // Act
+            var result = await service.ReadToStreamAsync(command, stream);
+            var json = Encoding.UTF8.GetString(stream.ToArray());
+
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(json, Is.EqualTo("[{\"id\":1001,\"isAdmin2\":false},{\"id\":1002,\"isAdmin2\":true}]"));
+            });
+        }
+
+        [Test]
         public async Task ReadToStreamMultipleResultsAsync_Test()
         {
             // Arrange
