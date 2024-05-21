@@ -253,7 +253,7 @@ namespace Tests.Services
             var fields = db.JoinJsonFields(["Id", "IIF(Name = 'Admin 2', TRUE, FALSE):boolean AS isAdmin2"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
             var jsonSql = db.JoinJsonFields(mapping, false);
 
-            var sql = $"SELECT {jsonSql} FROM (SELECT {fields} FROM User LIMIT 3)";
+            var sql = $"SELECT {jsonSql} FROM (SELECT {fields} FROM User LIMIT 2)";
             var command = new CommandDefinition(sql);
             using var stream = SharedUtils.GetStream();
 

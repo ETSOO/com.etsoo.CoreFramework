@@ -63,6 +63,20 @@ namespace Tests.Database
         }
 
         [Test]
+        public void JoinJsonFieldsJsonTest()
+        {
+            var mapping = new Dictionary<string, string>();
+            var result = db.JoinJsonFields(["u.Id", "u.JsonData:json"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
+            var json = db.JoinJsonFields(mapping, true);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.EqualTo("u.\"id\", u.\"jsonData\""));
+                Assert.That(mapping, Does.ContainKey("jsonData").WithValue("jsonData:json"));
+                Assert.That(json, Is.EqualTo("json_object('id', id, 'jsonData', json(jsonData))"));
+            });
+        }
+
+        [Test]
         public void JoinJsonFieldsEqualTest()
         {
             var mapping = new Dictionary<string, string>();

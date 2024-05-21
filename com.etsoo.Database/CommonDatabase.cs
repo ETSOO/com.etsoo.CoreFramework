@@ -22,6 +22,12 @@ namespace com.etsoo.Database
         protected const string BooleanSuffix = ":boolean";
 
         /// <summary>
+        /// JSON suffix
+        /// JSON值后缀
+        /// </summary>
+        protected const string JsonSuffix = ":json";
+
+        /// <summary>
         /// Database name
         /// 数据库名称
         /// </summary>
@@ -228,7 +234,13 @@ namespace com.etsoo.Database
                 {
                     suffix = BooleanSuffix;
                     field = field[..^BooleanSuffix.Length];
-                    DoFieldSuffix(ref field, ref suffix);
+                    DoBoolFieldSuffix(ref field, ref suffix);
+                }
+                else if (field.EndsWith(JsonSuffix))
+                {
+                    suffix = JsonSuffix;
+                    field = field[..^JsonSuffix.Length];
+                    DoJsonFieldSuffix(ref field, ref suffix);
                 }
                 else
                 {
@@ -280,12 +292,20 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// Do field suffix
-        /// 处理字段后缀
+        /// Do boolean field suffix
+        /// 处理逻辑字段后缀
         /// </summary>
         /// <param name="field">Select field</param>
         /// <param name="suffix">Suffix</param>
-        protected abstract void DoFieldSuffix(ref string field, ref string suffix);
+        protected abstract void DoBoolFieldSuffix(ref string field, ref string suffix);
+
+        /// <summary>
+        /// Do JSON field suffix
+        /// 处理JSON字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected abstract void DoJsonFieldSuffix(ref string field, ref string suffix);
 
         /// <summary>
         /// Join JSON fields

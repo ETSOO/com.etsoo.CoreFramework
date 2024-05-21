@@ -113,8 +113,6 @@ namespace com.etsoo.Database
             return new DbExceptionResult(DbExceptionType.DataProcessingFailed, false);
         }
 
-
-
         /// <summary>
         /// Guid items to parameters
         /// 转换Guid项目为TVP参数
@@ -153,12 +151,12 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// Do field suffix
-        /// 处理字段后缀
+        /// Do boolean field suffix
+        /// 处理逻辑字段后缀
         /// </summary>
         /// <param name="field">Select field</param>
         /// <param name="suffix">Suffix</param>
-        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        protected override void DoBoolFieldSuffix(ref string field, ref string suffix)
         {
             if (field.StartsWith("IIF("))
             {
@@ -167,6 +165,16 @@ namespace com.etsoo.Database
             }
 
             suffix = string.Empty;
+        }
+
+        /// <summary>
+        /// Do JSON field suffix
+        /// 处理JSON字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoJsonFieldSuffix(ref string field, ref string suffix)
+        {
         }
 
         /// <summary>
@@ -181,7 +189,13 @@ namespace com.etsoo.Database
             var items = new List<string>();
             foreach (var (key, value) in mappings)
             {
-                if (value.Equals(key))
+                if (value.EndsWith(JsonSuffix))
+                {
+                    var v = value[..^JsonSuffix.Length];
+                    v = $"JSON_QUERY({v})";
+                    items.Add($"{v} AS {EscapeIdentifier(key)}");
+                }
+                else if (value.Equals(key))
                 {
                     items.Add(key);
                 }

@@ -47,12 +47,22 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// Do field suffix
-        /// 处理字段后缀
+        /// Do boolean field suffix
+        /// 处理逻辑字段后缀
         /// </summary>
         /// <param name="field">Select field</param>
         /// <param name="suffix">Suffix</param>
-        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        protected override void DoBoolFieldSuffix(ref string field, ref string suffix)
+        {
+        }
+
+        /// <summary>
+        /// Do JSON field suffix
+        /// 处理JSON字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoJsonFieldSuffix(ref string field, ref string suffix)
         {
         }
 
@@ -81,8 +91,14 @@ namespace com.etsoo.Database
                         v = SqliteUtils.ToJsonBool(v);
                     }
                 }
+                else if (v.EndsWith(JsonSuffix))
+                {
+                    v = v[..^JsonSuffix.Length];
+                    v = $"json({v})";
+                }
                 return new[] { $"'{m.Key}'", v };
             }).ToList();
+
             var command = $"json_object({string.Join(", ", items)})";
 
             if (isObject)

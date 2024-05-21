@@ -58,14 +58,26 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// Do field suffix
-        /// 处理字段后缀
+        /// Do boolean field suffix
+        /// 处理逻辑字段后缀
         /// </summary>
         /// <param name="field">Select field</param>
         /// <param name="suffix">Suffix</param>
-        protected override void DoFieldSuffix(ref string field, ref string suffix)
+        protected override void DoBoolFieldSuffix(ref string field, ref string suffix)
         {
             field = field.Replace("IIF(", "IF(");
+        }
+
+        /// <summary>
+        /// Do JSON field suffix
+        /// 处理JSON字段后缀
+        /// </summary>
+        /// <param name="field">Select field</param>
+        /// <param name="suffix">Suffix</param>
+        protected override void DoJsonFieldSuffix(ref string field, ref string suffix)
+        {
+            // When the field type is "JSON", no need to add suffix
+            suffix = string.Empty;
         }
 
         /// <summary>
