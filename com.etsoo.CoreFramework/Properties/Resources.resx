@@ -219,6 +219,9 @@
   <data name="OutOfMemory" xml:space="preserve">
     <value>Out Of Memory</value>
   </data>
+  <data name="SchemaValidationError" xml:space="preserve">
+    <value>Schema Validation Error</value>
+  </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>Your token has expired</value>
   </data>

@@ -231,6 +231,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError OutOfMemory => new(nameof(OutOfMemory), Resources.OutOfMemory);
 
         /// <summary>
+        /// Schema validation error
+        /// 模式验证错误
+        /// </summary>
+        public static ApplicationError SchemaValidationError => new(nameof(SchemaValidationError), Resources.SchemaValidationError);
+
+        /// <summary>
         /// User name and password do not match error
         /// 您的令牌已过期错误
         /// </summary>

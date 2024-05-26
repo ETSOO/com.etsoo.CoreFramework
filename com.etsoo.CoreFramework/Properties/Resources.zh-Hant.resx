@@ -219,6 +219,9 @@
   <data name="OutOfMemory" xml:space="preserve">
     <value>內存不足</value>
   </data>
+  <data name="SchemaValidationError" xml:space="preserve">
+    <value>模式驗證錯誤</value>
+  </data>
   <data name="TokenExpired" xml:space="preserve">
     <value>您的令牌已過期</value>
   </data>

@@ -367,6 +367,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Schema Validation Error.
+        /// </summary>
+        public static string SchemaValidationError {
+            get {
+                return ResourceManager.GetString("SchemaValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your token has expired.
         /// </summary>
         public static string TokenExpired {
