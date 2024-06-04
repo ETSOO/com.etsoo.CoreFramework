@@ -6,6 +6,7 @@ namespace com.etsoo.CoreFramework.Json
     /// Email template schema
     /// 邮件模板模式
     /// </summary>
+    /// <see cref="Models.EmailTemplateDto"/>
     public static class EmailTemplateSchema
     {
         /// <summary>
@@ -36,6 +37,9 @@ namespace com.etsoo.CoreFramework.Json
                         .Type(SchemaValueType.Array)
                         .Format("email")
                         .UniqueItems(true)
+                    ),
+                    ("successMessage", new JsonSchemaBuilder()
+                        .Type(SchemaValueType.String)
                     )
                 )
                 .Required("subject", "template")

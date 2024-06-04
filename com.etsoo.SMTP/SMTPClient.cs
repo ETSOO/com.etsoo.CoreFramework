@@ -55,20 +55,9 @@ namespace com.etsoo.SMTP
             }
 
             // Default recipients
-            if (Options.To != null)
-            {
-                message.To.AddRange(Options.To.Select(item => MailboxAddress.Parse(item)));
-            }
-
-            if (Options.Cc != null)
-            {
-                message.Cc.AddRange(Options.Cc.Select(item => MailboxAddress.Parse(item)));
-            }
-
-            if (Options.Bcc != null)
-            {
-                message.Bcc.AddRange(Options.Bcc.Select(item => MailboxAddress.Parse(item)));
-            }
+            message.To.AddRange(Options.To);
+            message.Cc.AddRange(Options.Cc);
+            message.Bcc.AddRange(Options.Bcc);
 
             if (message.To.Count == 0)
             {

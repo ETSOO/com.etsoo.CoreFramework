@@ -113,7 +113,7 @@ namespace Tests.CoreFramework
             {
                 Subject = "Test",
                 Template = "Test",
-                Cc = ["info@etsoo.com", "sales@etsoo.com"]
+                Cc = ["info@etsoo.com", "ETSOO Sales <sales@etsoo.com>"]
             };
 
             var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);

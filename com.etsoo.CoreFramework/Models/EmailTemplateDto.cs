@@ -35,5 +35,11 @@
         /// 密送
         /// </summary>
         public IEnumerable<string>? Bcc { get; init; }
+
+        /// <summary>
+        /// Success message
+        /// 成功消息
+        /// </summary>
+        public string? SuccessMessage { get; init; }
     }
 }
