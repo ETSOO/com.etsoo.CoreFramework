@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Json;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.Utils;
 using NUnit.Framework;
 using System.Text.Json;
@@ -93,6 +94,55 @@ namespace Tests.CoreFramework
                     }
                 ]
             }]";
+            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+
+            // Act
+            var result = schema.Evaluate(json);
+
+            // Assert
+            Assert.That(result.IsValid, Is.False);
+        }
+
+        [Test]
+        public async Task EmailTemplateSchemaSuccessTest()
+        {
+            // Arrange
+            var schema = EmailTemplateSchema.Create();
+
+            var template = new EmailTemplateDto
+            {
+                Subject = "Test",
+                Template = "Test",
+                Cc = ["info@etsoo.com", "sales@etsoo.com"]
+            };
+
+            var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);
+
+            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+
+            // Act
+            var result = schema.Evaluate(json);
+
+            // Assert
+            Assert.That(result.IsValid, Is.True);
+        }
+
+        [Test]
+        public async Task EmailTemplateSchemaDuplicateCcFailedTest()
+        {
+            // Arrange
+            var schema = EmailTemplateSchema.Create();
+
+            var template = new EmailTemplateDto
+            {
+                Subject = "Test",
+                Template = "Test",
+                IsRazor = true,
+                Cc = ["info@etsoo.com", "info@etsoo.com"]
+            };
+
+            var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);
+
             var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
 
             // Act

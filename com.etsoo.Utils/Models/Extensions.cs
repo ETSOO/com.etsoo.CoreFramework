@@ -13,9 +13,9 @@
         /// <typeparam name="T">Generic item type</typeparam>
         /// <param name="list">List</param>
         /// <returns>Result</returns>
-        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> list)
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> list)
         {
-            return list.Where(x => x != null)!;
+            return list.Where(x => x != null);
         }
     }
 }

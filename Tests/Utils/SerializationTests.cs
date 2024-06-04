@@ -272,12 +272,11 @@ namespace Tests.Utils
             var intArray = doc.RootElement.GetProperty("intArray").GetArray<int>();
             Assert.Multiple(() =>
             {
-                Assert.That(intArray.Count(), Is.EqualTo(4));
+                Assert.That(intArray.Count(), Is.EqualTo(2));
                 Assert.That(intArray.First(), Is.EqualTo(1));
-                Assert.That(intArray.ElementAt(2), Is.Null);
             });
 
-            var intArrayNotNull = doc.RootElement.GetProperty("intArray").GetArray<int>(true).WhereNotNull();
+            var intArrayNotNull = doc.RootElement.GetProperty("intArray").GetArray<int>(true);
             Assert.Multiple(() =>
             {
                 Assert.That(intArrayNotNull.Count(), Is.EqualTo(3));
@@ -312,6 +311,44 @@ namespace Tests.Utils
 
             // Assert
             Assert.That(json, Is.EqualTo("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}"""));
+        }
+
+        [Test]
+        public void ToDictionaryTests()
+        {
+            // Arrange
+            var json = """{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""";
+            var doc = JsonDocument.Parse(json);
+
+            // Act
+            var dic = doc.RootElement.ToDictionary();
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(dic.Count, Is.EqualTo(6));
+                Assert.That(dic.Get<int>("a"), Is.EqualTo(1));
+                Assert.That(dic.Get<bool>("d"), Is.EqualTo(false));
+                Assert.That(dic.Get<DateTime>("e"), Is.EqualTo(DateTime.Parse("2021-01-01")));
+                Assert.That(dic.GetArray<int>("f").Count(), Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void FormatTemplateWithJsonTests()
+        {
+            // Arrange
+            var tempalte = """Hello, {a}, your name is {name}, the date is {e}""";
+            var json = """{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""";
+
+            // Act
+            var result = tempalte.FormatTemplateWithJson(json, "?");
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result, Is.EqualTo("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00"));
+            });
         }
     }
 }

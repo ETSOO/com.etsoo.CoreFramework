@@ -168,9 +168,9 @@ namespace Tests.Utils
             var result = await service.GetProductsAsync();
             Assert.Multiple(() =>
             {
-                Assert.That(result?.Total, Is.EqualTo(100));
+                Assert.That(result?.Total, Is.EqualTo(194));
                 Assert.That(result?.Products.First().Id, Is.EqualTo(1));
-                Assert.That(result?.Products.First().Price, Is.EqualTo(549M));
+                Assert.That(result?.Products.First().Price, Is.EqualTo(9.99M));
             });
         }
 
@@ -180,9 +180,9 @@ namespace Tests.Utils
             var result = await service.GetProductsStreamAsync();
             Assert.Multiple(() =>
             {
-                Assert.That(result?.Total, Is.EqualTo(100));
+                Assert.That(result?.Total, Is.EqualTo(194));
                 Assert.That(result?.Products.First().Id, Is.EqualTo(1));
-                Assert.That(result?.Products.First().Price, Is.EqualTo(549M));
+                Assert.That(result?.Products.First().Price, Is.EqualTo(9.99M));
             });
         }
 
@@ -192,7 +192,7 @@ namespace Tests.Utils
             var result = await service.AddProductAsync();
             Assert.Multiple(() =>
             {
-                Assert.That(result?.Id, Is.EqualTo(101));
+                Assert.That(result?.Id, Is.EqualTo(195));
                 Assert.That(result?.Title, Is.EqualTo("New Product"));
                 Assert.That(result?.Price, Is.EqualTo(3.15M));
             });

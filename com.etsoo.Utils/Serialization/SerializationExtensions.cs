@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace com.etsoo.Utils.Serialization
 {
@@ -11,7 +13,7 @@ namespace com.etsoo.Utils.Serialization
     /// Serialization extensions
     /// 序列化扩展
     /// </summary>
-    public static class SerializationExtensions
+    public static partial class SerializationExtensions
     {
         /// <summary>
         /// Create Utf8 Json writer
@@ -271,7 +273,7 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="element">Json element</param>
         /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
         /// <returns>Result</returns>
-        public static IEnumerable<T?> GetArray<T>(this JsonElement element, bool loose = false) where T : struct
+        public static IEnumerable<T> GetArray<T>(this JsonElement element, bool loose = false) where T : struct
         {
             // When not a Array
             if (element.ValueKind != JsonValueKind.Array) yield break;
@@ -279,7 +281,7 @@ namespace com.etsoo.Utils.Serialization
             foreach (var item in element.EnumerateArray())
             {
                 var value = item.GetValue<T>(loose);
-                yield return value;
+                if (value.HasValue) yield return value.Value;
             }
         }
 
@@ -293,7 +295,7 @@ namespace com.etsoo.Utils.Serialization
         /// <returns>Result</returns>
         [RequiresDynamicCode("GetArray 'T' may require dynamic access otherwise can break functionality when trimming application code")]
         [RequiresUnreferencedCode("GetArray 'T' may require dynamic access otherwise can break functionality when trimming application code")]
-        public static IEnumerable<T?> GetArray<T>(this JsonElement element) where T : class
+        public static IEnumerable<T> GetArray<T>(this JsonElement element) where T : class
         {
             // When not a Array
             if (element.ValueKind != JsonValueKind.Array) yield break;
@@ -301,7 +303,7 @@ namespace com.etsoo.Utils.Serialization
             foreach (var item in element.EnumerateArray())
             {
                 var value = item.GetValue<T>();
-                yield return value;
+                if (value != null) yield return value;
             }
         }
 
@@ -313,7 +315,7 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="element">Json element</param>
         /// <param name="typeInfo">Json type info</param>
         /// <returns>Result</returns>
-        public static IEnumerable<T?> GetArray<T>(this JsonElement element, JsonTypeInfo<T> typeInfo) where T : class
+        public static IEnumerable<T> GetArray<T>(this JsonElement element, JsonTypeInfo<T> typeInfo) where T : class
         {
             // When not a Array
             if (element.ValueKind != JsonValueKind.Array) yield break;
@@ -321,8 +323,51 @@ namespace com.etsoo.Utils.Serialization
             foreach (var item in element.EnumerateArray())
             {
                 var value = item.GetValue(typeInfo);
-                yield return value;
+                if (value != null) yield return value;
             }
         }
+
+        /// <summary>
+        /// Deserialize JsonElement to string dictionary
+        /// 反序列化 JsonElement 为字符串字典
+        /// </summary>
+        /// <param name="element">JSON Element</param>
+        /// <returns>Result</returns>
+        public static StringKeyDictionaryString ToDictionary(this JsonElement element)
+        {
+            var dictionary = new StringKeyDictionaryString();
+
+            foreach (var item in element.EnumerateObject())
+            {
+                dictionary[item.Name] = item.Value.ToString();
+            }
+
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Format template with JSON data
+        /// 使用 JSON 数据格式化模板
+        /// </summary>
+        /// <param name="template">Template</param>
+        /// <param name="json">JSON data</param>
+        /// <param name="defaultReplacement">Default replacement string</param>
+        /// <returns>Result</returns>
+        public static string FormatTemplateWithJson(this string template, string json, string defaultReplacement = "")
+        {
+            using var doc = JsonDocument.Parse(json);
+            foreach (var item in doc.RootElement.EnumerateObject())
+            {
+                template = template.Replace($"{{{item.Name}}}", HttpUtility.HtmlDecode(item.Value.ToString()));
+            }
+
+            // Remove the remaining placeholders
+            template = MyRegex().Replace(template, defaultReplacement);
+
+            return template;
+        }
+
+        [GeneratedRegex(@"\{[a-zA-Z_-]+\}")]
+        private static partial Regex MyRegex();
     }
 }

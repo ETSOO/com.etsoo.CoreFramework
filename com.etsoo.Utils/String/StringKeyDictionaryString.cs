@@ -1,4 +1,7 @@
-﻿namespace com.etsoo.Utils.String
+﻿using com.etsoo.Utils.Serialization;
+using System.Text.Json;
+
+namespace com.etsoo.Utils.String
 {
     /// <summary>
     /// Ignore case of string key and string value extended dictionary
@@ -48,6 +51,27 @@
         public T Get<T>(string key, T defaultValue) where T : struct
         {
             return Get<T>(key) ?? defaultValue;
+        }
+
+        /// <summary>
+        /// Get value with default value
+        /// 获取值，提供默认值
+        /// </summary>
+        /// <typeparam name="T">Struct type</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="defaultValue">Default value</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Value</returns>
+        public IEnumerable<T> GetArray<T>(string key, bool loose = false) where T : struct
+        {
+            var json = GetItem(key);
+            if (string.IsNullOrEmpty(json) || !json.StartsWith('[') || !json.EndsWith(']'))
+            {
+                return [];
+            }
+
+            var doc = JsonDocument.Parse(json);
+            return doc.RootElement.GetArray<T>(loose);
         }
     }
 }
