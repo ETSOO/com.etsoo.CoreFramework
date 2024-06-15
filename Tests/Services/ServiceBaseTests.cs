@@ -51,7 +51,7 @@ namespace Tests.Services
         {
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
-            var config = new AppConfiguration { Name = "test" };
+            var config = AppConfiguration.Create();
             var app = new CoreApplication<AppConfiguration, SqliteConnection>(config, db);
 
             service = new ServiceTest(app, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));

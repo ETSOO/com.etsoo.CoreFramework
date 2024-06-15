@@ -342,12 +342,14 @@ namespace Tests.Utils
             var json = """{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""";
 
             // Act
-            var result = tempalte.FormatTemplateWithJson(json, "?");
+            var result1 = tempalte.FormatTemplateWithJson(json, "?");
+            var result2 = tempalte.FormatTemplateWithJson(json, "(empty)");
 
             // Assert
             Assert.Multiple(() =>
             {
-                Assert.That(result, Is.EqualTo("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00"));
+                Assert.That(result1, Is.EqualTo("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00"));
+                Assert.That(result2, Is.EqualTo("Hello, 1, your name is (empty), the date is 2021-01-01T00:00:00"));
             });
         }
     }

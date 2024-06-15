@@ -300,21 +300,5 @@ namespace com.etsoo.Utils.Crypto
             await using var ms = SharedUtils.GetStream(bytes);
             return await sha512.ComputeHashAsync(ms);
         }
-
-        /// <summary>
-        /// Unseal data
-        /// 解封信息
-        /// Attributes for null-state static analysis
-        /// https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/attributes/nullable-analysis
-        /// </summary>
-        /// <param name="field">Field name</param>
-        /// <param name="input">Input data</param>
-        /// <param name="secureManager">Secure manager</param>
-        /// <returns>Unsealed data</returns>
-        public static string UnsealData(string field, string? input, Func<string, string, string>? secureManager)
-        {
-            if (string.IsNullOrEmpty(input)) return string.Empty;
-            return secureManager == null ? input : secureManager(field, input);
-        }
     }
 }

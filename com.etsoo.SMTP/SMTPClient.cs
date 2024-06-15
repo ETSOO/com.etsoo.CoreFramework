@@ -1,5 +1,4 @@
-﻿using com.etsoo.Utils.Crypto;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace com.etsoo.SMTP
@@ -21,21 +20,9 @@ namespace com.etsoo.SMTP
         /// 构造函数
         /// </summary>
         /// <param name="options">Options</param>
-        /// <param name="secureManager">Secure manager</param>
-        public SMTPClient(SMTPClientOptions options, Func<string, string, string>? secureManager = null)
+        public SMTPClient(SMTPClientOptions options)
         {
-            if (secureManager == null)
-            {
-                Options = options;
-            }
-            else
-            {
-                Options = options with
-                {
-                    UserName = CryptographyUtils.UnsealData("UserName", options.UserName, secureManager),
-                    Password = CryptographyUtils.UnsealData("Password", options.Password, secureManager)
-                };
-            }
+            Options = options;
         }
 
         /// <summary>

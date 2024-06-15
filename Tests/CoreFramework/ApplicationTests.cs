@@ -48,9 +48,6 @@ namespace Tests.CoreFramework
                 Assert.That(config?.Name, Is.EqualTo("TestApp"));
                 Assert.That(config?.Cultures[1], Is.EqualTo("zh-Hans-CN"));
             });
-
-            config?.UnsealData((field, input) => new string(input.Reverse().ToArray()));
-            Assert.That(config?.PrivateKey, Is.EqualTo("oostE"));
         }
     }
 }

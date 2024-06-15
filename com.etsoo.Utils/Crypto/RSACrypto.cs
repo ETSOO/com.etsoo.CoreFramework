@@ -13,21 +13,6 @@ namespace com.etsoo.Utils.Crypto
     /// </summary>
     public class RSACrypto
     {
-        [RequiresDynamicCode("IConfigurationSection may require dynamic access otherwise can break functionality when trimming application code")]
-        [RequiresUnreferencedCode("IConfigurationSection may require dynamic access otherwise can break functionality when trimming application code")]
-        private static (string? publicKey, string? privateKey) Parse(IConfigurationSection section, Func<string, string, string>? secureManager)
-        {
-            return Parse(section.GetValue<string?>("PublicKey"), section.GetValue<string?>("PrivateKey"), secureManager);
-        }
-
-        private static (string? publicKey, string? privateKey) Parse(string? publicKey, string? privateKey, Func<string, string, string>? secureManager)
-        {
-            return (
-                CryptographyUtils.UnsealData(nameof(publicKey), publicKey, secureManager),
-                CryptographyUtils.UnsealData(nameof(privateKey), privateKey, secureManager)
-            );
-        }
-
         /// <summary>
         /// RSA instance
         /// RAS实例
@@ -38,37 +23,12 @@ namespace com.etsoo.Utils.Crypto
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="keys">RAS public & private Keys</param>
-        public RSACrypto((string? publicKey, string? privateKey) keys)
-        {
-            var (publicKey, privateKey) = keys;
-
-            var hasPublicKey = !string.IsNullOrEmpty(publicKey);
-            var hasPrivateKey = !string.IsNullOrEmpty(privateKey);
-            if (!hasPublicKey && !hasPrivateKey)
-            {
-                // ArgumentNullException.ThrowIfNull(publicKey);
-                throw new ArgumentNullException(nameof(keys));
-            }
-
-            RSA = RSA.Create();
-
-            if (hasPrivateKey)
-                RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey!), out _);
-            else if (hasPublicKey)
-                RSA.ImportRSAPublicKey(Convert.FromBase64String(publicKey!), out _);
-        }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
         /// <param name="section">Configuration section</param>
         /// <param name="secureManager">Secure manager</param>
         [RequiresDynamicCode("section may require dynamic access otherwise can break functionality when trimming application code")]
         [RequiresUnreferencedCode("section may require dynamic access otherwise can break functionality when trimming application code")]
-        public RSACrypto(IConfigurationSection section, Func<string, string, string>? secureManager = null)
-            : this(Parse(section, secureManager))
+        public RSACrypto(IConfigurationSection section)
+            : this(section.GetValue<string?>("PublicKey"), section.GetValue<string?>("PrivateKey"))
         {
         }
 
@@ -78,10 +38,22 @@ namespace com.etsoo.Utils.Crypto
         /// </summary>
         /// <param name="publicKey">Public key</param>
         /// <param name="privateKey">Public key</param>
-        /// <param name="secureManager">Secure manager</param>
-        public RSACrypto(string? publicKey, string? privateKey, Func<string, string, string>? secureManager = null)
-            : this(Parse(publicKey, privateKey, secureManager))
+        public RSACrypto(string? publicKey, string? privateKey)
         {
+            var hasPublicKey = !string.IsNullOrEmpty(publicKey);
+            var hasPrivateKey = !string.IsNullOrEmpty(privateKey);
+            if (!hasPublicKey && !hasPrivateKey)
+            {
+                // ArgumentNullException.ThrowIfNull(publicKey);
+                throw new ArgumentNullException(nameof(publicKey));
+            }
+
+            RSA = RSA.Create();
+
+            if (hasPrivateKey)
+                RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey!), out _);
+            else if (hasPublicKey)
+                RSA.ImportRSAPublicKey(Convert.FromBase64String(publicKey!), out _);
         }
 
         /// <summary>

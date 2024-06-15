@@ -52,13 +52,11 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="services">Dependency injection services</param>
         /// <param name="settings">Settings</param>
-        /// <param name="secureManager">Secure manager</param>
         /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
         /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
         /// <param name="events">Events handler</param>
         public JwtService(IServiceCollection services,
             JwtSettings? settings,
-            Func<string, string, string>? secureManager = null,
             IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
             TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null,
             JwtBearerEvents? events = null)
@@ -99,10 +97,10 @@ namespace com.etsoo.CoreFramework.Authentication
 
             // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
             // AES256, 256 / 8 = 32 bytes
-            var encryptionKeyPlain = CryptographyUtils.UnsealData(nameof(settings.EncryptionKey), settings.EncryptionKey, secureManager);
+            var encryptionKey = settings.EncryptionKey;
 
             // RSA crypto provider
-            crypto = new RSACrypto(settings.PublicKey, settings.PrivateKey, secureManager);
+            crypto = new RSACrypto(settings.PublicKey, settings.PrivateKey);
 
             // Default signing key resolver
             this.issuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
@@ -122,11 +120,11 @@ namespace com.etsoo.CoreFramework.Authentication
             {
                 if (tokenDecryptionKeyResolver == null)
                 {
-                    return new List<SymmetricSecurityKey> { new(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid } };
+                    return new List<SymmetricSecurityKey> { new(Encoding.UTF8.GetBytes(encryptionKey)) { KeyId = kid } };
                 }
 
                 var keys = tokenDecryptionKeyResolver(token, securityToken, kid, validationParameters);
-                if (!keys.Any()) keys = keys.Append(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKeyPlain)) { KeyId = kid });
+                if (!keys.Any()) keys = keys.Append(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey)) { KeyId = kid });
 
                 return keys;
             };

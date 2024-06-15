@@ -70,7 +70,7 @@ namespace Tests.Services
         {
             var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
 
-            var config = new AppConfiguration { Name = "test" };
+            var config = new AppConfiguration { Name = "test", PrivateKey = "@s$a!" };
             app = new CoreApplication<AppConfiguration, SqlConnection>(config, db);
 
             service = new IntEntityService(app, "user", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));

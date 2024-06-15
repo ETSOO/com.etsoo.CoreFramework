@@ -353,7 +353,7 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="json">JSON data</param>
         /// <param name="defaultReplacement">Default replacement string</param>
         /// <returns>Result</returns>
-        public static string FormatTemplateWithJson(this string template, string json, string defaultReplacement = "")
+        public static string FormatTemplateWithJson(this string template, string json, string defaultReplacement = "?")
         {
             using var doc = JsonDocument.Parse(json);
             foreach (var item in doc.RootElement.EnumerateObject())

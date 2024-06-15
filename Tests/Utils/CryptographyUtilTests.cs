@@ -149,23 +149,5 @@ namespace Tests.Utils
             // Assert
             Assert.That(Convert.ToHexString(result), Is.EqualTo("EE26B0DD4AF7E749AA1A8EE3C10AE9923F618980772E473F8819A5D4940E0DB27AC185F8A0E1D5F84F88BC887FD67B143732C304CC5FA9AD8E6F57F50028A8FF"));
         }
-
-        [Test]
-        public void UnsealData_SuccessTest()
-        {
-            var result = CryptographyUtils.UnsealData("ConnectionString", "10DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
-            Assert.That(result, Is.EqualTo("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false;Min Pool Size=5;TrustServerCertificate=true"));
-        }
-
-        [Test]
-        public void UnsealData_ExceptionTest()
-        {
-            var field = "ConnectionString";
-            var exception = Assert.Catch<ApplicationException>(() =>
-            {
-                CryptographyUtils.UnsealData(field, "DC78B9C69CA3327CB053C80AC9E6F92B211F4A661DBDFF606ABBCB538E0822E3GDZpqzHKDvWEZuROhSvO7EVdINE340sPQD5fg0wwogTFx+RPGz5sZVoVDj5UIzjE+zE2QFkyUPQhrYcBFrxOJWGp0kJL67nGOkqKs80u8nTevAnqwchqO5yHTVKwmHKUGI2ijWvBLruuLMBmfD3lTA==", UnsealData);
-            });
-            Assert.That(exception?.Message, Is.EqualTo(field));
-        }
     }
 }
