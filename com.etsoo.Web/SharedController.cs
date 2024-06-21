@@ -5,7 +5,6 @@ using com.etsoo.UserAgentParser;
 using com.etsoo.WebUtils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json.Serialization.Metadata;
@@ -87,17 +86,7 @@ namespace com.etsoo.Web
         /// <returns>Valid or not</returns>
         protected bool CheckDevice([NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out UAParser? parser)
         {
-            // User-Agent validatation
-            parser = new UAParser(UserAgent);
-            if (!parser.Valid || parser.IsBot)
-            {
-                result = ApplicationErrors.NoUserAgent.AsResult();
-                parser = null;
-                return false;
-            }
-
-            result = null;
-            return true;
+            return MinimalApiUtils.CheckDevice(UserAgent, out result, out parser);
         }
 
         /// <summary>
@@ -111,47 +100,7 @@ namespace com.etsoo.Web
         /// <returns>Valid or not</returns>
         protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
         {
-            data = null;
-
-            if (!CheckDevice(out result, out var parser))
-            {
-                return false;
-            }
-
-            string? deviceCore;
-            try
-            {
-                deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
-            }
-            catch (Exception ex)
-            {
-                // Exception happened when device upgraded or changed view model (windows to mobile)
-                // Client should response to it to clear cached device id
-                result = service.LogException(ex);
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(deviceCore))
-            {
-                result = ApplicationErrors.NoValidData.AsResult("Device");
-                return false;
-            }
-
-            result = null;
-            data = (deviceCore, parser);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Write header
-        /// 写入头部信息
-        /// </summary>
-        /// <param name="key">Header key</param>
-        /// <param name="value">Header value</param>
-        protected void WriteHeader(string key, StringValues value)
-        {
-            Response.Headers.Add(new KeyValuePair<string, StringValues>(key, value));
+            return MinimalApiUtils.CheckDevice(service, UserAgent, deviceId, out result, out data);
         }
 
         /// <summary>

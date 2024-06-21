@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http.Headers;
 using System.Net;
-using System.Net.Sockets;
-using System.Security.Claims;
 
 namespace com.etsoo.WebUtils
 {
@@ -33,27 +30,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static T? GetEnumClaim<T>(this IHttpContextAccessor accessor, string claimType) where T : struct, Enum
         {
-            return accessor.HttpContext?.User.GetEnumClaim<T>(claimType);
-        }
-
-        /// <summary>
-        /// Get Enum item from claim
-        /// 从声明中获取枚举项
-        /// </summary>
-        /// <typeparam name="T">Generic Enum type</typeparam>
-        /// <param name="principal">Claims principal</param>
-        /// <param name="claimType">Claim type</param>
-        /// <returns>Result</returns>
-        public static T? GetEnumClaim<T>(this ClaimsPrincipal principal, string claimType) where T : struct, Enum
-        {
-            var claimValue = principal.FindFirst(claimType)?.Value;
-
-            if (!string.IsNullOrEmpty(claimValue) && Enum.TryParse<T>(claimValue, out var p))
-            {
-                return p;
-            }
-
-            return default;
+            return accessor.HttpContext?.GetEnumClaim<T>(claimType);
         }
 
         /// <summary>
@@ -64,7 +41,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static IPAddress? LocalIpAddress(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext?.Connection.LocalIpAddress;
+            return accessor.HttpContext?.LocalIpAddress();
         }
 
         /// <summary>
@@ -76,43 +53,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static IPAddress? RemoteIpAddress(this IHttpContextAccessor accessor, bool forwarded = true)
         {
-            var context = accessor.HttpContext;
-            if (context == null) return null;
-
-            var ip = context.Connection.RemoteIpAddress;
-            if (!forwarded) return ip;
-
-            if (context.Request.Headers.TryGetValue("X-Real-IP", out var xRealIpHeader)
-                && IPAddress.TryParse(xRealIpHeader.FirstOrDefault(), out var xRealIp)
-                && IsIpAddressValid(xRealIp))
-            {
-                return xRealIp;
-            }
-
-            if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var xForwardedHeader))
-            {
-                // Format: <client>, <proxy1>, <proxy2>,...
-                var ips = xForwardedHeader.FirstOrDefault()?.Trim()
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-                if (ips != null)
-                {
-                    foreach (var ipText in ips)
-                    {
-                        if (IPAddress.TryParse(ipText, out var fip) && IsIpAddressValid(fip))
-                        {
-                            return fip;
-                        }
-                    }
-                }
-            }
-
-            return ip;
-        }
-
-        private static bool IsIpAddressValid(IPAddress ipAddress)
-        {
-            return ipAddress.AddressFamily is AddressFamily.InterNetwork or AddressFamily.InterNetworkV6;
+            return accessor.HttpContext?.RemoteIpAddress(forwarded);
         }
 
         /// <summary>
@@ -123,7 +64,7 @@ namespace com.etsoo.WebUtils
         /// <returns>Result</returns>
         public static string? UserAgent(this IHttpContextAccessor accessor)
         {
-            return accessor.HttpContext?.Request.Headers[HeaderNames.UserAgent];
+            return accessor.HttpContext?.UserAgent();
         }
     }
 }
