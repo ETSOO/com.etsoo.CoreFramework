@@ -92,16 +92,6 @@ namespace com.etsoo.SourceGenerators
                     sql.Append($" WHERE NOT EXISTS (SELECT * FROM {tableNameEscaped} WHERE {pKey} = {idParameter})");
                 }
             }
-            else if (database == DatabaseName.MySQL)
-            {
-                sql.Append($@" VALUES ({string.Join(", ", values)}); {(idField == null ? "; SELECT LAST_INSERT_ID()" : $"SELECT {primaryKey} AS {pKey}")}");
-
-                if (ignoreExists)
-                {
-                    // INSERT = 6
-                    sql.Insert(6, " IGNORE");
-                }
-            }
             else if (database == DatabaseName.PostgreSQL || database == DatabaseName.SQLite)
             {
                 sql.Append($@" VALUES ({string.Join(", ", values)}) RETURNING {pKey}");
@@ -167,10 +157,6 @@ namespace com.etsoo.SourceGenerators
             if (database.HasFlag(DatabaseName.SQLServer))
             {
                 bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLServer));
-            }
-            if (database.HasFlag(DatabaseName.MySQL))
-            {
-                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.MySQL));
             }
             if (database.HasFlag(DatabaseName.PostgreSQL))
             {

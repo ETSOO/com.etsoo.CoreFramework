@@ -40,7 +40,6 @@ namespace com.etsoo.SourceGenerators
             {
                 return database switch
                 {
-                    DatabaseName.MySQL => name.Replace('[', '`').Replace(']', '`'),
                     DatabaseName.PostgreSQL or DatabaseName.SQLite => name.Replace("[", "\\\"").Replace("]", "\\\""),
                     _ => name
                 };
@@ -48,7 +47,6 @@ namespace com.etsoo.SourceGenerators
 
             return database switch
             {
-                DatabaseName.MySQL => $"`{name}`",
                 DatabaseName.PostgreSQL or DatabaseName.SQLite => $"\\\"{name}\\\"",
                 DatabaseName.SQLServer => $"[{name.Replace("[", "[[").Replace("]", "]]")}]",
                 _ => name
@@ -157,7 +155,6 @@ namespace com.etsoo.SourceGenerators
 
             var sql = db switch
             {
-                DatabaseName.MySQL => $"JSON_OBJECT({fields})",
                 DatabaseName.PostgreSQL => $"json_build_object({fields})",
                 DatabaseName.SQLite => $"json_object({fields})",
                 _ => fields
@@ -167,7 +164,6 @@ namespace com.etsoo.SourceGenerators
             {
                 sql = db switch
                 {
-                    DatabaseName.MySQL => $"JSON_ARRAYAGG({sql})",
                     DatabaseName.PostgreSQL => $"json_agg({sql})",
                     DatabaseName.SQLite => $"json_group_array({sql})",
                     _ => sql

@@ -12,13 +12,10 @@ namespace com.etsoo.SourceGenerators
         // SQL Server
         SQLServer = 1,
 
-        // MySQL
-        MySQL = 2,
-
         // PostgreSQL
-        PostgreSQL = 4,
+        PostgreSQL = 2,
 
         // SQLite
-        SQLite = 8
+        SQLite = 4
     }
 }

@@ -202,10 +202,6 @@ namespace com.etsoo.SourceGenerators
             {
                 bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.SQLServer));
             }
-            if (database.HasFlag(DatabaseName.MySQL))
-            {
-                bodies.Add(DatabaseName.MySQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.MySQL));
-            }
             if (database.HasFlag(DatabaseName.PostgreSQL))
             {
                 bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, namingPolicy, DatabaseName.PostgreSQL));
