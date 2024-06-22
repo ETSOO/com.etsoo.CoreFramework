@@ -37,9 +37,18 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <param name="audience">Audience</param>
-        /// <param name="keyId">Key id</param>
         /// <returns>Token</returns>
-        string CreateAccessToken(IServiceUser user, string? audience = null, string? keyId = null);
+        string CreateAccessToken(IUserToken user, string? audience = null);
+
+        /// <summary>
+        /// Create service access token
+        /// 创建服务访问令牌
+        /// </summary>
+        /// <param name="user">User</param>
+        /// <param name="keyId">Service key id</param>
+        /// <param name="audience">Audience</param>
+        /// <returns>Token</returns>
+        string CreateAccessToken(IServiceUser user, string keyId, string? audience = null);
 
         /// <summary>
         /// Create refresh token

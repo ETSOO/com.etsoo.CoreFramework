@@ -41,7 +41,7 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="user">Current user</param>
         /// <param name="parameters">Parameters</param>
-        void AddSystemParameters(IServiceUser user, IDbParameters parameters);
+        void AddSystemParameters(IUserToken user, IDbParameters parameters);
 
         /// <summary>
         /// Build command name, ["member", "view"] => ep_member_view (default) or epMemberView (override to achieve)

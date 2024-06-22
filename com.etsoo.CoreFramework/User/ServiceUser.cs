@@ -9,8 +9,8 @@ using System.Security.Claims;
 namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
-    /// Service user data
-    /// 服务用户数据
+    /// Service user data, more information has to be done with additional API call
+    /// 服务用户数据，更多信息需要额外的API调用
     /// </summary>
     public record ServiceUser : UserToken, IServiceUser, IUserCreator<ServiceUser>
     {
@@ -207,7 +207,12 @@ namespace com.etsoo.CoreFramework.User
         {
         }
 
-        private IEnumerable<Claim> GetClaims()
+        /// <summary>
+        /// Create claims
+        /// 创建声明
+        /// </summary>
+        /// <returns>Claims</returns>
+        public override IEnumerable<Claim> MoreClaims()
         {
             yield return new(ClaimTypes.Locality, Language.Name);
             yield return new(RoleValueClaim, RoleValue.ToString());
@@ -227,19 +232,8 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
-        /// Create claims
-        /// 创建声明
-        /// </summary>
-        /// <returns>Claims</returns>
-        public override IEnumerable<Claim> CreateClaims()
-        {
-            var claims = GetClaims();
-            return base.CreateClaims().Concat(claims);
-        }
-
-        /// <summary>
-        /// Update
-        /// 更新
+        /// Update role
+        /// 更新角色
         /// </summary>
         /// <param name="newRole">New role</param>
         public void Update(UserRole newRole)

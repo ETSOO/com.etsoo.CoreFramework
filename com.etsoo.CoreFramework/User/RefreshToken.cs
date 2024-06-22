@@ -47,21 +47,15 @@ namespace com.etsoo.CoreFramework.User
             Sid = sid;
         }
 
-        private IEnumerable<Claim> GetClaims()
-        {
-            if (!string.IsNullOrEmpty(Sid))
-                yield return new(ClaimTypes.PrimarySid, Sid);
-        }
-
         /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        public override IEnumerable<Claim> CreateClaims()
+        public override IEnumerable<Claim> MoreClaims()
         {
-            var claims = GetClaims();
-            return base.CreateClaims().Concat(claims);
+            if (!string.IsNullOrEmpty(Sid))
+                yield return new(ClaimTypes.PrimarySid, Sid);
         }
     }
 }

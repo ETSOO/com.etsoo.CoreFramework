@@ -47,7 +47,7 @@ namespace Tests.CoreFramework
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser("1", null, null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), 1, CultureInfo.CurrentCulture, "CN") { JsonData = "{ body: \"In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.\" }" };
+            var user = new CurrentUser("1", null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), 1, CultureInfo.CurrentCulture, "CN");
 
             // Act
             var token = service.CreateAccessToken(user);

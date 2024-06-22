@@ -1,4 +1,5 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils.String;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -6,22 +7,16 @@ using System.Security.Claims;
 namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
-    /// Current user data
-    /// 当前用户数据
+    /// Current user data, more information has to be done with additional API call
+    /// 当前用户数据，更多信息需要额外的API调用
     /// </summary>
-    public record CurrentUser : ServiceUser, ICurrentUser, IUserCreator<CurrentUser>
+    public record CurrentUser : UserToken, ICurrentUser, IUserCreator<CurrentUser>
     {
         /// <summary>
         /// Avatar claim type
         /// 头像声明类型
         /// </summary>
         public const string AvatarClaim = "avatar";
-
-        /// <summary>
-        /// Is Corporate claim type
-        /// 是否为法人申明类型
-        /// </summary>
-        public const string CorporateClaim = "Corporate";
 
         /// <summary>
         /// Organization name claim type
@@ -36,52 +31,50 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="claims">Claims</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static new CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
             if (claims == null) return null;
 
-            var user = ServiceUser.Create(claims);
+            var user = UserToken.Create(claims);
             if (user == null) return null;
 
             // Claims
             var name = claims.FindFirstValue(ClaimTypes.Name);
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
-
-            // Is corporate
-            var corporate = StringUtils.TryParse<bool>(claims.FindFirstValue(CorporateClaim)).GetValueOrDefault();
+            var language = claims.FindFirstValue(ClaimTypes.Locality);
+            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(ServiceUser.RoleValueClaim)).GetValueOrDefault();
 
             // Validate
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(language))
                 return null;
 
             // New user
             return new CurrentUser(
                 user.Id,
-                user.Uid,
                 user.Organization,
-                name, user.RoleValue,
+                name, roleValue,
                 user.ClientIp,
                 user.DeviceId,
-                user.Language,
+                new CultureInfo(language),
                 user.Region,
-                corporate,
                 connectionId)
             {
-                Service = user.Service,
                 Avatar = avatar,
                 OrganizationName = orgName
             };
         }
 
-        private static (string? Name, string? OrgName, string? Avatar, string? JsonData, bool Corporate) GetData(StringKeyDictionaryObject data)
+        private static (string? id, string? organization, short? Role, int? deviceId, string? Name, string? OrgName, string? Avatar) GetData(StringKeyDictionaryObject data)
         {
             return (
+                data.Get("Id"),
+                data.Get("Organization"),
+                data.Get<short>("Role"),
+                data.Get<int>("DeviceId"),
                 data.Get("Name"),
                 data.Get("OrgName"),
-                data.Get("Avatar"),
-                data.Get("JsonData"),
-                data.Get("Corporate", false)
+                data.Get("Avatar")
             );
         }
 
@@ -95,36 +88,29 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static new CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
-            // Base
-            var token = ServiceUser.Create(data, ip, language, region);
-            if (token == null) return null;
-
             // Get data
-            var (name, orgName, avatar, jsonData, corporate) = GetData(data);
+            var (id, organization, role, deviceId, name, orgName, avatar) = GetData(data);
 
             // Validation
-            if (string.IsNullOrEmpty(name))
+            if (id == null || role == null || deviceId == null || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
             return new CurrentUser(
-                token.Id,
-                token.Uid,
-                token.Organization,
+                id,
+                organization,
                 name,
-                token.RoleValue,
+                role.Value,
                 ip,
-                token.DeviceId,
+                deviceId.Value,
                 language,
                 region,
-                corporate,
                 connectionId)
             {
                 Avatar = avatar,
-                OrganizationName = orgName,
-                JsonData = jsonData
+                OrganizationName = orgName
             };
         }
 
@@ -147,23 +133,34 @@ namespace com.etsoo.CoreFramework.User
         public string? Avatar { get; private set; }
 
         /// <summary>
-        /// Json data
-        /// Json数据
+        /// Role value
+        /// 角色值
         /// </summary>
-        public string? JsonData { get; set; }
+        public virtual short RoleValue { get; private set; }
 
         /// <summary>
-        /// Is Corporate
-        /// 是否为法人
+        /// Role
+        /// 角色
         /// </summary>
-        public bool Corporate { get; private set; }
+        public UserRole? Role { get; private set; }
+
+        /// <summary>
+        /// Language
+        /// 语言
+        /// </summary>
+        public CultureInfo Language { get; }
+
+        /// <summary>
+        /// Connection id
+        /// 链接编号
+        /// </summary>
+        public string? ConnectionId { get; }
 
         /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
-        /// <param name="uid">Uid</param>
         /// <param name="organization">Organization</param>
         /// <param name="name">Name</param>
         /// <param name="roleValue">Role value</param>
@@ -171,27 +168,17 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
-        /// <param name="corporate">Is corporate</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? uid, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, bool? corporate = null, string? connectionId = null)
-            : base(id, uid, organization, roleValue, clientIp, deviceId, language, region, connectionId)
+        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, string? connectionId = null)
+            : base(id, clientIp, region, deviceId, organization)
         {
             Name = name;
-            Corporate = corporate.GetValueOrDefault();
-        }
+            RoleValue = roleValue;
+            Role = ServiceUser.GetRole(roleValue);
 
-        private IEnumerable<Claim> GetClaims()
-        {
-            yield return new(ClaimTypes.Name, Name);
-            yield return new(CorporateClaim, Corporate.ToJson());
+            Language = language;
 
-            if (!string.IsNullOrEmpty(OrganizationName))
-                yield return new(OrganizationNameClaim, OrganizationName);
-
-            if (Avatar != null)
-                yield return new(AvatarClaim, Avatar);
-            if (!string.IsNullOrEmpty(JsonData))
-                yield return new(ClaimTypes.UserData, JsonData);
+            ConnectionId = connectionId;
         }
 
         /// <summary>
@@ -199,10 +186,18 @@ namespace com.etsoo.CoreFramework.User
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        public override IEnumerable<Claim> CreateClaims()
+        public override IEnumerable<Claim> MoreClaims()
         {
-            var claims = GetClaims();
-            return base.CreateClaims().Concat(claims);
+            yield return new(ClaimTypes.Name, Name);
+
+            if (!string.IsNullOrEmpty(OrganizationName))
+                yield return new(OrganizationNameClaim, OrganizationName);
+
+            if (Avatar != null)
+                yield return new(AvatarClaim, Avatar);
+
+            yield return new(ClaimTypes.Locality, Language.Name);
+            yield return new(ServiceUser.RoleValueClaim, RoleValue.ToString());
         }
 
         /// <summary>
@@ -210,12 +205,14 @@ namespace com.etsoo.CoreFramework.User
         /// 更新
         /// </summary>
         /// <param name="data">Data collection</param>
-        public override void Update(StringKeyDictionaryObject data)
+        public virtual void Update(StringKeyDictionaryObject data)
         {
-            base.Update(data);
-
             // Editable fields
-            var (name, orgName, avatar, jsonData, corporate) = GetData(data);
+            var (_, _, role, _, name, orgName, avatar) = GetData(data);
+
+            // Role
+            if (role != null && RoleValue != role)
+                RoleValue = role.Value;
 
             // Name
             if (name != null)
@@ -223,14 +220,8 @@ namespace com.etsoo.CoreFramework.User
 
             OrganizationName = orgName;
 
-            // Corporate
-            Corporate = corporate;
-
             // Avatar
             Avatar = avatar;
-
-            // Json data
-            JsonData = jsonData;
         }
     }
 }

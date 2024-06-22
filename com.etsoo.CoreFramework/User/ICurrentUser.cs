@@ -1,10 +1,14 @@
-﻿namespace com.etsoo.CoreFramework.User
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils.String;
+using System.Globalization;
+
+namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
     /// Current user interface
     /// 当前用户接口
     /// </summary>
-    public interface ICurrentUser : IServiceUser
+    public interface ICurrentUser : IUserToken
     {
         /// <summary>
         /// Unique connection id
@@ -31,15 +35,28 @@
         string? Avatar { get; }
 
         /// <summary>
-        /// Json data
-        /// Json数据
+        /// Role value
+        /// 角色值
         /// </summary>
-        string? JsonData { get; set; }
+        short RoleValue { get; }
 
         /// <summary>
-        /// Is Corporate
-        /// 是否为法人
+        /// Role
+        /// 角色
         /// </summary>
-        bool Corporate { get; }
+        UserRole? Role { get; }
+
+        /// <summary>
+        /// Language
+        /// 语言
+        /// </summary>
+        CultureInfo Language { get; }
+
+        /// <summary>
+        /// Update
+        /// 更新
+        /// </summary>
+        /// <param name="data">Data collection</param>
+        void Update(StringKeyDictionaryObject data);
     }
 }

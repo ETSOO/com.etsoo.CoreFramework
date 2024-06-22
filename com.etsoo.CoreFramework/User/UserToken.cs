@@ -124,11 +124,21 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
+        /// More claims to provide
+        /// 提供更多声明
+        /// </summary>
+        /// <returns>Claims</returns>
+        public virtual IEnumerable<Claim> MoreClaims()
+        {
+            yield break;
+        }
+
+        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        public virtual IEnumerable<Claim> CreateClaims()
+        protected IEnumerable<Claim> CreateClaims()
         {
             yield return new(ClaimTypes.NameIdentifier, Id);
             yield return new(ClaimTypes.Country, Region);
@@ -137,6 +147,11 @@ namespace com.etsoo.CoreFramework.User
 
             if (!string.IsNullOrEmpty(Organization))
                 yield return new(OrganizationClaim, Organization);
+
+            foreach (var claim in MoreClaims())
+            {
+                yield return claim;
+            }
         }
 
         /// <summary>

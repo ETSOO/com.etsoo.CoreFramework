@@ -52,13 +52,6 @@ namespace com.etsoo.CoreFramework.User
         int DeviceId { get; }
 
         /// <summary>
-        /// Create claims
-        /// 创建声明
-        /// </summary>
-        /// <returns>Claims</returns>
-        IEnumerable<Claim> CreateClaims();
-
-        /// <summary>
         /// Create identity
         /// 创建身份
         /// </summary>
