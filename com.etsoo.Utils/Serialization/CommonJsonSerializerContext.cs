@@ -26,7 +26,10 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<byte>))]
     [JsonSerializable(typeof(IEnumerable<Guid>))]
     [JsonSerializable(typeof(IEnumerable<string>))]
-    [JsonSerializable(typeof(ActionResult))]
+    [JsonSerializable(typeof(IEnumerable<double>))]
+    [JsonSerializable(typeof(IEnumerable<decimal>))]
+    [JsonSerializable(typeof(IEnumerable<float>))]
+    [JsonSerializable(typeof(IActionResult))]
     [JsonSerializable(typeof(DateTime))]
     [JsonSerializable(typeof(DateTimeOffset))]
     public partial class CommonJsonSerializerContext : JsonSerializerContext
