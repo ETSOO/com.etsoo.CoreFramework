@@ -34,7 +34,7 @@ namespace com.etsoo.CoreFramework.Application
         /// Private key for hash or simple encryption/decryption, required
         /// 哈希或简单加密/解密私匙，必填
         /// </summary>
-        public required string PrivateKey { get; set; }
+        public string PrivateKey { get; set; } = string.Empty;
 
         /// <summary>
         /// Unique name
