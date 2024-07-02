@@ -51,7 +51,13 @@ namespace com.etsoo.Utils.Crypto
             RSA = RSA.Create();
 
             if (hasPrivateKey)
-                RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey!), out _);
+            {
+                // Check if PKCS8 and add the prefix if it is
+                if (privateKey?.StartsWith("Pkcs8:") is true)
+                    RSA.ImportPkcs8PrivateKey(Convert.FromBase64String(privateKey[6..]), out _);
+                else
+                    RSA.ImportRSAPrivateKey(Convert.FromBase64String(privateKey!), out _);
+            }
             else if (hasPublicKey)
                 RSA.ImportRSAPublicKey(Convert.FromBase64String(publicKey!), out _);
         }

@@ -3,6 +3,7 @@ using com.etsoo.Utils.String;
 using Microsoft.IO;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -59,6 +60,19 @@ namespace com.etsoo.Utils
         public static IEnumerable<string> GetKeys<E>(this E enumValue) where E : struct, Enum
         {
             return Enum.GetValues<E>().Where(v => enumValue.HasFlag(v)).Select(r => r.ToString());
+        }
+
+        /// <summary>
+        /// Get claim value from collection
+        /// 从声明集合中获取值
+        /// </summary>
+        /// <param name="claims">Claims</param>
+        /// <param name="type">Claim type</param>
+        /// <param name="comparisonType">Type comparison type</param>
+        /// <returns></returns>
+        public static string? GetValue(this IEnumerable<Claim> claims, string type, StringComparison comparisonType = StringComparison.OrdinalIgnoreCase)
+        {
+            return claims.FirstOrDefault(c => c.Type.Equals(type, comparisonType))?.Value;
         }
 
         private static readonly DateTime JsBaseDateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);

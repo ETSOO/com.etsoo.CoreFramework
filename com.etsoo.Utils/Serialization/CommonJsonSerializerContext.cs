@@ -9,7 +9,12 @@ namespace com.etsoo.Utils.Serialization
     /// Common JSON serializer context
     /// 通用 JSON 序列化器上下文
     /// </summary>
-    [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true)]
+    [JsonSourceGenerationOptions(
+        PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+        DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)
+    ]
     [JsonSerializable(typeof(StringKeyDictionaryObject))]
     [JsonSerializable(typeof(StringKeyDictionaryString))]
     [JsonSerializable(typeof(Dictionary<string, object>))]
@@ -30,6 +35,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<decimal>))]
     [JsonSerializable(typeof(IEnumerable<float>))]
     [JsonSerializable(typeof(IActionResult))]
+    [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(DateTime))]
     [JsonSerializable(typeof(DateTimeOffset))]
     public partial class CommonJsonSerializerContext : JsonSerializerContext

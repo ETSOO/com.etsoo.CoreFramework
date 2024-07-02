@@ -45,7 +45,7 @@ namespace com.etsoo.Web
         /// <param name="result">Action result</param>
         /// <param name="data">Result data</param>
         /// <returns>Valid or not</returns>
-        public static bool CheckDevice(IServiceBase service, string? userAgent, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
+        public static bool CheckDevice(this IServiceBase service, string? userAgent, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
         {
             data = null;
 

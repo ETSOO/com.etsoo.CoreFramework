@@ -100,7 +100,7 @@ namespace com.etsoo.Web
         /// <returns>Valid or not</returns>
         protected bool CheckDevice(IServiceBase service, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
         {
-            return MinimalApiUtils.CheckDevice(service, UserAgent, deviceId, out result, out data);
+            return service.CheckDevice(UserAgent, deviceId, out result, out data);
         }
 
         /// <summary>

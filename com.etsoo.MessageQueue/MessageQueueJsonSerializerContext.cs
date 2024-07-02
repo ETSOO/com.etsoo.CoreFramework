@@ -9,7 +9,8 @@ namespace com.etsoo.MessageQueue
     [JsonSourceGenerationOptions(
         PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
         DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase,
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     )]
     [JsonSerializable(typeof(MessageProperties))]
     [JsonSerializable(typeof(MessageReceivedProperties))]

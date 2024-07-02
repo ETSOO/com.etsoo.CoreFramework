@@ -1,10 +1,13 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.CoreFramework.User;
+using com.etsoo.Utils;
+using com.etsoo.Utils.Crypto;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Globalization;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Tests.CoreFramework
@@ -44,6 +47,16 @@ namespace Tests.CoreFramework
         }
 
         [Test]
+        public void SignDataTest()
+        {
+            var rsa = new RSACrypto(null, "Pkcs8:MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCNgoWeFN2Wi/fELIPZBV2hWPOm0Fb8621ptyBWfNLFlT553ZH6xC3sZxp9btM7JdwfWvs5VRonpBvfdgIBikMMbp1vCZJONjfpTLNcHlHgdF9rwk4MgCadarBKsMQAfwij8f15O9UVXBhvztGf6Ho09DnitJ1YnUk3kt8ClsLWOT0h3QTwnbjyhpg3/JmJw8jIPdzxxhrmYvqq4qvXzj9H5opjWd9oaMFaiGB4zFBsHMJXuH9ACsbbf6qnzj9AEy6V8cM9VZaTID4nFn5C49z3piawV+yM4P4p4a2SJq/d7dwbzSomPzUvLMnktTvk+NJRyNxyspjqOt72Y4j7YNQDAgMBAAECggEAAMtq1KhpVh8TFRbq5p0RGYbWV2l0E5d+1ckhdVreFB3ya9zCpRXU7C7oByxII1zjD4oDPx8rNm3Feku/VyLfnYJBgA4dtDK5vaWgnDPPYeNFZeWBarCNhvTCaKj1cMtF0SXatoOPfr81o+sVYkB77zAv4wYAnC7F6nn4ppsSHQHTG9nuLP4G0y2ULk9/9q2v/GdynH1OD7P1yUzB15if5IF6zvhwaXUM1PineRf4kYmaHtJdShKAWfVSBvC1Vilk+vqLMbwO55eoBTIHYpsZWln/ec6RE7z+Pb7g0rQdVSKr8BgXt5As5Gh/Y1d4SLXLUA0Zr7AhRpFWspWuvdhzAQKBgQDfS/b8h51xOyrMOPXcel0i3ZyKVJs4mBRVrLr0V1HS3yfAnp/kjC+eK2WTHjGGEPwZtcewtIWXXB+Y5GxpTxhx/53EER8vKH5QND6k5jxtdDQIHwUU5zVIxzyhY0Str6cilwKlWGivM8Io7zT3rHn1R87yLNyan2uj3OPztmJRiQKBgQCiPCHXEplzZmHO2xMRzkCe5XV8ZZLZQcVCuZpmj3c2wNWGrDTYJlYnV9dc1W0cyOwG8kyOPcC3ho9iRwth25nxMnw5afMtOYvwI4EvLmd22iiAGEAj9O0dOCB6Yxmis9asdttYhZCkL1G6HUCG4Mn6XSrLHZ2ruEuRae32/TWSKwKBgCaCDTgDky1BzOGnOQ8qswEeQq7AZHxgDbGwthUJMf0xqsNXF6/sVRHr3fp/DH9YUoGEjcl1eExgALr3OZL3pvmR4X08jqotS4s9V0hMxEMD9S0pXFD8hn3kjhou6lshnasja7tkAbmlLWitx+6meenI1nGBNxIbSA7cOxt+anoxAoGAed6wEQ9AxKahTLHXNmX4tyRpyCPJV3kHxOMGMIsPI8th24PbQpAx4eYjuvH8wEXSwDkd9zA+Z98mMM5rp3w+vSiOltaXPV7gV2lkbtvuDyM8j1UoQZqI0I1MIIP3SvjLh8zVYz8ac6u0OholUezk7TU1o1VBDzEnWzn277YwmvcCgYEAsHp6kOcKNxAvfzE8XZ0RfFNlfRREGtmJOsiNWqJzpyKRTSGsxRQUiNnd1rEWXGD0dBI1//d23//9FJA9uS7A4qKjo/EnuH05pjsTaB3zVyirtYcFKJL3DgbMeFoCKGUUbUmAEe7vIxdAKbpjJRL4HHZwwb8BcG7bHLmYFdbya5U=");
+            var sourceBytes = Encoding.UTF8.GetBytes("app_id=2021004153681483&charset=UTF-8&format=json&method=alipay.system.oauth.token&sign_type=RSA2&timestamp=2024-07-01 07:25:33&version=1.0");
+            var bytes = rsa.SignData(sourceBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+            var sign = Convert.ToBase64String(bytes);
+            Assert.That(sign, Is.EqualTo("UItF4asgd6OX+6uwjJr33KEA+FnyO00KeFaxNZOlEGE8BTN9nQbG0DJxTnwFonF7qHd9bBVptvTZCsSHrS5aww5n1ofPCuadewVJ14LJyexIURF6Rz8TDadXQlfDsCG7DrfIzs4ixeybwbPpNZMTFn1lpUmqR5jfybcR/aXT1RW9kh8PK6Q6m5Kp2Pl2q13DRGX7hCyJFvkq0ZdwRMtAgQAOCY5U9DYDROKVsAr+A/TyIQTQFIcIFtej+kDHZ5SKFllXgmPQONA3nEDOj/bU758rDnaQ3MKBPXe7FPUJooPtMTvAOD6fgnuOEXh9vStqOQKhuBeWAsnBxOP1L6uSWQ=="));
+        }
+
+        [Test]
         public void CreateAccessToken_Tests()
         {
             // Arrange
@@ -77,6 +90,7 @@ namespace Tests.CoreFramework
             {
                 Assert.That(expired, Is.False);
                 Assert.That(claimsPrincipal, Is.Not.Null);
+                Assert.That(claimsPrincipal?.Claims.GetValue("ipaddress"), Is.EqualTo("127.0.0.1"));
                 Assert.That(kid, Is.EqualTo("service"));
             });
 
