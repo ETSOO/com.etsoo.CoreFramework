@@ -22,7 +22,7 @@ namespace com.etsoo.CoreFramework.Authentication
         public int? RefreshTokenDays { get; set; }
 
         [Required]
-        public required string EncryptionKey { get; set; }
+        public string EncryptionKey { get; set; } = string.Empty;
 
         public string? PublicKey { get; set; }
         public string? PrivateKey { get; set; }
