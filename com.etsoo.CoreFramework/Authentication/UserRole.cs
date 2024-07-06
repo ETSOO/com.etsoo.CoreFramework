@@ -32,6 +32,18 @@
         User = 8,
 
         /// <summary>
+        /// Cashier
+        /// 出纳
+        /// </summary>
+        Cashier = 16,
+
+        /// <summary>
+        /// Team leader
+        /// 团队负责人
+        /// </summary>
+        Leader = 64,
+
+        /// <summary>
         /// Manager
         /// 经理
         /// </summary>

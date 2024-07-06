@@ -1,4 +1,7 @@
-﻿namespace com.etsoo.CoreFramework.Authentication
+﻿using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
+
+namespace com.etsoo.CoreFramework.Authentication
 {
     /// <summary>
     /// Jwt authentication service settings
@@ -6,19 +9,27 @@
     /// </summary>
     public record JwtSettings
     {
-        public string? DefaultIssuer { get; init; }
-        public string? DefaultAudience { get; init; }
-        public string? ValidIssuer { get; init; }
-        public IEnumerable<string>? ValidIssuers { get; init; }
-        public string? ValidAudience { get; init; }
-        public IEnumerable<string>? ValidAudiences { get; init; }
-        public IEnumerable<string>? TokenUrls { get; init; }
-        public bool? ValidateAudience { get; init; }
-        public string? SecurityAlgorithms { get; init; }
-        public int? AccessTokenMinutes { get; init; }
-        public int? RefreshTokenDays { get; init; }
-        public string EncryptionKey { get; init; } = string.Empty;
-        public string? PublicKey { get; init; }
-        public string? PrivateKey { get; init; }
+        public string? DefaultIssuer { get; set; }
+        public string? DefaultAudience { get; set; }
+        public string? ValidIssuer { get; set; }
+        public IEnumerable<string>? ValidIssuers { get; set; }
+        public string? ValidAudience { get; set; }
+        public IEnumerable<string>? ValidAudiences { get; set; }
+        public IEnumerable<string>? TokenUrls { get; set; }
+        public bool? ValidateAudience { get; set; }
+        public string? SecurityAlgorithms { get; set; }
+        public int? AccessTokenMinutes { get; set; }
+        public int? RefreshTokenDays { get; set; }
+
+        [Required]
+        public required string EncryptionKey { get; set; }
+
+        public string? PublicKey { get; set; }
+        public string? PrivateKey { get; set; }
+    }
+
+    [OptionsValidator]
+    public partial class ValidateJwtSettings : IValidateOptions<JwtSettings>
+    {
     }
 }
