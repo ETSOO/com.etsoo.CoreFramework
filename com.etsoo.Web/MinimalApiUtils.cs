@@ -36,15 +36,46 @@ namespace com.etsoo.Web
         }
 
         /// <summary>
+        /// Check device data without additional data
+        /// 检查设备信息，不返回额外数据
+        /// </summary>
+        /// <param name="service">Service</param>
+        /// <param name="userAgent">User agent string</param>
+        /// <param name="deviceId">Device id from client</param>
+        /// <returns>Check result</returns>
+        public static bool CheckDevice(this IServiceBase service, string? userAgent, string deviceId)
+        {
+            if (!CheckDevice(userAgent, out _, out var parser))
+            {
+                return false;
+            }
+
+            try
+            {
+                var deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+                if (string.IsNullOrEmpty(deviceCore))
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Check device data
         /// 检查设备信息
         /// </summary>
-        /// <param name="userAgent">User agent string</param>
         /// <param name="service">Service</param>
+        /// <param name="userAgent">User agent string</param>
         /// <param name="deviceId">Device id from client</param>
         /// <param name="result">Action result</param>
         /// <param name="data">Result data</param>
-        /// <returns>Valid or not</returns>
+        /// <returns>Check result</returns>
         public static bool CheckDevice(this IServiceBase service, string? userAgent, string deviceId, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out (string DeviceCore, UAParser Parser)? data)
         {
             data = null;
@@ -54,10 +85,20 @@ namespace com.etsoo.Web
                 return false;
             }
 
-            string? deviceCore;
             try
             {
-                deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+                var deviceCore = service.DecryptDeviceCore(deviceId, parser.ToShortName());
+
+                if (string.IsNullOrEmpty(deviceCore))
+                {
+                    result = ApplicationErrors.NoValidData.AsResult("Device");
+                    return false;
+                }
+
+                result = null;
+                data = (deviceCore, parser);
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -66,17 +107,6 @@ namespace com.etsoo.Web
                 result = service.LogException(ex);
                 return false;
             }
-
-            if (string.IsNullOrEmpty(deviceCore))
-            {
-                result = ApplicationErrors.NoValidData.AsResult("Device");
-                return false;
-            }
-
-            result = null;
-            data = (deviceCore, parser);
-
-            return true;
         }
     }
 }
