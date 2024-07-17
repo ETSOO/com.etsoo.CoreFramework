@@ -7,18 +7,32 @@
     public interface IStorage
     {
         /// <summary>
+        /// Root path or bucket name
+        /// 根路径或存储桶名称
+        /// </summary>
+        public string Root { get; }
+
+        /// <summary>
+        /// URL root
+        /// URL根路径
+        /// </summary>
+        public string URLRoot { get; }
+
+        /// <summary>
         /// Async delete file
         /// 异步删除文件
         /// </summary>
         /// <param name="path">Path</param>
-        ValueTask DeleteAsync(string path);
+        /// <returns>Is deleted</returns>
+        ValueTask<bool> DeleteAsync(string path, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async delete url file
         /// 异步删除URL文件
         /// </summary>
         /// <param name="url">URL</param>
-        ValueTask DeleteUrlAsync(string url);
+        /// <returns>Is deleted</returns>
+        ValueTask<bool> DeleteUrlAsync(string url, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async get write stream
@@ -26,8 +40,9 @@
         /// </summary>
         /// <param name="path">Path</param>
         /// <param name="writeCase">Write case</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Stream</returns>
-        ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew);
+        ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get Url address
@@ -43,7 +58,7 @@
         /// </summary>
         /// <param name="path">Path</param>
         /// <returns>Stream</returns>
-        ValueTask<Stream?> ReadAsync(string path);
+        ValueTask<Stream?> ReadAsync(string path, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Async write file

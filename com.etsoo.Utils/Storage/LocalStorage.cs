@@ -1,48 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Diagnostics.CodeAnalysis;
-
-namespace com.etsoo.Utils.Storage
+﻿namespace com.etsoo.Utils.Storage
 {
     /// <summary>
     /// Local Storage
     /// 本地存储
     /// </summary>
-    public class LocalStorage : IStorage
+    public class LocalStorage : StorageBase
     {
-        /// <summary>
-        /// Root
-        /// 根目录
-        /// </summary>
-        public string Root { get; }
-
-        /// <summary>
-        /// URL root
-        /// URL根路径
-        /// </summary>
-        public string URLRoot { get; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="section">Configuration section</param>
-        [RequiresUnreferencedCode("LocalStorage constructor AOT configuration issue")]
-        [RequiresDynamicCode("LocalStorage constructor AOT configuration issue")]
-        public LocalStorage(IConfigurationSection section)
-            : this(section.Get<LocalStorageSettings>())
+        public LocalStorage(string root, string urlRoot) : base(root, urlRoot)
         {
-
         }
 
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="settings">Settings</param>
-        public LocalStorage(LocalStorageSettings? settings)
+        public LocalStorage(StorageOptions options) : base(options.Root, options.URLRoot)
         {
-            Root = settings?.Root ?? string.Empty;
-            URLRoot = settings?.URLRoot ?? string.Empty;
         }
 
         /// <summary>
@@ -61,35 +30,20 @@ namespace com.etsoo.Utils.Storage
         /// 异步删除文件
         /// </summary>
         /// <param name="path">Path</param>
-        public async ValueTask DeleteAsync(string path)
+        /// <param name="cancellationToken">Cancellation token</param>
+        public override async ValueTask<bool> DeleteAsync(string path, CancellationToken cancellationToken = default)
         {
             var fi = GetFileInfo(path);
             if (fi.Exists)
             {
-                await Task.Run(() =>
+                return await Task.Run(() =>
                 {
                     fi.Delete();
-                });
+                    return true;
+                }, cancellationToken);
             }
-        }
 
-        /// <summary>
-        /// Async delete url file
-        /// 异步删除URL文件
-        /// </summary>
-        /// <param name="url">URL</param>
-        public async ValueTask DeleteUrlAsync(string url)
-        {
-            var pos = url.IndexOf(URLRoot, StringComparison.OrdinalIgnoreCase);
-            if (pos != -1)
-            {
-                var path = url[URLRoot.Length..];
-                pos = path.IndexOf('?');
-                if (pos != -1)
-                    path = path[0..pos];
-
-                await DeleteAsync(path);
-            }
+            return false;
         }
 
         /// <summary>
@@ -98,8 +52,9 @@ namespace com.etsoo.Utils.Storage
         /// </summary>
         /// <param name="path">Path</param>
         /// <param name="writeCase">Write case</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Stream</returns>
-        public async ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew)
+        public override async ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default)
         {
             var fi = GetFileInfo(path);
             if (
@@ -111,34 +66,23 @@ namespace com.etsoo.Utils.Storage
                 return null;
             }
 
-            if (writeCase == WriteCase.CreateOrOverwrite && fi.Exists)
-            {
-                // Delete existing file
-                fi.Delete();
-            }
-
-            // Create directory
-            if (fi.Directory != null && !fi.Directory.Exists)
-            {
-                fi.Directory.Create();
-            }
-
-            // Current file stream
             return await Task.Run(() =>
             {
-                return fi.Exists ? fi.OpenWrite() : fi.Create();
-            });
-        }
+                if (writeCase == WriteCase.CreateOrOverwrite && fi.Exists)
+                {
+                    // Delete existing file
+                    fi.Delete();
+                }
 
-        /// <summary>
-        /// Get Url address
-        /// 获取URL地址
-        /// </summary>
-        /// <param name="path">Path</param>
-        /// <returns>URL</returns>
-        public string GetUrl(string path)
-        {
-            return URLRoot + path.Replace('\\', '/');
+                // Create directory
+                if (fi.Directory != null && !fi.Directory.Exists)
+                {
+                    fi.Directory.Create();
+                }
+
+                // Current file stream
+                return fi.Exists ? fi.OpenWrite() : fi.Create();
+            }, cancellationToken);
         }
 
         /// <summary>
@@ -146,14 +90,15 @@ namespace com.etsoo.Utils.Storage
         /// 异步读文件
         /// </summary>
         /// <param name="path">Path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Stream</returns>
-        public async ValueTask<Stream?> ReadAsync(string path)
+        public override async ValueTask<Stream?> ReadAsync(string path, CancellationToken cancellationToken = default)
         {
             var fi = GetFileInfo(path);
             if (!fi.Exists)
                 return null;
 
-            return await Task.Run(fi.OpenRead);
+            return await Task.Run(fi.OpenRead, cancellationToken);
         }
 
         /// <summary>
@@ -164,32 +109,11 @@ namespace com.etsoo.Utils.Storage
         /// <param name="stream">Stream</param>
         /// <param name="writeCase">Write case</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default)
+        public override async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default)
         {
-            var fi = GetFileInfo(path);
-            if (
-                (writeCase == WriteCase.CreateNew && fi.Exists)
-                    ||
-                (writeCase == WriteCase.Appending && !fi.Exists)
-            )
-            {
-                return false;
-            }
-
-            if (writeCase == WriteCase.CreateOrOverwrite && fi.Exists)
-            {
-                // Delete existing file
-                fi.Delete();
-            }
-
-            // Create directory
-            if (fi.Directory != null && !fi.Directory.Exists)
-            {
-                fi.Directory.Create();
-            }
-
             // Current file stream
-            await using var fileStream = fi.Exists ? fi.OpenWrite() : fi.Create();
+            await using var fileStream = await GetWriteStreamAsync(path, writeCase, cancellationToken);
+            if (fileStream == null) return false;
 
             // Reset stream current position
             if (stream.CanSeek)
@@ -203,6 +127,7 @@ namespace com.etsoo.Utils.Storage
 
             // Close the stream explicitly
             fileStream.Close();
+            await fileStream.DisposeAsync();
 
             // Return
             return true;
