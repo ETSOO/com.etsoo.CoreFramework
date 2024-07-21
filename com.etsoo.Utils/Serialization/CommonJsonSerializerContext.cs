@@ -19,6 +19,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(StringKeyDictionaryString))]
     [JsonSerializable(typeof(Dictionary<string, object>))]
     [JsonSerializable(typeof(Dictionary<string, string>))]
+    [JsonSerializable(typeof(IDictionary<string, string>))]
     [JsonSerializable(typeof(IEnumerable<GuidItem>))]
     [JsonSerializable(typeof(IEnumerable<IdItem>))]
     [JsonSerializable(typeof(IEnumerable<IdLabelItem>))]

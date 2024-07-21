@@ -63,7 +63,7 @@ namespace com.etsoo.HtmlIO
                     if (!extension.StartsWith('.')) extension = "." + extension;
                     var filePath = path + Path.GetRandomFileName() + extension;
 
-                    var saveResult = await storage.WriteAsync(filePath, stream, WriteCase.CreateNew);
+                    var saveResult = await storage.WriteAsync(filePath, stream, WriteCase.CreateNew, cancellationToken: cancellationToken);
                     if (saveResult)
                     {
                         img.Source = storage.GetUrl(filePath);
