@@ -13,13 +13,8 @@ namespace Tests.Utils
 
         public LocalStorageTests()
         {
-            storage = new LocalStorage(root, "http://localhost/");
-        }
-
-        [OneTimeTearDown]
-        public void Cleanup()
-        {
             Directory.Delete(root, true);
+            storage = new LocalStorage(root, "http://localhost/");
         }
 
         [Test]
@@ -36,20 +31,21 @@ namespace Tests.Utils
         public async Task CommonOperationsTest()
         {
             // Act
+            var file = "a/test.txt";
             var content = "Hello, world!";
-            var writeResult = await storage.WriteAsync("a/test.txt", new MemoryStream(Encoding.UTF8.GetBytes(content)));
-            var result = await storage.FileExistsAsync("/a/test.txt");
+            var writeResult = await storage.WriteAsync(file, new MemoryStream(Encoding.UTF8.GetBytes(content)));
+            var result = await storage.FileExistsAsync(file);
 
-            await using var readResult = await storage.ReadAsync("/a/test.txt");
+            await using var readResult = await storage.ReadAsync(file);
             if (readResult != null)
             {
-                var readBytes = await SharedUtils.StreamToBytesAsync(readResult);
+                var readContent = await SharedUtils.StreamToStringAsync(readResult);
                 await readResult.DisposeAsync();
 
-                Assert.That(Encoding.UTF8.GetString(readBytes.Span), Is.EqualTo(content));
+                Assert.That(readContent, Is.EqualTo(content));
             }
 
-            var deleteResult = await storage.DeleteAsync("/a/test.txt");
+            var deleteResult = await storage.DeleteAsync(file);
 
             Assert.Multiple(() =>
             {
@@ -71,8 +67,9 @@ namespace Tests.Utils
             };
 
             // Act
-            var result = await storage.WriteAsync("/b/test.txt", new MemoryStream(Encoding.UTF8.GetBytes("Hello, world!")), tags: tags);
-            var readTags = await storage.ReadTagsAsync("/b/test.txt");
+            var file = "/b/test.txt";
+            var result = await storage.WriteAsync(file, new MemoryStream(Encoding.UTF8.GetBytes("Hello, world!")), tags: tags);
+            var readTags = await storage.ReadTagsAsync(file);
 
             // Assert
             Assert.Multiple(() =>
@@ -94,10 +91,13 @@ namespace Tests.Utils
             };
 
             // Act
-            var result = await storage.WriteAsync("/c/test.txt", new MemoryStream(Encoding.UTF8.GetBytes("Hello, world!")), tags: tags);
-            var copyResult = await storage.CopyAsync("/c/test.txt", "/c/test2.txt", tags: new Dictionary<string, string>(), deleteSource: false);
-            var readTags = await storage.ReadTagsAsync("/c/test2.txt");
+            var file = "/c/test.txt";
+            var file2 = "/c/test2.txt";
+            var result = await storage.WriteAsync(file, new MemoryStream(Encoding.UTF8.GetBytes("Hello, world!")), tags: tags);
+            var copyResult = await storage.CopyAsync(file, file2, tags: new Dictionary<string, string>(), deleteSource: false);
+            var readTags = await storage.ReadTagsAsync(file2);
             var entries = await storage.ListEntriesAsync("/c");
+            var deleteResult = await storage.DeleteFolderAsync("/c", true);
 
             // Assert
             Assert.Multiple(() =>
@@ -105,6 +105,7 @@ namespace Tests.Utils
                 Assert.That(result, Is.True);
                 Assert.That(readTags, Is.Null);
                 Assert.That(entries?.Count(), Is.EqualTo(2));
+                Assert.That(deleteResult, Is.True);
             });
         }
     }

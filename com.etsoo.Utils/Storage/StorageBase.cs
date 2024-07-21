@@ -91,6 +91,7 @@ namespace com.etsoo.Utils.Storage
 
         public abstract ValueTask<bool> CopyAsync(string srcPath, string destPath, IDictionary<string, string>? tags = null, bool deleteSource = false, CancellationToken cancellationToken = default);
         public abstract ValueTask<bool> DeleteAsync(string path, CancellationToken cancellationToken = default);
+        public abstract ValueTask<bool> DeleteFolderAsync(string path, bool recursive = false, CancellationToken cancellationToken = default);
         public abstract ValueTask<IEnumerable<StorageEntry>?> ListEntriesAsync(string path, CancellationToken cancellationToken = default);
         public abstract ValueTask<bool> FileExistsAsync(string path, CancellationToken cancellationToken = default);
         public abstract ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default);

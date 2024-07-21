@@ -100,6 +100,28 @@ namespace com.etsoo.Utils.Storage
         }
 
         /// <summary>
+        /// Async delete folder
+        /// 异步删除目录
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="recursive">Recursive</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public override async ValueTask<bool> DeleteFolderAsync(string path, bool recursive = false, CancellationToken cancellationToken = default)
+        {
+            var folder = new DirectoryInfo(GetPath(path));
+            if (folder.Exists)
+            {
+                return await Task.Run(() =>
+                {
+                    folder.Delete(recursive);
+                    return true;
+                }, cancellationToken);
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Async check file exists
         /// 异步检查文件是否存在
         /// </summary>

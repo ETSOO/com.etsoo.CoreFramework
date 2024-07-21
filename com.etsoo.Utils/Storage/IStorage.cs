@@ -40,6 +40,15 @@
         ValueTask<bool> DeleteAsync(string path, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Async delete folder
+        /// 异步删除目录
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="recursive">Recursive</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        ValueTask<bool> DeleteFolderAsync(string path, bool recursive = false, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Async delete url file
         /// 异步删除URL文件
         /// </summary>

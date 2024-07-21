@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
+using com.etsoo.Utils.Storage;
 using com.etsoo.Utils.String;
 using System.Text.Json.Serialization;
 
@@ -39,6 +40,8 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(DateTime))]
     [JsonSerializable(typeof(DateTimeOffset))]
+
+    [JsonSerializable(typeof(StorageEntry))]
     public partial class CommonJsonSerializerContext : JsonSerializerContext
     {
     }
