@@ -27,8 +27,8 @@ namespace com.etsoo.Utils.Storage
         /// <param name="urlRoot">URL root</param>
         public StorageBase(string root, string urlRoot)
         {
-            Root = root;
-            URLRoot = urlRoot;
+            Root = root.TrimStart().TrimEnd(' ', '/', '\\');
+            URLRoot = urlRoot.Trim();
         }
 
         /// <summary>
@@ -55,6 +55,30 @@ namespace com.etsoo.Utils.Storage
         }
 
         /// <summary>
+        /// Format path
+        /// 格式化路径
+        /// </summary>
+        /// <param name="path">Relative path</param>
+        /// <returns>Result</returns>
+        protected virtual string FormatPath(string path)
+        {
+            path = path.Replace('\\', '/');
+            if (!path.StartsWith('/')) path = '/' + path;
+            return path;
+        }
+
+        /// <summary>
+        /// Get full path
+        /// 获取完整路径
+        /// </summary>
+        /// <param name="path">Relative path</param>
+        /// <returns>Result</returns>
+        protected virtual string GetPath(string path)
+        {
+            return Root + FormatPath(path);
+        }
+
+        /// <summary>
         /// Get Url address
         /// 获取URL地址
         /// </summary>
@@ -62,12 +86,17 @@ namespace com.etsoo.Utils.Storage
         /// <returns>URL</returns>
         public string GetUrl(string path)
         {
-            return URLRoot + path.Replace('\\', '/');
+            return URLRoot + FormatPath(path);
         }
 
+        public abstract ValueTask<bool> CopyAsync(string srcPath, string destPath, IDictionary<string, string>? tags = null, bool deleteSource = false, CancellationToken cancellationToken = default);
         public abstract ValueTask<bool> DeleteAsync(string path, CancellationToken cancellationToken = default);
+        public abstract ValueTask<IEnumerable<StorageEntry>?> ListEntriesAsync(string path, CancellationToken cancellationToken = default);
+        public abstract ValueTask<bool> FileExistsAsync(string path, CancellationToken cancellationToken = default);
         public abstract ValueTask<Stream?> GetWriteStreamAsync(string path, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default);
         public abstract ValueTask<Stream?> ReadAsync(string path, CancellationToken cancellationToken = default);
-        public abstract ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default);
+        public abstract ValueTask<IDictionary<string, string>?> ReadTagsAsync(string path, CancellationToken cancellationToken = default);
+        public abstract ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, IDictionary<string, string>? tags = null, CancellationToken cancellationToken = default);
+        public abstract ValueTask<bool> WriteTagsAsync(string path, IDictionary<string, string> tags, CancellationToken cancellationToken = default);
     }
 }

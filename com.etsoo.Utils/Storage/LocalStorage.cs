@@ -1,4 +1,8 @@
-﻿namespace com.etsoo.Utils.Storage
+﻿using com.etsoo.Utils.Serialization;
+using Microsoft.Data.Sqlite;
+using System.Text.Json;
+
+namespace com.etsoo.Utils.Storage
 {
     /// <summary>
     /// Local Storage
@@ -6,12 +10,25 @@
     /// </summary>
     public class LocalStorage : StorageBase
     {
+        const string dbFile = "_e_i_o.db";
+        const string fsTable = "CREATE TABLE IF NOT EXISTS fs (path TEXT PRIMARY KEY, tags TEXT)";
+
         public LocalStorage(string root, string urlRoot) : base(root, urlRoot)
         {
         }
 
-        public LocalStorage(StorageOptions options) : base(options.Root, options.URLRoot)
+        public LocalStorage(StorageOptions options) : this(options.Root, options.URLRoot)
         {
+        }
+
+        /// <summary>
+        /// Get Sqlite connection
+        /// 获取 Sqlite 链接
+        /// </summary>
+        /// <returns>Result</returns>
+        protected SqliteConnection GetConnection()
+        {
+            return new SqliteConnection($"Data Source={Root}\\{dbFile};Cache=Shared;Mode=ReadWriteCreate;");
         }
 
         /// <summary>
@@ -22,7 +39,43 @@
         /// <returns>File info</returns>
         protected FileInfo GetFileInfo(string path)
         {
-            return new FileInfo(Root + path);
+            if (path.Contains(dbFile, StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Invalid path", nameof(path));
+
+            return new FileInfo(GetPath(path));
+        }
+
+        /// <summary>
+        /// Async copy file
+        /// 异步复制文件
+        /// </summary>
+        /// <param name="srcPath">Source path</param>
+        /// <param name="destPath">Destination path</param>
+        /// <param name="tags">Tags to override</param>
+        /// <param name="deleteSource">Is delete the source path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public override async ValueTask<bool> CopyAsync(string srcPath, string destPath, IDictionary<string, string>? tags = null, bool deleteSource = false, CancellationToken cancellationToken = default)
+        {
+            var fi = GetFileInfo(srcPath);
+            if (fi.Exists)
+            {
+                if (deleteSource)
+                {
+                    fi.MoveTo(GetPath(destPath), true);
+                }
+                else
+                {
+                    fi.CopyTo(GetPath(destPath), true);
+                }
+
+                if (tags != null)
+                {
+                    await WriteTagsAsync(destPath, tags, cancellationToken);
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -44,6 +97,19 @@
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Async check file exists
+        /// 异步检查文件是否存在
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public override async ValueTask<bool> FileExistsAsync(string path, CancellationToken cancellationToken = default)
+        {
+            await Task.CompletedTask;
+            return File.Exists(GetPath(path));
         }
 
         /// <summary>
@@ -86,6 +152,39 @@
         }
 
         /// <summary>
+        /// Async list entries under the path
+        /// 异步列出路径下的条目
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public override async ValueTask<IEnumerable<StorageEntry>?> ListEntriesAsync(string path, CancellationToken cancellationToken = default)
+        {
+            path = FormatPath(path);
+
+            var directory = new DirectoryInfo(GetPath(path));
+            if (!directory.Exists)
+                return null;
+
+            return await Task.Run(() =>
+            {
+                var entries = new List<StorageEntry>();
+
+                var directories = directory.GetDirectories();
+                entries.AddRange(directories.Select(d => new StorageEntry { Name = d.Name, IsFile = false, CreationTime = d.CreationTime, LastWriteTime = d.LastWriteTime }));
+
+                var files = directory.GetFiles();
+                if (string.IsNullOrEmpty(path) || path == "/")
+                {
+                    files = files.Where(f => f.Name != dbFile).ToArray();
+                }
+                entries.AddRange(files.Select(f => new StorageEntry { Name = f.Name, IsFile = true, Size = f.Length, CreationTime = f.CreationTime, LastWriteTime = f.LastWriteTime }));
+
+                return entries;
+            }, cancellationToken);
+        }
+
+        /// <summary>
         /// Async read file
         /// 异步读文件
         /// </summary>
@@ -102,14 +201,45 @@
         }
 
         /// <summary>
+        /// Async read tags
+        /// 异步读取标签
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public override async ValueTask<IDictionary<string, string>?> ReadTagsAsync(string path, CancellationToken cancellationToken = default)
+        {
+            path = FormatPath(path);
+
+            await using var connection = GetConnection();
+            await connection.OpenAsync(cancellationToken);
+
+            await using var command = connection.CreateCommand();
+
+            command.CommandText = $"{fsTable}; SELECT tags FROM fs WHERE path = @path";
+            command.Parameters.AddWithValue("@path", path);
+
+            var tags = await command.ExecuteScalarAsync(cancellationToken);
+            await connection.CloseAsync();
+
+            if (tags == null || tags == DBNull.Value)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize((string)tags, CommonJsonSerializerContext.Default.IDictionaryStringString);
+        }
+
+        /// <summary>
         /// Async write file
         /// 异步写文件
         /// </summary>
         /// <param name="path">Path</param>
         /// <param name="stream">Stream</param>
         /// <param name="writeCase">Write case</param>
+        /// <param name="tags">Tags</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public override async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, CancellationToken cancellationToken = default)
+        public override async ValueTask<bool> WriteAsync(string path, Stream stream, WriteCase writeCase = WriteCase.CreateNew, IDictionary<string, string>? tags = null, CancellationToken cancellationToken = default)
         {
             // Current file stream
             await using var fileStream = await GetWriteStreamAsync(path, writeCase, cancellationToken);
@@ -129,7 +259,50 @@
             fileStream.Close();
             await fileStream.DisposeAsync();
 
+            if (tags != null)
+            {
+                await WriteTagsAsync(path, tags, cancellationToken);
+            }
+
             // Return
+            return true;
+        }
+
+        /// <summary>
+        /// Async write tags
+        /// 异步写入标签
+        /// </summary>
+        /// <param name="path">Path</param>
+        /// <param name="tags">Tags</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public override async ValueTask<bool> WriteTagsAsync(string path, IDictionary<string, string> tags, CancellationToken cancellationToken = default)
+        {
+            path = FormatPath(path);
+
+            await using var connection = GetConnection();
+            await connection.OpenAsync(cancellationToken);
+
+            await using var command = connection.CreateCommand();
+
+            if (tags.Any())
+            {
+                var json = JsonSerializer.Serialize(tags, CommonJsonSerializerContext.Default.IDictionaryStringString);
+
+                command.CommandText = $"{fsTable}; INSERT OR REPLACE INTO fs (path, tags) VALUES (@path, @tags)";
+                command.Parameters.AddWithValue("@path", path);
+                command.Parameters.AddWithValue("@tags", json);
+            }
+            else
+            {
+                command.CommandText = $"{fsTable}; DELETE FROM fs WHERE path = @path";
+                command.Parameters.AddWithValue("@path", path);
+            }
+
+            await command.ExecuteNonQueryAsync(cancellationToken);
+
+            await connection.CloseAsync();
+
             return true;
         }
     }
