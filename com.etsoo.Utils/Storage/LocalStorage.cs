@@ -193,14 +193,14 @@ namespace com.etsoo.Utils.Storage
                 var entries = new List<StorageEntry>();
 
                 var directories = directory.GetDirectories();
-                entries.AddRange(directories.Select(d => new StorageEntry { Name = d.Name, IsFile = false, CreationTime = d.CreationTime, LastWriteTime = d.LastWriteTime }));
+                entries.AddRange(directories.Select(d => new StorageEntry { Name = d.Name, FullName = d.FullName, IsFile = false, CreationTime = d.CreationTime, LastWriteTime = d.LastWriteTime }));
 
                 var files = directory.GetFiles();
                 if (string.IsNullOrEmpty(path) || path == "/")
                 {
                     files = files.Where(f => f.Name != dbFile).ToArray();
                 }
-                entries.AddRange(files.Select(f => new StorageEntry { Name = f.Name, IsFile = true, Size = f.Length, CreationTime = f.CreationTime, LastWriteTime = f.LastWriteTime }));
+                entries.AddRange(files.Select(f => new StorageEntry { Name = f.Name, FullName = f.FullName, IsFile = true, Size = f.Length, CreationTime = f.CreationTime, LastWriteTime = f.LastWriteTime }));
 
                 return entries;
             }, cancellationToken);

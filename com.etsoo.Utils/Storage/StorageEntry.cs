@@ -13,6 +13,12 @@
         public required string Name { get; init; }
 
         /// <summary>
+        /// Full path of the file or directory
+        /// 文件或目录的完整路径
+        /// </summary>
+        public required string FullName { get; init; }
+
+        /// <summary>
         /// Is file or not
         /// 是否为文件
         /// </summary>
