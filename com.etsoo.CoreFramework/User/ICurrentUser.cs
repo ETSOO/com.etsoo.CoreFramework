@@ -11,12 +11,6 @@ namespace com.etsoo.CoreFramework.User
     public interface ICurrentUser : IUserToken
     {
         /// <summary>
-        /// Unique connection id
-        /// 唯一连接编号
-        /// </summary>
-        string? ConnectionId { get; }
-
-        /// <summary>
         /// Name
         /// 姓名
         /// </summary>

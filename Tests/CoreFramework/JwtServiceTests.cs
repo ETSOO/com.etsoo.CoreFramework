@@ -60,7 +60,8 @@ namespace Tests.CoreFramework
         public void CreateAccessToken_Tests()
         {
             // Arrange
-            var user = new CurrentUser("1", null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), 1, CultureInfo.CurrentCulture, "CN");
+            string[] userScopes = ["core", "crm"];
+            var user = new CurrentUser("1", userScopes, null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN");
 
             // Act
             var token = service.CreateAccessToken(user);
@@ -80,18 +81,16 @@ namespace Tests.CoreFramework
              */
             var publicService = new JwtService(new ServiceCollection(), section.Get<JwtSettings>(), null);
 
-            // Refresh token
-            var refreshToken = service.CreateRefreshToken(new RefreshToken("1", null, IPAddress.Parse("127.0.0.1"), "CN", 1, "service"));
-
             // Validate refresh token
-            var (claimsPrincipal, expired, kid, securityToken) = publicService.ValidateToken(refreshToken);
+            var (claimsPrincipal, kid, securityToken) = publicService.ValidateToken(token);
+
+            var scopes = claimsPrincipal?.Claims.Where(claim => claim.Type == "scope").Select(claim => claim.Value);
 
             Assert.Multiple(() =>
             {
-                Assert.That(expired, Is.False);
                 Assert.That(claimsPrincipal, Is.Not.Null);
-                Assert.That(claimsPrincipal?.Claims.GetValue("ipaddress"), Is.EqualTo("127.0.0.1"));
-                Assert.That(kid, Is.EqualTo("service"));
+                Assert.That(claimsPrincipal?.Claims.GetValue(UserToken.IPAddressClaim), Is.EqualTo("127.0.0.1"));
+                Assert.That(scopes, Is.EqualTo(userScopes));
             });
 
             // Public service should not generate token

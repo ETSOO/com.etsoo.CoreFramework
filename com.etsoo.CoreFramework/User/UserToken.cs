@@ -7,7 +7,7 @@ namespace com.etsoo.CoreFramework.User
     /// User token
     /// 用户令牌
     /// </summary>
-    public record UserToken : IUserToken
+    public record UserToken : MinUserToken, IUserToken
     {
         /// <summary>
         /// IP Address claim type
@@ -22,42 +22,41 @@ namespace com.etsoo.CoreFramework.User
         public const string OrganizationClaim = "organization";
 
         /// <summary>
+        /// Device id claim type
+        /// 设备编号声明类型
+        /// </summary>
+        public const string DeviceIdClaim = "deviceid";
+
+        /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
         /// <param name="claims">Claims</param>
+        /// <param name="connectionId">Connection id</param>
         /// <returns>Refresh token</returns>
-        public static UserToken? Create(ClaimsPrincipal? claims)
+        public new static UserToken? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
-            // Basic check
-            if (claims == null || claims.Identity == null || !claims.Identity.IsAuthenticated)
-                return null;
+            if (claims == null) return null;
+
+            var user = MinUserToken.Create(claims, connectionId);
+            if (user == null) return null;
 
             // Claims
-            var id = claims.FindFirstValue(ClaimTypes.NameIdentifier);
             var region = claims.FindFirstValue(ClaimTypes.Country);
             var ip = claims.FindFirstValue(IPAddressClaim);
-            var device = claims.FindFirstValue(ClaimTypes.AuthenticationInstant);
+            var deviceId = claims.FindFirstValue(DeviceIdClaim);
             var organization = claims.FindFirstValue(OrganizationClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(id)
-                || string.IsNullOrEmpty(region)
+            if (string.IsNullOrEmpty(region)
                 || string.IsNullOrEmpty(ip)
                 || !IPAddress.TryParse(ip, out var ipAddress)
-                || string.IsNullOrEmpty(device)
-                || !int.TryParse(device, out var deviceId))
+                || string.IsNullOrEmpty(deviceId))
                 return null;
 
             // New object
-            return new UserToken(id, ipAddress, region, deviceId, organization);
+            return new UserToken(user.Id, user.Scopes, ipAddress, region, deviceId, organization, user.ConnectionId);
         }
-
-        /// <summary>
-        /// User Id
-        /// 用户编号
-        /// </summary>
-        public string Id { get; }
 
         /// <summary>
         /// Int id
@@ -81,7 +80,7 @@ namespace com.etsoo.CoreFramework.User
         /// Device id
         /// 设备编号
         /// </summary>
-        public int DeviceId { get; }
+        public string DeviceId { get; }
 
         /// <summary>
         /// Organization id, support switch
@@ -100,13 +99,15 @@ namespace com.etsoo.CoreFramework.User
         /// 构造函数
         /// </summary>
         /// <param name="id">User id</param>
+        /// <param name="scopes">Scopes</param>
         /// <param name="clientIp"></param>
         /// <param name="region">Country or region</param>
         /// <param name="deviceId">Device id</param>
         /// <param name="organization">Organization</param>
-        public UserToken(string id, IPAddress clientIp, string region, int deviceId, string? organization)
+        /// <param name="connectionId">Connection id</param>
+        public UserToken(string id, IEnumerable<string>? scopes, IPAddress clientIp, string region, string deviceId, string? organization, string? connectionId = null)
+            : base(id, scopes, connectionId)
         {
-            Id = id;
             ClientIp = clientIp;
             Region = region;
             DeviceId = deviceId;
@@ -124,44 +125,24 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
-        /// More claims to provide
-        /// 提供更多声明
-        /// </summary>
-        /// <returns>Claims</returns>
-        public virtual IEnumerable<Claim> MoreClaims()
-        {
-            yield break;
-        }
-
-        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        protected IEnumerable<Claim> CreateClaims()
+        protected override List<Claim> CreateClaims()
         {
-            yield return new(ClaimTypes.NameIdentifier, Id);
-            yield return new(ClaimTypes.Country, Region);
-            yield return new(IPAddressClaim, ClientIp.ToString());
-            yield return new(ClaimTypes.AuthenticationInstant, DeviceId.ToString());
+            var claims = base.CreateClaims();
+
+            claims.AddRange([
+                new(ClaimTypes.Country, Region),
+                new(IPAddressClaim, ClientIp.ToString()),
+                new(DeviceIdClaim, DeviceId)
+            ]);
 
             if (!string.IsNullOrEmpty(Organization))
-                yield return new(OrganizationClaim, Organization);
+                claims.Add(new(OrganizationClaim, Organization));
 
-            foreach (var claim in MoreClaims())
-            {
-                yield return claim;
-            }
-        }
-
-        /// <summary>
-        /// Create identity
-        /// 创建身份
-        /// </summary>
-        /// <returns>Identity</returns>
-        public virtual ClaimsIdentity CreateIdentity()
-        {
-            return new ClaimsIdentity(CreateClaims());
+            return claims;
         }
     }
 }

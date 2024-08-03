@@ -16,14 +16,10 @@ namespace com.etsoo.CoreFramework.Authentication
         public string? ValidAudience { get; set; }
         public IEnumerable<string>? ValidAudiences { get; set; }
         public IEnumerable<string>? TokenUrls { get; set; }
-        public bool? ValidateAudience { get; set; }
         public string? SecurityAlgorithms { get; set; }
         public int? AccessTokenMinutes { get; set; }
-        public int? RefreshTokenDays { get; set; }
-
         [Required]
         public string EncryptionKey { get; set; } = string.Empty;
-
         public string? PublicKey { get; set; }
         public string? PrivateKey { get; set; }
     }

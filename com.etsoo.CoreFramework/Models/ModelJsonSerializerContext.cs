@@ -1,5 +1,4 @@
 ﻿using com.etsoo.CoreFramework.Services;
-using com.etsoo.Utils.Actions;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
@@ -15,7 +14,6 @@ namespace com.etsoo.CoreFramework.Models
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     )]
 
-    [JsonSerializable(typeof(ActionResult))]
     [JsonSerializable(typeof(ChangePasswordDto))]
     [JsonSerializable(typeof(ChangePasswordRQ))]
     [JsonSerializable(typeof(DateTime))]

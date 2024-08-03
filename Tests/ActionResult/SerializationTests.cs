@@ -1,5 +1,5 @@
-﻿using com.etsoo.CoreFramework.Models;
-using com.etsoo.Utils;
+﻿using com.etsoo.Utils;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using NUnit.Framework;
 using System.Buffers;
@@ -82,7 +82,7 @@ namespace Tests.ActionResult
 
             // Act
             var stream = SharedUtils.GetStream();
-            await result.ToJsonAsync(stream, ModelJsonSerializerContext.Default.ActionResult);
+            await result.ToJsonAsync(stream, CommonJsonSerializerContext.Default.ActionResult);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
             Assert.Multiple(() =>

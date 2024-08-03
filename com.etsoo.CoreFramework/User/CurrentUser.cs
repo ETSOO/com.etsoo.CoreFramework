@@ -31,7 +31,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="claims">Claims</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public new static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
             if (claims == null) return null;
 
@@ -52,6 +52,7 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new CurrentUser(
                 user.Id,
+                user.Scopes,
                 user.Organization,
                 name, roleValue,
                 user.ClientIp,
@@ -65,13 +66,14 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? id, string? organization, short? Role, int? deviceId, string? Name, string? OrgName, string? Avatar) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? Name, string? OrgName, string? Avatar) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
+                data.GetArray("Scopes"),
                 data.Get("Organization"),
                 data.Get<short>("Role"),
-                data.Get<int>("DeviceId"),
+                data.Get("DeviceId"),
                 data.Get("Name"),
                 data.Get("OrgName"),
                 data.Get("Avatar")
@@ -91,20 +93,21 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, organization, role, deviceId, name, orgName, avatar) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, orgName, avatar) = GetData(data);
 
             // Validation
-            if (id == null || role == null || deviceId == null || string.IsNullOrEmpty(name))
+            if (id == null || role == null || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
             return new CurrentUser(
                 id,
+                scopes,
                 organization,
                 name,
                 role.Value,
                 ip,
-                deviceId.Value,
+                deviceId,
                 language,
                 region,
                 connectionId)
@@ -151,16 +154,11 @@ namespace com.etsoo.CoreFramework.User
         public CultureInfo Language { get; }
 
         /// <summary>
-        /// Connection id
-        /// 链接编号
-        /// </summary>
-        public string? ConnectionId { get; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
+        /// <param name="scopes">Scopes</param>
         /// <param name="organization">Organization</param>
         /// <param name="name">Name</param>
         /// <param name="roleValue">Role value</param>
@@ -169,16 +167,13 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, string? organization, string name, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, string? connectionId = null)
-            : base(id, clientIp, region, deviceId, organization)
+        public CurrentUser(string id, IEnumerable<string>? scopes, string? organization, string name, short roleValue, IPAddress clientIp, string deviceId, CultureInfo language, string region, string? connectionId = null)
+            : base(id, scopes, clientIp, region, deviceId, organization, connectionId)
         {
             Name = name;
             RoleValue = roleValue;
             Role = ServiceUser.GetRole(roleValue);
-
             Language = language;
-
-            ConnectionId = connectionId;
         }
 
         /// <summary>
@@ -186,18 +181,23 @@ namespace com.etsoo.CoreFramework.User
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        public override IEnumerable<Claim> MoreClaims()
+        protected override List<Claim> CreateClaims()
         {
-            yield return new(ClaimTypes.Name, Name);
+            var claims = base.CreateClaims();
+
+            claims.AddRange([
+                new(ClaimTypes.Name, Name),
+                new(ClaimTypes.Locality, Language.Name),
+                new(ServiceUser.RoleValueClaim, RoleValue.ToString())
+            ]);
 
             if (!string.IsNullOrEmpty(OrganizationName))
-                yield return new(OrganizationNameClaim, OrganizationName);
+                claims.Add(new(OrganizationNameClaim, OrganizationName));
 
             if (Avatar != null)
-                yield return new(AvatarClaim, Avatar);
+                claims.Add(new(AvatarClaim, Avatar));
 
-            yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(ServiceUser.RoleValueClaim, RoleValue.ToString());
+            return claims;
         }
 
         /// <summary>
@@ -208,7 +208,10 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (_, _, role, _, name, orgName, avatar) = GetData(data);
+            var (_, scopes, _, role, _, name, orgName, avatar) = GetData(data);
+
+            // Scopes
+            Scopes = scopes;
 
             // Role
             if (role != null && RoleValue != role)

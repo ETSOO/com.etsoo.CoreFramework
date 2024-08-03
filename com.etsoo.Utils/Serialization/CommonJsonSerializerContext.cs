@@ -2,6 +2,7 @@
 using com.etsoo.Utils.Models;
 using com.etsoo.Utils.Storage;
 using com.etsoo.Utils.String;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.Utils.Serialization
@@ -37,6 +38,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<decimal>))]
     [JsonSerializable(typeof(IEnumerable<float>))]
     [JsonSerializable(typeof(IActionResult))]
+    [JsonSerializable(typeof(JsonElement))]
     [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(DateTime))]
     [JsonSerializable(typeof(DateTimeOffset))]

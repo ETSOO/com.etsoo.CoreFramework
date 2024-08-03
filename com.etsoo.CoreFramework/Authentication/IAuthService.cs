@@ -18,12 +18,6 @@ namespace com.etsoo.CoreFramework.Authentication
         int AccessTokenMinutes { get; }
 
         /// <summary>
-        /// Refresh token expiration days
-        /// 刷新令牌到期时间（天）
-        /// </summary>
-        int RefreshTokenDays { get; }
-
-        /// <summary>
         /// Create token
         /// 创建令牌
         /// </summary>
@@ -37,27 +31,9 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <param name="audience">Audience</param>
+        /// <param name="liveMinutes">Live minutes</param>
         /// <returns>Token</returns>
-        string CreateAccessToken(IUserToken user, string? audience = null);
-
-        /// <summary>
-        /// Create service access token
-        /// 创建服务访问令牌
-        /// </summary>
-        /// <param name="user">User</param>
-        /// <param name="keyId">Service key id</param>
-        /// <param name="audience">Audience</param>
-        /// <returns>Token</returns>
-        string CreateAccessToken(IServiceUser user, string keyId, string? audience = null);
-
-        /// <summary>
-        /// Create refresh token
-        /// 创建刷新令牌
-        /// </summary>
-        /// <param name="token">Refresh token</param>
-        /// <param name="validMinutes">Valid minutes</param>
-        /// <returns>Token</returns>
-        string CreateRefreshToken(IRefreshToken token, int? validMinutes = null);
+        string CreateAccessToken(IMinUserToken user, string? audience = null, int? liveMinutes = null);
 
         /// <summary>
         /// Sign data
@@ -84,7 +60,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="token">Token</param>
         /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token, string? audience = null);
+        (ClaimsPrincipal? claims, string? keyId, SecurityToken? securityToken) ValidateToken(string token, string? audience = null);
 
         /// <summary>
         /// Verify data

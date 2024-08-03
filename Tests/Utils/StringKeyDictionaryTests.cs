@@ -115,5 +115,89 @@ namespace Tests.Utils
                 Assert.That(dic.Get<decimal>("string"), Is.EqualTo(12.8M));
             });
         }
+
+        [Test]
+        public void DictionaryString_GetIntArray_Test()
+        {
+            // Arrange
+            var dic = new StringKeyDictionaryString(new Dictionary<string, string?>()
+            {
+                { "array1", "1, a,3,4" },
+                { "array2", "[1, 3, 4]" }
+            });
+
+            var array1 = dic.GetArray<int>("array1");
+            var array2 = dic.GetArray<int>("array2");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(array1.Count, Is.EqualTo(3));
+                Assert.That(array2.Count, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void DictionaryString_GetStringArray_Test()
+        {
+            // Arrange
+            var dic = new StringKeyDictionaryString(new Dictionary<string, string?>()
+            {
+                { "array1", "1, a, 3,4" },
+                { "array2", "[\"1\",\"3\",\"4\"]" }
+            });
+
+            var array1 = dic.GetArray("array1");
+            var array2 = dic.GetArray("array2");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(array1, Is.Not.Null);
+                Assert.That(array2, Is.Not.Null);
+                Assert.That(array1!.Count, Is.EqualTo(4));
+                Assert.That(array2!.Count, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void DictionaryObject_GetIntArray_Test()
+        {
+            // Arrange
+            var dic = new StringKeyDictionaryObject(new Dictionary<string, object?>()
+            {
+                { "array1", "1, a,3,4" },
+                { "array2", "[1, 3, 4]" }
+            });
+
+            var array1 = dic.GetArray<int>("array1");
+            var array2 = dic.GetArray<int>("array2");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(array1.Count, Is.EqualTo(3));
+                Assert.That(array2.Count, Is.EqualTo(3));
+            });
+        }
+
+        [Test]
+        public void DictionaryObject_GetStringArray_Test()
+        {
+            // Arrange
+            var dic = new StringKeyDictionaryObject(new Dictionary<string, object?>()
+            {
+                { "array1", "1, a, 3,4" },
+                { "array2", "[\"1\",\"3\",\"4\"]" }
+            });
+
+            var array1 = dic.GetArray("array1");
+            var array2 = dic.GetArray("array2");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(array1, Is.Not.Null);
+                Assert.That(array2, Is.Not.Null);
+                Assert.That(array1!.Count, Is.EqualTo(4));
+                Assert.That(array2!.Count, Is.EqualTo(3));
+            });
+        }
     }
 }

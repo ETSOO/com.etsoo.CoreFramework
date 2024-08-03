@@ -18,7 +18,7 @@ namespace Tests.Services
     internal class ServiceWithParameterTest : ServiceBase<AppConfiguration, SqliteConnection, ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
     {
         public ServiceWithParameterTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger)
-            : base(app, new CurrentUser("1001", null, "Admin", 255, IPAddress.Loopback, 1, new CultureInfo("zh-CN"), "CN"), flag, logger)
+            : base(app, new CurrentUser("1001", [], null, "Admin", 255, IPAddress.Loopback, "1", new CultureInfo("zh-CN"), "CN"), flag, logger)
         {
         }
 

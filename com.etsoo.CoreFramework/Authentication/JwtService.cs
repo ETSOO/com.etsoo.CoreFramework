@@ -20,19 +20,18 @@ namespace com.etsoo.CoreFramework.Authentication
     {
         private const string DefaultIssuer = "SmartERP";
 
-        private readonly TokenDecryptionKeyResolver tokenDecryptionKeyResolver;
-
         private readonly RSACrypto crypto;
         private readonly string securityAlgorithms;
-        private readonly IssuerSigningKeyResolver issuerSigningKeyResolver;
 
         private readonly string defaultIssuer;
-        private readonly string? validIssuer;
+        private readonly string validIssuer;
         private readonly IEnumerable<string>? validIssuers;
 
         private readonly string defaultAudience;
         private readonly string? validAudience;
         private readonly IEnumerable<string>? validAudiences;
+
+        private readonly string encryptionKey;
 
         /// <summary>
         /// Access token expiration minutes
@@ -41,37 +40,30 @@ namespace com.etsoo.CoreFramework.Authentication
         public int AccessTokenMinutes { get; }
 
         /// <summary>
-        /// Refresh token expiration days
-        /// 刷新令牌到期时间（天）
-        /// </summary>
-        public int RefreshTokenDays { get; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="services">Dependency injection services</param>
         /// <param name="settings">Settings</param>
-        /// <param name="issuerSigningKeyResolver">Issuer signing key resolver</param>
-        /// <param name="tokenDecryptionKeyResolver">Token decryption key resolver</param>
         /// <param name="events">Events handler</param>
         public JwtService(IServiceCollection services,
             JwtSettings? settings,
-            IssuerSigningKeyResolver? issuerSigningKeyResolver = null,
-            TokenDecryptionKeyResolver? tokenDecryptionKeyResolver = null,
             JwtBearerEvents? events = null)
         {
             // Jwt settings are required
             ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
             defaultIssuer = settings.DefaultIssuer ?? DefaultIssuer;
-            defaultAudience = settings.DefaultAudience ?? "All";
+            defaultAudience = settings.DefaultAudience ?? "ALL";
 
-            validIssuer = settings.ValidIssuer;
             validIssuers = settings.ValidIssuers;
-            if (string.IsNullOrEmpty(validIssuer))
+            if (string.IsNullOrEmpty(settings.ValidIssuer))
             {
                 validIssuer = defaultIssuer;
+            }
+            else
+            {
+                validIssuer = settings.ValidIssuer;
             }
 
             validAudience = settings.ValidAudience;
@@ -83,51 +75,18 @@ namespace com.etsoo.CoreFramework.Authentication
 
             var tokenUrls = settings.TokenUrls;
 
-            // Whether validate audience
-            var validateAudience = settings.ValidateAudience;
-
             // Hash algorithms
             securityAlgorithms = settings.SecurityAlgorithms ?? SecurityAlgorithms.RsaSha512Signature;
 
             // Default 30 minutes
             AccessTokenMinutes = settings.AccessTokenMinutes.GetValueOrDefault(30);
 
-            // Default 90 days
-            RefreshTokenDays = settings.RefreshTokenDays.GetValueOrDefault(90);
-
             // https://stackoverflow.com/questions/53487247/encrypting-jwt-security-token-supported-algorithms
             // AES256, 256 / 8 = 32 bytes
-            var encryptionKey = settings.EncryptionKey;
+            encryptionKey = settings.EncryptionKey;
 
             // RSA crypto provider
             crypto = new RSACrypto(settings.PublicKey, settings.PrivateKey);
-
-            // Default signing key resolver
-            this.issuerSigningKeyResolver = (token, securityToken, kid, validationParameters) =>
-            {
-                if (issuerSigningKeyResolver == null)
-                {
-                    return new List<RsaSecurityKey> { new(crypto.RSA) { KeyId = kid } };
-                }
-
-                var keys = issuerSigningKeyResolver(token, securityToken, kid, validationParameters);
-                if (!keys.Any()) keys = keys.Append(new RsaSecurityKey(crypto.RSA) { KeyId = kid });
-
-                return keys;
-            };
-
-            this.tokenDecryptionKeyResolver = (token, securityToken, kid, validationParameters) =>
-            {
-                if (tokenDecryptionKeyResolver == null)
-                {
-                    return new List<SymmetricSecurityKey> { new(Encoding.UTF8.GetBytes(encryptionKey)) { KeyId = kid } };
-                }
-
-                var keys = tokenDecryptionKeyResolver(token, securityToken, kid, validationParameters);
-                if (!keys.Any()) keys = keys.Append(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey)) { KeyId = kid });
-
-                return keys;
-            };
 
             // Sending the access token in the query string is required due to
             // a limitation in Browser APIs. We restrict it to only calls to the
@@ -187,12 +146,10 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // Token validation parameters
                 options.TokenValidationParameters = CreateValidationParameters();
-                if (validateAudience != null)
-                    options.TokenValidationParameters.ValidateAudience = validateAudience.Value;
             });
         }
 
-        private TokenValidationParameters CreateValidationParameters(bool validateLifetime = true, string? audience = null)
+        private TokenValidationParameters CreateValidationParameters(string? audience = null)
         {
             return new TokenValidationParameters
             {
@@ -200,15 +157,14 @@ namespace com.etsoo.CoreFramework.Authentication
                 RequireExpirationTime = true,
                 RequireAudience = true,
 
-                //IssuerSigningKey = new RsaSecurityKey(crypto.RSA),
-                IssuerSigningKeyResolver = issuerSigningKeyResolver,
+                IssuerSigningKey = GetIssuerSigningKey(),
+                //IssuerSigningKeyResolver = issuerSigningKeyResolver,
 
                 // Token decryption
-                // TokenDecryptionKey = encryptionKey,
-                TokenDecryptionKeyResolver = tokenDecryptionKeyResolver,
+                TokenDecryptionKey = GetTokenDecryptionKey(),
 
                 // false to valid additional data
-                ValidateLifetime = validateLifetime,
+                ValidateLifetime = true,
 
                 ValidateIssuer = true,
                 ValidateAudience = true,
@@ -216,7 +172,7 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // Specific audience
                 ValidAudience = audience ?? validAudience,
-                ValidAudiences = (audience == null ? validAudiences : null),
+                ValidAudiences = audience == null ? validAudiences : null,
 
                 ValidIssuer = validIssuer,
                 ValidIssuers = validIssuers
@@ -240,16 +196,13 @@ namespace com.etsoo.CoreFramework.Authentication
             };
 
             // Security key
-            var keys = issuerSigningKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
-            var securityKey = string.IsNullOrEmpty(action.KeyId) || action.KeyId == DefaultIssuer ? keys.FirstOrDefault() : keys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
-
-            var encryptionKeys = tokenDecryptionKeyResolver(string.Empty, null, action.KeyId, validataionParameters);
-            var encryptionKey = string.IsNullOrEmpty(action.KeyId) || action.KeyId == DefaultIssuer ? encryptionKeys.FirstOrDefault() : encryptionKeys.FirstOrDefault(item => !string.IsNullOrEmpty(item.KeyId) && item.KeyId.Equals(action.KeyId));
+            var securityKey = GetIssuerSigningKey();
+            var encryptionKey = GetTokenDecryptionKey();
 
             // Enable only with private key
-            if (securityKey == null || encryptionKey == null || (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists))
+            if (securityKey is RsaSecurityKey sk && sk.PrivateKeyStatus != PrivateKeyStatus.Exists)
             {
-                throw new InvalidOperationException("No Security Key");
+                throw new InvalidOperationException("No Issuer Signing Security Key");
             }
 
             // Token handler
@@ -286,43 +239,31 @@ namespace com.etsoo.CoreFramework.Authentication
         /// </summary>
         /// <param name="user">User</param>
         /// <param name="audience">Audience</param>
-        /// <param name="keyId">Key id</param>
+        /// <param name="liveMinutes">Live minutes</param>
         /// <returns>Token</returns>
-        public string CreateAccessToken(IUserToken user, string? audience = null)
+        public string CreateAccessToken(IMinUserToken user, string? audience = null, int? liveMinutes = null)
         {
-            return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes)));
+            return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(liveMinutes.GetValueOrDefault(AccessTokenMinutes))));
         }
 
         /// <summary>
-        /// Create service access token
-        /// 创建服务访问令牌
+        /// Get issuer signing key
+        /// 获取签发密钥
         /// </summary>
-        /// <param name="user">User</param>
-        /// <param name="keyId">Service key id</param>
-        /// <param name="audience">Audience</param>
-        /// <returns>Token</returns>
-        public string CreateAccessToken(IServiceUser user, string keyId, string? audience = null)
+        /// <returns>Security key</returns>
+        protected virtual SecurityKey GetIssuerSigningKey()
         {
-            user.Service = keyId;
-            return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(AccessTokenMinutes), keyId));
-        }
-
-        private string GetRefreshTokenAudience()
-        {
-            return defaultIssuer + "RefreshToken";
+            return new RsaSecurityKey(crypto.RSA);
         }
 
         /// <summary>
-        /// Create refresh token
-        /// 创建刷新令牌
+        /// Get token decryption key
+        /// 获取令牌解密密钥
         /// </summary>
-        /// <param name="token">Refresh token</param>
-        /// <param name="validMinutes">Valid minutes</param>
-        /// <returns>Token</returns>
-        public string CreateRefreshToken(IRefreshToken token, int? validMinutes = null)
+        /// <returns>Security key</returns>
+        protected virtual SecurityKey GetTokenDecryptionKey()
         {
-            var ts = validMinutes == null ? TimeSpan.FromDays(RefreshTokenDays) : TimeSpan.FromMinutes(validMinutes.Value);
-            return CreateToken(new AuthAction(token.CreateIdentity(), GetRefreshTokenAudience(), ts, token.Sid));
+            return new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey));
         }
 
         /// <summary>
@@ -356,16 +297,15 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="token">Token</param>
         /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        public (ClaimsPrincipal? claims, bool expired, string? kid, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
+        public (ClaimsPrincipal? claims, string? keyId, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
         {
             var handler = new JwtSecurityTokenHandler();
-            var claims = handler.ValidateToken(token, CreateValidationParameters(false, audience ?? GetRefreshTokenAudience()), out var validatedToken);
+            var claims = handler.ValidateToken(token, CreateValidationParameters(audience), out var validatedToken);
 
             var securityToken = validatedToken as JwtSecurityToken;
-            var expired = (validatedToken.ValidTo < DateTime.UtcNow);
-            var kid = validatedToken is JwtSecurityToken jk ? jk.Header.Kid : (validatedToken.SecurityKey?.KeyId);
+            var keyId = validatedToken is JwtSecurityToken jk ? jk.Header.Kid : (validatedToken.SecurityKey?.KeyId);
 
-            return (claims, expired, kid, securityToken);
+            return (claims, keyId, securityToken);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Serialization;
+using System.Text.Json;
 
 namespace com.etsoo.Utils.String
 {
@@ -97,6 +98,70 @@ namespace com.etsoo.Utils.String
 
             // Create the object
             return TSelf.Create(this);
+        }
+
+        /// <summary>
+        /// Get array value
+        /// 获取数组值
+        /// </summary>
+        /// <typeparam name="T">Struct type</typeparam>
+        /// <param name="key">Key</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <param name="splitter">Splitter</param>
+        /// <returns>Value</returns>
+        public IEnumerable<T> GetArray<T>(string key, bool loose = false, char splitter = ',') where T : struct
+        {
+            var item = GetItem(key);
+            if (item == null) return [];
+
+            if (item is IEnumerable<T> array)
+            {
+                return array;
+            }
+
+            if (item is string str)
+            {
+                if (str.StartsWith('[') && str.EndsWith(']'))
+                {
+                    var doc = JsonDocument.Parse(str);
+                    return doc.RootElement.GetArray<T>(loose);
+                }
+
+                return StringUtils.AsEnumerable<T>(str, splitter);
+            }
+
+            return [];
+        }
+
+        /// <summary>
+        /// Get string array
+        /// 获取字符串数组
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="splitter">Splitter</param>
+        /// <returns>Result</returns>
+        public IEnumerable<string>? GetArray(string key, char splitter = ',')
+        {
+            var item = GetItem(key);
+            if (item == null) return null;
+
+            if (item is IEnumerable<string> stringArray)
+            {
+                return stringArray;
+            }
+
+            if (item is string str)
+            {
+                if (str.StartsWith('[') && str.EndsWith(']'))
+                {
+                    var doc = JsonDocument.Parse(str);
+                    return doc.RootElement.GetArray(CommonJsonSerializerContext.Default.String);
+                }
+
+                return StringUtils.AsEnumerable(str, splitter);
+            }
+
+            return null;
         }
     }
 }

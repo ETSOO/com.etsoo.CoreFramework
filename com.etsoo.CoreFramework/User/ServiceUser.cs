@@ -33,7 +33,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="claims">Claims</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static ServiceUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public new static ServiceUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
         {
             if (claims == null) return null;
 
@@ -55,13 +55,15 @@ namespace com.etsoo.CoreFramework.User
             // New user
             return new ServiceUser(
                 token.Id,
+                token.Scopes,
                 userUidString,
                 token.Organization,
                 roleValue,
                 token.ClientIp,
                 token.DeviceId,
                 new CultureInfo(language),
-                token.Region)
+                token.Region,
+                connectionId)
             {
                 Service = service
             };
@@ -85,13 +87,14 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="data">Input</param>
         /// <returns>Result</returns>
-        static (string? id, string? organization, short? Role, int? deviceId, string? uid) GetData(StringKeyDictionaryObject data)
+        static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? uid) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
+                data.GetArray("Scopes"),
                 data.Get("Organization"),
                 data.Get<short>("Role"),
-                data.Get<int>("DeviceId"),
+                data.Get("DeviceId"),
                 data.Get("Uid")
             );
         }
@@ -109,20 +112,21 @@ namespace com.etsoo.CoreFramework.User
         public static ServiceUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, organization, role, deviceId, uid) = GetData(data);
+            var (id, scopes, organization, role, deviceId, uid) = GetData(data);
 
             // Validation
-            if (id == null || role == null || deviceId == null)
+            if (id == null || role == null || string.IsNullOrEmpty(deviceId))
                 return null;
 
             // New user
             return new ServiceUser(
                 id,
+                scopes,
                 uid,
                 organization,
                 role.Value,
                 ip,
-                deviceId.Value,
+                deviceId,
                 language,
                 region,
                 connectionId);
@@ -160,16 +164,11 @@ namespace com.etsoo.CoreFramework.User
         public string? Uid { get; }
 
         /// <summary>
-        /// Connection id
-        /// 链接编号
-        /// </summary>
-        public string? ConnectionId { get; }
-
-        /// <summary>
         /// Constructor
         /// 构造函数
         /// </summary>
         /// <param name="id">Id</param>
+        /// <param name="scopes">Scopes</param>
         /// <param name="uid">Uid, shared between multiple applications</param>
         /// <param name="organization">Organization identifying units in SaSS</param>
         /// <param name="roleValue">Role value</param>
@@ -178,16 +177,13 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
-        public ServiceUser(string id, string? uid, string? organization, short roleValue, IPAddress clientIp, int deviceId, CultureInfo language, string region, string? connectionId = null)
-            : base(id, clientIp, region, deviceId, organization)
+        public ServiceUser(string id, IEnumerable<string>? scopes, string? uid, string? organization, short roleValue, IPAddress clientIp, string deviceId, CultureInfo language, string region, string? connectionId = null)
+            : base(id, scopes, clientIp, region, deviceId, organization)
         {
             RoleValue = roleValue;
             Role = GetRole(roleValue);
-
             Language = language;
             Uid = uid;
-
-            ConnectionId = connectionId;
         }
 
         /// <summary>
@@ -196,14 +192,16 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <param name="role">User role</param>
         /// <param name="id">Username</param>
+        /// <param name="scopes">Scopes</param>
         /// <param name="clientIp">Client IP</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
         /// <param name="organization">Organization</param>
         /// <param name="uid">Uid, shared between multiple applications</param>
         /// <param name="deviceId">Device id</param>
-        public ServiceUser(UserRole role, string id, IPAddress clientIp, CultureInfo language, string region, string? organization = null, string? uid = null, int deviceId = 0)
-            : this(id, uid, organization, (short)role, clientIp, deviceId, language, region)
+        /// <param name="connectionId">Connection id</param>
+        public ServiceUser(UserRole role, string id, IEnumerable<string>? scopes, IPAddress clientIp, CultureInfo language, string region, string? organization = null, string? uid = null, string deviceId = "", string? connectionId = null)
+            : this(id, scopes, uid, organization, (short)role, clientIp, deviceId, language, region, connectionId)
         {
         }
 
@@ -212,23 +210,25 @@ namespace com.etsoo.CoreFramework.User
         /// 创建声明
         /// </summary>
         /// <returns>Claims</returns>
-        public override IEnumerable<Claim> MoreClaims()
+        protected override List<Claim> CreateClaims()
         {
-            yield return new(ClaimTypes.Locality, Language.Name);
-            yield return new(RoleValueClaim, RoleValue.ToString());
-            if (Uid != null) yield return new(ClaimTypes.PrimarySid, Uid);
-            if (Service != null) yield return new(ServiceClaim, Service);
+            var claims = base.CreateClaims();
+
+            claims.AddRange([
+                new(ClaimTypes.Locality, Language.Name),
+                new(RoleValueClaim, RoleValue.ToString())
+            ]);
+
+            if (Uid != null) claims.Add(new(ClaimTypes.PrimarySid, Uid));
+            if (Service != null) claims.Add(new(ServiceClaim, Service));
 
             if (Role.HasValue)
             {
                 var roles = Role.Value.GetKeys();
-
-                // Multiple roles
-                foreach (var role in roles)
-                {
-                    yield return new(ClaimTypes.Role, role);
-                }
+                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             }
+
+            return claims;
         }
 
         /// <summary>
@@ -253,7 +253,10 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (_, _, role, _, _) = GetData(data);
+            var (_, scopes, _, role, _, _) = GetData(data);
+
+            // Scopes
+            Scopes = scopes;
 
             // Role
             if (role != null && RoleValue != role)
