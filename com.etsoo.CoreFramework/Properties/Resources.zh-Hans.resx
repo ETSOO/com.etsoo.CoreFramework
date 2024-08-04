@@ -156,6 +156,9 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>该设备已被暂时禁止使用至 {0}</value>
   </data>
+  <data name="EmailExists" xml:space="preserve">
+    <value>电子邮箱已注册</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>无效的操作</value>
   </data>
@@ -176,6 +179,9 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>需要加入机构</value>
+  </data>
+  <data name="MobileExists" xml:space="preserve">
+    <value>手机号码已注册</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>没有返回操作结果</value>

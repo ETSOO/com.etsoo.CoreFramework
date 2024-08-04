@@ -178,6 +178,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Email address has been registered.
+        /// </summary>
+        public static string EmailExists {
+            get {
+                return ResourceManager.GetString("EmailExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
         public static string InvalidAction {
@@ -237,6 +246,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string JoinOrgRequired {
             get {
                 return ResourceManager.GetString("JoinOrgRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mobile number has been registered.
+        /// </summary>
+        public static string MobileExists {
+            get {
+                return ResourceManager.GetString("MobileExists", resourceCulture);
             }
         }
         

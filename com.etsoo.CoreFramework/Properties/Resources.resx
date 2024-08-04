@@ -156,6 +156,9 @@
   <data name="DeviceFrozen" xml:space="preserve">
     <value>The device has been temporarily blocked until {0}</value>
   </data>
+  <data name="EmailExists" xml:space="preserve">
+    <value>Email address has been registered</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>Invalid Action</value>
   </data>
@@ -176,6 +179,9 @@
   </data>
   <data name="JoinOrgRequired" xml:space="preserve">
     <value>Join Organization Required</value>
+  </data>
+  <data name="MobileExists" xml:space="preserve">
+    <value>Mobile number has been registered</value>
   </data>
   <data name="NoActionResult" xml:space="preserve">
     <value>No Action Result</value>

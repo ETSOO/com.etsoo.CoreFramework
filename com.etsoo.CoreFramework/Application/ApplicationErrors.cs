@@ -111,6 +111,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError DeviceFrozen => new(nameof(DeviceFrozen), Resources.DeviceFrozen);
 
         /// <summary>
+        /// Email address has been registered
+        /// 电子邮箱已注册
+        /// </summary>
+        public static ApplicationError EmailExists => new(nameof(EmailExists), Resources.EmailExists);
+
+        /// <summary>
         /// Invalid Action
         /// 无效的操作
         /// </summary>
@@ -145,6 +151,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 需要加入组织
         /// </summary>
         public static ApplicationError JoinOrgRequired => new(nameof(JoinOrgRequired), Resources.JoinOrgRequired);
+
+        /// <summary>
+        /// Mobile number has been registered
+        /// 手机号码已注册
+        /// </summary>
+        public static ApplicationError MobileExists => new(nameof(MobileExists), Resources.MobileExists);
 
         /// <summary>
         /// No action result error
