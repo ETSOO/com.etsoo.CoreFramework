@@ -117,6 +117,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError EmailExists => new(nameof(EmailExists), Resources.EmailExists);
 
         /// <summary>
+        /// Request frequency is too high
+        /// 请求频次过高
+        /// </summary>
+        public static ApplicationError HighRequestRrequency => new(nameof(HighRequestRrequency), Resources.HighRequestRrequency);
+
+        /// <summary>
         /// Invalid Action
         /// 无效的操作
         /// </summary>
@@ -289,12 +295,15 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(DeleteReferencedData) => DeleteReferencedData,
                 nameof(DeviceDisabled) => DeviceDisabled,
                 nameof(DeviceFrozen) => DeviceFrozen,
+                nameof(EmailExists) => EmailExists,
+                nameof(HighRequestRrequency) => HighRequestRrequency,
                 nameof(InvalidAction) => InvalidAction,
                 nameof(InvalidEmail) => InvalidEmail,
                 nameof(InvalidMobile) => InvalidMobile,
                 nameof(IPAddressChanged) => IPAddressChanged,
                 nameof(ItemExists) => ItemExists,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
+                nameof(MobileExists) => MobileExists,
                 nameof(NoActionResult) => NoActionResult,
                 nameof(NoDataReturned) => NoDataReturned,
                 nameof(NoDeviceMatch) => NoDeviceMatch,

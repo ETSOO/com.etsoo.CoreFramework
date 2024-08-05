@@ -187,6 +187,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Request frequency is too high.
+        /// </summary>
+        public static string HighRequestRrequency {
+            get {
+                return ResourceManager.GetString("HighRequestRrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
         public static string InvalidAction {

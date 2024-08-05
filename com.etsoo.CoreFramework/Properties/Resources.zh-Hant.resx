@@ -159,6 +159,9 @@
   <data name="EmailExists" xml:space="preserve">
     <value>電子郵件已註冊</value>
   </data>
+  <data name="HighRequestRrequency" xml:space="preserve">
+    <value>請求頻次過高</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>無效的操作</value>
   </data>

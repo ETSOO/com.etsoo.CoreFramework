@@ -159,6 +159,9 @@
   <data name="EmailExists" xml:space="preserve">
     <value>Email address has been registered</value>
   </data>
+  <data name="HighRequestRrequency" xml:space="preserve">
+    <value>Request frequency is too high</value>
+  </data>
   <data name="InvalidAction" xml:space="preserve">
     <value>Invalid Action</value>
   </data>
