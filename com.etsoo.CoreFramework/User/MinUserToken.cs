@@ -6,7 +6,7 @@ namespace com.etsoo.CoreFramework.User
     /// Minimal user token
     /// 最小用户令牌
     /// </summary>
-    public record MinUserToken : IMinUserToken
+    public record MinUserToken : IMinUserToken, IMinUserCreator<MinUserToken>
     {
         /// <summary>
         /// Scope claim type

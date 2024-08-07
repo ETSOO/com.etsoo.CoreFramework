@@ -6,11 +6,11 @@ using System.Security.Claims;
 namespace com.etsoo.CoreFramework.User
 {
     /// <summary>
-    /// User creator interface
-    /// 用户创建者接口
+    /// Minimal user creator interface
+    /// 最小用户创建者接口
     /// </summary>
     /// <typeparam name="TSelf">Generic user type</typeparam>
-    public interface IUserCreator<TSelf> where TSelf : IUserCreator<TSelf>
+    public interface IMinUserCreator<TSelf> where TSelf : IMinUserCreator<TSelf>
     {
         /// <summary>
         /// Create user from claims
@@ -20,7 +20,15 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
         static abstract TSelf? Create(ClaimsPrincipal? claims, string? connectionId = null);
+    }
 
+    /// <summary>
+    /// User creator interface
+    /// 用户创建者接口
+    /// </summary>
+    /// <typeparam name="TSelf">Generic user type</typeparam>
+    public interface IUserCreator<TSelf> : IMinUserCreator<TSelf> where TSelf : IUserCreator<TSelf>
+    {
         /// <summary>
         /// Create user from result data
         /// 从操作结果数据创建用户
