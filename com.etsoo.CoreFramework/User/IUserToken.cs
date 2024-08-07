@@ -9,12 +9,6 @@ namespace com.etsoo.CoreFramework.User
     public interface IUserToken : IMinUserToken
     {
         /// <summary>
-        /// Int id
-        /// 整数编号
-        /// </summary>
-        int IdInt { get; }
-
-        /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>

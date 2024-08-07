@@ -15,6 +15,12 @@ namespace com.etsoo.CoreFramework.User
         string Id { get; }
 
         /// <summary>
+        /// Int id
+        /// 整数编号
+        /// </summary>
+        int IdInt { get; }
+
+        /// <summary>
         /// Unique connection id
         /// 唯一连接编号
         /// </summary>

@@ -46,6 +46,12 @@ namespace com.etsoo.CoreFramework.User
         public string Id { get; }
 
         /// <summary>
+        /// Int id
+        /// 整数编号
+        /// </summary>
+        public int IdInt { get; }
+
+        /// <summary>
         /// Connection id
         /// 链接编号
         /// </summary>
@@ -67,6 +73,12 @@ namespace com.etsoo.CoreFramework.User
         public MinUserToken(string id, IEnumerable<string>? scopes = null, string? connectionId = null)
         {
             Id = id;
+
+            if (int.TryParse(id, out var idValue))
+            {
+                IdInt = idValue;
+            }
+
             Scopes = scopes;
             ConnectionId = connectionId;
         }

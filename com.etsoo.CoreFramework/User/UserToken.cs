@@ -59,12 +59,6 @@ namespace com.etsoo.CoreFramework.User
         }
 
         /// <summary>
-        /// Int id
-        /// 整数编号
-        /// </summary>
-        public int IdInt { get; }
-
-        /// <summary>
         /// Client IP
         /// 客户端IP地址
         /// </summary>
@@ -112,11 +106,6 @@ namespace com.etsoo.CoreFramework.User
             Region = region;
             DeviceId = deviceId;
             Organization = organization;
-
-            if (int.TryParse(id, out var idValue))
-            {
-                IdInt = idValue;
-            }
 
             if (int.TryParse(organization, out var organizationValue))
             {
