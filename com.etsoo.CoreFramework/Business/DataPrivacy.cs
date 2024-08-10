@@ -19,6 +19,12 @@
         Customer = 20,
 
         /// <summary>
+        /// Channel disclosure
+        /// 渠道可见
+        /// </summary>
+        Channel = 30,
+
+        /// <summary>
         /// Internal
         /// 内部可见
         /// </summary>

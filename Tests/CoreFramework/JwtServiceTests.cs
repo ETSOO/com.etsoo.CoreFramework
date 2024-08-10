@@ -61,7 +61,7 @@ namespace Tests.CoreFramework
         {
             // Arrange
             string[] userScopes = ["core", "crm"];
-            var user = new CurrentUser("1", userScopes, null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN");
+            var user = new CurrentUser("1", userScopes, null, "Etsoo", 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN", null, null, null);
 
             // Act
             var token = service.CreateAccessToken(user);

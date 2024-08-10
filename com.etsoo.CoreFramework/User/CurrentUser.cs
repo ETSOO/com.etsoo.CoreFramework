@@ -25,6 +25,12 @@ namespace com.etsoo.CoreFramework.User
         public const string OrganizationNameClaim = "OrgName";
 
         /// <summary>
+        /// Channel organization claim type
+        /// 渠道机构声明类型
+        /// </summary>
+        public const string ChannelOrganizationClaim = "ChannelOrganization";
+
+        /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>
@@ -59,14 +65,12 @@ namespace com.etsoo.CoreFramework.User
                 user.DeviceId,
                 new CultureInfo(language),
                 user.Region,
-                connectionId)
-            {
-                Avatar = avatar,
-                OrganizationName = orgName
-            };
+                connectionId,
+                avatar,
+                orgName);
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? Name, string? OrgName, string? Avatar) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? orgName, string? avatar, string? channelOrganization) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -76,7 +80,8 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("DeviceId"),
                 data.Get("Name"),
                 data.Get("OrgName"),
-                data.Get("Avatar")
+                data.Get("Avatar"),
+                data.Get("ChannelOrganization")
             );
         }
 
@@ -93,7 +98,7 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, orgName, avatar) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, orgName, avatar, channelOrganization) = GetData(data);
 
             // Validation
             if (id == null || role == null || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
@@ -110,11 +115,10 @@ namespace com.etsoo.CoreFramework.User
                 deviceId,
                 language,
                 region,
-                connectionId)
-            {
-                Avatar = avatar,
-                OrganizationName = orgName
-            };
+                avatar,
+                orgName,
+                channelOrganization,
+                connectionId);
         }
 
         /// <summary>
@@ -128,6 +132,18 @@ namespace com.etsoo.CoreFramework.User
         /// 机构名称
         /// </summary>
         public string? OrganizationName { get; set; }
+
+        /// <summary>
+        /// Channel organization id
+        /// 渠道机构编号
+        /// </summary>
+        public string? ChannelOrganization { get; private set; }
+
+        /// <summary>
+        /// Int channel organization id
+        /// 整数渠道机构编号
+        /// </summary>
+        public int? ChannelOrganizationInt { get; }
 
         /// <summary>
         /// Avatar
@@ -166,14 +182,27 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
+        /// <param name="avatar">Avatar</param>
+        /// <param name="orgName">Organization name</param>
+        /// <param name="channelOrganization">Channel organization</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, IEnumerable<string>? scopes, string? organization, string name, short roleValue, IPAddress clientIp, string deviceId, CultureInfo language, string region, string? connectionId = null)
+        public CurrentUser(string id, IEnumerable<string>? scopes, string? organization, string name, short roleValue,
+            IPAddress clientIp, string deviceId, CultureInfo language, string region,
+            string? avatar, string? orgName, string? channelOrganization, string? connectionId = null)
             : base(id, scopes, clientIp, region, deviceId, organization, connectionId)
         {
             Name = name;
             RoleValue = roleValue;
             Role = ServiceUser.GetRole(roleValue);
             Language = language;
+            Avatar = avatar;
+            OrganizationName = orgName;
+            ChannelOrganization = channelOrganization;
+
+            if (int.TryParse(channelOrganization, out var channelOrganizationValue))
+            {
+                ChannelOrganizationInt = channelOrganizationValue;
+            }
         }
 
         /// <summary>
@@ -208,7 +237,7 @@ namespace com.etsoo.CoreFramework.User
         public virtual void Update(StringKeyDictionaryObject data)
         {
             // Editable fields
-            var (_, scopes, _, role, _, name, orgName, avatar) = GetData(data);
+            var (_, scopes, _, role, _, name, orgName, avatar, _) = GetData(data);
 
             // Scopes
             Scopes = scopes;
