@@ -26,16 +26,22 @@
         Operator = 4,
 
         /// <summary>
+        /// Partner
+        /// 渠道合作伙伴
+        /// </summary>
+        Partner = 8,
+
+        /// <summary>
         /// User
         /// 用户
         /// </summary>
-        User = 8,
+        User = 16,
 
         /// <summary>
         /// Cashier
         /// 出纳
         /// </summary>
-        Cashier = 16,
+        Cashier = 32,
 
         /// <summary>
         /// Team leader
