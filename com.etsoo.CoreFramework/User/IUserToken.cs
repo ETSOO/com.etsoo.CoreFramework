@@ -12,13 +12,13 @@ namespace com.etsoo.CoreFramework.User
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        string? Organization { get; }
+        string Organization { get; }
 
         /// <summary>
         /// Int organization id
         /// 整数机构编号
         /// </summary>
-        int? OrganizationInt { get; }
+        int OrganizationInt { get; }
 
         /// <summary>
         /// Client IP address

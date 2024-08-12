@@ -25,10 +25,22 @@ namespace com.etsoo.CoreFramework.User
         public const string OrganizationNameClaim = "OrgName";
 
         /// <summary>
+        /// Organization user id claim type
+        /// 机构用户编号申明类型
+        /// </summary>
+        public const string OidClaim = "Oid";
+
+        /// <summary>
         /// Channel organization claim type
         /// 渠道机构声明类型
         /// </summary>
         public const string ChannelOrganizationClaim = "ChannelOrganization";
+
+        /// <summary>
+        /// Parent organization claim type
+        /// 父机构声明类型
+        /// </summary>
+        public const string ParentOrganizationClaim = "ParentOrganization";
 
         /// <summary>
         /// Create user
@@ -47,12 +59,15 @@ namespace com.etsoo.CoreFramework.User
             // Claims
             var name = claims.FindFirstValue(ClaimTypes.Name);
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
+            var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
             var language = claims.FindFirstValue(ClaimTypes.Locality);
             var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(ServiceUser.RoleValueClaim)).GetValueOrDefault();
+            var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
+            var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(language))
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(language))
                 return null;
 
             // New user
@@ -65,12 +80,15 @@ namespace com.etsoo.CoreFramework.User
                 user.DeviceId,
                 new CultureInfo(language),
                 user.Region,
-                connectionId,
+                oid,
                 avatar,
-                orgName);
+                orgName,
+                channelOrganization,
+                parentOrganization,
+                connectionId);
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? orgName, string? avatar, string? channelOrganization) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -80,8 +98,10 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("DeviceId"),
                 data.Get("Name"),
                 data.Get("OrgName"),
+                data.Get("oid"),
                 data.Get("Avatar"),
-                data.Get("ChannelOrganization")
+                data.Get("ChannelOrganization"),
+                data.Get("ParentOrganization")
             );
         }
 
@@ -98,10 +118,10 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, orgName, avatar, channelOrganization) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, orgName, oid, avatar, channelOrganization, parentOrganization) = GetData(data);
 
             // Validation
-            if (id == null || role == null || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
+            if (id == null || role == null || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
@@ -115,9 +135,11 @@ namespace com.etsoo.CoreFramework.User
                 deviceId,
                 language,
                 region,
+                oid,
                 avatar,
                 orgName,
                 channelOrganization,
+                parentOrganization,
                 connectionId);
         }
 
@@ -126,6 +148,18 @@ namespace com.etsoo.CoreFramework.User
         /// 姓名
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Organization user Id
+        /// 机构用户编号
+        /// </summary>
+        public string Oid { get; }
+
+        /// <summary>
+        /// Int organization user id
+        /// 整数机构用户编号
+        /// </summary>
+        public int OidInt { get; }
 
         /// <summary>
         /// Organization name
@@ -137,13 +171,25 @@ namespace com.etsoo.CoreFramework.User
         /// Channel organization id
         /// 渠道机构编号
         /// </summary>
-        public string? ChannelOrganization { get; private set; }
+        public string? ChannelOrganization { get; }
 
         /// <summary>
         /// Int channel organization id
         /// 整数渠道机构编号
         /// </summary>
         public int? ChannelOrganizationInt { get; }
+
+        /// <summary>
+        /// Parent organization id
+        /// 父机构编号
+        /// </summary>
+        public string? ParentOrganization { get; }
+
+        /// <summary>
+        /// Int parent organization id
+        /// 整数父机构编号
+        /// </summary>
+        public int? ParentOrganizationInt { get; }
 
         /// <summary>
         /// Avatar
@@ -182,26 +228,40 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
+        /// <param name="oid">Organization user id</param>
         /// <param name="avatar">Avatar</param>
         /// <param name="orgName">Organization name</param>
         /// <param name="channelOrganization">Channel organization</param>
+        /// <param name="parentOrganization">Parent organization id</param>
         /// <param name="connectionId">Connection id</param>
-        public CurrentUser(string id, IEnumerable<string>? scopes, string? organization, string name, short roleValue,
-            IPAddress clientIp, string deviceId, CultureInfo language, string region,
-            string? avatar, string? orgName, string? channelOrganization, string? connectionId = null)
+        public CurrentUser(string id, IEnumerable<string>? scopes, string organization, string name, short roleValue,
+            IPAddress clientIp, string deviceId, CultureInfo language, string region, string oid,
+            string? avatar, string? orgName, string? channelOrganization, string? parentOrganization, string? connectionId = null)
             : base(id, scopes, clientIp, region, deviceId, organization, connectionId)
         {
             Name = name;
             RoleValue = roleValue;
             Role = ServiceUser.GetRole(roleValue);
             Language = language;
+            Oid = oid;
             Avatar = avatar;
             OrganizationName = orgName;
             ChannelOrganization = channelOrganization;
+            ParentOrganization = parentOrganization;
+
+            if (int.TryParse(oid, out var oidValue))
+            {
+                OidInt = oidValue;
+            }
 
             if (int.TryParse(channelOrganization, out var channelOrganizationValue))
             {
                 ChannelOrganizationInt = channelOrganizationValue;
+            }
+
+            if (int.TryParse(parentOrganization, out var parentOrganizationValue))
+            {
+                ParentOrganizationInt = parentOrganizationValue;
             }
         }
 
@@ -217,43 +277,23 @@ namespace com.etsoo.CoreFramework.User
             claims.AddRange([
                 new(ClaimTypes.Name, Name),
                 new(ClaimTypes.Locality, Language.Name),
-                new(ServiceUser.RoleValueClaim, RoleValue.ToString())
+                new(ServiceUser.RoleValueClaim, RoleValue.ToString()),
+                new(OidClaim, Oid)
             ]);
 
             if (!string.IsNullOrEmpty(OrganizationName))
                 claims.Add(new(OrganizationNameClaim, OrganizationName));
 
+            if (!string.IsNullOrEmpty(ChannelOrganization))
+                claims.Add(new(ChannelOrganizationClaim, ChannelOrganization));
+
+            if (!string.IsNullOrEmpty(ParentOrganization))
+                claims.Add(new(ParentOrganizationClaim, ParentOrganization));
+
             if (Avatar != null)
                 claims.Add(new(AvatarClaim, Avatar));
 
             return claims;
-        }
-
-        /// <summary>
-        /// Update
-        /// 更新
-        /// </summary>
-        /// <param name="data">Data collection</param>
-        public virtual void Update(StringKeyDictionaryObject data)
-        {
-            // Editable fields
-            var (_, scopes, _, role, _, name, orgName, avatar, _) = GetData(data);
-
-            // Scopes
-            Scopes = scopes;
-
-            // Role
-            if (role != null && RoleValue != role)
-                RoleValue = role.Value;
-
-            // Name
-            if (name != null)
-                Name = name;
-
-            OrganizationName = orgName;
-
-            // Avatar
-            Avatar = avatar;
         }
     }
 }

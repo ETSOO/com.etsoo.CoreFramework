@@ -51,7 +51,8 @@ namespace com.etsoo.CoreFramework.User
             if (string.IsNullOrEmpty(region)
                 || string.IsNullOrEmpty(ip)
                 || !IPAddress.TryParse(ip, out var ipAddress)
-                || string.IsNullOrEmpty(deviceId))
+                || string.IsNullOrEmpty(deviceId)
+                || string.IsNullOrEmpty(organization))
                 return null;
 
             // New object
@@ -80,13 +81,13 @@ namespace com.etsoo.CoreFramework.User
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        public string? Organization { get; private set; }
+        public string Organization { get; private set; }
 
         /// <summary>
-        /// Int organization id
-        /// 整数机构编号
+        /// Int organization id, default 0
+        /// 整数机构编号，默认为0
         /// </summary>
-        public int? OrganizationInt { get; }
+        public int OrganizationInt { get; }
 
         /// <summary>
         /// Constructor
@@ -99,7 +100,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="deviceId">Device id</param>
         /// <param name="organization">Organization</param>
         /// <param name="connectionId">Connection id</param>
-        public UserToken(string id, IEnumerable<string>? scopes, IPAddress clientIp, string region, string deviceId, string? organization, string? connectionId = null)
+        public UserToken(string id, IEnumerable<string>? scopes, IPAddress clientIp, string region, string deviceId, string organization, string? connectionId = null)
             : base(id, scopes, connectionId)
         {
             ClientIp = clientIp;

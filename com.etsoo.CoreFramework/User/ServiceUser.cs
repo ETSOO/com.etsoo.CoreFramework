@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.Utils;
 using com.etsoo.Utils.String;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
@@ -160,7 +159,6 @@ namespace com.etsoo.CoreFramework.User
         /// User Uid
         /// 用户全局编号
         /// </summary>
-        [NotNullIfNotNull(nameof(Organization))]
         public string? Uid { get; }
 
         /// <summary>
@@ -243,24 +241,6 @@ namespace com.etsoo.CoreFramework.User
                 Role = newRole;
                 RoleValue = (short)newRole;
             }
-        }
-
-        /// <summary>
-        /// Update
-        /// 更新
-        /// </summary>
-        /// <param name="data">Data collection</param>
-        public virtual void Update(StringKeyDictionaryObject data)
-        {
-            // Editable fields
-            var (_, scopes, _, role, _, _) = GetData(data);
-
-            // Scopes
-            Scopes = scopes;
-
-            // Role
-            if (role != null && RoleValue != role)
-                RoleValue = role.Value;
         }
     }
 }

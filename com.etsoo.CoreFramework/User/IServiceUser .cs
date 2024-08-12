@@ -1,5 +1,4 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
-using com.etsoo.Utils.String;
 using System.Globalization;
 
 namespace com.etsoo.CoreFramework.User
@@ -39,12 +38,5 @@ namespace com.etsoo.CoreFramework.User
         /// 服务
         /// </summary>
         string? Service { get; set; }
-
-        /// <summary>
-        /// Update
-        /// 更新
-        /// </summary>
-        /// <param name="data">Data collection</param>
-        void Update(StringKeyDictionaryObject data);
     }
 }
