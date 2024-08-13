@@ -38,12 +38,6 @@
         User = 16,
 
         /// <summary>
-        /// Cashier
-        /// 出纳
-        /// </summary>
-        Cashier = 32,
-
-        /// <summary>
         /// Team leader
         /// 团队负责人
         /// </summary>
@@ -62,10 +56,10 @@
         Finance = 256,
 
         /// <summary>
-        /// HR Manager
-        /// 人事经理
+        /// Executives
+        /// 高管
         /// </summary>
-        HRManager = 512,
+        Executive = 512,
 
         /// <summary>
         /// Administrator
