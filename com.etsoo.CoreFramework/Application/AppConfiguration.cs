@@ -67,6 +67,13 @@ namespace com.etsoo.CoreFramework.Application
         public double CacheHours { get; set; } = 24D;
 
         /// <summary>
+        /// Refresh token valid days
+        /// 刷新令牌有效天数
+        /// </summary>
+        [Range(1, 300)]
+        public int RefreshTokenDays { get; set; } = 30;
+
+        /// <summary>
         /// Init call encryption identifier
         /// 初始化调用加密标识
         /// </summary>
