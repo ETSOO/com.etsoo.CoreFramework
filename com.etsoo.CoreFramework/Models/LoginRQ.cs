@@ -16,12 +16,6 @@ namespace com.etsoo.CoreFramework.Models
         public required string Pwd { get; init; }
 
         /// <summary>
-        /// Specific servce id, or uid includes organization data
-        /// 具体服务编号，或包括机构信息的全局编号
-        /// </summary>
-        public string? ServiceId { get; init; }
-
-        /// <summary>
         /// Timezone name
         /// 时区名称
         /// </summary>
