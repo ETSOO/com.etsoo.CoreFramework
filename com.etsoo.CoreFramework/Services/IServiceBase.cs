@@ -67,8 +67,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="rq">Request data</param>
         /// <param name="secret">Encryption secret</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret);
+        ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Log exception and return simple user result

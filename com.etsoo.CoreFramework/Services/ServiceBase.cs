@@ -229,8 +229,9 @@ namespace com.etsoo.CoreFramework.Services
         /// </summary>
         /// <param name="rq">Request data</param>
         /// <param name="secret">Encryption secret</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public async ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret)
+        public async ValueTask<ActionResult> InitCallAsync(InitCallRQ rq, string secret, CancellationToken cancellationToken = default)
         {
             // Check timestamp
             var clientDT = SharedUtils.JsMilisecondsToUTC(rq.Timestamp);
@@ -271,7 +272,7 @@ namespace com.etsoo.CoreFramework.Services
                         var source = await HashDecryptAsync(rq.Identifier, App.Configuration.InitCallEncryptionIdentifier);
                         if (source != null && int.TryParse(source, out var deviceId))
                         {
-                            await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId);
+                            await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId, cancellationToken);
                         }
                     }
                 }
@@ -295,8 +296,9 @@ namespace com.etsoo.CoreFramework.Services
         /// <param name="prevDeviceId">Previous client device id</param>
         /// <param name="newDeviceId">New client device id</param>
         /// <param name="deviceId">Serverside device id</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected virtual Task InitCallUpdateAsync(string prevDeviceId, string newDeviceId, int deviceId)
+        protected virtual Task InitCallUpdateAsync(string prevDeviceId, string newDeviceId, int deviceId, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
