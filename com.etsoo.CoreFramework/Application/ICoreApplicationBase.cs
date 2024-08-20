@@ -85,10 +85,10 @@ namespace com.etsoo.CoreFramework.Application
         /// <summary>
         /// Get exchange key
         /// </summary>
+        /// <param name="appId">Application id</param>
         /// <param name="key">Encryption key</param>
-        /// <param name="serviceId">Service id</param>
         /// <returns>Result</returns>
-        string GetExchangeKey(string key, int serviceId);
+        string GetExchangeKey(int appId, string key);
 
         /// <summary>
         /// Hash password bytes

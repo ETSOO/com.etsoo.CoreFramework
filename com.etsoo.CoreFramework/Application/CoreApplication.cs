@@ -197,12 +197,12 @@ namespace com.etsoo.CoreFramework.Application
         /// <summary>
         /// Get exchange key
         /// </summary>
+        /// <param name="appId">Application id</param>
         /// <param name="key">Encryption key</param>
-        /// <param name="serviceId">Service id</param>
         /// <returns>Result</returns>
-        public virtual string GetExchangeKey(string key, int serviceId)
+        public virtual string GetExchangeKey(int appId, string key)
         {
-            return $"{key}-S{serviceId}";
+            return $"App{appId}-{key}";
         }
 
         /// <summary>
