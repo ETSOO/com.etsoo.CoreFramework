@@ -38,6 +38,12 @@ namespace com.etsoo.CoreFramework.User
         public const string OrganizationNameClaim = "OrgName";
 
         /// <summary>
+        /// Role value claim type
+        /// 角色值声明类型
+        /// </summary>
+        public const string RoleValueClaim = "Role";
+
+        /// <summary>
         /// Organization user id claim type
         /// 机构用户编号申明类型
         /// </summary>
@@ -75,7 +81,7 @@ namespace com.etsoo.CoreFramework.User
             var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
             var language = claims.FindFirstValue(ClaimTypes.Locality);
-            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(ServiceUser.RoleValueClaim)).GetValueOrDefault();
+            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
 
@@ -290,7 +296,7 @@ namespace com.etsoo.CoreFramework.User
             claims.AddRange([
                 new(ClaimTypes.Name, Name),
                 new(ClaimTypes.Locality, Language.Name),
-                new(ServiceUser.RoleValueClaim, RoleValue.ToString()),
+                new(RoleValueClaim, RoleValue.ToString()),
                 new(OidClaim, Oid)
             ]);
 

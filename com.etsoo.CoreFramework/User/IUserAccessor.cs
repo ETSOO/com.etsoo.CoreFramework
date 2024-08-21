@@ -52,14 +52,6 @@ namespace com.etsoo.CoreFramework.User
     }
 
     /// <summary>
-    /// Service user accessor interface
-    /// 服务用户访问器接口
-    /// </summary>
-    public interface IUserAccessor : IUserAccessor<ServiceUser>
-    {
-    }
-
-    /// <summary>
     /// Current user accessor interface
     /// 当前用户访问器接口
     /// </summary>
