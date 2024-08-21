@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -7,6 +8,7 @@ namespace com.etsoo.CoreFramework.User
     /// User token
     /// 用户令牌
     /// </summary>
+    [JsonDerivedType(typeof(CurrentUser))]
     public record UserToken : MinUserToken, IUserToken
     {
         /// <summary>

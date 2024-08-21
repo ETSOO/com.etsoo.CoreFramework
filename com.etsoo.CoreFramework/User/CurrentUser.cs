@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils;
 using com.etsoo.Utils.String;
 using System.Globalization;
 using System.Net;
@@ -12,6 +13,18 @@ namespace com.etsoo.CoreFramework.User
     /// </summary>
     public record CurrentUser : UserToken, ICurrentUser, IUserCreator<CurrentUser>
     {
+        /// <summary>
+        /// Get role from value
+        /// 从值获取角色
+        /// </summary>
+        /// <param name="roleValue">Role value</param>
+        /// <returns>User role</returns>
+        public static UserRole? GetRole(short roleValue)
+        {
+            var userRole = (UserRole)roleValue;
+            return SharedUtils.EnumIsDefined(userRole) ? userRole : null;
+        }
+
         /// <summary>
         /// Avatar claim type
         /// 头像声明类型
@@ -98,7 +111,7 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("DeviceId"),
                 data.Get("Name"),
                 data.Get("OrgName"),
-                data.Get("oid"),
+                data.Get("Oid"),
                 data.Get("Avatar"),
                 data.Get("ChannelOrganization"),
                 data.Get("ParentOrganization")
@@ -241,7 +254,7 @@ namespace com.etsoo.CoreFramework.User
         {
             Name = name;
             RoleValue = roleValue;
-            Role = ServiceUser.GetRole(roleValue);
+            Role = GetRole(roleValue);
             Language = language;
             Oid = oid;
             Avatar = avatar;

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Services;
+using com.etsoo.CoreFramework.User;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
@@ -42,6 +43,9 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(UpdateResultData<long>), TypeInfoPropertyName = "UpdateResultLongData")]
     [JsonSerializable(typeof(UpdateResultData<Guid>), TypeInfoPropertyName = "UpdateResultGuidData")]
     [JsonSerializable(typeof(UpdateResultData<int>), TypeInfoPropertyName = "UpdateResultIntData")]
+
+    [JsonSerializable(typeof(AppTokenData))]
+    [JsonSerializable(typeof(UserToken))]
     public partial class ModelJsonSerializerContext : JsonSerializerContext
     {
     }
