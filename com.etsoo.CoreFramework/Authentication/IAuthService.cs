@@ -18,11 +18,11 @@ namespace com.etsoo.CoreFramework.Authentication
         int AccessTokenMinutes { get; }
 
         /// <summary>
-        /// Create token
-        /// 创建令牌
+        /// Create JWE token
+        /// 创建加密令牌
         /// </summary>
         /// <param name="action">Action</param>
-        /// <returns>Token</returns>
+        /// <returns>JWE Token</returns>
         public string CreateToken(AuthAction action);
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace com.etsoo.CoreFramework.Authentication
         string CreateAccessToken(IMinUserToken user, string? audience = null, int? liveMinutes = null);
 
         /// <summary>
-        /// Create token
-        /// 创建令牌
+        /// Create id token
+        /// 创建ID令牌
         /// </summary>
         /// <param name="claims">Claims</param>
         /// <param name="signingKey">Signing key</param>
@@ -64,13 +64,24 @@ namespace com.etsoo.CoreFramework.Authentication
         byte[] SignData(byte[] data, HashAlgorithmName? hashAlgorithm = null);
 
         /// <summary>
-        /// Validate token
-        /// 验证令牌
+        /// Validate token, exception if failed
+        /// 验证令牌，失败则抛出异常
         /// </summary>
         /// <param name="token">Token</param>
         /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        (ClaimsPrincipal? claims, string? keyId, SecurityToken? securityToken) ValidateToken(string token, string? audience = null);
+        (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateToken(string token, string? audience = null);
+
+        /// <summary>
+        /// Validate id token, exception if failed
+        /// 验证ID令牌，失败则抛出异常
+        /// </summary>
+        /// <param name="token">Token</param>
+        /// <param name="issuer">Valid issuer</param>
+        /// <param name="signingKey">Signing key</param>
+        /// <param name="audience">Audience</param>
+        /// <returns>Claim data</returns>
+        (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null);
 
         /// <summary>
         /// Verify data

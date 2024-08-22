@@ -149,19 +149,13 @@ namespace com.etsoo.CoreFramework.Authentication
             });
         }
 
-        private TokenValidationParameters CreateValidationParameters(string? audience = null)
+        private TokenValidationParameters CreateValidationParametersBase(string? audience = null)
         {
             return new TokenValidationParameters
             {
                 RequireSignedTokens = true,
                 RequireExpirationTime = true,
                 RequireAudience = true,
-
-                IssuerSigningKey = GetIssuerSigningKey(),
-                //IssuerSigningKeyResolver = issuerSigningKeyResolver,
-
-                // Token decryption
-                TokenDecryptionKey = GetTokenDecryptionKey(),
 
                 // false to valid additional data
                 ValidateLifetime = true,
@@ -177,6 +171,27 @@ namespace com.etsoo.CoreFramework.Authentication
                 ValidIssuer = validIssuer,
                 ValidIssuers = validIssuers
             };
+        }
+
+        private TokenValidationParameters CreateValidationParameters(string? audience = null)
+        {
+            var parameters = CreateValidationParametersBase(audience);
+            parameters.IssuerSigningKey = GetIssuerSigningKey();
+            parameters.TokenDecryptionKey = GetTokenDecryptionKey();
+            return parameters;
+        }
+
+        private TokenValidationParameters CreateIdTokenValidationParameters(string signingKey, string? issuer = null, string? audience = null)
+        {
+            // Security key
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+
+            var parameters = CreateValidationParametersBase(audience);
+            parameters.IssuerSigningKey = securityKey;
+            parameters.ValidIssuer = issuer;
+            parameters.ValidateIssuer = !string.IsNullOrEmpty(issuer);
+
+            return parameters;
         }
 
         /// <summary>
@@ -214,7 +229,7 @@ namespace com.etsoo.CoreFramework.Authentication
                 // User identity
                 Subject = action.Claims,
 
-                // TimeSpan.FromMinutes or TimeSpan.FromDays
+                // Expires
                 Expires = DateTime.UtcNow.AddTicks(action.LiveSpan.Ticks),
 
                 // Issuer
@@ -247,8 +262,8 @@ namespace com.etsoo.CoreFramework.Authentication
         }
 
         /// <summary>
-        /// Create token
-        /// 创建令牌
+        /// Create id token
+        /// 创建ID令牌
         /// </summary>
         /// <param name="claims">Claims</param>
         /// <param name="signingKey">Signing key</param>
@@ -287,6 +302,9 @@ namespace com.etsoo.CoreFramework.Authentication
 
                 // Audience
                 Audience = validataionParameters.ValidAudience,
+
+                // Expires in 5 minutes
+                Expires = DateTime.UtcNow.AddMinutes(5),
 
                 // Signing credentials
                 SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
@@ -341,21 +359,37 @@ namespace com.etsoo.CoreFramework.Authentication
         }
 
         /// <summary>
-        /// Validate token
-        /// 验证令牌
+        /// Validate token, exception if failed
+        /// 验证令牌，失败则抛出异常
         /// </summary>
         /// <param name="token">Token</param>
         /// <param name="audience">Audience</param>
         /// <returns>Claim data</returns>
-        public (ClaimsPrincipal? claims, string? keyId, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
+        public (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
         {
             var handler = new JwtSecurityTokenHandler();
             var claims = handler.ValidateToken(token, CreateValidationParameters(audience), out var validatedToken);
 
-            var securityToken = validatedToken as JwtSecurityToken;
-            var keyId = validatedToken is JwtSecurityToken jk ? jk.Header.Kid : (validatedToken.SecurityKey?.KeyId);
+            // var securityToken = validatedToken as JwtSecurityToken;
+            // var keyId = validatedToken is JwtSecurityToken jk ? jk.Header.Kid : (validatedToken.SecurityKey?.KeyId);
 
-            return (claims, keyId, securityToken);
+            return (claims, validatedToken);
+        }
+
+        /// <summary>
+        /// Validate id token, exception if failed
+        /// 验证ID令牌，失败则抛出异常
+        /// </summary>
+        /// <param name="token">Token</param>
+        /// <param name="issuer">Valid issuer</param>
+        /// <param name="signingKey">Signing key</param>
+        /// <param name="audience">Audience</param>
+        /// <returns>Claim data</returns>
+        public (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var claims = handler.ValidateToken(token, CreateIdTokenValidationParameters(signingKey, issuer, audience), out var validatedToken);
+            return (claims, validatedToken);
         }
 
         /// <summary>

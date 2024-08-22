@@ -65,7 +65,7 @@ namespace com.etsoo.CoreFramework.User
         {
             try
             {
-                var (claims, _, _) = authService.ValidateToken(token, audience);
+                var (claims, _) = authService.ValidateToken(token, audience);
                 if (claims != null)
                 {
                     return U.Create(claims, connectionId);
