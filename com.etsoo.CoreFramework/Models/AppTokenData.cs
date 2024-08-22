@@ -35,5 +35,12 @@
         /// 用于访问 access_token 授予的访问权限的范围，表示为一组以空格分隔的区分大小写的字符串
         /// </summary>
         public required string Scope { get; init; }
+
+        /// <summary>
+        /// A JWT that contains identity information about the user that is digitally signed by the system
+        /// scope with 'openid' will contain an ID token
+        /// JWT 包含由系统数字签名的有关用户的身份信息
+        /// </summary>
+        public string? IdToken { get; init; }
     }
 }

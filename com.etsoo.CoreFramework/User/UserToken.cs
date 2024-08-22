@@ -12,6 +12,12 @@ namespace com.etsoo.CoreFramework.User
     public record UserToken : MinUserToken, IUserToken
     {
         /// <summary>
+        /// Region claim type
+        /// 区域声明类型
+        /// </summary>
+        public const string RegionClaim = "region";
+
+        /// <summary>
         /// IP Address claim type
         /// IP地址声明类型
         /// </summary>
@@ -44,7 +50,7 @@ namespace com.etsoo.CoreFramework.User
             if (user == null) return null;
 
             // Claims
-            var region = claims.FindFirstValue(ClaimTypes.Country);
+            var region = claims.FindFirstValue(RegionClaim);
             var ip = claims.FindFirstValue(IPAddressClaim);
             var deviceId = claims.FindFirstValue(DeviceIdClaim);
             var organization = claims.FindFirstValue(OrganizationClaim);
@@ -126,7 +132,7 @@ namespace com.etsoo.CoreFramework.User
             var claims = base.CreateClaims();
 
             claims.AddRange([
-                new(ClaimTypes.Country, Region),
+                new(RegionClaim, Region),
                 new(IPAddressClaim, ClientIp.ToString()),
                 new(DeviceIdClaim, DeviceId)
             ]);

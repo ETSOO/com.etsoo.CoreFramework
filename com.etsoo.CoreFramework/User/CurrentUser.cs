@@ -32,34 +32,46 @@ namespace com.etsoo.CoreFramework.User
         public const string AvatarClaim = "avatar";
 
         /// <summary>
+        /// Name claim type
+        /// 姓名声明类型
+        /// </summary>
+        public const string NameClaim = "name";
+
+        /// <summary>
+        /// Locality claim type
+        /// 本地化声明类型
+        /// </summary>
+        public const string LocalityClaim = "locality";
+
+        /// <summary>
         /// Organization name claim type
         /// 机构名称申明类型
         /// </summary>
-        public const string OrganizationNameClaim = "OrgName";
+        public const string OrganizationNameClaim = "orgname";
 
         /// <summary>
         /// Role value claim type
         /// 角色值声明类型
         /// </summary>
-        public const string RoleValueClaim = "Role";
+        public const string RoleValueClaim = "role";
 
         /// <summary>
         /// Organization user id claim type
         /// 机构用户编号申明类型
         /// </summary>
-        public const string OidClaim = "Oid";
+        public const string OidClaim = "oid";
 
         /// <summary>
         /// Channel organization claim type
         /// 渠道机构声明类型
         /// </summary>
-        public const string ChannelOrganizationClaim = "ChannelOrganization";
+        public const string ChannelOrganizationClaim = "channelorganization";
 
         /// <summary>
         /// Parent organization claim type
         /// 父机构声明类型
         /// </summary>
-        public const string ParentOrganizationClaim = "ParentOrganization";
+        public const string ParentOrganizationClaim = "parentorganization";
 
         /// <summary>
         /// Create user
@@ -76,11 +88,11 @@ namespace com.etsoo.CoreFramework.User
             if (user == null) return null;
 
             // Claims
-            var name = claims.FindFirstValue(ClaimTypes.Name);
+            var name = claims.FindFirstValue(NameClaim);
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
             var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
-            var language = claims.FindFirstValue(ClaimTypes.Locality);
+            var language = claims.FindFirstValue(LocalityClaim);
             var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
@@ -294,8 +306,8 @@ namespace com.etsoo.CoreFramework.User
             var claims = base.CreateClaims();
 
             claims.AddRange([
-                new(ClaimTypes.Name, Name),
-                new(ClaimTypes.Locality, Language.Name),
+                new(NameClaim, Name),
+                new(LocalityClaim, Language.Name),
                 new(RoleValueClaim, RoleValue.ToString()),
                 new(OidClaim, Oid)
             ]);

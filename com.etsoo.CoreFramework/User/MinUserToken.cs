@@ -9,6 +9,12 @@ namespace com.etsoo.CoreFramework.User
     public record MinUserToken : IMinUserToken, IMinUserCreator<MinUserToken>
     {
         /// <summary>
+        /// Id claim type
+        /// 编号声明类型
+        /// </summary>
+        public const string IdClaim = "nameid";
+
+        /// <summary>
         /// Scope claim type
         /// 范围声明类型
         /// </summary>
@@ -28,7 +34,7 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // Claims
-            var id = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+            var id = claims.FindFirstValue(IdClaim);
             var scopes = claims.FindAll(ScopeClaim).Select(claim => claim.Value);
 
             // Validate
@@ -92,7 +98,7 @@ namespace com.etsoo.CoreFramework.User
         {
             var claims = new List<Claim>
             {
-                new(ClaimTypes.NameIdentifier, Id)
+                new(IdClaim, Id)
             };
 
             if (Scopes != null)

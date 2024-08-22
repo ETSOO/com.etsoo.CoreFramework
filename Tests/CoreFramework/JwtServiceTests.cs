@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -97,6 +98,29 @@ namespace Tests.CoreFramework
             Assert.Throws<InvalidOperationException>(() =>
             {
                 publicService.CreateAccessToken(user);
+            });
+        }
+
+        [Test]
+        public void CreateIdToken_Tests()
+        {
+            // Arrange
+            var userName = "Etsoo User";
+            string[] userScopes = ["core", "crm"];
+            var user = new CurrentUser("1", userScopes, "0", userName, 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN", "0", null, null, null, null);
+
+            // Act
+            var identity = user.CreateIdentity();
+            var token = service.CreateIdToken(identity, new string('-', 32), "app6");
+            var claims = new JwtSecurityToken(token).Claims;
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
+                Assert.That(claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Aud)?.Value, Is.EqualTo("app6"));
+                Assert.That(claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
+                Assert.That(claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
             });
         }
 

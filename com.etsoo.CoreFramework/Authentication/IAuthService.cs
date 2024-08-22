@@ -36,6 +36,16 @@ namespace com.etsoo.CoreFramework.Authentication
         string CreateAccessToken(IMinUserToken user, string? audience = null, int? liveMinutes = null);
 
         /// <summary>
+        /// Create token
+        /// 创建令牌
+        /// </summary>
+        /// <param name="claims">Claims</param>
+        /// <param name="signingKey">Signing key</param>
+        /// <param name="audience">Audience</param>
+        /// <returns>JWS Token</returns>
+        string CreateIdToken(ClaimsIdentity claims, string signingKey, string? audience = null);
+
+        /// <summary>
         /// Sign data
         /// 数据签名
         /// </summary>

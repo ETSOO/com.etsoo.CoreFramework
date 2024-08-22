@@ -180,11 +180,11 @@ namespace com.etsoo.CoreFramework.Authentication
         }
 
         /// <summary>
-        /// Create token
-        /// 创建令牌
+        /// Create JWE token
+        /// 创建加密令牌
         /// </summary>
         /// <param name="action">Action</param>
-        /// <returns>Token</returns>
+        /// <returns>JWE Token</returns>
         public string CreateToken(AuthAction action)
         {
             // Token validation parameters
@@ -240,10 +240,60 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="user">User</param>
         /// <param name="audience">Audience</param>
         /// <param name="liveMinutes">Live minutes</param>
-        /// <returns>Token</returns>
+        /// <returns>JWE Token</returns>
         public string CreateAccessToken(IMinUserToken user, string? audience = null, int? liveMinutes = null)
         {
             return CreateToken(new AuthAction(user.CreateIdentity(), audience ?? defaultAudience, TimeSpan.FromMinutes(liveMinutes.GetValueOrDefault(AccessTokenMinutes))));
+        }
+
+        /// <summary>
+        /// Create token
+        /// 创建令牌
+        /// </summary>
+        /// <param name="claims">Claims</param>
+        /// <param name="signingKey">Signing key</param>
+        /// <param name="audience">Audience</param>
+        /// <returns>JWS Token</returns>
+        public string CreateIdToken(ClaimsIdentity claims, string signingKey, string? audience = null)
+        {
+            // Token validation parameters
+            var validataionParameters = new TokenValidationParameters
+            {
+                ValidIssuer = validIssuer,
+                ValidIssuers = validIssuers,
+                ValidAudience = audience
+            };
+
+            // SHA256 requires 256 bits key
+            if (signingKey.Length < 32)
+            {
+                throw new ArgumentException("Signing key length must be at least 32 characters");
+            }
+
+            // Security key
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
+
+            // Token handler
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            // Token descriptor
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                // User identity
+                Subject = claims,
+
+                // Issuer
+                Issuer = validataionParameters.ValidIssuer,
+
+                // Audience
+                Audience = validataionParameters.ValidAudience,
+
+                // Signing credentials
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            // Create the token
+            return tokenHandler.CreateEncodedJwt(tokenDescriptor);
         }
 
         /// <summary>
