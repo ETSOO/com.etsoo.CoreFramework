@@ -42,52 +42,53 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // New object
-            return new MinUserToken(id, scopes, connectionId);
+            return new MinUserToken
+            {
+                Id = id,
+                ConnectionId = connectionId,
+                Scopes = scopes
+            };
         }
+
+        string id = default!;
 
         /// <summary>
         /// User Id
         /// 用户编号
         /// </summary>
-        public string Id { get; }
+        public required string Id
+        {
+            get
+            {
+                return id;
+            }
+            init
+            {
+                id = value;
+                if (int.TryParse(id, out var idValue))
+                {
+                    IdInt = idValue;
+                }
+            }
+        }
 
         /// <summary>
         /// Int id
         /// 整数编号
         /// </summary>
-        public int IdInt { get; }
+        public int IdInt { get; init; }
 
         /// <summary>
         /// Connection id
         /// 链接编号
         /// </summary>
-        public string? ConnectionId { get; }
+        public string? ConnectionId { get; init; }
 
         /// <summary>
         /// Scopes
         /// 范围
         /// </summary>
-        public IEnumerable<string>? Scopes { get; protected set; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="id">User id</param>
-        /// <param name="scopes">Scopes</param>
-        /// <param name="connectionId">Connection id</param>
-        public MinUserToken(string id, IEnumerable<string>? scopes = null, string? connectionId = null)
-        {
-            Id = id;
-
-            if (int.TryParse(id, out var idValue))
-            {
-                IdInt = idValue;
-            }
-
-            Scopes = scopes;
-            ConnectionId = connectionId;
-        }
+        public IEnumerable<string>? Scopes { get; init; }
 
         /// <summary>
         /// Create claims

@@ -62,7 +62,19 @@ namespace Tests.CoreFramework
         {
             // Arrange
             string[] userScopes = ["core", "crm"];
-            var user = new CurrentUser("1", userScopes, "0", "Etsoo", 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN", "0", null, null, null, null);
+            var user = new CurrentUser
+            {
+                Id = "1",
+                Scopes = userScopes,
+                Name = "Etsoo User",
+                RoleValue = 1,
+                ClientIp = IPAddress.Parse("127.0.0.1"),
+                Region = "CN",
+                Organization = "0",
+                Oid = "0",
+                DeviceId = "1",
+                Language = CultureInfo.CurrentCulture
+            };
 
             // Act
             var token = service.CreateAccessToken(user);
@@ -106,8 +118,22 @@ namespace Tests.CoreFramework
         {
             // Arrange
             var userName = "Etsoo User";
+            var appKey = "#xaa";
             string[] userScopes = ["core", "crm"];
-            var user = new CurrentUser("1", userScopes, "0", userName, 1, IPAddress.Parse("127.0.0.1"), "1", CultureInfo.CurrentCulture, "CN", "0", null, null, null, null);
+            var user = new CurrentUser
+            {
+                Id = "1",
+                Scopes = userScopes,
+                Name = userName,
+                RoleValue = 1,
+                ClientIp = IPAddress.Parse("127.0.0.1"),
+                Region = "CN",
+                Organization = "0",
+                Oid = "0",
+                DeviceId = "1",
+                Language = CultureInfo.CurrentCulture,
+                AppKey = appKey
+            };
 
             // Act
             var identity = user.CreateIdentity();
@@ -130,6 +156,7 @@ namespace Tests.CoreFramework
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
+                Assert.That(claims?.FirstOrDefault(c => c.Type == CurrentUser.AppKeyClaim)?.Value, Is.EqualTo(appKey));
             });
         }
 

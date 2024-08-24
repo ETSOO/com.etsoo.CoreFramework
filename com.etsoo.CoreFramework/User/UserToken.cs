@@ -64,63 +64,61 @@ namespace com.etsoo.CoreFramework.User
                 return null;
 
             // New object
-            return new UserToken(user.Id, user.Scopes, ipAddress, region, deviceId, organization, user.ConnectionId);
+            return new UserToken
+            {
+                Id = user.Id,
+                ConnectionId = user.ConnectionId,
+                Scopes = user.Scopes,
+
+                ClientIp = ipAddress,
+                Region = region,
+                DeviceId = deviceId,
+                Organization = organization
+            };
         }
 
         /// <summary>
         /// Client IP
         /// 客户端IP地址
         /// </summary>
-        public IPAddress ClientIp { get; }
+        public required IPAddress ClientIp { get; init; }
 
         /// <summary>
         /// Country or region, like CN means China
         /// 国家和地区，比如 CN = 中国
         /// </summary>
-        public string Region { get; }
+        public required string Region { get; init; }
 
         /// <summary>
         /// Device id
         /// 设备编号
         /// </summary>
-        public string DeviceId { get; }
+        public required string DeviceId { get; init; }
+
+        private string organization = default!;
 
         /// <summary>
         /// Organization id, support switch
         /// 机构编号，可切换
         /// </summary>
-        public string Organization { get; private set; }
+        public required string Organization
+        {
+            get { return organization; }
+            init
+            {
+                organization = value;
+                if (int.TryParse(organization, out var organizationValue))
+                {
+                    OrganizationInt = organizationValue;
+                }
+            }
+        }
 
         /// <summary>
         /// Int organization id, default 0
         /// 整数机构编号，默认为0
         /// </summary>
-        public int OrganizationInt { get; }
-
-        /// <summary>
-        /// Constructor
-        /// 构造函数
-        /// </summary>
-        /// <param name="id">User id</param>
-        /// <param name="scopes">Scopes</param>
-        /// <param name="clientIp"></param>
-        /// <param name="region">Country or region</param>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="organization">Organization</param>
-        /// <param name="connectionId">Connection id</param>
-        public UserToken(string id, IEnumerable<string>? scopes, IPAddress clientIp, string region, string deviceId, string organization, string? connectionId = null)
-            : base(id, scopes, connectionId)
-        {
-            ClientIp = clientIp;
-            Region = region;
-            DeviceId = deviceId;
-            Organization = organization;
-
-            if (int.TryParse(organization, out var organizationValue))
-            {
-                OrganizationInt = organizationValue;
-            }
-        }
+        public int OrganizationInt { get; init; }
 
         /// <summary>
         /// Create claims
