@@ -20,5 +20,11 @@ namespace com.etsoo.CoreFramework.Models
         /// 时区名称
         /// </summary>
         public string? Timezone { get; init; }
+
+        /// <summary>
+        /// Authentication request
+        /// 授权请求
+        /// </summary>
+        public AuthRequest? Auth { get; init; }
     }
 }
