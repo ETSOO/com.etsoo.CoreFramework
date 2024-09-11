@@ -9,6 +9,18 @@ namespace com.etsoo.CoreFramework.Models
     public record AuthRequest
     {
         /// <summary>
+        /// Code response type
+        /// 代码响应类型
+        /// </summary>
+        public const string CodeResponseType = "code";
+
+        /// <summary>
+        /// Token response type
+        /// 令牌响应类型
+        /// </summary>
+        public const string TokenResponseType = "token";
+
+        /// <summary>
         /// Application ID
         /// 应用编号
         /// </summary>
@@ -36,7 +48,7 @@ namespace com.etsoo.CoreFramework.Models
         /// Response type, code or token
         /// 响应类型，代码或令牌
         /// </summary>
-        [AllowedValues("code", "token")]
+        [AllowedValues(CodeResponseType, TokenResponseType)]
         public required string ResponseType { get; init; }
 
         /// <summary>
