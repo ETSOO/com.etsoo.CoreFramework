@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.CoreFramework.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Authentication request
@@ -28,19 +30,36 @@
         /// Redirect URI
         /// 重定向URI
         /// </summary>
-        public required string RedirectUri { get; init; }
+        public required Uri RedirectUri { get; init; }
 
         /// <summary>
         /// Response type, code or token
         /// 响应类型，代码或令牌
         /// </summary>
+        [AllowedValues("code", "token")]
         public required string ResponseType { get; init; }
 
         /// <summary>
-        /// Scope
-        /// 作用域
+        /// Space-delimited permission scope(s)
+        /// 空格分隔的权限范围
         /// </summary>
-        public required string Scope { get; init; }
+        public required string Scope { get; set; }
+
+        /// <summary>
+        /// Scopes
+        /// 范围
+        /// </summary>
+        public IEnumerable<string> Scopes
+        {
+            get
+            {
+                return Scope.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            }
+            set
+            {
+                Scope = string.Join(' ', value);
+            }
+        }
 
         /// <summary>
         /// State value
