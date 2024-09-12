@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.String;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -24,7 +26,7 @@ namespace com.etsoo.CoreFramework.Models
         /// Application ID
         /// 应用编号
         /// </summary>
-        public required string AppId { get; init; }
+        public required int AppId { get; init; }
 
         /// <summary>
         /// Application key
@@ -83,6 +85,35 @@ namespace com.etsoo.CoreFramework.Models
         /// Signature
         /// 签名
         /// </summary>
-        public required string Sign { get; init; }
+        public string Sign { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Sign the request with the app secret
+        /// 对请求使用应用密钥签名
+        /// </summary>
+        /// <param name="appSecret">Application secret</param>
+        /// <returns>Result</returns>
+        public string SignWith(string appSecret)
+        {
+            var rq = new SortedDictionary<string, string>()
+            {
+                { "scope", Scope },
+                { "responseType", ResponseType },
+                { "state", State },
+                { "redirectUri", RedirectUri.ToString() },
+                { "appId", AppId.ToString() },
+                { "appKey", AppKey }
+            };
+
+            if (!string.IsNullOrEmpty(LoginHint))
+            {
+                rq.Add("loginHint", LoginHint);
+            }
+
+            // With an extra '&' at the end
+            var query = rq.JoinAsString().TrimEnd('&');
+
+            return Convert.ToHexString(CryptographyUtils.HMACSHA256(query, appSecret));
+        }
     }
 }
