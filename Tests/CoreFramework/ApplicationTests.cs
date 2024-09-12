@@ -49,5 +49,24 @@ namespace Tests.CoreFramework
                 Assert.That(config?.Cultures[1], Is.EqualTo("zh-Hans-CN"));
             });
         }
+
+        [Test]
+        public async Task EncryptionTest()
+        {
+            var db = new SqliteDatabase("Data Source = etsoo.db;");
+            var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
+            var text = "Hello, world!";
+            var encrypted = app.EncriptData(text, "a", 1);
+            var decrypted = app.DecriptData(encrypted, "a");
+
+            Assert.That(decrypted, Is.EqualTo(text));
+
+            await Task.Delay(1000);
+
+            Assert.Catch<Exception>(() =>
+            {
+                app.DecriptData(encrypted, "a");
+            });
+        }
     }
 }

@@ -68,8 +68,9 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="plainText">Plain text</param>
         /// <param name="key">Key</param>
+        /// <param name="seconds">Valid in seconds, default is 3 hours</param>
         /// <returns>Result</returns>
-        string EncriptData(string plainText, string key = "");
+        string EncriptData(string plainText, string key = "", int seconds = 10800);
 
         /// <summary>
         /// Get API user data
