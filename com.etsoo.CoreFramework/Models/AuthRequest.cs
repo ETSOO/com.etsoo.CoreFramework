@@ -23,6 +23,12 @@ namespace com.etsoo.CoreFramework.Models
         public const string TokenResponseType = "token";
 
         /// <summary>
+        /// Offline access type
+        /// 离线访问类型
+        /// </summary>
+        public const string OfflineAccessType = "offline";
+
+        /// <summary>
         /// Application ID
         /// 应用编号
         /// </summary>
@@ -39,6 +45,12 @@ namespace com.etsoo.CoreFramework.Models
         /// 登录提示（个人登录名）
         /// </summary>
         public string? LoginHint { get; init; }
+
+        /// <summary>
+        /// Access type
+        /// 访问类型
+        /// </summary>
+        public string? AccessType { get; init; }
 
         /// <summary>
         /// Redirect URI
@@ -104,6 +116,11 @@ namespace com.etsoo.CoreFramework.Models
                 { "appId", AppId.ToString() },
                 { "appKey", AppKey }
             };
+
+            if (!string.IsNullOrEmpty(AccessType))
+            {
+                rq.Add("accessType", AccessType);
+            }
 
             if (!string.IsNullOrEmpty(LoginHint))
             {
