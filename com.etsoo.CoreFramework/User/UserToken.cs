@@ -89,11 +89,30 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public required string Region { get; init; }
 
+        private string deviceId = default!;
+
         /// <summary>
         /// Device id
         /// 设备编号
         /// </summary>
-        public required string DeviceId { get; init; }
+        public required string DeviceId
+        {
+            get { return deviceId; }
+            init
+            {
+                deviceId = value;
+                if (int.TryParse(deviceId, out var deviceValue))
+                {
+                    DeviceIdInt = deviceValue;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Int device id
+        /// 整数设备编号
+        /// </summary>
+        public int DeviceIdInt { get; init; }
 
         private string organization = default!;
 

@@ -37,5 +37,11 @@ namespace com.etsoo.CoreFramework.User
         /// 设备编号
         /// </summary>
         string DeviceId { get; }
+
+        /// <summary>
+        /// Int device id
+        /// 整数设备编号
+        /// </summary>
+        int DeviceIdInt { get; }
     }
 }
