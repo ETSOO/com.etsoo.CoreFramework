@@ -15,6 +15,8 @@ namespace com.etsoo.CoreFramework.Models
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     )]
 
+    [JsonSerializable(typeof(AuthCreateTokenRQ))]
+    [JsonSerializable(typeof(AuthRefreshTokenRQ))]
     [JsonSerializable(typeof(AuthRequest))]
     [JsonSerializable(typeof(ChangePasswordDto))]
     [JsonSerializable(typeof(ChangePasswordRQ))]

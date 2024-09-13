@@ -109,22 +109,22 @@ namespace com.etsoo.CoreFramework.Models
         {
             var rq = new SortedDictionary<string, string>()
             {
-                { "scope", Scope },
-                { "responseType", ResponseType },
-                { "state", State },
-                { "redirectUri", RedirectUri.ToString() },
-                { "appId", AppId.ToString() },
-                { "appKey", AppKey }
+                { nameof(AppId), AppId.ToString() },
+                { nameof(AppKey), AppKey },
+                { nameof(RedirectUri), RedirectUri.ToString() },
+                { nameof(ResponseType), ResponseType },
+                { nameof(Scope), Scope },
+                { nameof(State), State }
             };
 
             if (!string.IsNullOrEmpty(AccessType))
             {
-                rq.Add("accessType", AccessType);
+                rq.Add(nameof(AccessType), AccessType);
             }
 
             if (!string.IsNullOrEmpty(LoginHint))
             {
-                rq.Add("loginHint", LoginHint);
+                rq.Add(nameof(LoginHint), LoginHint);
             }
 
             // With an extra '&' at the end
