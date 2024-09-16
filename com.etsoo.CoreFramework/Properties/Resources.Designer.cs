@@ -133,6 +133,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Data Not Ready.
+        /// </summary>
+        public static string DataNotReady {
+            get {
+                return ResourceManager.GetString("DataNotReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         public static string DataProcessingFailed {

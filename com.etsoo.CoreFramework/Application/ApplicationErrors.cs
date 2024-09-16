@@ -81,6 +81,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError CodeSendingFailed => new(nameof(CodeSendingFailed), Resources.CodeSendingFailed);
 
         /// <summary>
+        /// Data Not Ready
+        /// 数据尚未准备就绪
+        /// </summary>
+        public static ApplicationError DataNotReady => new(nameof(DataNotReady), Resources.DataNotReady);
+
+        /// <summary>
         /// Data Processing Failed
         /// 数据处理失败
         /// </summary>
@@ -290,6 +296,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(CodeFrozen) => CodeFrozen,
                 nameof(CodesNoMatch) => CodesNoMatch,
                 nameof(CodeSendingFailed) => CodeSendingFailed,
+                nameof(DataNotReady) => DataNotReady,
                 nameof(DataProcessingFailed) => DataProcessingFailed,
                 nameof(DbConnectionFailed) => DbConnectionFailed,
                 nameof(DeleteReferencedData) => DeleteReferencedData,

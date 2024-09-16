@@ -240,4 +240,7 @@
   <data name="UserRegistered" xml:space="preserve">
     <value>用戶名已註冊</value>
   </data>
+  <data name="DataNotReady" xml:space="preserve">
+    <value>數據尚未準備就緒</value>
+  </data>
 </root>

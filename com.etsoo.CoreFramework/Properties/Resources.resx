@@ -240,4 +240,7 @@
   <data name="UserRegistered" xml:space="preserve">
     <value>Username is already registered</value>
   </data>
+  <data name="DataNotReady" xml:space="preserve">
+    <value>Data Not Ready</value>
+  </data>
 </root>
