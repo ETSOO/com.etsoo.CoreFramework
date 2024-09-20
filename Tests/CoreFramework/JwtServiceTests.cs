@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Crypto;
@@ -10,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Tests.CoreFramework
 {
@@ -79,8 +81,20 @@ namespace Tests.CoreFramework
             // Act
             var token = service.CreateAccessToken(user);
 
-            // Assert
-            Assert.That(token, Is.Not.Null);
+            // Serialization
+            var userJson = JsonSerializer.Serialize(user, ModelJsonSerializerContext.Default.CurrentUser);
+
+            // Deserialize
+            var user2 = JsonSerializer.Deserialize(userJson, ModelJsonSerializerContext.Default.CurrentUser);
+
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(token, Is.Not.Null);
+                Assert.That(user2, Is.Not.Null);
+                Assert.That(user2!.ClientIp, Is.EqualTo(user.ClientIp));
+                Assert.That(user2.Language, Is.EqualTo(user.Language));
+            });
 
             // Arrange, public key verification
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using com.etsoo.CoreFramework.Json;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 
@@ -8,7 +9,6 @@ namespace com.etsoo.CoreFramework.User
     /// User token
     /// 用户令牌
     /// </summary>
-    [JsonDerivedType(typeof(CurrentUser))]
     public record UserToken : MinUserToken, IUserToken
     {
         /// <summary>
@@ -81,6 +81,7 @@ namespace com.etsoo.CoreFramework.User
         /// Client IP
         /// 客户端IP地址
         /// </summary>
+        [JsonConverter(typeof(IPAddressConverter))]
         public required IPAddress ClientIp { get; init; }
 
         /// <summary>

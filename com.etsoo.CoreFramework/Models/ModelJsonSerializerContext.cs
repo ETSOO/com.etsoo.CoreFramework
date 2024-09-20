@@ -48,7 +48,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(UpdateResultData<int>), TypeInfoPropertyName = "UpdateResultIntData")]
 
     [JsonSerializable(typeof(AppTokenData))]
-    [JsonSerializable(typeof(UserToken))]
+    [JsonSerializable(typeof(IUserToken))]
     public partial class ModelJsonSerializerContext : JsonSerializerContext
     {
     }

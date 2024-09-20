@@ -1,9 +1,11 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.CoreFramework.Json;
 using com.etsoo.Utils;
 using com.etsoo.Utils.String;
 using System.Globalization;
 using System.Net;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -330,6 +332,7 @@ namespace com.etsoo.CoreFramework.User
         /// Language
         /// 语言
         /// </summary>
+        [JsonConverter(typeof(CultureInfoConverter))]
         public required CultureInfo Language { get; init; }
 
         /// <summary>

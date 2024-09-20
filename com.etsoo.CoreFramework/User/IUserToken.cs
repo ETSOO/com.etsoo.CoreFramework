@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -6,6 +7,9 @@ namespace com.etsoo.CoreFramework.User
     /// User token interface
     /// 用户令牌接口
     /// </summary>
+    [JsonDerivedType(typeof(ICurrentUser))]
+    [JsonDerivedType(typeof(UserToken))]
+    [JsonDerivedType(typeof(CurrentUser))]
     public interface IUserToken : IMinUserToken
     {
         /// <summary>
