@@ -19,6 +19,7 @@ namespace com.etsoo.CoreFramework.Authentication
     public class JwtService : IAuthService
     {
         private const string DefaultIssuer = "SmartERP";
+        private const string AllAudience = "ALL";
 
         private readonly RSACrypto crypto;
         private readonly string securityAlgorithms;
@@ -30,6 +31,7 @@ namespace com.etsoo.CoreFramework.Authentication
         private readonly string defaultAudience;
         private readonly string? validAudience;
         private readonly IEnumerable<string>? validAudiences;
+        private readonly bool validateAudience;
 
         private readonly string encryptionKey;
 
@@ -54,7 +56,8 @@ namespace com.etsoo.CoreFramework.Authentication
             ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
             defaultIssuer = settings.DefaultIssuer ?? DefaultIssuer;
-            defaultAudience = settings.DefaultAudience ?? "ALL";
+            defaultAudience = settings.DefaultAudience ?? AllAudience;
+            validateAudience = settings.ValidateAudience ?? true;
 
             validIssuers = settings.ValidIssuers;
             if (string.IsNullOrEmpty(settings.ValidIssuer))
@@ -68,7 +71,7 @@ namespace com.etsoo.CoreFramework.Authentication
 
             validAudience = settings.ValidAudience;
             validAudiences = settings.ValidAudiences;
-            if (string.IsNullOrEmpty(validAudience) && validAudiences == null)
+            if (string.IsNullOrEmpty(validAudience) && (validAudiences == null || !validAudiences.Any()))
             {
                 validAudience = defaultAudience;
             }
@@ -151,6 +154,8 @@ namespace com.etsoo.CoreFramework.Authentication
 
         private TokenValidationParameters CreateValidationParametersBase(string? audience = null)
         {
+            audience ??= validAudience;
+
             return new TokenValidationParameters
             {
                 RequireSignedTokens = true,
@@ -161,11 +166,11 @@ namespace com.etsoo.CoreFramework.Authentication
                 ValidateLifetime = true,
 
                 ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateAudience = validateAudience,
                 ValidateIssuerSigningKey = true,
 
                 // Specific audience
-                ValidAudience = audience ?? validAudience,
+                ValidAudience = audience,
                 ValidAudiences = audience == null ? validAudiences : null,
 
                 ValidIssuer = validIssuer,
@@ -202,14 +207,6 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>JWE Token</returns>
         public string CreateToken(AuthAction action)
         {
-            // Token validation parameters
-            var validataionParameters = new TokenValidationParameters
-            {
-                ValidIssuer = validIssuer,
-                ValidIssuers = validIssuers,
-                ValidAudience = action.Audience
-            };
-
             // Security key
             var securityKey = GetIssuerSigningKey();
             var encryptionKey = GetTokenDecryptionKey();
@@ -233,10 +230,10 @@ namespace com.etsoo.CoreFramework.Authentication
                 Expires = DateTime.UtcNow.AddTicks(action.LiveSpan.Ticks),
 
                 // Issuer
-                Issuer = validataionParameters.ValidIssuer,
+                Issuer = validIssuer,
 
                 // Audience
-                Audience = validataionParameters.ValidAudience,
+                Audience = action.Audience,
 
                 // JWE vs JWS
                 // https://stackoverflow.com/questions/33589353/what-are-the-pros-cons-of-using-jwe-or-jws
@@ -271,13 +268,7 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>JWS Token</returns>
         public string CreateIdToken(ClaimsIdentity claims, string signingKey, string? audience = null)
         {
-            // Token validation parameters
-            var validataionParameters = new TokenValidationParameters
-            {
-                ValidIssuer = validIssuer,
-                ValidIssuers = validIssuers,
-                ValidAudience = audience
-            };
+            audience ??= defaultAudience;
 
             // SHA256 requires 256 bits key
             if (signingKey.Length < 32)
@@ -298,10 +289,10 @@ namespace com.etsoo.CoreFramework.Authentication
                 Subject = claims,
 
                 // Issuer
-                Issuer = validataionParameters.ValidIssuer,
+                Issuer = validIssuer,
 
                 // Audience
-                Audience = validataionParameters.ValidAudience,
+                Audience = audience,
 
                 // Expires in 5 minutes
                 Expires = DateTime.UtcNow.AddMinutes(5),

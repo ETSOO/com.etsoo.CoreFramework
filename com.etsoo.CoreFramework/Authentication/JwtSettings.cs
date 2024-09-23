@@ -15,6 +15,7 @@ namespace com.etsoo.CoreFramework.Authentication
         public IEnumerable<string>? ValidIssuers { get; set; }
         public string? ValidAudience { get; set; }
         public IEnumerable<string>? ValidAudiences { get; set; }
+        public bool? ValidateAudience { get; set; }
         public IEnumerable<string>? TokenUrls { get; set; }
         public string? SecurityAlgorithms { get; set; }
         public int? AccessTokenMinutes { get; set; }
