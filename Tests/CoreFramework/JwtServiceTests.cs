@@ -175,6 +175,27 @@ namespace Tests.CoreFramework
         }
 
         [Test]
+        public void ValidateIdToken_Tests()
+        {
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
+            var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
+            var publicService = new JwtService(new ServiceCollection(), section.Get<JwtSettings>(), null);
+
+            var (cp, token) = publicService.ValidateIdToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxMDEwIiwic2NvcGUiOiJjb3JlIiwicmVnaW9uIjoiQ04iLCJpcGFkZHJlc3MiOiI6OjEiLCJkZXZpY2VpZCI6IjEwMDYiLCJvcmdhbml6YXRpb24iOiIwIiwibmFtZSI6IuiClui1niIsImxvY2FsaXR5IjoiemgtQ04iLCJyb2xlIjoiMTYiLCJvaWQiOiIwIiwibmJmIjoxNzI3MTQ4NDA2LCJleHAiOjE3MjcxNDg3MDYsImlhdCI6MTcyNzE0ODQwNiwiaXNzIjoiU21hcnRFUlAiLCJhdWQiOiJBTEwifQ.2zODXPP5NMz_zMKOoWeydzkbZUizFyFrkbvWAZVc2_g", "JwANgd$v=U*cW9-Dg7DA=jejn2UN<t-S", null, null, false);
+
+            var user = CurrentUser.Create(cp);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(user, Is.Not.Null);
+                Assert.That(token, Is.Not.Null);
+                Assert.That(token?.Issuer, Is.EqualTo("SmartERP"));
+                Assert.That(user?.Id, Is.EqualTo("1010"));
+                Assert.That(user?.Organization, Is.EqualTo("0"));
+            });
+        }
+
+        [Test]
         public void SignDataAndVerify_Tests()
         {
             // Arrange, public key service

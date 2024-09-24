@@ -186,7 +186,7 @@ namespace com.etsoo.CoreFramework.Authentication
             return parameters;
         }
 
-        private TokenValidationParameters CreateIdTokenValidationParameters(string signingKey, string? issuer = null, string? audience = null)
+        private TokenValidationParameters CreateIdTokenValidationParameters(string signingKey, string? issuer = null, string? audience = null, bool validateLifetime = true)
         {
             // Security key
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
@@ -195,6 +195,7 @@ namespace com.etsoo.CoreFramework.Authentication
             parameters.IssuerSigningKey = securityKey;
             parameters.ValidIssuer = issuer;
             parameters.ValidateIssuer = !string.IsNullOrEmpty(issuer);
+            parameters.ValidateLifetime = validateLifetime;
 
             return parameters;
         }
@@ -358,7 +359,11 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <returns>Claim data</returns>
         public (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateToken(string token, string? audience = null)
         {
-            var handler = new JwtSecurityTokenHandler();
+            var handler = new JwtSecurityTokenHandler
+            {
+                MapInboundClaims = false
+            };
+
             var claims = handler.ValidateToken(token, CreateValidationParameters(audience), out var validatedToken);
 
             // var securityToken = validatedToken as JwtSecurityToken;
@@ -375,11 +380,16 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="issuer">Valid issuer</param>
         /// <param name="signingKey">Signing key</param>
         /// <param name="audience">Audience</param>
+        /// <param name="validateLifetime">Validate the lifetime of the token</param>
         /// <returns>Claim data</returns>
-        public (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null)
+        public (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null, bool validateLifetime = true)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var claims = handler.ValidateToken(token, CreateIdTokenValidationParameters(signingKey, issuer, audience), out var validatedToken);
+            var handler = new JwtSecurityTokenHandler
+            {
+                MapInboundClaims = false
+            };
+
+            var claims = handler.ValidateToken(token, CreateIdTokenValidationParameters(signingKey, issuer, audience, validateLifetime), out var validatedToken);
             return (claims, validatedToken);
         }
 

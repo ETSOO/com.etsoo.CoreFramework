@@ -152,11 +152,9 @@ namespace com.etsoo.CoreFramework.User
             claims.AddRange([
                 new(RegionClaim, Region),
                 new(IPAddressClaim, ClientIp.ToString()),
-                new(DeviceIdClaim, DeviceId)
+                new(DeviceIdClaim, DeviceId),
+                new(OrganizationClaim, Organization)
             ]);
-
-            if (!string.IsNullOrEmpty(Organization))
-                claims.Add(new(OrganizationClaim, Organization));
 
             return claims;
         }

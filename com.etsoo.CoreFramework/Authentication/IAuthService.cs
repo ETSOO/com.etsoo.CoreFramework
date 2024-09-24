@@ -80,8 +80,9 @@ namespace com.etsoo.CoreFramework.Authentication
         /// <param name="issuer">Valid issuer</param>
         /// <param name="signingKey">Signing key</param>
         /// <param name="audience">Audience</param>
+        /// <param name="validateLifetime">Validate the lifetime of the token</param>
         /// <returns>Claim data</returns>
-        (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null);
+        (ClaimsPrincipal? claims, SecurityToken? securityToken) ValidateIdToken(string token, string signingKey, string? issuer = null, string? audience = null, bool validateLifetime = true);
 
         /// <summary>
         /// Verify data
