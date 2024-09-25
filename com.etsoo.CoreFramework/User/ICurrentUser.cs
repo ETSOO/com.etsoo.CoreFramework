@@ -80,5 +80,17 @@ namespace com.etsoo.CoreFramework.User
         /// 语言
         /// </summary>
         CultureInfo Language { get; }
+
+        /// <summary>
+        /// User uid
+        /// 用户uid
+        /// </summary>
+        string? Uid { get; init; }
+
+        /// <summary>
+        /// App key
+        /// 程序键值
+        /// </summary>
+        string? AppKey { get; init; }
     }
 }
