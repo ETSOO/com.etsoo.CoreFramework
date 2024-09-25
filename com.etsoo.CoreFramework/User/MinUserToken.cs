@@ -1,4 +1,7 @@
-﻿using System.Security.Claims;
+﻿using com.etsoo.Utils.Serialization;
+using com.etsoo.Utils.String;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace com.etsoo.CoreFramework.User
 {
@@ -21,6 +24,12 @@ namespace com.etsoo.CoreFramework.User
         public const string ScopeClaim = "scope";
 
         /// <summary>
+        /// JSON data claim type
+        /// JSON数据声明类型
+        /// </summary>
+        public const string JsonDataClaim = "jsondata";
+
+        /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
@@ -36,17 +45,21 @@ namespace com.etsoo.CoreFramework.User
             // Claims
             var id = claims.FindFirstValue(IdClaim);
             var scopes = claims.FindAll(ScopeClaim).Select(claim => claim.Value);
+            var jsonData = claims.FindFirstValue(JsonDataClaim);
 
             // Validate
             if (string.IsNullOrEmpty(id))
                 return null;
+
+            var data = string.IsNullOrEmpty(jsonData) ? null : JsonSerializer.Deserialize(jsonData, CommonJsonSerializerContext.Default.DictionaryStringObject);
 
             // New object
             return new MinUserToken
             {
                 Id = id,
                 ConnectionId = connectionId,
-                Scopes = scopes
+                Scopes = scopes,
+                JsonData = data == null ? [] : new StringKeyDictionaryObject(data)
             };
         }
 
@@ -90,6 +103,13 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public IEnumerable<string>? Scopes { get; init; }
 
+
+        /// <summary>
+        /// JSON data
+        /// JSON数据
+        /// </summary>
+        public StringKeyDictionaryObject JsonData { get; init; } = [];
+
         /// <summary>
         /// Create claims
         /// 创建声明
@@ -105,6 +125,12 @@ namespace com.etsoo.CoreFramework.User
             if (Scopes != null)
             {
                 claims.AddRange(Scopes.Select(scope => new Claim(ScopeClaim, scope)));
+            }
+
+            if (JsonData.Any())
+            {
+                var json = JsonSerializer.Serialize(JsonData, CommonJsonSerializerContext.Default.StringKeyDictionaryObject);
+                claims.Add(new(JsonDataClaim, json));
             }
 
             return claims;
