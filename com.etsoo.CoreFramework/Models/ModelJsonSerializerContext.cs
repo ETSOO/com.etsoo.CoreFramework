@@ -36,6 +36,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(QueryRQ<long>), TypeInfoPropertyName = "QueryLongRQ")]
     [JsonSerializable(typeof(QueryRQ<Guid>), TypeInfoPropertyName = "QueryGuidRQ")]
     [JsonSerializable(typeof(RefreshTokenData))]
+    [JsonSerializable(typeof(RefreshTokenRQ))]
     [JsonSerializable(typeof(SendEmailRQ))]
     [JsonSerializable(typeof(SignoutRQ))]
     [JsonSerializable(typeof(SortRQ))]
