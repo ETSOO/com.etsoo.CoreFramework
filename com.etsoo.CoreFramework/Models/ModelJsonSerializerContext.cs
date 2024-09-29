@@ -31,6 +31,8 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(LoginIdRQ))]
     [JsonSerializable(typeof(LoginRQ))]
     [JsonSerializable(typeof(MergeRQ))]
+    [JsonSerializable(typeof(PublicServiceUserData))]
+    [JsonSerializable(typeof(PublicUserData))]
     [JsonSerializable(typeof(QueryRQ))]
     [JsonSerializable(typeof(QueryRQ<int>), TypeInfoPropertyName = "QueryIntRQ")]
     [JsonSerializable(typeof(QueryRQ<long>), TypeInfoPropertyName = "QueryLongRQ")]
