@@ -13,10 +13,10 @@
         public required string AccessToken { get; init; }
 
         /// <summary>
-        /// The token type. Always set to Bearer
-        /// 令牌类型。始终设置为 Bearer
+        /// The token type. Current always set to Bearer
+        /// 令牌类型。当前始终设置为 Bearer
         /// </summary>
-        public required string TokenType { get; init; }
+        public string TokenType { get; init; } = "Bearer";
 
         /// <summary>
         /// The remaining lifetime of the access token in seconds
