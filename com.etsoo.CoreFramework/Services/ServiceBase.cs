@@ -263,8 +263,10 @@ namespace com.etsoo.CoreFramework.Services
                 try
                 {
                     var previousPassphrase = Decrypt(rq.DeviceId, secret);
-                    if (previousPassphrase == null) return ApplicationErrors.NoValidData.AsResult("DeviceId");
-                    result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
+                    if (!string.IsNullOrEmpty(previousPassphrase))
+                    {
+                        result.Data.Add("PreviousPassphrase", CryptographyUtils.AESEncrypt(previousPassphrase, clientPassphrase, 1));
+                    }
 
                     // Repo update
                     if (!string.IsNullOrEmpty(rq.Identifier))
@@ -278,7 +280,7 @@ namespace com.etsoo.CoreFramework.Services
                 }
                 catch (Exception ex)
                 {
-                    return LogException(ex);
+                    Logger.LogWarning(ex, "InitCallAsync: Decrypt device id failed with {@rq}", rq);
                 }
             }
 
