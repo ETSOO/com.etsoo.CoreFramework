@@ -9,12 +9,6 @@ namespace com.etsoo.CoreFramework.Models
     public record PublicServiceUserData : PublicUserData
     {
         /// <summary>
-        /// Service passphrase
-        /// 服务口令
-        /// </summary>
-        public required string Passphrase { get; init; }
-
-        /// <summary>
         /// User global unique identifier
         /// 用户全局唯一标识
         /// </summary>
@@ -30,7 +24,6 @@ namespace com.etsoo.CoreFramework.Models
         {
             base.SaveTo(result);
 
-            result.Data[nameof(Passphrase)] = Passphrase;
             result.Data[nameof(Uid)] = Uid;
             result.Data[nameof(OrganizationName)] = OrganizationName;
         }
