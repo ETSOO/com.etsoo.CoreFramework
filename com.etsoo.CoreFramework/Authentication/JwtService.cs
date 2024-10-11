@@ -148,6 +148,7 @@ namespace com.etsoo.CoreFramework.Authentication
                 options.SaveToken = false;
 
                 // Token validation parameters
+                options.MapInboundClaims = false;
                 options.TokenValidationParameters = CreateValidationParameters();
             });
         }
@@ -219,7 +220,10 @@ namespace com.etsoo.CoreFramework.Authentication
             }
 
             // Token handler
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler
+            {
+                MapInboundClaims = false
+            };
 
             // Token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -281,7 +285,10 @@ namespace com.etsoo.CoreFramework.Authentication
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
 
             // Token handler
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenHandler = new JwtSecurityTokenHandler
+            {
+                MapInboundClaims = false
+            };
 
             // Token descriptor
             var tokenDescriptor = new SecurityTokenDescriptor

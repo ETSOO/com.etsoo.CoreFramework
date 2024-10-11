@@ -12,7 +12,7 @@ namespace com.etsoo.Web
         /// Exposed headers
         /// 公开的标头
         /// </summary>
-        public string[] ExposedHeaders { get; init; } = Array.Empty<string>();
+        public string[] ExposedHeaders { get; init; } = [];
 
         /// <summary>
         /// Logger, for debug purpose only
@@ -46,7 +46,7 @@ namespace com.etsoo.Web
         /// <param name="includeLocals">Include local addresses</param>
         public CorsPolicySetupOptions(string[]? sites, bool includeLocals = false)
         {
-            if (sites?.Any() is true || includeLocals)
+            if (sites?.Length > 0 || includeLocals)
             {
                 Sites = sites;
                 IncludeLocals = includeLocals;
@@ -70,7 +70,7 @@ namespace com.etsoo.Web
                 return true;
             }
 
-            if (Sites?.Any() is true)
+            if (Sites?.Length > 0)
             {
                 var originParts = origin.Split('.');
                 var len = originParts.Length;
