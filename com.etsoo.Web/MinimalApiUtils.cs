@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
+using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using IActionResult = com.etsoo.Utils.Actions.IActionResult;
 
@@ -107,6 +108,35 @@ namespace com.etsoo.Web
                 result = service.LogException(ex);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Output refresh token
+        /// 输出刷新令牌
+        /// </summary>
+        /// <param name="accessor">HTTP accessor</param>
+        /// <param name="refreshToken">Refresh token</param>
+        /// <param name="headerName">Header name</param>
+        public static void OutputRefreshToken(IHttpContextAccessor accessor, string refreshToken, string headerName = Constants.RefreshTokenHeaderName)
+        {
+            var response = accessor.HttpContext?.Response;
+            if (response == null)
+            {
+                return;
+            }
+            OutputRefreshToken(response, refreshToken, headerName);
+        }
+
+        /// <summary>
+        /// Output refresh token
+        /// 输出刷新令牌
+        /// </summary>
+        /// <param name="response">HTTP response</param>
+        /// <param name="refreshToken">Refresh token</param>
+        /// <param name="headerName">Header name</param>
+        public static void OutputRefreshToken(HttpResponse response, string refreshToken, string headerName = Constants.RefreshTokenHeaderName)
+        {
+            response.Headers.Append(headerName, refreshToken);
         }
     }
 }
