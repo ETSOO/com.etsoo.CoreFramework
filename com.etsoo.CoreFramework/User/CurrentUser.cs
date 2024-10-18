@@ -16,6 +16,28 @@ namespace com.etsoo.CoreFramework.User
     public record CurrentUser : UserToken, ICurrentUser, IUserCreator<CurrentUser>
     {
         /// <summary>
+        /// AppId to permission scope
+        /// 程序编号到权限范围
+        /// </summary>
+        /// <param name="appId">App id</param>
+        /// <returns>Scope</returns>
+        public static string AppIdToScope(int appId)
+        {
+            return appId == 1 ? "core" : $"app{appId}";
+        }
+
+        /// <summary>
+        /// Permision scope to app id
+        /// 权限范围到程序编号
+        /// </summary>
+        /// <param name="scope">Scope</param>
+        /// <returns>App id</returns>
+        public static int ScopeToAppId(string scope)
+        {
+            return scope == "core" ? 1 : StringUtils.TryParse<int>(scope[3..]).GetValueOrDefault();
+        }
+
+        /// <summary>
         /// Get role from value
         /// 从值获取角色
         /// </summary>
