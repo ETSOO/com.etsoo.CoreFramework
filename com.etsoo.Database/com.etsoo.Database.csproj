@@ -16,7 +16,7 @@
 	  <Description>ETSOO Database Utilities
 亿速思维数据库工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.1.9</Version>
+	  <Version>1.1.10</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -35,7 +35,7 @@
     <PackageReference Include="Azure.Identity" Version="1.13.0" />
     <PackageReference Include="Dapper.StrongName" Version="2.1.44" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.65.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.66.0" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
   </ItemGroup>
 

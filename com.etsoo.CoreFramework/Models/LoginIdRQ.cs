@@ -1,5 +1,6 @@
 ﻿using com.etsoo.WebUtils.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -7,6 +8,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Login id request data
     /// 登录编号请求数据
     /// </summary>
+    [JsonDerivedType(typeof(LoginRQ))]
     public record LoginIdRQ
     {
         /// <summary>
