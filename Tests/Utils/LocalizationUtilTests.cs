@@ -125,14 +125,14 @@ namespace Tests.Utils
             // Arrange & Act
             var py1 = ChineseUtils.GetPinyin("尉迟敬德", true).ToPinyin(true);
             var py2 = ChineseUtils.GetPinyin("朴敬业", true).ToPinyin(true);
-            var py3 = ChineseUtils.GetPinyin("肖赞会", true).ToPinyin(true);
+            var py3 = ChineseUtils.GetPinyin("肖赞长沙人是会长", true).ToPinyin(true);
 
             // Assert
             Assert.Multiple(() =>
             {
                 Assert.That(py1, Is.EqualTo("Yu4 Chi2 Jing4 De2"));
                 Assert.That(py2, Is.EqualTo("Piao2 Jing4 Ye4"));
-                Assert.That(py3, Is.EqualTo("Xiao1 Zan4 Hui4"));
+                Assert.That(py3, Is.EqualTo("Xiao1 Zan4 Chang2 Sha1 Ren2 Shi4 Hui4 Zhang3"));
             });
         }
     }
