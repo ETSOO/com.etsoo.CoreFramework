@@ -62,6 +62,36 @@ namespace com.etsoo.CoreFramework.User
         public const string NameClaim = "name";
 
         /// <summary>
+        /// Given name claim type
+        /// 名声明类型
+        /// </summary>
+        public const string GivenNameClaim = "givenname";
+
+        /// <summary>
+        /// Family name claim type
+        /// 姓声明类型
+        /// </summary>
+        public const string FamilyNameClaim = "familyname";
+
+        /// <summary>
+        /// Preferred name claim type
+        /// 首选姓名声明类型
+        /// </summary>
+        public const string PreferredNameClaim = "preferredname";
+
+        /// <summary>
+        /// Latin given name claim type
+        /// 拉丁名声明类型
+        /// </summary>
+        public const string LatinGivenNameClaim = "latingivenname";
+
+        /// <summary>
+        /// Latin family name claim type
+        /// 拉丁姓声明类型
+        /// </summary>
+        public const string LatinFamilyNameClaim = "latinfamilyname";
+
+        /// <summary>
         /// Locality claim type
         /// 本地化声明类型
         /// </summary>
@@ -125,6 +155,11 @@ namespace com.etsoo.CoreFramework.User
 
             // Claims
             var name = claims.FindFirstValue(NameClaim);
+            var givenName = claims.FindFirstValue(GivenNameClaim);
+            var familyName = claims.FindFirstValue(FamilyNameClaim);
+            var preferredName = claims.FindFirstValue(PreferredNameClaim);
+            var latinGivenName = claims.FindFirstValue(LatinGivenNameClaim);
+            var latinFamilyName = claims.FindFirstValue(LatinFamilyNameClaim);
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
             var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
@@ -150,6 +185,11 @@ namespace com.etsoo.CoreFramework.User
                 Organization = user.Organization,
 
                 Name = name,
+                GivenName = givenName,
+                FamilyName = familyName,
+                PreferredName = preferredName,
+                LatinGivenName = latinGivenName,
+                LatinFamilyName = latinFamilyName,
                 RoleValue = roleValue,
                 Language = new CultureInfo(language),
                 Oid = oid,
@@ -162,7 +202,7 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? appKey) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? appKey) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -171,6 +211,11 @@ namespace com.etsoo.CoreFramework.User
                 data.Get<short>("Role"),
                 data.Get("DeviceId"),
                 data.Get("Name"),
+                data.Get("GivenName"),
+                data.Get("FamilyName"),
+                data.Get("PreferredName"),
+                data.Get("LatinGivenName"),
+                data.Get("LatinFamilyName"),
                 data.Get("OrgName"),
                 data.Get("Oid"),
                 data.Get("Avatar"),
@@ -194,7 +239,7 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appKey) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appKey) = GetData(data);
 
             // Validation
             if (id == null || role == null || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
@@ -211,6 +256,11 @@ namespace com.etsoo.CoreFramework.User
                 Region = region,
                 Organization = organization,
                 Name = name,
+                GivenName = givenName,
+                FamilyName = familyName,
+                PreferredName = preferredName,
+                LatinGivenName = latinGivenName,
+                LatinFamilyName = latinFamilyName,
                 RoleValue = role.Value,
                 Language = language,
                 Oid = oid,
@@ -228,6 +278,36 @@ namespace com.etsoo.CoreFramework.User
         /// 姓名
         /// </summary>
         public required string Name { get; init; }
+
+        /// <summary>
+        /// Given name
+        /// 名
+        /// </summary>
+        public string? GivenName { get; init; }
+
+        /// <summary>
+        /// Family name
+        /// 姓
+        /// </summary>
+        public string? FamilyName { get; init; }
+
+        /// <summary>
+        /// Preferred name
+        /// 首选姓名
+        /// </summary>
+        public string? PreferredName { get; init; }
+
+        /// <summary>
+        /// Latin given name
+        /// 拉丁名
+        /// </summary>
+        public string? LatinGivenName { get; init; }
+
+        /// <summary>
+        /// Latin family name
+        /// 拉丁姓
+        /// </summary>
+        public string? LatinFamilyName { get; init; }
 
         private string oid = default!;
 
@@ -384,6 +464,21 @@ namespace com.etsoo.CoreFramework.User
                 new(RoleValueClaim, RoleValue.ToString()),
                 new(OidClaim, Oid)
             ]);
+
+            if (!string.IsNullOrEmpty(GivenName))
+                claims.Add(new(GivenNameClaim, GivenName));
+
+            if (!string.IsNullOrEmpty(FamilyName))
+                claims.Add(new(FamilyNameClaim, FamilyName));
+
+            if (!string.IsNullOrEmpty(PreferredName))
+                claims.Add(new(PreferredNameClaim, PreferredName));
+
+            if (!string.IsNullOrEmpty(LatinGivenName))
+                claims.Add(new(LatinGivenNameClaim, LatinGivenName));
+
+            if (!string.IsNullOrEmpty(LatinFamilyName))
+                claims.Add(new(LatinFamilyNameClaim, LatinFamilyName));
 
             if (!string.IsNullOrEmpty(OrganizationName))
                 claims.Add(new(OrganizationNameClaim, OrganizationName));

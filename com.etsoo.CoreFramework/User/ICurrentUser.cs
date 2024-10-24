@@ -28,6 +28,36 @@ namespace com.etsoo.CoreFramework.User
         string Name { get; }
 
         /// <summary>
+        /// Given name
+        /// 名
+        /// </summary>
+        string? GivenName { get; }
+
+        /// <summary>
+        /// Family name
+        /// 姓
+        /// </summary>
+        string? FamilyName { get; }
+
+        /// <summary>
+        /// Preferred name
+        /// 首选姓名
+        /// </summary>
+        string? PreferredName { get; }
+
+        /// <summary>
+        /// Latin given name
+        /// 拉丁名
+        /// </summary>
+        string? LatinGivenName { get; }
+
+        /// <summary>
+        /// Latin family name
+        /// 拉丁姓
+        /// </summary>
+        string? LatinFamilyName { get; }
+
+        /// <summary>
         /// Organization name
         /// 机构名称
         /// </summary>

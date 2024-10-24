@@ -96,5 +96,44 @@ namespace Tests.Utils
                 Assert.That(data?.EnglishName, Is.EqualTo("Chinese Yuan"));
             });
         }
+
+        [Test]
+        public void GetPinyinTests()
+        {
+            // Arrange
+            var pinyin = ChineseUtils.GetPinyin("重庆爱好真好重");
+
+            // Act
+            var py1 = pinyin.ToPinyin();
+            var py2 = pinyin.ToPinyin(true);
+            var py3 = pinyin.ToInitials();
+            var py4 = ChineseUtils.GetPinyin("青岛亿速思维网络科技有限公司").ToPinyin(true);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(py1, Is.EqualTo("Chong Qing Ai Hao Zhen Hao Zhong"));
+                Assert.That(py2, Is.EqualTo("Chong2 Qing4 Ai4 Hao4 Zhen1 Hao3 Zhong4"));
+                Assert.That(py3, Is.EqualTo("CQAHZHZ"));
+                Assert.That(py4, Is.EqualTo("Qing1 Dao3 Yi4 Su4 Si1 Wei2 Wang3 Luo4 Ke1 Ji4 You3 Xian4 Gong1 Si1"));
+            });
+        }
+
+        [Test]
+        public void GetPinyinNameTests()
+        {
+            // Arrange & Act
+            var py1 = ChineseUtils.GetPinyin("尉迟敬德", true).ToPinyin(true);
+            var py2 = ChineseUtils.GetPinyin("朴敬业", true).ToPinyin(true);
+            var py3 = ChineseUtils.GetPinyin("肖赞会", true).ToPinyin(true);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(py1, Is.EqualTo("Yu4 Chi2 Jing4 De2"));
+                Assert.That(py2, Is.EqualTo("Piao2 Jing4 Ye4"));
+                Assert.That(py3, Is.EqualTo("Xiao1 Zan4 Hui4"));
+            });
+        }
     }
 }
