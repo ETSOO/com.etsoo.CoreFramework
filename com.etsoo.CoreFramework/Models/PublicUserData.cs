@@ -15,6 +15,30 @@ namespace com.etsoo.CoreFramework.Models
         public required string Name { get; init; }
 
         /// <summary>
+        /// Given name
+        /// 名
+        /// </summary>
+        public string? GivenName { get; init; }
+
+        /// <summary>
+        /// Family name
+        /// 姓
+        /// </summary>
+        public string? FamilyName { get; init; }
+
+        /// <summary>
+        /// Latin given name
+        /// 拉丁名（拼音）
+        /// </summary>
+        public string? LatinGivenName { get; init; }
+
+        /// <summary>
+        /// Latin family name
+        /// 拉丁姓（拼音）
+        /// </summary>
+        public string? LatinFamilyName { get; init; }
+
+        /// <summary>
         /// Avatar
         /// 头像
         /// </summary>
