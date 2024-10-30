@@ -1,6 +1,4 @@
-﻿using com.etsoo.Localization.Chinese;
-
-namespace com.etsoo.Localization
+﻿namespace com.etsoo.Localization.Chinese
 {
     /// <summary>
     /// Chinese characters
@@ -2613,6 +2611,7 @@ namespace com.etsoo.Localization
             {
                 PinYins = [
                     new("bo", CharTone.Second, isFamilyName: true),
+                    new("bo", CharTone.Fourth, cases: ["薄荷"]),
                     new("bao", CharTone.Second, cases: ["薄饼", "薄田", "势孤力薄", "薄膜"])
                 ]
             },

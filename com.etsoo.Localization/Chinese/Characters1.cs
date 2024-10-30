@@ -1,6 +1,4 @@
-﻿using com.etsoo.Localization.Chinese;
-
-namespace com.etsoo.Localization
+﻿namespace com.etsoo.Localization.Chinese
 {
     /// <summary>
     /// Chinese characters
@@ -672,8 +670,8 @@ namespace com.etsoo.Localization
             ['少'] = new()
             {
                 PinYins = [
-                    new("shao", CharTone.Third),
-                    new("shao", CharTone.Fourth)
+                    new("shao", CharTone.Fourth),
+                    new("shao", CharTone.Third)
                 ]
             },
 
@@ -713,10 +711,13 @@ namespace com.etsoo.Localization
                 PinYins = [new("shui", CharTone.Third)]
             },
 
-            // 见: jian
+            // 见: jian | xian
             ['见'] = new()
             {
-                PinYins = [new("jian", CharTone.Fourth)]
+                PinYins = [
+                    new("jian", CharTone.Fourth),
+                    new("xian", CharTone.Fourth, cases: ["初见", "情见", "叠见", "肘见", "层见", "龙见", "见粮", "见世报", "图穷匕见", "见世生苗", "间见层出", "水清石见", "见素抱朴"])
+                ]
             },
 
             // 午: wu
@@ -1001,7 +1002,7 @@ namespace com.etsoo.Localization
             {
                 PinYins = [
                     new("dou", CharTone.Fourth),
-                    new("dou", CharTone.Third, cases: ["斗胆", "斗篷", "一斗", "两斗", "三斗"])
+                    new("dou", CharTone.Third, cases: ["筋斗", "斗胆", "北斗", "斗笠", "斗篷", "阿斗", "斗金", "烟斗", "大斗", "八斗", "一斗", "两斗", "三斗", "五斗", "小斗", "翻跟斗", "斗转星移"])
                 ]
             },
 
@@ -2714,7 +2715,7 @@ namespace com.etsoo.Localization
             {
                 PinYins = [
                     new("xue", CharTone.Fourth),
-                    new("xie", CharTone.Third, cases: ["鸡血", "血块"])
+                    new("xie", CharTone.Third, cases: ["鸡血", "血块", "流血", "吐血"])
                 ]
             },
 
@@ -2744,7 +2745,7 @@ namespace com.etsoo.Localization
             {
                 PinYins = [
                     new("xing", CharTone.Second, isFamilyName: true),
-                    new("hang", CharTone.Second, cases: ["字里行间", "行列", "罗列成行", "排行", "银行", "几行", "商行", "同行", "各行各业"])
+                    new("hang", CharTone.Second, cases: ["字里行间", "闵行", "行列", "罗列成行", "排行", "银行", "几行", "商行", "同行", "各行各业"])
                 ]
             },
 

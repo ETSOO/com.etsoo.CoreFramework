@@ -173,6 +173,18 @@ namespace com.etsoo.CoreFramework.User
     }
 
     /// <summary>
+    /// Current user accessor
+    /// 当前用户访问器
+    /// </summary>
+    public class CurrentUserAccessor : UserAccessor<CurrentUser>
+    {
+        [ActivatorUtilitiesConstructor]
+        public CurrentUserAccessor(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        {
+        }
+    }
+
+    /// <summary>
     /// User accessor for Minimal Api
     /// 最小接口用户访问器
     /// </summary>

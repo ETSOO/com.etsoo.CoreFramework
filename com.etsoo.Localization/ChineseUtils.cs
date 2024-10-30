@@ -79,6 +79,26 @@ namespace com.etsoo.Localization
             {
                 return c7;
             }
+            else if (ChineseCharacters.Characters8.TryGetValue(input, out var c8))
+            {
+                return c8;
+            }
+            else if (ChineseCharacters.Characters9.TryGetValue(input, out var c9))
+            {
+                return c9;
+            }
+            else if (ChineseCharacters.Characters10.TryGetValue(input, out var c10))
+            {
+                return c10;
+            }
+            else if (ChineseCharacters.Characters11.TryGetValue(input, out var c11))
+            {
+                return c11;
+            }
+            else if (ChineseCharacters.Characters12.TryGetValue(input, out var c12))
+            {
+                return c12;
+            }
             else
             {
                 return null;

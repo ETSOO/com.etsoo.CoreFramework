@@ -50,12 +50,4 @@ namespace com.etsoo.CoreFramework.User
         /// <returns>Result</returns>
         U? CreateUserFromToken<U>(IAuthService authService, string token, string? audience = null, string? connectionId = null) where U : MinUserToken, IMinUserCreator<U>;
     }
-
-    /// <summary>
-    /// Current user accessor interface
-    /// 当前用户访问器接口
-    /// </summary>
-    public interface ICurrentUserAccessor : IUserAccessor<CurrentUser>
-    {
-    }
 }

@@ -1,6 +1,4 @@
-﻿using com.etsoo.Localization.Chinese;
-
-namespace com.etsoo.Localization
+﻿namespace com.etsoo.Localization.Chinese
 {
     /// <summary>
     /// Chinese characters
