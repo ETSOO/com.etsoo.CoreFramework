@@ -59,7 +59,7 @@ namespace com.etsoo.CoreFramework.User
                 Id = id,
                 ConnectionId = connectionId,
                 Scopes = scopes,
-                JsonData = data == null ? [] : new StringKeyDictionaryObject(data)
+                JsonData = data == null ? [] : new StringKeyDictionaryObject(data!)
             };
         }
 

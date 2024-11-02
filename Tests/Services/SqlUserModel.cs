@@ -29,12 +29,10 @@ namespace Tests.Services
     }
 
     [SqlSelectCommand("User", NamingPolicy.CamelCase, Database = DatabaseName.SQLServer | DatabaseName.SQLite)]
-    internal partial record SqlUserTiplist : TiplistRQ
+    internal partial record SqlUserTiplist : QueryRQ<int>
     {
-        public int? Id { get; init; }
-
         [SqlColumn(ColumnName = "id", QuerySign = SqlQuerySign.NotEqual)]
-        public IEnumerable<int>? ExcludedIds { get; init; }
+        public override IEnumerable<int>? ExcludedIds { get; set; }
 
         [SqlColumn(ColumnName = "name", QuerySign = SqlQuerySign.Like)]
         public override string? Keyword { get; set; }

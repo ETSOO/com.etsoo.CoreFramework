@@ -188,7 +188,7 @@ namespace Tests.Services
             var result = model.CreateSqlSelectJson(db, ["id", "name AS label"]);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT json_group_array(json_object('id', id, 'label', label)) FROM (SELECT \"id\", name AS \"label\" FROM \"User\" WHERE \"id\" = @Id AND \"id\" NOT IN (2,4,8) AND \"name\" LIKE @Keyword LIMIT 10)"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT json_group_array(json_object('id', id, 'label', label)) FROM (SELECT \"id\", name AS \"label\" FROM \"User\" WHERE \"id\" NOT IN (2,4,8) AND \"name\" LIKE @Keyword AND \"id\" = @Id AND \"excludedIds\" IN (2,4,8) AND \"keyword\" = @Keyword)"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(3));
             });
         }
