@@ -1,4 +1,5 @@
-﻿using com.etsoo.CoreFramework.Services;
+﻿using com.etsoo.CoreFramework.Business;
+using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
 using System.Text.Json.Serialization;
 
@@ -14,6 +15,15 @@ namespace com.etsoo.CoreFramework.Models
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     )]
+
+    [JsonSerializable(typeof(AssetUnit))]
+    [JsonSerializable(typeof(DataPrivacy))]
+    [JsonSerializable(typeof(EntityStatus))]
+    [JsonSerializable(typeof(IdentityType))]
+    [JsonSerializable(typeof(IdentityTypeFlags))]
+    [JsonSerializable(typeof(PinyinFormatType))]
+    [JsonSerializable(typeof(ProductUnit))]
+    [JsonSerializable(typeof(RepeatOption))]
 
     [JsonSerializable(typeof(ApiTokenRQ))]
     [JsonSerializable(typeof(AuthCreateTokenRQ))]
