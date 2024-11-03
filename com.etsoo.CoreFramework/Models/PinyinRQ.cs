@@ -6,7 +6,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Pinyin format type
     /// 拼音格式类型
     /// </summary>
-    public enum PinyinFormatType
+    public enum PinyinFormatType : byte
     {
         /// <summary>
         /// Default, full Pinyin without tone
@@ -41,15 +41,15 @@ namespace com.etsoo.CoreFramework.Models
         public required string Input { get; init; }
 
         /// <summary>
+        /// Return format
+        /// 返回格式
+        /// </summary>
+        public PinyinFormatType Format { get; init; }
+
+        /// <summary>
         /// Is name
         /// 是否为姓名
         /// </summary>
         public bool? IsName { get; init; }
-
-        /// <summary>
-        /// Return format
-        /// 返回格式
-        /// </summary>
-        public PinyinFormatType? Format { get; init; }
     }
 }

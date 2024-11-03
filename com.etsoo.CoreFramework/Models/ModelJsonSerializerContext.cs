@@ -31,7 +31,6 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(InitCallRQ))]
     [JsonSerializable(typeof(LoginIdRQ))]
     [JsonSerializable(typeof(MergeRQ))]
-    [JsonSerializable(typeof(PinyinFormatType))]
     [JsonSerializable(typeof(PinyinRQ))]
     [JsonSerializable(typeof(PublicServiceUserData))]
     [JsonSerializable(typeof(PublicUserData))]
