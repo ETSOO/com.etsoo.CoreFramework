@@ -1,32 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using com.etsoo.CoreFramework.Business;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.CoreFramework.Models
 {
-    /// <summary>
-    /// Pinyin format type
-    /// 拼音格式类型
-    /// </summary>
-    public enum PinyinFormatType : byte
-    {
-        /// <summary>
-        /// Default, full Pinyin without tone
-        /// 默认，不带声调的全拼
-        /// </summary>
-        Default,
-
-        /// <summary>
-        /// Initial letter
-        /// 首字母
-        /// </summary>
-        Initial,
-
-        /// <summary>
-        /// Full Pinyin with tone
-        /// 带声调的全拼
-        /// </summary>
-        Tone
-    }
-
     /// <summary>
     /// Get Pinyin request data
     /// 获取拼音请求数据
