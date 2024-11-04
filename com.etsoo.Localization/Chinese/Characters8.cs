@@ -10,7 +10,7 @@
         /// All Chinese characters 8 (second level)
         /// 所有中文字符8（二级汉字）
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters8 = new()
+        public static Dictionary<char, ChineseCharacter> Characters8 => new(800)
         {
             // 乂: yi | ai
             ['乂'] = new()

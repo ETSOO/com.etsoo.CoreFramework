@@ -10,7 +10,7 @@
         /// All Chinese characters 5
         /// 所有中文字符5
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters5 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters5 = new(800)
         {
             // 蜓: ting
             ['蜓'] = new()

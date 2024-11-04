@@ -10,7 +10,7 @@
         /// All Chinese characters 4
         /// 所有中文字符4
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters4 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters4 = new(800)
         {
             // 虑: lv
             ['虑'] = new()

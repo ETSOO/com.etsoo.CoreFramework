@@ -98,6 +98,53 @@ namespace Tests.Utils
         }
 
         [Test]
+        [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
+        public void RegionChineseTest()
+        {
+            var regions = LocalizationUtils.GetAllRegions();
+            var region = regions.FirstOrDefault(r => r.Key.Equals("US")).Value;
+            Assert.Multiple(() =>
+            {
+                Assert.That(region?.Name, Is.EqualTo("美国"));
+                Assert.That(region?.Currency.Name, Is.EqualTo("美元"));
+            });
+        }
+
+        [Test]
+        [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
+        public void CurrenciesByIdsTest()
+        {
+            var currencies = LocalizationUtils.GetAllRegions().GetCurrencies(["CNY", "USD", "NZD"]).ToArray();
+            Assert.Multiple(() =>
+            {
+                Assert.That(currencies, Has.Length.EqualTo(3));
+                Assert.That(currencies[2].Name, Is.EqualTo("新西兰元"));
+            });
+        }
+
+        [Test]
+        [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
+        public void RegionsByIdsTest()
+        {
+            var regions = LocalizationUtils.GetAllRegions().GetRegions(["CN", "US", "NZ"]).ToArray();
+            Assert.Multiple(() =>
+            {
+                Assert.That(regions, Has.Length.EqualTo(3));
+                Assert.That(regions[1].Name, Is.EqualTo("美国"));
+            });
+        }
+
+        [Test]
+        public void GetCurrencyDataNullTests()
+        {
+            var data = LocalizationUtils.GetCurrencyData("CNY1");
+            Assert.That(data, Is.Null);
+        }
+
+        [Test]
         public void GetPinyinTests()
         {
             // Arrange

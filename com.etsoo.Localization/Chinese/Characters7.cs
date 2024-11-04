@@ -10,7 +10,7 @@
         /// All Chinese characters 7
         /// 所有中文字符7
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters7 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters7 = new(800)
         {
             // 崎: qi
             ['崎'] = new()

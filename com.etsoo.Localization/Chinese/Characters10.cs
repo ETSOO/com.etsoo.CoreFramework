@@ -10,7 +10,7 @@
         /// All Chinese characters 10 (second level)
         /// 所有中文字符10（二级汉字）
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters10 = new()
+        public static Dictionary<char, ChineseCharacter> Characters10 => new(800)
         {
             // 疱: pao
             ['疱'] = new()

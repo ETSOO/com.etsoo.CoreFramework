@@ -10,7 +10,7 @@
         /// All Chinese characters 3
         /// 所有中文字符3
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters3 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters3 = new(800)
         {
             // 净: jing
             ['净'] = new()

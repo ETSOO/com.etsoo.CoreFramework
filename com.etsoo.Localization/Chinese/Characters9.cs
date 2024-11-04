@@ -10,7 +10,7 @@
         /// All Chinese characters 9 (second level)
         /// 所有中文字符9（二级汉字）
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters9 = new()
+        public static Dictionary<char, ChineseCharacter> Characters9 => new(800)
         {
             // 诩: xu
             ['诩'] = new()

@@ -10,7 +10,7 @@
         /// All Chinese characters 12 (second level)
         /// 所有中文字符12（二级汉字）
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters12 = new()
+        public static Dictionary<char, ChineseCharacter> Characters12 => new(800)
         {
             // 糁: shen | san
             ['糁'] = new()

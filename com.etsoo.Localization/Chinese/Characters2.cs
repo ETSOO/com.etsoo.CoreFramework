@@ -10,7 +10,7 @@
         /// All Chinese characters 2
         /// 所有中文字符2
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters2 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters2 = new(800)
         {
             // 导: dao
             ['导'] = new()

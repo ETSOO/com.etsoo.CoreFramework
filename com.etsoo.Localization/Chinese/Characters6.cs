@@ -10,7 +10,7 @@
         /// All Chinese characters 6
         /// 所有中文字符6
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters6 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters6 = new(800)
         {
             // 匕: bi
             ['匕'] = new()

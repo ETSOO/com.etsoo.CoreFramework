@@ -11,7 +11,7 @@
         /// All Chinese characters 1
         /// 所有中文字符1
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters1 = new()
+        public static readonly Dictionary<char, ChineseCharacter> Characters1 = new(800)
         {
             // 一: yi
             ['一'] = new()

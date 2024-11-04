@@ -10,7 +10,7 @@
         /// All Chinese characters 11 (second level)
         /// 所有中文字符11（二级汉字）
         /// </summary>
-        public static readonly SortedDictionary<char, ChineseCharacter> Characters11 = new()
+        public static Dictionary<char, ChineseCharacter> Characters11 => new(800)
         {
             // 鱿: you
             ['鱿'] = new()
