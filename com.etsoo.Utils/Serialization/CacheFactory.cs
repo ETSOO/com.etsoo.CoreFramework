@@ -24,11 +24,11 @@ namespace com.etsoo.Utils.Serialization
         /// <returns>Result</returns>
         [RequiresDynamicCode("DoAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
         [RequiresUnreferencedCode("DoAsync 'T' may require dynamic access otherwise can break functionality when trimming application code")]
-        public static async Task<T?> DoAsync<T>(
+        public static async Task<T> DoAsync<T>(
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
-            Func<Task<T?>> actionFunc,
+            Func<Task<T>> actionFunc,
             DistributedCacheEntryOptions? options = null,
             CancellationToken cancellationToken = default)
         {
@@ -42,7 +42,18 @@ namespace com.etsoo.Utils.Serialization
             var cachedBytes = await cache.GetAsync(key, cancellationToken);
             if (cachedBytes is not null && cachedBytes.Length > 0)
             {
-                return await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes), cancellationToken: cancellationToken);
+                try
+                {
+                    var result = await JsonSerializer.DeserializeAsync<T>(SharedUtils.GetStream(cachedBytes), cancellationToken: cancellationToken);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                catch
+                {
+                    // Ignore malformed data
+                }
             }
 
             var newValue = await actionFunc();
@@ -74,11 +85,11 @@ namespace com.etsoo.Utils.Serialization
         /// <param name="options">Options</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<T?> DoAsync<T>(
+        public static async Task<T> DoAsync<T>(
             IDistributedCache cache,
             double cacheHours,
             Func<string> keyFunc,
-            Func<JsonTypeInfo<T>, Task<T?>> actionFunc,
+            Func<JsonTypeInfo<T>, Task<T>> actionFunc,
             JsonTypeInfo<T> typeInfo,
             DistributedCacheEntryOptions? options = null,
             CancellationToken cancellationToken = default)
@@ -93,7 +104,18 @@ namespace com.etsoo.Utils.Serialization
             var cachedBytes = await cache.GetAsync(key, cancellationToken);
             if (cachedBytes is not null && cachedBytes.Length > 0)
             {
-                return await JsonSerializer.DeserializeAsync(SharedUtils.GetStream(cachedBytes), typeInfo, cancellationToken: cancellationToken);
+                try
+                {
+                    var result = await JsonSerializer.DeserializeAsync(SharedUtils.GetStream(cachedBytes), typeInfo, cancellationToken: cancellationToken);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+                catch
+                {
+                    // Ignore malformed data
+                }
             }
 
             var newValue = await actionFunc(typeInfo);
