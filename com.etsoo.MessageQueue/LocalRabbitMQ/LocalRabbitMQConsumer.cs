@@ -25,7 +25,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         {
             var consumer = sender as AsyncEventingBasicConsumer;
             if (consumer == null) return;
-            var channel = consumer.Model;
+            var channel = consumer.Channel;
 
             using var cancellationTokenSource = new CancellationTokenSource();
 
@@ -34,14 +34,14 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
             {
                 properties = LocalRabbitMQUtils.CreatePropertiesFromArgs(e);
                 await ProcessAsync(e.Body, properties, cancellationTokenSource.Token);
-                channel.BasicAck(e.DeliveryTag, false);
+                await channel.BasicAckAsync(e.DeliveryTag, false, cancellationTokenSource.Token);
             }
             catch (Exception ex)
             {
                 cancellationTokenSource.Cancel();
 
                 Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
-                channel.BasicNack(e.DeliveryTag, false, true);
+                await channel.BasicNackAsync(e.DeliveryTag, false, true, cancellationTokenSource.Token);
             }
 
             cancellationTokenSource.Dispose();
@@ -54,61 +54,63 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         /// <param name="cancellationToken">Indicates that the start process has been aborted.</param>
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            var consumer = await Task.Run(() =>
+            var connection = await LocalRabbitMQUtils.CreateConnectionAsync(_options, cancellationToken);
+
+            var channel = await connection.CreateChannelAsync(null, cancellationToken);
+
+            var exchange = _options.Exchange;
+            string queue;
+            if (string.IsNullOrEmpty(exchange))
             {
-                var connection = LocalRabbitMQUtils.CreateConnection(_options);
+                var queueName = _options.QueueName;
+                if (string.IsNullOrEmpty(queueName)) throw new Exception("Please define QueueName");
 
-                var channel = connection.CreateModel();
+                queue = queueName;
 
-                var exchange = _options.Exchange;
-                string queue;
-                if (string.IsNullOrEmpty(exchange))
+                await channel.QueueDeclareAsync(queue: queue,
+                                     durable: _options.Durable,
+                                     exclusive: _options.Exclusive,
+                                     autoDelete: _options.AutoDelete,
+                                     arguments: _options.QueueArguments,
+                                     cancellationToken: cancellationToken);
+
+                var qos = _options.QosOptions;
+                if (qos != null)
                 {
-                    var queueName = _options.QueueName;
-                    if (string.IsNullOrEmpty(queueName)) throw new Exception("Please define QueueName");
-
-                    queue = queueName;
-
-                    channel.QueueDeclare(queue: queue,
-                                         durable: _options.Durable,
-                                         exclusive: _options.Exclusive,
-                                         autoDelete: _options.AutoDelete,
-                                         arguments: _options.QueueArguments);
-
-                    var qos = _options.QosOptions;
-                    if (qos != null)
-                    {
-                        channel.BasicQos(prefetchSize: qos.PrefetchSize, prefetchCount: qos.PrefetchCount, global: qos.Global);
-                    }
+                    await channel.BasicQosAsync(
+                        prefetchSize: qos.PrefetchSize,
+                        prefetchCount: qos.PrefetchCount,
+                        global: qos.Global,
+                        cancellationToken: cancellationToken);
                 }
-                else
-                {
-                    var exchangeType = _options.ExchangeType ?? ExchangeType.Fanout;
+            }
+            else
+            {
+                var exchangeType = _options.ExchangeType ?? ExchangeType.Fanout;
 
-                    var routingKey = _options.RoutingKey;
+                var routingKey = _options.RoutingKey;
 
-                    if (exchangeType == ExchangeType.Fanout) routingKey = string.Empty;
-                    else if (string.IsNullOrEmpty(routingKey)) throw new Exception("Please define RoutingKey");
+                if (exchangeType == ExchangeType.Fanout) routingKey = string.Empty;
+                else if (string.IsNullOrEmpty(routingKey)) throw new Exception("Please define RoutingKey");
 
-                    channel.ExchangeDeclare(exchange: exchange, type: exchangeType);
+                await channel.ExchangeDeclareAsync(exchange: exchange, type: exchangeType, cancellationToken: cancellationToken);
 
-                    queue = channel.QueueDeclare().QueueName;
+                queue = (await channel.QueueDeclareAsync(cancellationToken: cancellationToken)).QueueName;
 
-                    channel.QueueBind(queue: queue,
-                      exchange: exchange,
-                      routingKey: routingKey,
-                      arguments: _options.QueueArguments);
-                }
+                await channel.QueueBindAsync(queue: queue,
+                  exchange: exchange,
+                  routingKey: routingKey,
+                  arguments: _options.QueueArguments,
+                  cancellationToken: cancellationToken);
+            }
 
-                var consumer = new AsyncEventingBasicConsumer(channel);
-                consumer.Received += MessageHandler;
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.ReceivedAsync += MessageHandler;
 
-                channel.BasicConsume(queue: queue,
-                         autoAck: false,
-                         consumer: consumer);
-
-                return consumer;
-            }, cancellationToken);
+            await channel.BasicConsumeAsync(queue: queue,
+                     autoAck: false,
+                     consumer: consumer,
+                     cancellationToken: cancellationToken);
 
             _consumer = consumer;
         }
@@ -120,20 +122,17 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            await Task.Run(() =>
+            if (_consumer != null)
             {
-                if (_consumer != null)
-                {
-                    _consumer.Received -= MessageHandler;
+                _consumer.ReceivedAsync -= MessageHandler;
 
-                    if (_consumer.Model.IsOpen)
-                        _consumer.Model.Close();
+                if (_consumer.Channel.IsOpen)
+                    await _consumer.Channel.CloseAsync(cancellationToken);
 
-                    _consumer.Model.Dispose();
+                await _consumer.Channel.DisposeAsync();
 
-                    _consumer = null;
-                }
-            }, cancellationToken);
+                _consumer = null;
+            }
         }
 
         /// <summary>

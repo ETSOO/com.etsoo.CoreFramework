@@ -176,6 +176,18 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Check the field is modified with the model
+        /// 测试字段是否被修改
+        /// </summary>
+        /// <param name="model">Model</param>
+        /// <param name="field">Test field</param>
+        /// <returns>Result</returns>
+        public static bool IsModified(this IUpdateModel model, string field)
+        {
+            return model.ChangedFields?.Contains(field, StringComparer.OrdinalIgnoreCase) is true;
+        }
+
+        /// <summary>
         /// Async execute SQL Command with multiple collections, write to stream of the first row first column value, used to read huge text data like json/xml
         /// 异步执行SQL命令，读取多个数据集第一行第一列的数据到流，用于读取大文本字段，比如返回的JSON/XML数据
         /// </summary>

@@ -20,7 +20,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         /// </summary>
         /// <param name="options">Options</param>
         /// <returns>Connection</returns>
-        public static IConnection CreateConnection(LocalRabbitMQOptions options)
+        public static async Task<IConnection> CreateConnectionAsync(LocalRabbitMQOptions options, CancellationToken cancellationToken = default)
         {
             var clientProvidedName = options.ClientProvidedName;
 
@@ -31,8 +31,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
 
             var factory = new ConnectionFactory
             {
-                ClientProvidedName = clientProvidedName,
-                DispatchConsumersAsync = true
+                ClientProvidedName = clientProvidedName
             };
 
             if (options.UserName != null) factory.UserName = options.UserName;
@@ -41,13 +40,19 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
             if (options.HostName != null) factory.HostName = options.HostName;
             if (options.Port.HasValue) factory.Port = options.Port.Value;
             if (options.Ssl != null) factory.Ssl = options.Ssl;
-            if (options.ConsumerDispatchConcurrency.HasValue) factory.ConsumerDispatchConcurrency = options.ConsumerDispatchConcurrency.Value;
 
             // Connection is thread safe
-            connection = factory.CreateConnection();
+            connection = await factory.CreateConnectionAsync(cancellationToken);
 
             // Add or update
             return connections.AddOrUpdate(clientProvidedName, connection, (key, oldConnection) => connection);
+        }
+
+        private static Dictionary<string, object> FilterHeader(IDictionary<string, object?>? headers)
+        {
+            return headers?.Where(item => item.Value != null)
+                               .ToDictionary(item => item.Key, item => item.Value!)
+                       ?? [];
         }
 
         /// <summary>
@@ -62,7 +67,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
 
             var p = new MessageReceivedProperties
             {
-                MessageId = bp.MessageId,
+                MessageId = bp.MessageId ?? string.Empty,
                 CorrelationId = bp.CorrelationId,
                 AppId = bp.AppId,
                 ContentEncoding = bp.ContentEncoding,
@@ -71,18 +76,22 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 ReplyTo = bp.ReplyTo,
                 Type = bp.Type,
                 Timestamp = bp.Timestamp.UnixTime,
-                Headers = bp.Headers ?? new Dictionary<string, object>()
+                Headers = FilterHeader(bp.Headers)
             };
 
-            var userId = p.Headers.GetHeaderValue(nameof(p.UserId));
+            var userId = p.Headers!.GetHeaderValue(nameof(p.UserId));
             if (userId != null) p.UserId = userId;
 
-            p.Headers[LoginUserIdField] = bp.UserId;
+            if (bp.UserId != null)
+                p.Headers[LoginUserIdField] = bp.UserId;
+
             p.Headers[nameof(bp.Persistent)] = bp.Persistent;
-            p.Headers[nameof(bp.CorrelationId)] = bp.CorrelationId;
-            p.Headers[nameof(bp.Expiration)] = bp.Expiration;
-            p.Headers[nameof(bp.ProtocolClassId)] = bp.ProtocolClassId;
-            p.Headers[nameof(bp.ProtocolClassName)] = bp.ProtocolClassName;
+
+            if (bp.CorrelationId != null)
+                p.Headers[nameof(bp.CorrelationId)] = bp.CorrelationId;
+
+            if (bp.Expiration != null)
+                p.Headers[nameof(bp.Expiration)] = bp.Expiration;
 
             return p;
         }

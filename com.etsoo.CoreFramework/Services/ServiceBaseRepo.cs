@@ -483,8 +483,8 @@ namespace com.etsoo.CoreFramework.Services
                     (matchField, alias) = DatabaseUtils.SplitField(matchField);
                     return (matchField, alias, value);
                 })
-                .Where(field => model.ChangedFields.Contains(field.matchField, StringComparer.OrdinalIgnoreCase)
-                    || field.alias != null && model.ChangedFields.Contains(field.alias, StringComparer.OrdinalIgnoreCase))
+                .Where(field => model.IsModified(field.matchField)
+                    || field.alias != null && model.IsModified(field.alias))
                 .Select(field => $"{App.DB.EscapeIdentifier(field.matchField)} = {field.value}");
 
             if (!updateFields.Any())

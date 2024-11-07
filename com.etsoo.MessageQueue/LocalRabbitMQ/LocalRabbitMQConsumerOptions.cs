@@ -64,7 +64,7 @@
         /// Additional queue arguments, e.g. "x-queue-type"
         /// 额外的队列参数，例如 “x-queue-type”
         /// </summary>
-        public IDictionary<string, object>? QueueArguments { get; init; }
+        public IDictionary<string, object?>? QueueArguments { get; init; }
 
         /// <summary>
         /// BasicQos options
