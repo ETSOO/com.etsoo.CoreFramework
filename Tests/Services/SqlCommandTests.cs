@@ -112,11 +112,23 @@ namespace Tests.Services
         [Test]
         public void SelectModelTest()
         {
-            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = "Name ASC, Id DESC" } };
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
             var result = model.CreateSqlSelect(db, ["Id", "Name", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY Name ASC, Id DESC LIMIT 16"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16"));
+                Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(6));
+            });
+        }
+
+        [Test]
+        public void SelectModelKeysetTest()
+        {
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, Keysets = ["亿速思维", 10], OrderBy = [("Name", false), ("Id", true)] } };
+            var result = model.CreateSqlSelect(db, ["Id", "Name", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE Name >= @Name AND Id < @Id AND \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(6));
             });
         }
@@ -172,11 +184,11 @@ namespace Tests.Services
         [Test]
         public void SelectJsonModelTest()
         {
-            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = "Name ASC, Id DESC" } };
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
             var result = model.CreateSqlSelectJson(db, ["Id", "Name", "IsDeleted", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT json_group_array(json_object('id', id, 'name', name, 'isDeleted', is_deleted, 'valid', valid)) FROM (SELECT \"id\", \"name\", \"is_deleted\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY Name ASC, Id DESC LIMIT 16)"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT json_group_array(json_object('id', id, 'name', name, 'isDeleted', is_deleted, 'valid', valid)) FROM (SELECT \"id\", \"name\", \"is_deleted\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16)"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(6));
             });
         }
@@ -196,11 +208,11 @@ namespace Tests.Services
         [Test]
         public void SelectGenericModelTest()
         {
-            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = "Name ASC, Id DESC" } };
+            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
             var result = model.Default.SelectResult2.CreateSqlSelect(db);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT \"creation\" AS creation, \"id\" AS id, \"name\" AS name, \"status\" AS status FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY Name ASC, Id DESC LIMIT 16"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"creation\" AS creation, \"id\" AS id, \"name\" AS name, \"status\" AS status FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(7));
             });
         }
@@ -208,11 +220,11 @@ namespace Tests.Services
         [Test]
         public void SelectGenericJsonModelTest()
         {
-            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = "Name ASC, Id DESC" } };
+            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
             var result = model.Default.SelectResult2.CreateSqlSelectJson(db);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT json_object('creation', creation, 'id', id, 'name', name, 'status', status) FROM (SELECT \"creation\" AS creation, \"id\" AS id, \"name\" AS name, \"status\" AS status FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY Name ASC, Id DESC LIMIT 16)"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT json_object('creation', creation, 'id', id, 'name', name, 'status', status) FROM (SELECT \"creation\" AS creation, \"id\" AS id, \"name\" AS name, \"status\" AS status FROM \"User\" WHERE \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16)"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(7));
             });
         }

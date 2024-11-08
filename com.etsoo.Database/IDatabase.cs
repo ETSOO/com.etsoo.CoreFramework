@@ -80,6 +80,14 @@ namespace com.etsoo.Database
         string EscapeIdentifier(string name);
 
         /// <summary>
+        /// Escape SQL part
+        /// 转义SQL部分
+        /// </summary>
+        /// <param name="part">SQL part</param>
+        /// <returns>Result</returns>
+        string EscapePart(string part);
+
+        /// <summary>
         /// Get exception result
         /// 获取数据库异常结果
         /// </summary>

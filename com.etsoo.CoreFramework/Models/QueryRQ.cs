@@ -108,6 +108,11 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public virtual IActionResult? Validate()
         {
+            if (!QueryPaging.IsOrderByValid())
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(QueryPaging));
+            }
+
             if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));
@@ -161,6 +166,11 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public virtual IActionResult? Validate()
         {
+            if (!QueryPaging.IsOrderByValid())
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(QueryPaging));
+            }
+
             if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));

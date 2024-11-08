@@ -72,6 +72,25 @@ namespace com.etsoo.Database
         public abstract string EscapeIdentifier(string name);
 
         /// <summary>
+        /// Escape SQL part
+        /// 转义SQL部分
+        /// </summary>
+        /// <param name="part">SQL part</param>
+        /// <returns>Result</returns>
+        public virtual string EscapePart(string part)
+        {
+            var parts = part.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1)
+            {
+                return EscapeIdentifier(parts[0]);
+            }
+            else
+            {
+                return string.Join('.', parts.Select(EscapeIdentifier));
+            }
+        }
+
+        /// <summary>
         /// Get exception result
         /// 获取数据库异常结果
         /// </summary>

@@ -304,10 +304,14 @@ namespace com.etsoo.SourceGenerators
                         {{
                             var parameters = new DbParameters();
                             var conditions = new List<string>();
-                            var sql = new StringBuilder();
+
+                            // Keyset pagination
+                            QueryPaging?.GetKeysetConditions(parameters, conditions);
 
                             var currentPage = QueryPaging?.CurrentPage ?? 0;
                             var pageSize = QueryPaging?.BatchSize ?? 0;
+
+                            var sql = new StringBuilder();
 
                             var mappings = new Dictionary<string, string>();
 
@@ -327,7 +331,7 @@ namespace com.etsoo.SourceGenerators
                                 sql.Append(string.Join("" AND "", conditions));
                             }}
 
-                            var orderBy = QueryPaging?.GetOrderCommand();
+                            var orderBy = QueryPaging?.GetOrderCommand(db);
                             if (!String.IsNullOrEmpty(orderBy))
                             {{ 
                                 sql.Append("" "");

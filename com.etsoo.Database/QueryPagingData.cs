@@ -3,8 +3,9 @@
 namespace com.etsoo.Database
 {
     /// <summary>
-    /// Query paging data
-    /// 查询分页数据
+    /// Query paging data, Offset pagination vs Keyset pagination
+    /// https://learn.microsoft.com/en-us/ef/core/querying/pagination
+    /// 查询分页数据，偏移分页与键集分页
     /// </summary>
     public partial record QueryPagingData
     {
@@ -12,7 +13,13 @@ namespace com.etsoo.Database
         /// Current page
         /// 当前页码
         /// </summary>
-        public uint CurrentPage { get; set; }
+        public uint? CurrentPage { get; set; }
+
+        /// <summary>
+        /// Keyset array, same order as the order by fields
+        /// 键值数组，与排序字段顺序一致
+        /// </summary>
+        public IEnumerable<object>? Keysets { get; set; }
 
         /// <summary>
         /// Batch size
@@ -22,15 +29,9 @@ namespace com.etsoo.Database
         public ushort BatchSize { get; set; } = 10;
 
         /// <summary>
-        /// Order by field
-        /// 排序字段
+        /// Order by fields, unique fields put in the end
+        /// 排序字段，唯一字段放在最后
         /// </summary>
-        public string? OrderBy { get; set; }
-
-        /// <summary>
-        /// Order ascending or descending
-        /// 升序或降序排列
-        /// </summary>
-        public bool? OrderByAsc { get; set; }
+        public IEnumerable<(string field, bool descending)>? OrderBy { get; set; }
     }
 }

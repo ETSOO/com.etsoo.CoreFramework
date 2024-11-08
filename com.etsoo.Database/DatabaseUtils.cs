@@ -16,29 +16,60 @@ namespace com.etsoo.Database
     public static partial class DatabaseUtils
     {
         /// <summary>
+        /// Is the order by fields valid
+        /// 排序字段是否有效
+        /// </summary>
+        /// <param name="data">Pagination data</param>
+        /// <returns>Result</returns>
+        public static bool IsOrderByValid(this QueryPagingData? data)
+        {
+            if (data == null || data.OrderBy == null) return true;
+            return !data.OrderBy.Any(o => !IsValidField(o.field));
+        }
+
+        /// <summary>
         /// Get order command
         /// 获取排序命令
         /// </summary>
+        /// <param name="data">Query paging data</param>
+        /// <param name="db">Database</param>
         /// <returns>Command</returns>
-        public static string? GetOrderCommand(this QueryPagingData? data)
+        public static string? GetOrderCommand(this QueryPagingData? data, IDatabase? db = null)
         {
             var orderBy = data?.OrderBy;
-            if (string.IsNullOrEmpty(orderBy)) return null;
+            if (orderBy?.Any() is not true) return null;
 
-            if (GetOrderCommandRegex().IsMatch(orderBy))
+            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.field) ? $"{(db == null ? o.field : db.EscapePart(o.field))} {(o.descending ? "DESC" : "ASC")}" : null).Where(o => o != null));
+
+            return $"ORDER BY {result}";
+        }
+
+        /// <summary>
+        /// Get keyset conditions
+        /// 获取键集条件
+        /// </summary>
+        /// <param name="data">Pagination data</param>
+        /// <param name="parameters">Parameters</param>
+        /// <param name="conditions">Conditions</param>
+        public static void GetKeysetConditions(this QueryPagingData? data, DbParameters parameters, List<string> conditions)
+        {
+            if (data == null || data.Keysets?.Any() is not true) return;
+
+            // Reset the current page
+            data.CurrentPage = null;
+
+            var len = data.Keysets.Count();
+            for (var k = 0; k < len; k++)
             {
-                var byText = data!.OrderByAsc.GetValueOrDefault(true) ? "ASC" : "DESC";
-                if (orderBy.EndsWith(" ASC", StringComparison.OrdinalIgnoreCase) || orderBy.EndsWith(" DESC", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"ORDER BY {orderBy}";
-                }
-                else
-                {
-                    return $"ORDER BY {orderBy} {byText}";
-                }
-            }
+                var keyset = data.Keysets.ElementAt(k);
+                var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? ("id", false);
 
-            return null;
+                var field = orderBy.field;
+                parameters.Add(field, keyset);
+
+                // Last order field should own an unique index
+                conditions.Add($"{field} {(orderBy.descending ? "<" : ">")}{((k + 1) < len ? "=" : "")} @{field}");
+            }
         }
 
         /// <summary>
@@ -50,6 +81,17 @@ namespace com.etsoo.Database
         public static bool IsAnsi(this string input)
         {
             return !input.Any(c => c > 127);
+        }
+
+        /// <summary>
+        /// Is the field valid
+        /// 字段是否有效
+        /// </summary>
+        /// <param name="field">Field</param>
+        /// <returns>Result</returns>
+        public static bool IsValidField(string field)
+        {
+            return OrderFieldRegex().IsMatch(field);
         }
 
         /// <summary>
@@ -388,7 +430,7 @@ namespace com.etsoo.Database
         [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase)]
         private static partial Regex MyRegex1();
 
-        [GeneratedRegex("^[0-9a-zA-Z_\\s,]+$")]
-        private static partial Regex GetOrderCommandRegex();
+        [GeneratedRegex("^[0-9a-zA-Z_\\.]+$")]
+        private static partial Regex OrderFieldRegex();
     }
 }
