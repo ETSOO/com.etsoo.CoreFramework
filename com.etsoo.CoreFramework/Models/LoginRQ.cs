@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Utils.Actions;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -12,7 +13,6 @@ namespace com.etsoo.CoreFramework.Models
         /// Login password
         /// 登录密码
         /// </summary>
-        [StringLength(512, MinimumLength = 64)]
         public required string Pwd { get; init; }
 
         /// <summary>
@@ -26,5 +26,21 @@ namespace com.etsoo.CoreFramework.Models
         /// 授权请求
         /// </summary>
         public AuthRequest? Auth { get; init; }
+
+        public override IActionResult? Validate()
+        {
+            var result = base.Validate();
+            if (result != null)
+            {
+                return result;
+            }
+
+            if (Pwd.Length is not (>= 64 and <= 512))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Pwd));
+            }
+
+            return null;
+        }
     }
 }

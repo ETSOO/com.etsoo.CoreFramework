@@ -1,4 +1,7 @@
-﻿using com.etsoo.Utils.Crypto;
+﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.Models;
 using com.etsoo.Utils.String;
 
 namespace com.etsoo.CoreFramework.Models
@@ -7,7 +10,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Authentication refresh token request
     /// 认证刷新令牌请求
     /// </summary>
-    public record AuthRefreshTokenRQ
+    public record AuthRefreshTokenRQ : IModelValidator
     {
         /// <summary>
         /// Application ID
@@ -52,6 +55,31 @@ namespace com.etsoo.CoreFramework.Models
             var query = rq.JoinAsString().TrimEnd('&');
 
             return Convert.ToHexString(CryptographyUtils.HMACSHA256(query, appSecret));
+        }
+
+        /// <summary>
+        /// Validate the model
+        /// 验证模块
+        /// </summary>
+        /// <returns>Result</returns>
+        public IActionResult? Validate()
+        {
+            if (AppKey.Length is not (>= 32 and <= 128))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(AppKey));
+            }
+
+            if (RefreshToken.Length is not (>= 64 and <= 512))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(RefreshToken));
+            }
+
+            if (Sign.Length is not (>= 128 and <= 1024))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Sign));
+            }
+
+            return null;
         }
     }
 }

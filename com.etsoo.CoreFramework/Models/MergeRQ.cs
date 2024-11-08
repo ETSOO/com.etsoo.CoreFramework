@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace com.etsoo.CoreFramework.Models
+﻿namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
     /// Merget request data
@@ -12,15 +10,13 @@ namespace com.etsoo.CoreFramework.Models
         /// Source id
         /// 原编号
         /// </summary>
-        [Required]
-        public int SourceId { get; init; }
+        public required int SourceId { get; init; }
 
         /// <summary>
         /// Merge target id
         /// 合并目标编号
         /// </summary>
-        [Required]
-        public int TargetId { get; init; }
+        public required int TargetId { get; init; }
 
         /// <summary>
         /// Is to delete source item

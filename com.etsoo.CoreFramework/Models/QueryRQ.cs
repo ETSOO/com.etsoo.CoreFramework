@@ -1,5 +1,8 @@
-﻿using com.etsoo.CoreFramework.Business;
+﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Business;
 using com.etsoo.Database;
+using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Models;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -7,7 +10,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Query request data interface
     /// 查询请求数据接口
     /// </summary>
-    public interface IQueryRQ
+    public interface IQueryRQ : IModelValidator
     {
         /// <summary>
         /// Id
@@ -97,6 +100,21 @@ namespace com.etsoo.CoreFramework.Models
         /// 排除的编号
         /// </summary>
         public virtual IEnumerable<T>? ExcludedIds { get; set; }
+
+        /// <summary>
+        /// Validate the model
+        /// 验证模块
+        /// </summary>
+        /// <returns>Result</returns>
+        public virtual IActionResult? Validate()
+        {
+            if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));
+            }
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -124,5 +142,58 @@ namespace com.etsoo.CoreFramework.Models
         /// 排除的编号
         /// </summary>
         public virtual IEnumerable<string>? ExcludedIds { get; set; }
+
+        /// <summary>
+        /// Is valid id or not
+        /// 编号是否有效
+        /// </summary>
+        /// <param name="id">Id</param>
+        /// <returns>Result</returns>
+        protected virtual bool IsValidId(string id)
+        {
+            return id.Length is (>=1 and <= 256);
+        }
+
+        /// <summary>
+        /// Validate the model
+        /// 验证模块
+        /// </summary>
+        /// <returns>Result</returns>
+        public virtual IActionResult? Validate()
+        {
+            if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));
+            }
+
+            if (Id != null && !IsValidId(Id))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Id));
+            }
+
+            if (Ids != null)
+            {
+                foreach (var id in Ids)
+                {
+                    if (!IsValidId(id))
+                    {
+                        return ApplicationErrors.NoValidData.AsResult(nameof(Ids));
+                    }
+                }
+            }
+
+            if (ExcludedIds != null)
+            {
+                foreach (var id in ExcludedIds)
+                {
+                    if (!IsValidId(id))
+                    {
+                        return ApplicationErrors.NoValidData.AsResult(nameof(ExcludedIds));
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
+using com.etsoo.Utils.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using IActionResult = com.etsoo.Utils.Actions.IActionResult;
@@ -13,6 +15,53 @@ namespace com.etsoo.Web
     /// </summary>
     public static class MinimalApiUtils
     {
+        /// <summary>
+        /// Add model validators alternative to DataAnnotations
+        /// 添加模块验证器，替代DataAnnotations
+        /// </summary>
+        /// <typeparam name="TBuilder">Generic builder type</typeparam>
+        /// <param name="builder">Builder</param>
+        /// <returns>Result</returns>
+        public static TBuilder AddModelValidators<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
+        {
+            builder.AddEndpointFilter(async (context, next) =>
+            {
+                Dictionary<string, string[]> errors = [];
+
+                foreach (var argument in context.Arguments)
+                {
+                    if (argument is IModelValidator validator)
+                    {
+                        var result = validator.Validate();
+                        if (result != null && !result.Ok)
+                        {
+                            var field = result.Field ?? string.Empty;
+                            var title = result.Title ?? "Unknown";
+                            if (errors.TryGetValue(field, out var messages))
+                            {
+                                errors[field] = [.. messages, title];
+                            }
+                            else
+                            {
+                                errors[field] = [title];
+                            }
+                        }
+                    }
+                }
+
+                if (errors.Count > 0)
+                {
+                    return Results.ValidationProblem(errors);
+                }
+                else
+                {
+                    return await next(context);
+                }
+            });
+
+            return builder;
+        }
+
         /// <summary>
         /// Check device data
         /// 检查设备信息
