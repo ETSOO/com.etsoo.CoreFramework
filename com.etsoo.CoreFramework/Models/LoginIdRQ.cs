@@ -42,19 +42,9 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(DeviceId));
             }
 
-            if (Id.IndexOf('@') > 0)
+            if (Id.Length is not (>= 32 and <= 256))
             {
-                if (Id.Length is not (>= 6 and <= 512))
-                {
-                    return ApplicationErrors.NoValidData.AsResult(nameof(Id));
-                }
-            }
-            else
-            {
-                if (Id.Length is not (>= 6 and <= 20))
-                {
-                    return ApplicationErrors.NoValidData.AsResult(nameof(Id));
-                }
+                return ApplicationErrors.NoValidData.AsResult(nameof(Id));
             }
 
             if (Region.Length is not 2)
