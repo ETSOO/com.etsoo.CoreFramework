@@ -24,7 +24,7 @@ namespace com.etsoo.Database
         public static bool IsOrderByValid(this QueryPagingData? data)
         {
             if (data == null || data.OrderBy == null) return true;
-            return !data.OrderBy.Any(o => !IsValidField(o.field));
+            return !data.OrderBy.Any(o => !IsValidField(o.Key));
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace com.etsoo.Database
         public static string? GetOrderCommand(this QueryPagingData? data, IDatabase? db = null)
         {
             var orderBy = data?.OrderBy;
-            if (orderBy?.Any() is not true) return null;
+            if (orderBy == null || orderBy.Count == 0) return null;
 
-            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.field) ? $"{(db == null ? o.field : db.EscapePart(o.field))} {(o.descending ? "DESC" : "ASC")}" : null).Where(o => o != null));
+            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.Key) ? $"{(db == null ? o.Key : db.EscapePart(o.Key))} {(o.Value ? "DESC" : "ASC")}" : null).Where(o => o != null));
 
             return $"ORDER BY {result}";
         }
@@ -62,13 +62,13 @@ namespace com.etsoo.Database
             for (var k = 0; k < len; k++)
             {
                 var keyset = data.Keysets.ElementAt(k);
-                var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? ("id", false);
+                var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? new KeyValuePair<string, bool>("id", true);
 
-                var field = orderBy.field;
+                var field = orderBy.Key;
                 parameters.Add(field, keyset);
 
                 // Last order field should own an unique index
-                conditions.Add($"{field} {(orderBy.descending ? "<" : ">")}{((k + 1) < len ? "=" : "")} @{field}");
+                conditions.Add($"{field} {(orderBy.Value ? "<" : ">")}{((k + 1) < len ? "=" : "")} @{field}");
             }
         }
 

@@ -113,7 +113,7 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(QueryPaging));
             }
 
-            if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
+            if (Keyword != null && Keyword.Length > 128)
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));
             }
@@ -171,7 +171,7 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(QueryPaging));
             }
 
-            if (Keyword != null && Keyword.Length is not (>= 2 and <= 128))
+            if (Keyword != null && Keyword.Length > 128)
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Keyword));
             }

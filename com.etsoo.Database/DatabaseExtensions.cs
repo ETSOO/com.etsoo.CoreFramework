@@ -5,6 +5,8 @@ using Dapper;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace com.etsoo.Database
@@ -252,6 +254,102 @@ namespace com.etsoo.Database
             Encoding.UTF8.GetBytes(format.RootEnd, writer);
 
             return hasContent;
+        }
+
+        /// <summary>
+        /// ETSOO query paging
+        /// 亿速思维分页查询
+        /// </summary>
+        /// <typeparam name="TSource">Generic queryable collection type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="data">Paging data</param>
+        /// <returns>Result</returns>
+        [RequiresUnreferencedCode("Expression requires unreferenced code")]
+        public static IQueryable<TSource> QueryEtsooPaging<TSource>(this IQueryable<TSource> source, QueryPagingData data)
+        {
+            // Create a parameter expression representing the source type (TSource) with the name "x"
+            var parameter = Expression.Parameter(typeof(TSource), "x");
+
+            if (data.OrderBy?.Count > 0)
+            {
+                var len = data.OrderBy.Count();
+
+                var expression = source.Expression;
+
+                for (var o = 0; o < len; o++)
+                {
+                    var orderBy = data.OrderBy.ElementAt(o);
+
+                    var field = orderBy.Key;
+
+                    // Create a member expression representing the property/field to order by, using the parameter expression
+                    var selector = Expression.PropertyOrField(parameter, field);
+
+                    // Determine the method name for ordering based on whether it is descending and if it is the first order clause
+                    var method = orderBy.Value ?
+                        (o == 0 ? "OrderByDescending" : "ThenByDescending") : (o == 0 ? "OrderBy" : "ThenBy");
+
+                    // Create a method call expression to call the appropriate OrderBy/ThenBy method on the IQueryable
+                    expression = Expression.Call(
+                        typeof(Queryable), // The type that contains the static methods (OrderBy, ThenBy, etc.)
+                        method, // The method name determined above
+                        [source.ElementType, selector.Type], // The generic type arguments for the method
+                        expression, // The source IQueryable's expression
+                        Expression.Quote(Expression.Lambda(selector, parameter)) // The lambda expression for the selector, quoted to prevent it from being compiled
+                    );
+                }
+
+                source = source.Provider.CreateQuery<TSource>(expression);
+            }
+
+            if (data.Keysets?.Any() is true)
+            {
+                // Keyset paging
+                var len = data.Keysets.Count();
+
+                var expression = source.Expression;
+
+                for (var k = 0; k < len; k++)
+                {
+                    var keyset = data.Keysets.ElementAt(k);
+                    var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? new KeyValuePair<string, bool>("id", true);
+
+                    var field = orderBy.Key;
+
+                    // Create a member expression representing the property/field to filter on
+                    var member = Expression.PropertyOrField(parameter, field);
+
+                    // Create a constant expression representing the value to compare against
+                    var constant = Expression.Constant(keyset);
+
+                    // Create a binary expression representing the equality comparison
+                    // Unique field of ordering is put in the end
+                    var body = (k + 1) < len ?
+                        (orderBy.Value ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant))
+                        : (orderBy.Value ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
+
+                    // Create a lambda expression representing the predicate
+                    var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                    // Call the Where method with the constructed predicate
+                    return source.Where(predicate);
+                }
+
+                source = source.Provider.CreateQuery<TSource>(expression);
+            }
+            else
+            {
+                // Offset paging
+                // Skip rows
+                var currentPage = data.CurrentPage.GetValueOrDefault();
+                if (currentPage > 0)
+                {
+                    source = source.Skip((int)(currentPage - 1) * data.BatchSize);
+                }
+            }
+
+            // Rows to read
+            return source.Take(data.BatchSize);
         }
     }
 }

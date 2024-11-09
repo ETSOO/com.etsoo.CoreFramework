@@ -32,6 +32,6 @@ namespace com.etsoo.Database
         /// Order by fields, unique fields put in the end
         /// 排序字段，唯一字段放在最后
         /// </summary>
-        public IEnumerable<(string field, bool descending)>? OrderBy { get; set; }
+        public Dictionary<string, bool>? OrderBy { get; set; }
     }
 }

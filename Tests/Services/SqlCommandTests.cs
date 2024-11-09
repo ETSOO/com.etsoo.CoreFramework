@@ -112,7 +112,7 @@ namespace Tests.Services
         [Test]
         public void SelectModelTest()
         {
-            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = new() { { "Name", false }, { "Id", true } } } };
             var result = model.CreateSqlSelect(db, ["Id", "Name", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
@@ -124,7 +124,7 @@ namespace Tests.Services
         [Test]
         public void SelectModelKeysetTest()
         {
-            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, Keysets = ["亿速思维", 10], OrderBy = [("Name", false), ("Id", true)] } };
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, Keysets = ["亿速思维", 10], OrderBy = new() { { "Name", false }, { "Id", true } } } };
             var result = model.CreateSqlSelect(db, ["Id", "Name", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
@@ -184,7 +184,7 @@ namespace Tests.Services
         [Test]
         public void SelectJsonModelTest()
         {
-            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
+            var model = new SelectTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = new() { { "Name", false }, { "Id", true } } } };
             var result = model.CreateSqlSelectJson(db, ["Id", "Name", "IsDeleted", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
@@ -208,7 +208,7 @@ namespace Tests.Services
         [Test]
         public void SelectGenericModelTest()
         {
-            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
+            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = new() { { "Name", false }, { "Id", true } } } };
             var result = model.Default.SelectResult2.CreateSqlSelect(db);
             Assert.Multiple(() =>
             {
@@ -220,7 +220,7 @@ namespace Tests.Services
         [Test]
         public void SelectGenericJsonModelTest()
         {
-            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = [("Name", false), ("Id", true)] } };
+            var model = new SelectGenericTest { Id = 1, Name = "ABC%", Status = EntityStatus.Completed, CreationStart = new DateTime(2021, 1, 1), CreationEnd = new DateTime(2021, 1, 31), Ranges = [2, 4, 8], QueryPaging = new QueryPagingData { BatchSize = 16, OrderBy = new() { { "Name", false }, { "Id", true } } } };
             var result = model.Default.SelectResult2.CreateSqlSelectJson(db);
             Assert.Multiple(() =>
             {
