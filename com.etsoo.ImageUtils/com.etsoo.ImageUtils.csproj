@@ -16,7 +16,7 @@
 	  <Description>ETSOO Image Utilities
 亿速思维图形工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.65</Version>
+	  <Version>1.0.66</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>

@@ -154,6 +154,48 @@ namespace com.etsoo.Utils.Serialization
         }
 
         /// <summary>
+        /// Get JsonElement value
+        /// 获取 JsonElement 值
+        /// </summary>
+        /// <typeparam name="T">Generic value type</typeparam>
+        /// <param name="element">Json element</param>
+        /// <param name="loose">Loose Json type check, true means string "1" also considered as number 1</param>
+        /// <returns>Result</returns>
+        public static object? GetValue(this JsonElement element, Type type, bool loose = false)
+        {
+            // Kind
+            var kind = element.ValueKind;
+
+            // Type code
+            var typeCode = Type.GetTypeCode(type);
+
+            return typeCode switch
+            {
+                TypeCode.String => element.GetString(),
+                TypeCode.Boolean => (kind == JsonValueKind.True || kind == JsonValueKind.False) ? element.GetBoolean() : (loose ? StringUtils.TryParse<bool>(element.ToString()) : null),
+                TypeCode.DateTime => kind == JsonValueKind.String && element.TryGetDateTime(out var v) ? v : null,
+                TypeCode.Decimal => kind == JsonValueKind.Number && element.TryGetDecimal(out var v) ? v : (loose ? StringUtils.TryParse<decimal>(element.ToString()) : null),
+                TypeCode.Double => kind == JsonValueKind.Number && element.TryGetDouble(out var v) ? v : (loose ? StringUtils.TryParse<double>(element.ToString()) : null),
+                TypeCode.Int16 => kind == JsonValueKind.Number && element.TryGetInt16(out var v) ? v : (loose ? StringUtils.TryParse<short>(element.ToString()) : null),
+                TypeCode.Int32 => kind == JsonValueKind.Number && element.TryGetInt32(out var v) ? v : (loose ? StringUtils.TryParse<int>(element.ToString()) : null),
+                TypeCode.Int64 => kind == JsonValueKind.Number && element.TryGetInt64(out var v) ? v : (loose ? StringUtils.TryParse<long>(element.ToString()) : null),
+                TypeCode.Byte => kind == JsonValueKind.Number && element.TryGetByte(out var v) ? v : (loose ? StringUtils.TryParse<byte>(element.ToString()) : null),
+                TypeCode.SByte => kind == JsonValueKind.Number && element.TryGetSByte(out var v) ? v : (loose ? StringUtils.TryParse<sbyte>(element.ToString()) : null),
+                TypeCode.Single => kind == JsonValueKind.Number && element.TryGetSingle(out var v) ? v : (loose ? StringUtils.TryParse<float>(element.ToString()) : null),
+                TypeCode.UInt16 => kind == JsonValueKind.Number && element.TryGetUInt16(out var v) ? v : (loose ? StringUtils.TryParse<ushort>(element.ToString()) : null),
+                TypeCode.UInt32 => kind == JsonValueKind.Number && element.TryGetUInt32(out var v) ? v : (loose ? StringUtils.TryParse<uint>(element.ToString()) : null),
+                TypeCode.UInt64 => kind == JsonValueKind.Number && element.TryGetUInt64(out var v) ? v : (loose ? StringUtils.TryParse<ulong>(element.ToString()) : null),
+                TypeCode.Object => type.FullName switch
+                {
+                    "System.Guid" => kind == JsonValueKind.String && element.TryGetGuid(out var v) ? v : null,
+                    "System.DateTimeOffset" => kind == JsonValueKind.String && element.TryGetDateTimeOffset(out var v) ? v : null,
+                    _ => null
+                },
+                _ => null
+            };
+        }
+
+        /// <summary>
         /// Get Utf8JsonReader value
         /// 获取 Utf8JsonReader 值
         /// </summary>

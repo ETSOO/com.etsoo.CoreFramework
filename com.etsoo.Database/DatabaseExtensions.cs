@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
@@ -8,6 +9,7 @@ using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text;
+using System.Text.Json;
 
 namespace com.etsoo.Database
 {
@@ -257,8 +259,11 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// ETSOO query paging
-        /// 亿速思维分页查询
+        /// Etsoo query paging
+        /// 亿速思维查询分页
+        /// https://learn.microsoft.com/en-us/answers/questions/1336973/in-what-use-cases-are-lambda-expressions-most-util
+        /// https://stackoverflow.com/questions/36298868/how-to-dynamically-order-by-certain-entity-properties-in-entity-framework-7-cor
+        /// https://www.codeproject.com/Articles/5358166/A-Dynamic-Where-Implementation-for-Entity-Framewor
         /// </summary>
         /// <typeparam name="TSource">Generic queryable collection type</typeparam>
         /// <param name="source">Source</param>
@@ -267,12 +272,9 @@ namespace com.etsoo.Database
         [RequiresUnreferencedCode("Expression requires unreferenced code")]
         public static IQueryable<TSource> QueryEtsooPaging<TSource>(this IQueryable<TSource> source, QueryPagingData data)
         {
-            // Create a parameter expression representing the source type (TSource) with the name "x"
-            var parameter = Expression.Parameter(typeof(TSource), "x");
-
             if (data.OrderBy?.Count > 0)
             {
-                var len = data.OrderBy.Count();
+                var len = data.OrderBy.Count;
 
                 var expression = source.Expression;
 
@@ -281,6 +283,9 @@ namespace com.etsoo.Database
                     var orderBy = data.OrderBy.ElementAt(o);
 
                     var field = orderBy.Key;
+
+                    // Create a parameter expression representing the source type (TSource) with the name "x"
+                    var parameter = Expression.Parameter(typeof(TSource), "x");
 
                     // Create a member expression representing the property/field to order by, using the parameter expression
                     var selector = Expression.PropertyOrField(parameter, field);
@@ -307,35 +312,61 @@ namespace com.etsoo.Database
                 // Keyset paging
                 var len = data.Keysets.Count();
 
-                var expression = source.Expression;
-
                 for (var k = 0; k < len; k++)
                 {
-                    var keyset = data.Keysets.ElementAt(k);
+                    var keysetItem = data.Keysets.ElementAt(k);
                     var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? new KeyValuePair<string, bool>("id", true);
 
                     var field = orderBy.Key;
+
+                    // Create a parameter expression representing the source type (TSource) with the name "x"
+                    var parameter = Expression.Parameter(typeof(TSource), "x");
 
                     // Create a member expression representing the property/field to filter on
                     var member = Expression.PropertyOrField(parameter, field);
 
                     // Create a constant expression representing the value to compare against
+                    var keyset = keysetItem is JsonElement jKey ? jKey.GetValue(member.Type) : keysetItem;
                     var constant = Expression.Constant(keyset);
 
-                    // Create a binary expression representing the equality comparison
-                    // Unique field of ordering is put in the end
-                    var body = (k + 1) < len ?
-                        (orderBy.Value ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant))
-                        : (orderBy.Value ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
+                    // When the keyset is string or guid, use the CompareTo method
+                    var isString = member.Type == typeof(string);
+                    if (isString || member.Type == typeof(Guid))
+                    {
+                        // Call the CompareTo method on the member expression with the constant expression as the argument
+                        var compareToMethod = member.Type.GetMethod("CompareTo", [member.Type])!;
 
-                    // Create a lambda expression representing the predicate
-                    var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+                        // Create a method call expression to call the CompareTo method on the member expression
+                        var compareToExpression = Expression.Call(member, compareToMethod, constant);
 
-                    // Call the Where method with the constructed predicate
-                    return source.Where(predicate);
+                        // Create a binary expression representing the equality comparison
+                        var zero = Expression.Constant(0);
+
+                        var body = orderBy.Value ?
+                            ((k + 1) < len ? Expression.LessThanOrEqual(compareToExpression, zero) : Expression.LessThan(compareToExpression, zero)) :
+                            ((k + 1) < len ? Expression.GreaterThanOrEqual(compareToExpression, zero) : Expression.GreaterThan(compareToExpression, zero));
+
+                        // Create a lambda expression representing the predicate
+                        var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                        // Call the Where method with the constructed predicate
+                        source = source.Where(predicate);
+                    }
+                    else
+                    {
+                        // Create a binary expression representing the equality comparison
+                        // Unique field of ordering is put in the end
+                        var body = orderBy.Value ?
+                            ((k + 1) < len ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant)) :
+                            ((k + 1) < len ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
+
+                        // Create a lambda expression representing the predicate
+                        var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                        // Call the Where method with the constructed predicate
+                        source = source.Where(predicate);
+                    }
                 }
-
-                source = source.Provider.CreateQuery<TSource>(expression);
             }
             else
             {
@@ -350,6 +381,66 @@ namespace com.etsoo.Database
 
             // Rows to read
             return source.Take(data.BatchSize);
+        }
+
+        /// <summary>
+        /// Etsoo query contains
+        /// 亿速思维查询包含
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <typeparam name="TKey">Generic key type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="collection">Contain collection</param>
+        /// <param name="idSelector">Id selector</param>
+        /// <param name="exclude">Exclude instead of contain</param>
+        /// <returns>Result</returns>
+        [RequiresDynamicCode("Expression requires dynamic code")]
+        public static IQueryable<TSource> QueryEtsooContains<TSource, TKey>(this IQueryable<TSource> source, IEnumerable<TKey> collection, Expression<Func<TSource, TKey>> idSelector, bool exclude = false)
+        {
+            // Get the Contains method from the Enumerable type
+#pragma warning disable IL2060 // Call to 'System.Reflection.MethodInfo.MakeGenericMethod' can not be statically analyzed. It's not possible to guarantee the availability of requirements of the generic method.
+            var containsMethod = typeof(Enumerable).GetMethods()
+                .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                .MakeGenericMethod(typeof(TKey));
+#pragma warning restore IL2060
+
+            // Create a constant expression representing the value to compare against
+            var constant = Expression.Constant(collection);
+
+            // Create a method call expression to call the Contains method on the constant expression
+            var containsExpression = Expression.Call(containsMethod, constant, idSelector.Body);
+
+            // Create a lambda expression representing the predicate
+            Expression predicateExpression = exclude ? Expression.Not(containsExpression) : containsExpression;
+            var predicate = Expression.Lambda<Func<TSource, bool>>(predicateExpression, idSelector.Parameters[0]);
+
+            // Call the Where method with the constructed predicate
+            return source.Where(predicate);
+        }
+
+        /// <summary>
+        /// Etsoo query equal
+        /// 亿速思维查询相等
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="value">Equal value</param>
+        /// <param name="left">Equal left expression</param>
+        /// <param name="parameter">Parameter</param>
+        /// <returns>Result</returns>
+        public static IQueryable<TSource> QueryEtsooEqual<TSource>(this IQueryable<TSource> source, object? value, Expression left, ParameterExpression parameter)
+        {
+            // Create a constant expression representing the value to compare against
+            var constant = Expression.Constant(value);
+
+            // Create a binary expression representing the equality comparison
+            var body = Expression.Equal(left, constant);
+
+            // Create a lambda expression representing the predicate
+            var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+            // Call the Where method with the constructed predicate
+            return source.Where(predicate);
         }
     }
 }
