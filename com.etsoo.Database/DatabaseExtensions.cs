@@ -3,6 +3,10 @@ using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.SpanMemory;
 using com.etsoo.Utils.String;
 using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
@@ -10,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.Database
 {
@@ -17,7 +22,7 @@ namespace com.etsoo.Database
     /// Database extension
     /// 数据库扩展
     /// </summary>
-    public static class DatabaseExtensions
+    public static partial class DatabaseExtensions
     {
         /// <summary>
         /// Get column names from DataReader
@@ -264,6 +269,7 @@ namespace com.etsoo.Database
         /// https://learn.microsoft.com/en-us/answers/questions/1336973/in-what-use-cases-are-lambda-expressions-most-util
         /// https://stackoverflow.com/questions/36298868/how-to-dynamically-order-by-certain-entity-properties-in-entity-framework-7-cor
         /// https://www.codeproject.com/Articles/5358166/A-Dynamic-Where-Implementation-for-Entity-Framewor
+        /// https://stackoverflow.com/questions/53500412/write-dynamic-linq-queries-for-sorting-and-projecting-with-ef-core
         /// </summary>
         /// <typeparam name="TSource">Generic queryable collection type</typeparam>
         /// <param name="source">Source</param>
@@ -288,7 +294,8 @@ namespace com.etsoo.Database
                     var parameter = Expression.Parameter(typeof(TSource), "x");
 
                     // Create a member expression representing the property/field to order by, using the parameter expression
-                    var selector = Expression.PropertyOrField(parameter, field);
+                    // Expression.PropertyOrField(parameter, name)
+                    var selector = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
 
                     // Determine the method name for ordering based on whether it is descending and if it is the first order clause
                     var method = orderBy.Value ?
@@ -323,7 +330,8 @@ namespace com.etsoo.Database
                     var parameter = Expression.Parameter(typeof(TSource), "x");
 
                     // Create a member expression representing the property/field to filter on
-                    var member = Expression.PropertyOrField(parameter, field);
+                    // Expression.PropertyOrField(parameter, field)
+                    var member = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
 
                     // Create a constant expression representing the value to compare against
                     var keyset = keysetItem is JsonElement jKey ? jKey.GetValue(member.Type) : keysetItem;
@@ -442,5 +450,126 @@ namespace com.etsoo.Database
             // Call the Where method with the constructed predicate
             return source.Where(predicate);
         }
+
+        /// <summary>
+        /// To JSON async without the need of a model and serializing
+        /// 异步转换为JSON，无需模型和序列化
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="writer">Writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="namingPolicy">Naming policy</param>
+        /// <returns>Has content or not</returns>
+        public static async Task<bool> ToJsonAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
+        {
+            // Create command
+            // source.TagWith("") and DbCommandInterceptor to flag it and do custom process
+            // https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/interceptors
+            await using var command = source.CreateDbCommand();
+
+            // Get the command text
+            var commandText = command.CommandText;
+
+            // Make sure the connection is not null
+            if (command.Connection == null)
+            {
+                throw new DataException("Connection is required");
+            }
+
+            // Parse the command text to get the columns
+            var match = SelectRegex().Match(commandText);
+            if (!match.Success || match.Groups.Count < 2)
+            {
+                throw new DataException("SELECT command text is not valid");
+            }
+
+            // Naming policy
+            namingPolicy ??= JsonNamingPolicy.CamelCase;
+
+            // Columns
+            var columns = SplitRegex().Split(match.Groups[1].Value);
+
+            // Is SqlServer
+            var isSqlServer = command.Connection is SqlConnection;
+            char[] trimChars = isSqlServer ? ['"', '\'', '[', ']'] : ['"', '\''];
+
+            // Fields
+            var fields = columns.Select(c =>
+            {
+                c = c.Trim('\r', '\n', '\t');
+
+                var pos = c.LastIndexOf(" AS ", StringComparison.OrdinalIgnoreCase);
+                string source;
+                if (pos == -1)
+                {
+                    source = c.Split('.').Last();
+                }
+                else
+                {
+                    source = c[(pos + 4)..];
+                }
+
+                var name = namingPolicy.ConvertName(source.Trim(trimChars));
+                return new { source, name };
+            });
+
+            // Determine the database type
+            if (isSqlServer)
+            {
+                command.CommandText = $"SELECT {string.Join(", ", fields.Select(f => $"{f.source} AS {f.name}"))} FROM ({commandText}) FOR JSON PATH";
+            }
+            else if (command.Connection is NpgsqlConnection)
+            {
+                command.CommandText = $"SELECT json_agg(json_build_object({string.Join(", ", fields.Select(f => $"'{f.name}', {f.source}"))})) FROM ({commandText})";
+            }
+            else if (command.Connection is SqliteConnection)
+            {
+                command.CommandText = $"SELECT json_group_array(json_object({string.Join(", ", fields.Select(f => $"'{f.name}', {f.source}"))})) FROM ({commandText})";
+            }
+            else
+            {
+                throw new NotSupportedException("Database type not supported");
+            }
+
+            // Open connection
+            await command.Connection.OpenAsync(cancellationToken);
+
+            // Execute reader
+            await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleResult, cancellationToken);
+
+            // Has content
+            var hasContent = reader.HasRows;
+
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                // Get the TextReader
+                using var textReader = reader.GetTextReader(0);
+
+                // Write
+                await textReader.ReadAllBytesAsyn(writer);
+            }
+
+            return hasContent;
+        }
+
+        /// <summary>
+        /// \(                   # the opening parenthesis
+        /// (?>                  # open an atomic group
+        ///     \(  (?<DEPTH>)   # when an opening parenthesis is encountered, then increment the stack named DEPTH
+        ///   |                  # OR
+        ///     \) (?<-DEPTH>)   # when a closing parenthesis is encountered, then decrement the stack named DEPTH
+        ///   |                  # OR
+        ///     [^()]+           # content that is not parenthesis
+        /// )*                   # close the atomic group, repeat zero or more times
+        /// \)                   # the closing parenthesis
+        /// (?(DEPTH)(?!))       # conditional: if the stack named DEPTH is not empty then fail (ie: parenthesis are not balanced)
+        /// </summary>
+        /// <returns></returns>
+        [GeneratedRegex(@"SELECT\s+(\(((?>\((?<DEPTH>)|\)(?<-DEPTH>)|[^()]+))*\)(?(DEPTH)(?!))|.+)\s+FROM", RegexOptions.IgnoreCase)]
+        private static partial Regex SelectRegex();
+
+        [GeneratedRegex(@"\s*,\s*(?!(?:[^(]*\([^)]*\))*[^()]*\))", RegexOptions.IgnoreCase)]
+        private static partial Regex SplitRegex();
     }
 }
