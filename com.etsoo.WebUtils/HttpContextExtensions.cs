@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using System.IO.Pipelines;
 using System.Net;
+using System.Net.Mime;
 using System.Net.Sockets;
 using System.Security.Claims;
 
@@ -55,6 +57,28 @@ namespace com.etsoo.WebUtils
             }
 
             return default;
+        }
+
+        /// <summary>
+        /// Get JSON writer
+        /// 获取JSON写入器
+        /// </summary>
+        /// <param name="response">Http Response</param>
+        /// <returns>Writer</returns>
+        public static PipeWriter GetJsonWriter(this HttpResponse response)
+        {
+            response.JsonContentType();
+            return response.BodyWriter;
+        }
+
+        /// <summary>
+        /// Set JSON content type
+        /// 设置 JSON 内容类型
+        /// </summary>
+        /// <param name="response">HTTP Response</param>
+        public static void JsonContentType(this HttpResponse response)
+        {
+            response.ContentType = MediaTypeNames.Application.Json;
         }
 
         /// <summary>
@@ -123,6 +147,24 @@ namespace com.etsoo.WebUtils
         public static void WriteHeader(this HttpResponse response, string key, StringValues value)
         {
             response.Headers.Add(new KeyValuePair<string, StringValues>(key, value));
+        }
+
+        /// <summary>
+        /// Async write raw JSON string
+        /// 异步输出原始 JSON 字符串
+        /// </summary>
+        /// <param name="response">HTTP response</param>
+        /// <param name="raw">Raw JSON string</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Task</returns>
+        public static async Task WriteRawJsonAsync(this HttpResponse response, string? raw, CancellationToken cancellationToken = default)
+        {
+            // Content type
+            response.JsonContentType();
+            if (!string.IsNullOrEmpty(raw))
+                await response.WriteAsync(raw, cancellationToken);
+            else
+                response.StatusCode = (int)HttpStatusCode.NoContent;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using com.etsoo.CoreFramework.Application;
-using com.etsoo.CoreFramework.DB;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.UserAgentParser;
 using com.etsoo.WebUtils;

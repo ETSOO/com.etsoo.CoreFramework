@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.IO.Pipelines;
 using System.Net;
 
 namespace com.etsoo.WebUtils
@@ -31,6 +32,19 @@ namespace com.etsoo.WebUtils
         public static T? GetEnumClaim<T>(this IHttpContextAccessor accessor, string claimType) where T : struct, Enum
         {
             return accessor.HttpContext?.GetEnumClaim<T>(claimType);
+        }
+
+        /// <summary>
+        /// Get JSON writer
+        /// 获取JSON写入器
+        /// </summary>
+        /// <param name="accessor">HttpContextAccessor</param>
+        /// <returns>Writer</returns>
+        /// <exception cref="NullReferenceException">Null Reference Exception</exception>
+        public static PipeWriter GetJsonWriter(this IHttpContextAccessor accessor)
+        {
+            var response = accessor.HttpContext?.Response ?? throw new NullReferenceException("No HttpContext");
+            return response.GetJsonWriter();
         }
 
         /// <summary>
