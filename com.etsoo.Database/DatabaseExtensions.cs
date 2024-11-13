@@ -18,6 +18,12 @@ using System.Text.RegularExpressions;
 
 namespace com.etsoo.Database
 {
+    record QueryJsonField
+    {
+        public required string Source { get; init; }
+        public required string Name { get; init; }
+    }
+
     /// <summary>
     /// Database extension
     /// 数据库扩展
@@ -463,6 +469,21 @@ namespace com.etsoo.Database
         /// <returns>Has content or not</returns>
         public static async Task<bool> ToJsonAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
         {
+            return await source.ToJsonInternalAsync(writer, namingPolicy, false, cancellationToken);
+        }
+
+        /// <summary>
+        /// To JSON async without the need of a model and serializing
+        /// 异步转换为JSON，无需模型和序列化
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="writer">Writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="namingPolicy">Naming policy</param>
+        /// <returns>Has content or not</returns>
+        internal static async Task<bool> ToJsonInternalAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, bool isObject = false, CancellationToken cancellationToken = default)
+        {
             // Create command
             // source.TagWith("") and DbCommandInterceptor to flag it and do custom process
             // https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/interceptors
@@ -511,21 +532,21 @@ namespace com.etsoo.Database
                 }
 
                 var name = namingPolicy.ConvertName(source.Trim(trimChars));
-                return new { source, name };
+                return new QueryJsonField { Source = source, Name = name };
             });
 
             // Determine the database type
             if (isSqlServer)
             {
-                command.CommandText = $"SELECT {string.Join(", ", fields.Select(f => $"{f.source} AS {f.name}"))} FROM ({commandText}) FOR JSON PATH";
+                command.CommandText = BuildSqlserverQuery(commandText, fields, isObject);
             }
             else if (command.Connection is NpgsqlConnection)
             {
-                command.CommandText = $"SELECT json_agg(json_build_object({string.Join(", ", fields.Select(f => $"'{f.name}', {f.source}"))})) FROM ({commandText})";
+                command.CommandText = BuildNpgsqlQuery(commandText, fields, isObject);
             }
             else if (command.Connection is SqliteConnection)
             {
-                command.CommandText = $"SELECT json_group_array(json_object({string.Join(", ", fields.Select(f => $"'{f.name}', {f.source}"))})) FROM ({commandText})";
+                command.CommandText = BuildSqliteQuery(commandText, fields, isObject);
             }
             else
             {
@@ -551,6 +572,76 @@ namespace com.etsoo.Database
             }
 
             return hasContent;
+        }
+
+        private static string BuildSqlserverQuery(string commandText, IEnumerable<QueryJsonField> fields, bool isObject)
+        {
+            return $"SELECT {string.Join(", ", fields.Select(f => $"{f.Source} AS {f.Name}"))} FROM ({commandText}) FOR JSON PATH{(isObject ? ", WITHOUT_ARRAY_WRAPPER" : "")}";
+        }
+
+        private static string BuildNpgsqlQuery(string commandText, IEnumerable<QueryJsonField> fields, bool isObject)
+        {
+            var sb = new StringBuilder("SELECT ");
+
+            if (!isObject)
+            {
+                sb.Append("json_agg(");
+            }
+
+            sb.Append("json_build_object(");
+            sb.Append(string.Join(", ", fields.Select(f => $"'{f.Name}', {f.Source}")));
+            sb.Append(')');
+
+            if (!isObject)
+            {
+                sb.Append(')');
+            }
+
+            sb.Append(" FROM (");
+            sb.Append(commandText);
+            sb.Append(')');
+
+            return sb.ToString();
+        }
+
+        private static string BuildSqliteQuery(string commandText, IEnumerable<QueryJsonField> fields, bool isObject)
+        {
+            var sb = new StringBuilder("SELECT ");
+
+            if (!isObject)
+            {
+                sb.Append("json_group_array(");
+            }
+
+            sb.Append("json_object(");
+            sb.Append(string.Join(", ", fields.Select(f => $"'{f.Name}', {f.Source}")));
+            sb.Append(')');
+
+            if (!isObject)
+            {
+                sb.Append(')');
+            }
+
+            sb.Append(" FROM (");
+            sb.Append(commandText);
+            sb.Append(')');
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// To JSON object async without the need of a model and serializing
+        /// 异步转换为JSON对象，无需模型和序列化
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="writer">Writer</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <param name="namingPolicy">Naming policy</param>
+        /// <returns>Has content or not</returns>
+        public static async Task<bool> ToJsonObjectAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
+        {
+            return await source.ToJsonInternalAsync(writer, namingPolicy, true, cancellationToken);
         }
 
         /// <summary>
