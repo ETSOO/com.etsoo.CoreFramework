@@ -43,6 +43,15 @@ namespace com.etsoo.CoreFramework.Models
             var p = rq.QueryPaging;
             if (p != null)
             {
+                // Default order by
+                if (p.OrderBy == null || p.OrderBy.Count == 0)
+                {
+                    // Avoid the id field with default prefix
+                    var idField = string.Join('.', idSelector.Body.ToString().Split('.').Skip(1));
+
+                    p.OrderBy = new Dictionary<string, bool>() { [idField] = true };
+                }
+
                 source = source.QueryEtsooPaging(p);
             }
 

@@ -10,6 +10,7 @@ using Npgsql;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text;
@@ -416,7 +417,7 @@ namespace com.etsoo.Database
             var containsMethod = typeof(Enumerable).GetMethods()
                 .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
                 .MakeGenericMethod(typeof(TKey));
-#pragma warning restore IL2060
+#pragma warning restore IL2060 // Call to 'System.Reflection.MethodInfo.MakeGenericMethod' can not be statically analyzed. It's not possible to guarantee the availability of requirements of the generic method.
 
             // Create a constant expression representing the value to compare against
             var constant = Expression.Constant(collection);
@@ -552,6 +553,9 @@ namespace com.etsoo.Database
             {
                 throw new NotSupportedException("Database type not supported");
             }
+
+            // Write the CommandText for debugging
+            Debug.WriteLine(command.CommandText, $"EFCore {nameof(ToJsonInternalAsync)}");
 
             // Open connection
             await command.Connection.OpenAsync(cancellationToken);
