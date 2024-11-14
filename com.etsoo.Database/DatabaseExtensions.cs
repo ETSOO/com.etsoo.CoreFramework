@@ -568,11 +568,25 @@ namespace com.etsoo.Database
 
             while (await reader.ReadAsync(cancellationToken))
             {
-                // Get the TextReader
-                using var textReader = reader.GetTextReader(0);
+                if (await reader.IsDBNullAsync(0, cancellationToken))
+                {
+                    // PostgreSql returns null with column "json_agg"
+                    if (!isObject)
+                    {
+                        // Write empty array []
+                        writer.Write([(byte)91, (byte)93]);
+                    }
+                    hasContent = false;
+                    break;
+                }
+                else
+                {
+                    // Get the TextReader
+                    using var textReader = reader.GetTextReader(0);
 
-                // Write
-                await textReader.ReadAllBytesAsyn(writer);
+                    // Write
+                    await textReader.ReadAllBytesAsyn(writer);
+                }
             }
 
             return hasContent;
