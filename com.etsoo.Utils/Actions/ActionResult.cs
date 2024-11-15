@@ -179,6 +179,37 @@ namespace com.etsoo.Utils.Actions
         }
 
         /// <summary>
+        /// Create a success result with data
+        /// 创建一个带有数据的成功操作结果
+        /// </summary>
+        /// <param name="data">Data to return</param>
+        /// <returns>Result</returns>
+        public static IActionResult Succeed(string data)
+        {
+            return new ActionResult
+            {
+                Ok = true,
+                Data = new() { { nameof(data), data } }
+            };
+        }
+
+        /// <summary>
+        /// Create a success result with id and data
+        /// 创建一个带有编号和数据的成功操作结果
+        /// </summary>
+        /// <param name="id">Id</param>
+        /// <param name="data">Data</param>
+        /// <returns>Result</returns>
+        public static IActionResult Succeed(long id, string data)
+        {
+            return new ActionResult
+            {
+                Ok = true,
+                Data = new() { { nameof(id), id }, { nameof(data), data } }
+            };
+        }
+
+        /// <summary>
         /// Create a success result
         /// 创建一个成功的操作结果
         /// </summary>
