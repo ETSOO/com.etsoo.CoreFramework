@@ -179,33 +179,48 @@ namespace com.etsoo.Utils.Actions
         }
 
         /// <summary>
-        /// Create a success result with data
-        /// 创建一个带有数据的成功操作结果
+        /// Create a success result with message data
+        /// 创建一个带有消息数据的成功操作结果
         /// </summary>
-        /// <param name="data">Data to return</param>
+        /// <param name="msg">Message</param>
         /// <returns>Result</returns>
-        public static IActionResult Succeed(string data)
+        public static IActionResult Succeed(string msg)
         {
             return new ActionResult
             {
                 Ok = true,
-                Data = new() { { nameof(data), data } }
+                Data = new() { { nameof(msg), msg } }
             };
         }
 
         /// <summary>
-        /// Create a success result with id and data
+        /// Create a success result with id
         /// 创建一个带有编号和数据的成功操作结果
         /// </summary>
         /// <param name="id">Id</param>
-        /// <param name="data">Data</param>
         /// <returns>Result</returns>
-        public static IActionResult Succeed(long id, string data)
+        public static IActionResult Succeed(long id)
         {
             return new ActionResult
             {
                 Ok = true,
-                Data = new() { { nameof(id), id }, { nameof(data), data } }
+                Data = new() { { nameof(id), id } }
+            };
+        }
+
+        /// <summary>
+        /// Create a success result with id and message
+        /// 创建一个带有编号和消息数据的成功操作结果
+        /// </summary>
+        /// <param name="id">Id</param>
+        /// <param name="data">Data</param>
+        /// <returns>Result</returns>
+        public static IActionResult Succeed(long id, string msg)
+        {
+            return new ActionResult
+            {
+                Ok = true,
+                Data = new() { { nameof(id), id }, { nameof(msg), msg } }
             };
         }
 
