@@ -16,6 +16,7 @@ namespace com.etsoo.CoreFramework.Models
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     )]
 
+    [JsonSerializable(typeof(AntiforgeryToken))]
     [JsonSerializable(typeof(AssetUnit))]
     [JsonSerializable(typeof(DataPrivacy))]
     [JsonSerializable(typeof(EntityStatus))]

@@ -177,15 +177,25 @@ namespace com.etsoo.Database
             await using var reader = await connection.ExecuteReaderAsync(command, CommandBehavior.SingleResult);
 
             // Has content
-            var hasContent = reader.HasRows;
+            var hasContent = false;
 
             while (await reader.ReadAsync(command.CancellationToken))
             {
-                // Get the TextReader
-                using var textReader = reader.GetTextReader(0);
+                if (await reader.IsDBNullAsync(0, command.CancellationToken))
+                {
+                    continue;
+                }
+                else
+                {
+                    // Get the TextReader
+                    using var textReader = reader.GetTextReader(0);
 
-                // Write
-                await textReader.ReadAllBytesAsyn(writer);
+                    // Write
+                    await textReader.ReadAllBytesAsyn(writer);
+
+                    // Has content
+                    hasContent = true;
+                }
             }
 
             return hasContent;
@@ -234,23 +244,26 @@ namespace com.etsoo.Database
 
                 if (reader.HasRows)
                 {
-                    hasContent = true;
-
                     // The content maybe splitted into severl rows
                     while (await reader.ReadAsync(command.CancellationToken))
                     {
                         // NULL may returned
-                        if (await reader.IsDBNullAsync(0))
+                        if (await reader.IsDBNullAsync(0, command.CancellationToken))
                         {
                             Encoding.UTF8.GetBytes(format.BlankValue, writer);
                             break;
                         }
+                        else
+                        {
+                            // Get the TextReader
+                            using var textReader = reader.GetTextReader(0);
 
-                        // Get the TextReader
-                        using var textReader = reader.GetTextReader(0);
+                            // Write
+                            await textReader.ReadAllBytesAsyn(writer);
 
-                        // Write
-                        await textReader.ReadAllBytesAsyn(writer);
+                            // Has content
+                            hasContent = true;
+                        }
                     }
                 }
                 else
@@ -564,20 +577,13 @@ namespace com.etsoo.Database
             await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleResult, cancellationToken);
 
             // Has content
-            var hasContent = reader.HasRows;
+            var hasContent = false;
 
             while (await reader.ReadAsync(cancellationToken))
             {
                 if (await reader.IsDBNullAsync(0, cancellationToken))
                 {
-                    // PostgreSql returns null with column "json_agg"
-                    if (!isObject)
-                    {
-                        // Write empty array []
-                        writer.Write([(byte)91, (byte)93]);
-                    }
-                    hasContent = false;
-                    break;
+                    continue;
                 }
                 else
                 {
@@ -586,7 +592,20 @@ namespace com.etsoo.Database
 
                     // Write
                     await textReader.ReadAllBytesAsyn(writer);
+
+                    // Has content
+                    hasContent = true;
                 }
+            }
+
+            if (!hasContent && !isObject)
+            {
+                // PostgreSql returns null with column "json_agg"
+                // Write empty array []
+                writer.Write([(byte)91, (byte)93]);
+
+                // Has content
+                hasContent = true;
             }
 
             return hasContent;
