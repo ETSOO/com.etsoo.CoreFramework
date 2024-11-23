@@ -75,6 +75,7 @@ namespace Tests.CoreFramework
                 Organization = "0",
                 Oid = "0",
                 DeviceId = "1",
+                AppId = 1,
                 Language = CultureInfo.CurrentCulture
             };
 
@@ -98,6 +99,7 @@ namespace Tests.CoreFramework
                 Assert.That(user2, Is.Not.Null);
                 Assert.That(user2!.ClientIp, Is.EqualTo(user.ClientIp));
                 Assert.That(user2.Language, Is.EqualTo(user.Language));
+                Assert.That(user2.AppId, Is.EqualTo(user.AppId));
                 Assert.That(userJson, Does.Contain("customAmount"));
                 Assert.That(user2.JsonData.Get<bool>("CustomFlag"), Is.False);
             });

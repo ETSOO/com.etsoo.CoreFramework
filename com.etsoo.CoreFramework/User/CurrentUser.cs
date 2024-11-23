@@ -134,6 +134,12 @@ namespace com.etsoo.CoreFramework.User
         public const string UidClaim = "uid";
 
         /// <summary>
+        /// App id claim type
+        /// 程序编号值声明类型
+        /// </summary>
+        public const string AppIdClaim = "appid";
+
+        /// <summary>
         /// App key claim type
         /// 程序键值声明类型
         /// </summary>
@@ -169,6 +175,7 @@ namespace com.etsoo.CoreFramework.User
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
             var uid = claims.FindFirstValue(UidClaim);
             var appKey = claims.FindFirstValue(AppKeyClaim);
+            var appId = StringUtils.TryParse<int>(claims.FindFirstValue(AppIdClaim));
 
             // Validate
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(language))
@@ -198,11 +205,12 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
+                AppId = appId,
                 AppKey = appKey
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? appKey) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, int? appId, string? appKey) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -222,6 +230,7 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("ChannelOrganization"),
                 data.Get("ParentOrganization"),
                 data.Get("Uid"),
+                data.Get<int>("AppId"),
                 data.Get("AppKey")
             );
         }
@@ -239,7 +248,7 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appKey) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appId, appKey) = GetData(data);
 
             // Validation
             if (id == null || role == null || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
@@ -269,6 +278,7 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
+                AppId = appId,
                 AppKey = appKey
             };
         }
@@ -444,6 +454,12 @@ namespace com.etsoo.CoreFramework.User
         public string? Uid { get; init; }
 
         /// <summary>
+        /// App id
+        /// 程序编号
+        /// </summary>
+        public int? AppId { get; init; }
+
+        /// <summary>
         /// App key
         /// 程序键值
         /// </summary>
@@ -491,6 +507,9 @@ namespace com.etsoo.CoreFramework.User
 
             if (!string.IsNullOrEmpty(Uid))
                 claims.Add(new(UidClaim, Uid));
+
+            if (AppId.HasValue)
+                claims.Add(new(AppIdClaim, AppId.Value.ToString()));
 
             if (!string.IsNullOrEmpty(AppKey))
                 claims.Add(new(AppKeyClaim, AppKey));
