@@ -100,6 +100,10 @@ namespace com.etsoo.CoreFramework.Models
         public virtual void SaveTo(IActionResult result)
         {
             result.Data[nameof(Name)] = Name;
+            result.Data[nameof(GivenName)] = GivenName;
+            result.Data[nameof(FamilyName)] = FamilyName;
+            result.Data[nameof(LatinGivenName)] = LatinGivenName;
+            result.Data[nameof(LatinFamilyName)] = LatinFamilyName;
             result.Data[nameof(Avatar)] = Avatar;
             result.Data[nameof(Organization)] = Organization;
             result.Data[nameof(IsChannel)] = IsChannel;

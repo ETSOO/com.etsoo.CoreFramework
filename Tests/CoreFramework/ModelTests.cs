@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Buffers;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 
 namespace Tests.CoreFramework
 {
@@ -140,7 +142,7 @@ namespace Tests.CoreFramework
         }
 
         [Test]
-        public void AuthRefreshTokenRQTest()
+        public async Task AuthRefreshTokenRQTest()
         {
             var rq = new AuthRefreshTokenRQ
             {
@@ -150,10 +152,14 @@ namespace Tests.CoreFramework
             };
             rq.Sign = rq.SignWith("JwANgd$v=U*cW9-Dg7DA=jejn2UN<t-S");
 
+            using var jsonContent = JsonContent.Create(rq, ModelJsonSerializerContext.Default.AuthRefreshTokenRQ);
+            var newRQ = JsonSerializer.Deserialize(await jsonContent.ReadAsStreamAsync(), ModelJsonSerializerContext.Default.AuthRefreshTokenRQ);
+
             Assert.Multiple(() =>
             {
                 Assert.That(rq.Validate(), Is.Null);
                 Assert.That(rq.Sign, Has.Length.LessThan(128));
+                Assert.That(newRQ?.Sign, Is.EqualTo(rq.Sign));
             });
         }
     }
