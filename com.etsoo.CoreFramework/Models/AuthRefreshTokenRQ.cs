@@ -64,7 +64,7 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public IActionResult? Validate()
         {
-            if (AppKey.Length is not (>= 32 and <= 128))
+            if (AppKey.Length > 0 && AppKey.Length is not (>= 32 and <= 128))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(AppKey));
             }
