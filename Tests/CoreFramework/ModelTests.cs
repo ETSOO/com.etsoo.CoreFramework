@@ -138,5 +138,23 @@ namespace Tests.CoreFramework
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
             Assert.That(json, Is.EqualTo("[]"));
         }
+
+        [Test]
+        public void AuthRefreshTokenRQTest()
+        {
+            var rq = new AuthRefreshTokenRQ
+            {
+                AppId = 1,
+                AppKey = "",
+                RefreshToken = "v0ezp)kemg4j4Uegu3Y~pO-Ty4>o286RuTuxfs<Wd0rR4JsVX79Rad8L1I@de~>k"
+            };
+            rq.Sign = rq.SignWith("JwANgd$v=U*cW9-Dg7DA=jejn2UN<t-S");
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(rq.Validate(), Is.Null);
+                Assert.That(rq.Sign, Has.Length.LessThan(128));
+            });
+        }
     }
 }

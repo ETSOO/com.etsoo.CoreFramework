@@ -81,7 +81,7 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(Code));
             }
 
-            if (Sign.Length is not (>= 64 and <= 512))
+            if (Sign.Length is not (>= 32 and <= 512))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Sign));
             }

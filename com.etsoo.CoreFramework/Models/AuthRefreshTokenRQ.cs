@@ -74,7 +74,7 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(RefreshToken));
             }
 
-            if (Sign.Length is not (>= 128 and <= 1024))
+            if (Sign.Length is not (>= 64 and <= 1024))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Sign));
             }
