@@ -12,6 +12,18 @@ namespace com.etsoo.CoreFramework.Models
     public record ChangePasswordDto(string OldPassword, string Password)
     {
         /// <summary>
+        /// Application ID
+        /// 应用编号
+        /// </summary>
+        public required int AppId { get; init; }
+
+        /// <summary>
+        /// Application key
+        /// 应用键值
+        /// </summary>
+        public required string AppKey { get; init; }
+
+        /// <summary>
         /// Signature
         /// 签名
         /// </summary>
@@ -27,6 +39,8 @@ namespace com.etsoo.CoreFramework.Models
         {
             var rq = new SortedDictionary<string, string>
             {
+                [nameof(AppId)] = AppId.ToString(),
+                [nameof(AppKey)] = AppKey,
                 [nameof(OldPassword)] = OldPassword,
                 [nameof(Password)] = Password
             };
