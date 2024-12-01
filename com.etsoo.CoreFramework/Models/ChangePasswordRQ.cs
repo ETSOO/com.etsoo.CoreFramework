@@ -11,10 +11,16 @@ namespace com.etsoo.CoreFramework.Models
     public record ChangePasswordRQ : IModelValidator
     {
         /// <summary>
+        /// Application id
+        /// 应用编号
+        /// </summary>
+        public int AppId { get; init; }
+
+        /// <summary>
         /// Device id for encryption
         /// 用于加密的设备编号
         /// </summary>
-        public string? DeviceId { get; init; }
+        public required string DeviceId { get; init; }
 
         /// <summary>
         /// Current password
@@ -35,12 +41,17 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public IActionResult? Validate()
         {
-            if (OldPassword.Length is not (>= 16 and <= 512))
+            if (DeviceId.Length is not (>= 32 and <= 512))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(DeviceId));
+            }
+
+            if (OldPassword.Length is not (>= 64 and <= 512))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(OldPassword));
             }
 
-            if (Password.Length is not (>= 16 and <= 512))
+            if (Password.Length is not (>= 64 and <= 512))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Password));
             }
