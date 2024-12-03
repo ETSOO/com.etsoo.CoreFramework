@@ -58,19 +58,44 @@ namespace com.etsoo.Database
             // Reset the current page
             data.CurrentPage = null;
 
+            var condition = new StringBuilder();
+            condition.Append('(');
+
             var len = data.Keysets.Count();
+            var fields = new List<string>();
             for (var k = 0; k < len; k++)
             {
                 var keyset = data.Keysets.ElementAt(k);
-                var orderBy = data.OrderBy?.ElementAtOrDefault(k);
-                if (orderBy == null) continue;
+                var orderBy = (data.OrderBy?.ElementAtOrDefault(k)) ?? throw new Exception($"Field in {k} is not found");
 
                 var field = orderBy.Field;
                 parameters.Add(field, keyset);
 
-                // Last order field should own an unique index
-                conditions.Add($"{field} {(orderBy.Desc ? "<" : ">")}{(orderBy.Unique ? "=" : "")} @{field}");
+                var main = $"{field} {(orderBy.Desc ? "<" : ">")} @{field}";
+
+                if (k == 0)
+                {
+                    condition.Append(main);
+                }
+                else
+                {
+                    condition.Append(" OR (");
+
+                    condition.Append(string.Join(" AND ", fields.Select(f => $"{f} = @{f}")));
+                    condition.Append(" AND ");
+                    condition.Append(main);
+
+                    condition.Append(')');
+                }
+
+                if (orderBy.Unique) break;
+
+                fields.Add(field);
             }
+
+            condition.Append(')');
+
+            conditions.Add(condition.ToString());
         }
 
         /// <summary>

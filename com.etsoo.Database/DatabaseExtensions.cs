@@ -10,7 +10,6 @@ using Npgsql;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text;
@@ -334,8 +333,19 @@ namespace com.etsoo.Database
                 source = source.Provider.CreateQuery<TSource>(expression);
 
                 // Make sure the keysets count is the same as the order by fields
-                if (data.Keysets?.Count() == len)
+                if (data.Keysets?.Count() <= len)
                 {
+                    len = data.Keysets.Count();
+
+                    // Create a parameter expression representing the source type (TSource) with the name "x"
+                    var parameter = Expression.Parameter(typeof(TSource), "x");
+
+                    // Body expression
+                    BinaryExpression? body = null;
+
+                    // Previous expression
+                    BinaryExpression? previous = null;
+
                     // Keyset paging
                     for (var k = 0; k < len; k++)
                     {
@@ -347,16 +357,15 @@ namespace com.etsoo.Database
 
                         var field = orderBy.Field;
 
-                        // Create a parameter expression representing the source type (TSource) with the name "x"
-                        var parameter = Expression.Parameter(typeof(TSource), "x");
-
                         // Create a member expression representing the property/field to filter on
                         // Expression.PropertyOrField(parameter, field)
                         var member = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
 
                         // Create a constant expression representing the value to compare against
                         var keyset = keysetItem is JsonElement jKey ? jKey.GetValue(member.Type) : keysetItem;
+
                         var constant = Expression.Constant(keyset);
+                        Expression left;
 
                         // When the keyset is string or guid, use the CompareTo method
                         var isString = member.Type == typeof(string);
@@ -366,35 +375,50 @@ namespace com.etsoo.Database
                             var compareToMethod = member.Type.GetMethod("CompareTo", [member.Type])!;
 
                             // Create a method call expression to call the CompareTo method on the member expression
-                            var compareToExpression = Expression.Call(member, compareToMethod, constant);
+                            left = Expression.Call(member, compareToMethod, constant);
 
                             // Create a binary expression representing the equality comparison
-                            var zero = Expression.Constant(0);
-
-                            var body = orderBy.Desc ?
-                                (orderBy.Unique ? Expression.LessThan(compareToExpression, zero) : Expression.LessThanOrEqual(compareToExpression, zero)) :
-                                (orderBy.Unique ? Expression.GreaterThan(compareToExpression, zero) : Expression.GreaterThanOrEqual(compareToExpression, zero));
-
-                            // Create a lambda expression representing the predicate
-                            var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
-
-                            // Call the Where method with the constructed predicate
-                            source = source.Where(predicate);
+                            constant = Expression.Constant(0);
                         }
                         else
                         {
-                            // Create a binary expression representing the equality comparison
-                            // Unique field of ordering is put in the end
-                            var body = orderBy.Desc ?
-                                ((k + 1) < len ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant)) :
-                                ((k + 1) < len ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
-
-                            // Create a lambda expression representing the predicate
-                            var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
-
-                            // Call the Where method with the constructed predicate
-                            source = source.Where(predicate);
+                            left = member;
                         }
+
+                        var main = orderBy.Desc ? Expression.LessThan(left, constant) : Expression.GreaterThan(left, constant);
+
+                        if (body == null || previous == null)
+                        {
+                            body = main;
+                        }
+                        else
+                        {
+                            var mainNew = Expression.And(previous, main);
+                            body = Expression.Or(body, mainNew);
+                        }
+
+                        if (orderBy.Unique)
+                        {
+                            // Unique keyset, break
+                            break;
+                        }
+                        else if (previous == null)
+                        {
+                            previous = Expression.Equal(left, constant);
+                        }
+                        else
+                        {
+                            previous = Expression.And(previous, Expression.Equal(left, constant));
+                        }
+                    }
+
+                    if (body != null)
+                    {
+                        // Create a lambda expression representing the predicate
+                        var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                        // Call the Where method with the constructed predicate
+                        source = source.Where(predicate);
                     }
                 }
                 else
@@ -483,7 +507,7 @@ namespace com.etsoo.Database
         /// <param name="cancellationToken">Cancellation token</param>
         /// <param name="namingPolicy">Naming policy</param>
         /// <returns>Has content or not</returns>
-        public static async Task<bool> ToJsonAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
+        public static async Task<(bool hasContent, string commandText)> ToJsonAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
         {
             return await source.ToJsonInternalAsync(writer, namingPolicy, false, cancellationToken);
         }
@@ -498,7 +522,7 @@ namespace com.etsoo.Database
         /// <param name="cancellationToken">Cancellation token</param>
         /// <param name="namingPolicy">Naming policy</param>
         /// <returns>Has content or not</returns>
-        internal static async Task<bool> ToJsonInternalAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, bool isObject = false, CancellationToken cancellationToken = default)
+        internal static async Task<(bool hasContent, string commandText)> ToJsonInternalAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, bool isObject = false, CancellationToken cancellationToken = default)
         {
             // Create command
             // source.TagWith("") and DbCommandInterceptor to flag it and do custom process
@@ -569,9 +593,6 @@ namespace com.etsoo.Database
                 throw new NotSupportedException("Database type not supported");
             }
 
-            // Write the CommandText for debugging
-            Debug.WriteLine(command.CommandText, $"EFCore {nameof(ToJsonInternalAsync)}");
-
             // Open connection
             await command.Connection.OpenAsync(cancellationToken);
 
@@ -610,7 +631,7 @@ namespace com.etsoo.Database
                 hasContent = true;
             }
 
-            return hasContent;
+            return (hasContent, command.CommandText);
         }
 
         private static string BuildSqlserverQuery(string commandText, IEnumerable<QueryJsonField> fields, bool isObject)
@@ -678,7 +699,7 @@ namespace com.etsoo.Database
         /// <param name="cancellationToken">Cancellation token</param>
         /// <param name="namingPolicy">Naming policy</param>
         /// <returns>Has content or not</returns>
-        public static async Task<bool> ToJsonObjectAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
+        public static async Task<(bool hasContent, string commandText)> ToJsonObjectAsync<TSource>(this IQueryable<TSource> source, IBufferWriter<byte> writer, JsonNamingPolicy? namingPolicy = null, CancellationToken cancellationToken = default)
         {
             return await source.ToJsonInternalAsync(writer, namingPolicy, true, cancellationToken);
         }

@@ -103,10 +103,16 @@ namespace Tests.CoreFramework
             var db = CreateDbContext();
 
             var writer = new ArrayBufferWriter<byte>();
-            var users = await db.Users.QueryEtsoo(rq, (u) => u.Id).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonAsync(writer);
+            var (hasContent, commandText) = await db.Users.QueryEtsoo(rq, (u) => u.Id).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonAsync(writer);
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
-            Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(hasContent, Is.True);
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+                Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
+            });
         }
 
         [Test]
@@ -127,10 +133,70 @@ namespace Tests.CoreFramework
             var db = CreateDbContext();
 
             var writer = new ArrayBufferWriter<byte>();
-            var users = await db.Users.QueryEtsoo(rq, (u) => u.Id, (u) => u.Status).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonAsync(writer);
+            var (hasContent, _) = await db.Users.QueryEtsoo(rq, (u) => u.Id, (u) => u.Status).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonAsync(writer);
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
-            Assert.That(json, Is.EqualTo("[]"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(hasContent, Is.True);
+                Assert.That(json, Is.EqualTo("[]"));
+            });
+        }
+
+        [Test]
+        public async Task QueryJsonObjectTest()
+        {
+            var rq = new QueryRQ<int>
+            {
+                ExcludedIds = [1, 2, 3],
+                QueryPaging = new QueryPagingData
+                {
+                    BatchSize = 1,
+                    OrderBy = [new() { Field = "Name" }]
+                }
+            };
+
+            var db = CreateDbContext();
+
+            var writer = new ArrayBufferWriter<byte>();
+            var (hasContent, commandText) = await db.Users.QueryEtsoo(rq, (u) => u.Id).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonObjectAsync(writer);
+
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(hasContent, Is.True);
+                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+                Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
+            });
+        }
+
+        [Test]
+        public async Task QueryJsonObjectWithKeysetsTest()
+        {
+            var rq = new QueryRQ<int>
+            {
+                ExcludedIds = [1, 2, 3],
+                QueryPaging = new QueryPagingData
+                {
+                    BatchSize = 1,
+                    Keysets = ["肖赞", 1],
+                    OrderBy = [new() { Field = "Name" }]
+                }
+            };
+
+            var db = CreateDbContext();
+
+            var writer = new ArrayBufferWriter<byte>();
+            var (hasContent, commandText) = await db.Users.QueryEtsoo(rq, (u) => u.Id).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonObjectAsync(writer);
+
+            var json = Encoding.UTF8.GetString(writer.WrittenSpan);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(hasContent, Is.False);
+                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3) AND (\"u\".\"Name\" > '肖赞' OR (\"u\".\"Name\" = '肖赞' AND \"u\".\"Id\" < 1))\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+            });
         }
 
         [Test]

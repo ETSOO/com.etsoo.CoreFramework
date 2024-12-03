@@ -128,7 +128,7 @@ namespace Tests.Services
             var result = model.CreateSqlSelect(db, ["Id", "Name", "SQLServer:CAST(IIF(Status < 200, 1, 0) AS bit)^SQLite:IIF(Status < 200, 'true', 'false') AS Valid"]);
             Assert.Multiple(() =>
             {
-                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE Name > @Name AND Id <= @Id AND \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16"));
+                Assert.That(result.Item1, Is.EqualTo("SELECT \"id\", \"name\", IIF(Status < 200, 'true', 'false') AS \"valid\" FROM \"User\" WHERE (Name > @Name OR (Name = @Name AND Id < @Id)) AND \"id\" = @Id AND \"name\" LIKE @Name AND \"entity_status\" <> @Status AND \"is_deleted\" IS NULL AND \"creation_start\" >= @CreationStart AND \"creation_end\" < @CreationEnd AND \"range\" IN (2,4,8) ORDER BY \"Name\" ASC, \"Id\" DESC LIMIT 16"));
                 Assert.That(result.Item2.ParameterNames.Count(), Is.EqualTo(6));
             });
         }
