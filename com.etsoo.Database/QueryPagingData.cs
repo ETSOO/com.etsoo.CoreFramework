@@ -3,6 +3,29 @@
 namespace com.etsoo.Database
 {
     /// <summary>
+    /// Query paging order
+    /// 查询分页排序
+    /// </summary>
+    public record QueryPagingOrder
+    {
+        /// <summary>
+        /// Field name
+        /// </summary>
+        public required string Field { get; init; }
+
+        /// <summary>
+        /// Descending
+        /// </summary>
+        public bool Desc { get; set; }
+
+        /// <summary>
+        /// Is unique value
+        /// </summary>
+        public bool Unique { get; set; }
+    }
+
+
+    /// <summary>
     /// Query paging data, Offset pagination vs Keyset pagination
     /// https://learn.microsoft.com/en-us/ef/core/querying/pagination
     /// 查询分页数据，偏移分页与键集分页
@@ -29,9 +52,9 @@ namespace com.etsoo.Database
         public ushort BatchSize { get; set; } = 10;
 
         /// <summary>
-        /// Order by fields, unique fields put in the end
-        /// 排序字段，唯一字段放在最后
+        /// Order by fields
+        /// 排序字段
         /// </summary>
-        public Dictionary<string, bool>? OrderBy { get; set; }
+        public IEnumerable<QueryPagingOrder>? OrderBy { get; set; }
     }
 }

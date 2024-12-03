@@ -96,11 +96,7 @@ namespace Tests.CoreFramework
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 2,
-                    OrderBy = new Dictionary<string, bool>
-                    {
-                        ["Name"] = false,
-                        ["Id"] = true
-                    }
+                    OrderBy = [new() { Field = "Name" }]
                 }
             };
 
@@ -124,11 +120,7 @@ namespace Tests.CoreFramework
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 2,
-                    OrderBy = new Dictionary<string, bool>
-                    {
-                        ["Name"] = false,
-                        ["Id"] = true
-                    }
+                    OrderBy = [new() { Field = "Name" }, new() { Field = "Id", Desc = true }]
                 }
             };
 

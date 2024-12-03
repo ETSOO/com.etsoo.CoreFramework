@@ -298,9 +298,9 @@ namespace com.etsoo.Database
         [RequiresUnreferencedCode("Expression requires unreferenced code")]
         public static IQueryable<TSource> QueryEtsooPaging<TSource>(this IQueryable<TSource> source, QueryPagingData data)
         {
-            if (data.OrderBy?.Count > 0)
+            if (data.OrderBy?.Any() is true)
             {
-                var len = data.OrderBy.Count;
+                var len = data.OrderBy.Count();
 
                 var expression = source.Expression;
 
@@ -308,7 +308,7 @@ namespace com.etsoo.Database
                 {
                     var orderBy = data.OrderBy.ElementAt(o);
 
-                    var field = orderBy.Key;
+                    var field = orderBy.Field;
 
                     // Create a parameter expression representing the source type (TSource) with the name "x"
                     var parameter = Expression.Parameter(typeof(TSource), "x");
@@ -318,7 +318,7 @@ namespace com.etsoo.Database
                     var selector = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
 
                     // Determine the method name for ordering based on whether it is descending and if it is the first order clause
-                    var method = orderBy.Value ?
+                    var method = orderBy.Desc ?
                         (o == 0 ? "OrderByDescending" : "ThenByDescending") : (o == 0 ? "OrderBy" : "ThenBy");
 
                     // Create a method call expression to call the appropriate OrderBy/ThenBy method on the IQueryable
@@ -332,78 +332,80 @@ namespace com.etsoo.Database
                 }
 
                 source = source.Provider.CreateQuery<TSource>(expression);
-            }
 
-            if (data.Keysets?.Any() is true)
-            {
-                // Keyset paging
-                var len = data.Keysets.Count();
-
-                for (var k = 0; k < len; k++)
+                // Make sure the keysets count is the same as the order by fields
+                if (data.Keysets?.Count() == len)
                 {
-                    var keysetItem = data.Keysets.ElementAt(k);
-                    var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? new KeyValuePair<string, bool>("id", true);
-
-                    var field = orderBy.Key;
-
-                    // Create a parameter expression representing the source type (TSource) with the name "x"
-                    var parameter = Expression.Parameter(typeof(TSource), "x");
-
-                    // Create a member expression representing the property/field to filter on
-                    // Expression.PropertyOrField(parameter, field)
-                    var member = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
-
-                    // Create a constant expression representing the value to compare against
-                    var keyset = keysetItem is JsonElement jKey ? jKey.GetValue(member.Type) : keysetItem;
-                    var constant = Expression.Constant(keyset);
-
-                    // When the keyset is string or guid, use the CompareTo method
-                    var isString = member.Type == typeof(string);
-                    if (isString || member.Type == typeof(Guid))
+                    // Keyset paging
+                    for (var k = 0; k < len; k++)
                     {
-                        // Call the CompareTo method on the member expression with the constant expression as the argument
-                        var compareToMethod = member.Type.GetMethod("CompareTo", [member.Type])!;
+                        var keysetItem = data.Keysets.ElementAt(k);
+                        if (keysetItem == null) continue;
 
-                        // Create a method call expression to call the CompareTo method on the member expression
-                        var compareToExpression = Expression.Call(member, compareToMethod, constant);
+                        var orderBy = data.OrderBy?.ElementAtOrDefault(k);
+                        if (orderBy == null) continue;
 
-                        // Create a binary expression representing the equality comparison
-                        var zero = Expression.Constant(0);
+                        var field = orderBy.Field;
 
-                        var body = orderBy.Value ?
-                            ((k + 1) < len ? Expression.LessThanOrEqual(compareToExpression, zero) : Expression.LessThan(compareToExpression, zero)) :
-                            ((k + 1) < len ? Expression.GreaterThanOrEqual(compareToExpression, zero) : Expression.GreaterThan(compareToExpression, zero));
+                        // Create a parameter expression representing the source type (TSource) with the name "x"
+                        var parameter = Expression.Parameter(typeof(TSource), "x");
 
-                        // Create a lambda expression representing the predicate
-                        var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+                        // Create a member expression representing the property/field to filter on
+                        // Expression.PropertyOrField(parameter, field)
+                        var member = field.Split('.', StringSplitOptions.RemoveEmptyEntries).Aggregate((Expression)parameter, Expression.PropertyOrField);
 
-                        // Call the Where method with the constructed predicate
-                        source = source.Where(predicate);
-                    }
-                    else
-                    {
-                        // Create a binary expression representing the equality comparison
-                        // Unique field of ordering is put in the end
-                        var body = orderBy.Value ?
-                            ((k + 1) < len ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant)) :
-                            ((k + 1) < len ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
+                        // Create a constant expression representing the value to compare against
+                        var keyset = keysetItem is JsonElement jKey ? jKey.GetValue(member.Type) : keysetItem;
+                        var constant = Expression.Constant(keyset);
 
-                        // Create a lambda expression representing the predicate
-                        var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+                        // When the keyset is string or guid, use the CompareTo method
+                        var isString = member.Type == typeof(string);
+                        if (isString || member.Type == typeof(Guid))
+                        {
+                            // Call the CompareTo method on the member expression with the constant expression as the argument
+                            var compareToMethod = member.Type.GetMethod("CompareTo", [member.Type])!;
 
-                        // Call the Where method with the constructed predicate
-                        source = source.Where(predicate);
+                            // Create a method call expression to call the CompareTo method on the member expression
+                            var compareToExpression = Expression.Call(member, compareToMethod, constant);
+
+                            // Create a binary expression representing the equality comparison
+                            var zero = Expression.Constant(0);
+
+                            var body = orderBy.Desc ?
+                                (orderBy.Unique ? Expression.LessThan(compareToExpression, zero) : Expression.LessThanOrEqual(compareToExpression, zero)) :
+                                (orderBy.Unique ? Expression.GreaterThan(compareToExpression, zero) : Expression.GreaterThanOrEqual(compareToExpression, zero));
+
+                            // Create a lambda expression representing the predicate
+                            var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                            // Call the Where method with the constructed predicate
+                            source = source.Where(predicate);
+                        }
+                        else
+                        {
+                            // Create a binary expression representing the equality comparison
+                            // Unique field of ordering is put in the end
+                            var body = orderBy.Desc ?
+                                ((k + 1) < len ? Expression.LessThanOrEqual(member, constant) : Expression.LessThan(member, constant)) :
+                                ((k + 1) < len ? Expression.GreaterThanOrEqual(member, constant) : Expression.GreaterThan(member, constant));
+
+                            // Create a lambda expression representing the predicate
+                            var predicate = Expression.Lambda<Func<TSource, bool>>(body, parameter);
+
+                            // Call the Where method with the constructed predicate
+                            source = source.Where(predicate);
+                        }
                     }
                 }
-            }
-            else
-            {
-                // Offset paging
-                // Skip rows
-                var currentPage = data.CurrentPage.GetValueOrDefault();
-                if (currentPage > 0)
+                else
                 {
-                    source = source.Skip((int)(currentPage - 1) * data.BatchSize);
+                    // Offset paging
+                    // Skip rows
+                    var currentPage = data.CurrentPage.GetValueOrDefault();
+                    if (currentPage > 0)
+                    {
+                        source = source.Skip((int)(currentPage - 1) * data.BatchSize);
+                    }
                 }
             }
 

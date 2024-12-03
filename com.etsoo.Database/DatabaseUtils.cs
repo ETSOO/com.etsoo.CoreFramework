@@ -24,7 +24,7 @@ namespace com.etsoo.Database
         public static bool IsOrderByValid(this QueryPagingData? data)
         {
             if (data == null || data.OrderBy == null) return true;
-            return !data.OrderBy.Any(o => !IsValidField(o.Key));
+            return !data.OrderBy.Any(o => !IsValidField(o.Field));
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace com.etsoo.Database
         public static string? GetOrderCommand(this QueryPagingData? data, IDatabase? db = null)
         {
             var orderBy = data?.OrderBy;
-            if (orderBy == null || orderBy.Count == 0) return null;
+            if (orderBy?.Any() is null or false) return null;
 
-            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.Key) ? $"{(db == null ? o.Key : db.EscapePart(o.Key))} {(o.Value ? "DESC" : "ASC")}" : null).Where(o => o != null));
+            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.Field) ? $"{(db == null ? o.Field : db.EscapePart(o.Field))} {(o.Desc ? "DESC" : "ASC")}" : null).Where(o => o != null));
 
             return $"ORDER BY {result}";
         }
@@ -53,7 +53,7 @@ namespace com.etsoo.Database
         /// <param name="conditions">Conditions</param>
         public static void GetKeysetConditions(this QueryPagingData? data, DbParameters parameters, List<string> conditions)
         {
-            if (data == null || data.Keysets?.Any() is not true) return;
+            if (data == null || data.Keysets?.Any() is null or false) return;
 
             // Reset the current page
             data.CurrentPage = null;
@@ -62,13 +62,14 @@ namespace com.etsoo.Database
             for (var k = 0; k < len; k++)
             {
                 var keyset = data.Keysets.ElementAt(k);
-                var orderBy = data.OrderBy?.ElementAtOrDefault(k) ?? new KeyValuePair<string, bool>("id", true);
+                var orderBy = data.OrderBy?.ElementAtOrDefault(k);
+                if (orderBy == null) continue;
 
-                var field = orderBy.Key;
+                var field = orderBy.Field;
                 parameters.Add(field, keyset);
 
                 // Last order field should own an unique index
-                conditions.Add($"{field} {(orderBy.Value ? "<" : ">")}{((k + 1) < len ? "=" : "")} @{field}");
+                conditions.Add($"{field} {(orderBy.Desc ? "<" : ">")}{(orderBy.Unique ? "=" : "")} @{field}");
             }
         }
 

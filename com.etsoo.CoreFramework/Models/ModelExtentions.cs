@@ -44,12 +44,22 @@ namespace com.etsoo.CoreFramework.Models
             if (p != null)
             {
                 // Default order by
-                if (p.OrderBy == null || p.OrderBy.Count == 0)
-                {
-                    // Avoid the id field with default prefix
-                    var idField = string.Join('.', idSelector.Body.ToString().Split('.').Skip(1));
+                p.OrderBy ??= [];
 
-                    p.OrderBy = new Dictionary<string, bool>() { [idField] = true };
+                // Avoid the id field with default prefix
+                var idField = string.Join('.', idSelector.Body.ToString().Split('.').Skip(1));
+
+                // Get the id field
+                var id = p.OrderBy.FirstOrDefault(o => o.Field.Equals(idField, StringComparison.OrdinalIgnoreCase));
+
+                if (id == null)
+                {
+                    p.OrderBy = p.OrderBy.Append(new() { Field = idField, Desc = true, Unique = true });
+                }
+                else
+                {
+                    // Set unique to override initial value
+                    id.Unique = true;
                 }
 
                 source = source.QueryEtsooPaging(p);
