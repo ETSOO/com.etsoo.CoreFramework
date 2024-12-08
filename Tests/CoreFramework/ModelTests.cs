@@ -120,6 +120,9 @@ namespace Tests.CoreFramework
         {
             var rq = new QueryRQ<int>
             {
+                Ids = [1001, 1002, 1003],
+                ExcludedIds = [1, 2, 3],
+                Disabled = false,
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 1,
@@ -131,14 +134,16 @@ namespace Tests.CoreFramework
 
             var writer = new ArrayBufferWriter<byte>();
             var (_, commandText) = await db.Users
-                .QueryEtsoo(rq, (u) => u.Id)
-                .QueryEtsooKeywords("肖赞", null, (u) => u.Name)
+                .QueryEtsoo(rq, (u) => u.Id, (u) => u.Status, (q) =>
+                {
+                    return q.QueryEtsooKeywords("肖赞", null, (u) => u.Name);
+                })
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 
             Assert.Multiple(() =>
             {
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u0\".\"Id\", \"u0\".\"Name\" AS \"NewName\", \"u0\".\"Status\"\r\nFROM (\r\n    SELECT \"u\".\"Id\", \"u\".\"Name\", \"u\".\"Status\"\r\n    FROM \"User\" AS \"u\"\r\n    ORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\n    LIMIT @__p_0\r\n) AS \"u0\"\r\nWHERE \"u0\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u0\".\"Name\", \"u0\".\"Id\" DESC)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" IN (1001, 1002, 1003) AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" <= 100 AND \"u\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_1)"));
             });
         }
 
@@ -147,6 +152,9 @@ namespace Tests.CoreFramework
         {
             var rq = new QueryRQ<int>
             {
+                Id = 1001,
+                ExcludedIds = [1, 2, 3],
+                Disabled = true,
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 1,
@@ -158,15 +166,17 @@ namespace Tests.CoreFramework
 
             var writer = new ArrayBufferWriter<byte>();
             var (hasContent, commandText) = await db.Users
-                .QueryEtsoo(rq, (u) => u.Id)
-                .QueryEtsooKeywords("肖 -赞 \"肖必须\"", null, (u) => u.Name)
+                .QueryEtsoo(rq, (u) => u.Id, (u) => u.Status, (q) =>
+                {
+                    return q.QueryEtsooKeywords("肖 -赞 \"肖必须\"", null, (u) => u.Name);
+                })
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 
             Assert.Multiple(() =>
             {
                 Assert.That(hasContent, Is.True); // Empty array
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u0\".\"Id\", \"u0\".\"Name\" AS \"NewName\", \"u0\".\"Status\"\r\nFROM (\r\n    SELECT \"u\".\"Id\", \"u\".\"Name\", \"u\".\"Status\"\r\n    FROM \"User\" AS \"u\"\r\n    ORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\n    LIMIT @__p_0\r\n) AS \"u0\"\r\nWHERE (\"u0\".\"Name\" LIKE '%肖%' AND \"u0\".\"Name\" NOT LIKE '%赞%') OR \"u0\".\"Name\" LIKE '%肖必须%'\r\nORDER BY \"u0\".\"Name\", \"u0\".\"Id\" DESC)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" = 1001 AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" > 100 AND ((\"u\".\"Name\" LIKE '%肖%' AND \"u\".\"Name\" NOT LIKE '%赞%') OR \"u\".\"Name\" LIKE '%肖必须%')\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_1)"));
             });
         }
 

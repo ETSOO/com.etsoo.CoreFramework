@@ -509,6 +509,20 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public static IQueryable<TSource> QueryEtsooKeywords<TSource>(this IQueryable<TSource> source, string keywords, (Type type, string method)? likeMethod, params Expression<Func<TSource, string?>>[] fields)
         {
+            return source.Where(keywords.ToEtsooKeywords(likeMethod, fields));
+        }
+
+        /// <summary>
+        /// Where clause of ETSOO query keywords
+        /// ETSOO 查询关键字的 Where 子句
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="keywords">Keywords</param>
+        /// <param name="likeMethod">Like type and method name, custom ILike for PostgreSQL</param>
+        /// <param name="fields">Fields</param>
+        /// <returns>Result</returns>
+        public static Expression<Func<TSource, bool>> ToEtsooKeywords<TSource>(this string keywords, (Type type, string method)? likeMethod, params Expression<Func<TSource, string?>>[] fields)
+        {
             var parts = keywords.ParseQueryKeywords();
 
             var (methodType, methodName) = likeMethod ?? (typeof(DbFunctionsExtensions), nameof(DbFunctionsExtensions.Like));
@@ -553,15 +567,9 @@ namespace com.etsoo.Database
                 }
             }
 
-            if (expression == null)
-            {
-                return source;
-            }
-            else
-            {
-                var predicate = Expression.Lambda<Func<TSource, bool>>(expression, fields.First().Parameters[0]);
-                return source.Where(predicate);
-            }
+            if (expression  == null) throw new Exception("No Expression");
+
+            return Expression.Lambda<Func<TSource, bool>>(expression, fields.First().Parameters[0]);
         }
 
         /// <summary>

@@ -19,11 +19,17 @@ namespace com.etsoo.CoreFramework.Models
         /// <typeparam name="TKey">Generic key type</typeparam>
         /// <param name="source">Source</param>
         /// <param name="rq">Query request data</param>
-        /// <param name="idSelector">Id selector</param>
+        /// <param name="idSelector">Id field selector</param>
+        /// <param name="statusSelector">Status field selector</param>
+        /// <param name="otherFilters">Other filters</param>
         /// <returns>Result</returns>
         [RequiresDynamicCode("Expression requires dynamic code")]
         [RequiresUnreferencedCode("Expression requires unreferenced code")]
-        public static IQueryable<TSource> QueryEtsoo<TSource, TKey>(this IQueryable<TSource> source, QueryRQ<TKey> rq, Expression<Func<TSource, TKey>> idSelector) where TKey : struct
+        public static IQueryable<TSource> QueryEtsoo<TSource, TKey>(
+            this IQueryable<TSource> source, QueryRQ<TKey> rq,
+            Expression<Func<TSource, TKey>> idSelector,
+            Expression<Func<TSource, EntityStatus>>? statusSelector = null,
+            Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null) where TKey : struct
         {
             if (rq.Id.HasValue)
             {
@@ -40,32 +46,46 @@ namespace com.etsoo.CoreFramework.Models
                 source = source.QueryEtsooContains(rq.ExcludedIds, idSelector, true);
             }
 
+            if (statusSelector != null)
+            {
+                source = source.QueryEtsooStatus(rq, statusSelector);
+            }
+
+            if (otherFilters != null)
+            {
+                source = otherFilters(source);
+            }
+
             var p = rq.QueryPaging;
             if (p != null)
             {
-                // Default order by
-                p.OrderBy ??= [];
-
-                // Avoid the id field with default prefix
-                var idField = string.Join('.', idSelector.Body.ToString().Split('.').Skip(1));
-
-                // Get the id field
-                var id = p.OrderBy.FirstOrDefault(o => o.Field.Equals(idField, StringComparison.OrdinalIgnoreCase));
-
-                if (id == null)
-                {
-                    p.OrderBy = p.OrderBy.Append(new() { Field = idField, Desc = true, Unique = true });
-                }
-                else
-                {
-                    // Set unique to override initial value
-                    id.Unique = true;
-                }
-
+                p.SetDefaultOrderBy(idSelector.Body);
                 source = source.QueryEtsooPaging(p);
             }
 
             return source;
+        }
+
+        private static void SetDefaultOrderBy(this QueryPagingData p, Expression idBody)
+        {
+            // Default order by
+            p.OrderBy ??= [];
+
+            // Avoid the id field with default prefix
+            var idField = string.Join('.', idBody.ToString().Split('.').Skip(1));
+
+            // Get the id field
+            var id = p.OrderBy.FirstOrDefault(o => o.Field.Equals(idField, StringComparison.OrdinalIgnoreCase));
+
+            if (id == null)
+            {
+                p.OrderBy = p.OrderBy.Append(new() { Field = idField, Desc = true, Unique = true });
+            }
+            else
+            {
+                // Set unique to override initial value
+                id.Unique = true;
+            }
         }
 
         /// <summary>
@@ -75,11 +95,18 @@ namespace com.etsoo.CoreFramework.Models
         /// <typeparam name="TSource">Generic source type</typeparam>
         /// <param name="source">Source</param>
         /// <param name="rq">Query request data</param>
-        /// <param name="idSelector">Id selector</param>
+        /// <param name="idSelector">Id field selector</param>
+        /// <param name="statusSelector">Status field selector</param>
+        /// <param name="otherFilters">Other filters</param>
         /// <returns>Result</returns>
         [RequiresDynamicCode("Expression requires dynamic code")]
         [RequiresUnreferencedCode("Expression requires unreferenced code")]
-        public static IQueryable<TSource> QueryEtsoo<TSource>(this IQueryable<TSource> source, QueryRQ rq, Expression<Func<TSource, string>> idSelector)
+        public static IQueryable<TSource> QueryEtsoo<TSource>(
+            this IQueryable<TSource> source,
+            QueryRQ rq,
+            Expression<Func<TSource, string>> idSelector,
+            Expression<Func<TSource, EntityStatus>>? statusSelector = null,
+            Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null)
         {
             if (!string.IsNullOrEmpty(rq.Id))
             {
@@ -96,9 +123,20 @@ namespace com.etsoo.CoreFramework.Models
                 source = source.QueryEtsooContains(rq.ExcludedIds, idSelector, true);
             }
 
+            if (statusSelector != null)
+            {
+                source = source.QueryEtsooStatus(rq, statusSelector);
+            }
+
+            if (otherFilters != null)
+            {
+                source = otherFilters(source);
+            }
+
             var p = rq.QueryPaging;
             if (p != null)
             {
+                p.SetDefaultOrderBy(idSelector.Body);
                 source = source.QueryEtsooPaging(p);
             }
 
@@ -106,63 +144,16 @@ namespace com.etsoo.CoreFramework.Models
         }
 
         /// <summary>
-        /// Etsoo query with string id
-        /// 亿速思维查询（字符串编号）
-        /// </summary>
-        /// <typeparam name="TSource">Generic source type</typeparam>
-        /// <typeparam name="TKey">Generic key type</typeparam>
-        /// <param name="source">Source</param>
-        /// <param name="rq">Query request data</param>
-        /// <param name="idSelector">Id selector</param>
-        /// <param name="statusSelector">Status selector</param>
-        /// <returns>Result</returns>
-        [RequiresDynamicCode("Expression requires dynamic code")]
-        [RequiresUnreferencedCode("Expression requires unreferenced code")]
-        public static IQueryable<TSource> QueryEtsoo<TSource, TKey>(this IQueryable<TSource> source, QueryRQ<TKey> rq, Expression<Func<TSource, TKey>> idSelector, Expression<Func<TSource, EntityStatus>> statusSelector) where TKey : struct
-        {
-            source = source.QueryEtsoo(rq, idSelector);
-
-            if (rq.Status != null)
-            {
-                source = source.QueryEtsooEqual(rq.Status.Value, statusSelector.Body, statusSelector.Parameters[0]);
-            }
-
-            if (rq.Disabled != null)
-            {
-                // Create a constant expression representing the value to compare against
-                var value = (byte)EntityStatus.Approved;
-                var constant = Expression.Constant(value);
-
-                // Create a binary expression representing the equality comparison
-                var typeConvertBody = Expression.Convert(statusSelector.Body, value.GetType());
-                var body = rq.Disabled.Value ? Expression.GreaterThan(typeConvertBody, constant) : Expression.LessThanOrEqual(typeConvertBody, constant);
-
-                // Create a lambda expression representing the predicate
-                var predicate = Expression.Lambda<Func<TSource, bool>>(body, statusSelector.Parameters[0]);
-
-                // Call the Where method with the constructed predicate
-                source = source.Where(predicate);
-            }
-
-            return source;
-        }
-
-        /// <summary>
-        /// Etsoo query with string id
-        /// 亿速思维查询（字符串编号）
+        /// Etsoo query with status
+        /// Etsoo 状态查询
         /// </summary>
         /// <typeparam name="TSource">Generic source type</typeparam>
         /// <param name="source">Source</param>
         /// <param name="rq">Query request data</param>
-        /// <param name="idSelector">Id selector</param>
-        /// <param name="statusSelector">Status selector</param>
+        /// <param name="statusSelector">Status field selector</param>
         /// <returns>Result</returns>
-        [RequiresDynamicCode("Expression requires dynamic code")]
-        [RequiresUnreferencedCode("Expression requires unreferenced code")]
-        public static IQueryable<TSource> QueryEtsoo<TSource>(this IQueryable<TSource> source, QueryRQ rq, Expression<Func<TSource, string>> idSelector, Expression<Func<TSource, EntityStatus>> statusSelector)
+        public static IQueryable<TSource> QueryEtsooStatus<TSource>(this IQueryable<TSource> source, IQueryRQ rq, Expression<Func<TSource, EntityStatus>> statusSelector)
         {
-            source = source.QueryEtsoo(rq, idSelector);
-
             if (rq.Status != null)
             {
                 source = source.QueryEtsooEqual(rq.Status.Value, statusSelector.Body, statusSelector.Parameters[0]);
