@@ -132,7 +132,7 @@ namespace Tests.CoreFramework
             var writer = new ArrayBufferWriter<byte>();
             var (_, commandText) = await db.Users
                 .QueryEtsoo(rq, (u) => u.Id)
-                .QueryEtsooKeywords("肖赞", "Like", (u) => u.Name)
+                .QueryEtsooKeywords("肖赞", null, (u) => u.Name)
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 
@@ -159,7 +159,7 @@ namespace Tests.CoreFramework
             var writer = new ArrayBufferWriter<byte>();
             var (hasContent, commandText) = await db.Users
                 .QueryEtsoo(rq, (u) => u.Id)
-                .QueryEtsooKeywords("肖 -赞 \"肖必须\"", "Like", (u) => u.Name)
+                .QueryEtsooKeywords("肖 -赞 \"肖必须\"", null, (u) => u.Name)
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 

@@ -504,14 +504,14 @@ namespace com.etsoo.Database
         /// <typeparam name="TSource">Generic source type</typeparam>
         /// <param name="source">Source</param>
         /// <param name="keywords">Keywords</param>
-        /// <param name="likeMethod">Method name, default is Like, maybe ILike for PostgreSQL</param>
+        /// <param name="likeMethod">Like type and method name, custom ILike for PostgreSQL</param>
         /// <param name="fields">Fields</param>
         /// <returns>Result</returns>
-        public static IQueryable<TSource> QueryEtsooKeywords<TSource>(this IQueryable<TSource> source, string keywords, string likeMethod = "Like", params Expression<Func<TSource, string?>>[] fields)
+        public static IQueryable<TSource> QueryEtsooKeywords<TSource>(this IQueryable<TSource> source, string keywords, (Type type, string method)? likeMethod, params Expression<Func<TSource, string?>>[] fields)
         {
             var parts = keywords.ParseQueryKeywords();
 
-            var funType = typeof(DbFunctionsExtensions);
+            var (methodType, methodName) = likeMethod ?? (typeof(DbFunctionsExtensions), nameof(DbFunctionsExtensions.Like));
 
             Expression? expression = null;
 
@@ -524,8 +524,8 @@ namespace com.etsoo.Database
                     var pattern = Expression.Constant($"%{keyword}%");
 
                     Expression call = Expression.Call(
-                        funType,
-                        likeMethod,
+                        methodType,
+                        methodName,
                         Type.EmptyTypes,
                         Expression.Property(null, typeof(EF), nameof(EF.Functions)),
                         field.Body,
