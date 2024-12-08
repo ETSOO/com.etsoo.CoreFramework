@@ -509,7 +509,7 @@ namespace com.etsoo.Database
         /// <returns>Result</returns>
         public static IQueryable<TSource> QueryEtsooKeywords<TSource>(this IQueryable<TSource> source, string keywords, string likeMethod = "Like", params Expression<Func<TSource, string?>>[] fields)
         {
-            var parts = ParseKeywords(keywords);
+            var parts = keywords.ParseQueryKeywords();
 
             var funType = typeof(DbFunctionsExtensions);
 
@@ -565,12 +565,23 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// Parse keywords
-        /// 解析关键字
+        /// Is the keywords complex query
+        /// 关键词是否为复杂查询
+        /// </summary>
+        /// <param name="keywords">Keywords</param>
+        /// <returns>Result</returns>
+        public static bool IsComplexQueryKeywords(this string keywords)
+        {
+            return KeywordSplitRegex().IsMatch(keywords);
+        }
+
+        /// <summary>
+        /// Parse query keywords
+        /// 解析查询关键字
         /// </summary>
         /// <param name="keywords">Source keywords</param>
         /// <returns>Result</returns>
-        public static IEnumerable<(string keyword, bool excluded, bool combine)> ParseKeywords(string keywords)
+        public static IEnumerable<(string keyword, bool excluded, bool combine)> ParseQueryKeywords(this string keywords)
         {
             // Regex split does not work as expected
             var matches = KeywordSplitRegex().Matches(keywords);
