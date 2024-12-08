@@ -498,6 +498,134 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// Query keywords
+        /// 查询关键字
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="keywords">Keywords</param>
+        /// <param name="likeMethod">Method name, default is Like, maybe ILike for PostgreSQL</param>
+        /// <param name="fields">Fields</param>
+        /// <returns>Result</returns>
+        public static IQueryable<TSource> QueryEtsooKeywords<TSource>(this IQueryable<TSource> source, string keywords, string likeMethod = "Like", params Expression<Func<TSource, string?>>[] fields)
+        {
+            var parts = ParseKeywords(keywords);
+
+            var funType = typeof(DbFunctionsExtensions);
+
+            Expression? expression = null;
+
+            foreach (var field in fields)
+            {
+                Expression? fieldExpression = null;
+
+                foreach (var (keyword, excluded, combined) in parts)
+                {
+                    var pattern = Expression.Constant($"%{keyword}%");
+
+                    Expression call = Expression.Call(
+                        funType,
+                        likeMethod,
+                        Type.EmptyTypes,
+                        Expression.Property(null, typeof(EF), nameof(EF.Functions)),
+                        field.Body,
+                        pattern
+                    );
+
+                    if (excluded)
+                    {
+                        call = Expression.Not(call);
+                    }
+
+                    if (fieldExpression == null)
+                    {
+                        fieldExpression = call;
+                    }
+                    else
+                    {
+                        fieldExpression = combined ? Expression.And(fieldExpression, call) : Expression.Or(fieldExpression, call);
+                    }
+                }
+
+                if (fieldExpression != null)
+                {
+                    expression = expression == null ? fieldExpression : Expression.Or(expression, fieldExpression);
+                }
+            }
+
+            if (expression == null)
+            {
+                return source;
+            }
+            else
+            {
+                var predicate = Expression.Lambda<Func<TSource, bool>>(expression, fields.First().Parameters[0]);
+                return source.Where(predicate);
+            }
+        }
+
+        /// <summary>
+        /// Parse keywords
+        /// 解析关键字
+        /// </summary>
+        /// <param name="keywords">Source keywords</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<(string keyword, bool excluded, bool combine)> ParseKeywords(string keywords)
+        {
+            // Regex split does not work as expected
+            var matches = KeywordSplitRegex().Matches(keywords);
+            List<string> parts = [];
+            var start = 0;
+            foreach (Match match in matches)
+            {
+                if (match.Index > start)
+                {
+                    parts.Add(keywords[start..match.Index]);
+                }
+                start = match.Index + match.Length;
+            }
+
+            // Last item
+            if (start < keywords.Length)
+            {
+                parts.Add(keywords[start..]);
+            }
+
+            foreach (var part in parts)
+            {
+                var first = part[0];
+                string one;
+                bool excluded = false;
+                bool combined = false;
+                if (first == '+' || first == '-')
+                {
+                    one = part[1..];
+
+                    if (first == '-')
+                    {
+                        combined = true;
+                        excluded = true;
+                    }
+                    else if (first == '+')
+                    {
+                        combined = true;
+                    }
+                }
+                else
+                {
+                    one = part;
+                }
+
+                if (one.StartsWith('"') && one.EndsWith('"'))
+                {
+                    one = one[1..^1];
+                }
+
+                yield return (one, excluded, combined);
+            }
+        }
+
+        /// <summary>
         /// To JSON async without the need of a model and serializing
         /// 异步转换为JSON，无需模型和序列化
         /// </summary>
@@ -720,7 +848,20 @@ namespace com.etsoo.Database
         [GeneratedRegex(@"SELECT\s+(\(((?>\((?<DEPTH>)|\)(?<-DEPTH>)|[^()]+))*\)(?(DEPTH)(?!))|.+)\s+FROM", RegexOptions.IgnoreCase)]
         private static partial Regex SelectRegex();
 
+        /// <summary>
+        /// Split items regex with comma but not inside parentheses
+        /// 使用逗号（但不在括号内）拆分项目正则表达式
+        /// </summary>
+        /// <returns></returns>
         [GeneratedRegex(@"\s*,\s*(?!(?:[^(]*\([^)]*\))*[^()]*\))", RegexOptions.IgnoreCase)]
-        private static partial Regex SplitRegex();
+        public static partial Regex SplitRegex();
+
+        /// <summary>
+        /// Split search engine like keywords regex
+        /// 拆分搜索引擎类似关键词正则表达式
+        /// </summary>
+        /// <returns></returns>
+        [GeneratedRegex(@"\s+(?=[-+]?(""|\w)[^""]*(\1|\s|$))")]
+        public static partial Regex KeywordSplitRegex();
     }
 }

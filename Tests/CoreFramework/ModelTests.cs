@@ -116,6 +116,34 @@ namespace Tests.CoreFramework
         }
 
         [Test]
+        public async Task QueryJsonLikeTest()
+        {
+            var rq = new QueryRQ<int>
+            {
+                QueryPaging = new QueryPagingData
+                {
+                    BatchSize = 1,
+                    OrderBy = [new() { Field = "Name" }]
+                }
+            };
+
+            var db = CreateDbContext();
+
+            var writer = new ArrayBufferWriter<byte>();
+            var (hasContent, commandText) = await db.Users
+                .QueryEtsoo(rq, (u) => u.Id)
+                .QueryEtsooKeywords("肖 -赞 \"肖必须\"", "Like", (u) => u.Name)
+                .Select(u => new { u.Id, NewName = u.Name, u.Status })
+                .ToJsonAsync(writer);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(hasContent, Is.True); // Empty array
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u0\".\"Id\", \"u0\".\"Name\" AS \"NewName\", \"u0\".\"Status\"\r\nFROM (\r\n    SELECT \"u\".\"Id\", \"u\".\"Name\", \"u\".\"Status\"\r\n    FROM \"User\" AS \"u\"\r\n    ORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\n    LIMIT @__p_0\r\n) AS \"u0\"\r\nWHERE (\"u0\".\"Name\" LIKE '%肖%' AND \"u0\".\"Name\" NOT LIKE '%赞%') OR \"u0\".\"Name\" LIKE '%肖必须%'\r\nORDER BY \"u0\".\"Name\", \"u0\".\"Id\" DESC)"));
+            });
+        }
+
+        [Test]
         public async Task QueryJsonEmptyTest()
         {
             var rq = new QueryRQ<int>
