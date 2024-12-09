@@ -159,7 +159,7 @@ namespace com.etsoo.CoreFramework.Models
                 source = source.QueryEtsooEqual(rq.Status.Value, statusSelector.Body, statusSelector.Parameters[0]);
             }
 
-            if (rq.Disabled != null)
+            if (rq.Enabled != null)
             {
                 // Create a constant expression representing the value to compare against
                 var value = (byte)EntityStatus.Approved;
@@ -167,7 +167,7 @@ namespace com.etsoo.CoreFramework.Models
 
                 // Create a binary expression representing the equality comparison
                 var typeConvertBody = Expression.Convert(statusSelector.Body, value.GetType());
-                var body = rq.Disabled.Value ? Expression.GreaterThan(typeConvertBody, constant) : Expression.LessThanOrEqual(typeConvertBody, constant);
+                var body = rq.Enabled.Value ? Expression.LessThanOrEqual(typeConvertBody, constant) : Expression.GreaterThan(typeConvertBody, constant);
 
                 // Create a lambda expression representing the predicate
                 var predicate = Expression.Lambda<Func<TSource, bool>>(body, statusSelector.Parameters[0]);

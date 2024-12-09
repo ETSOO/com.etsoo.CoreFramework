@@ -122,7 +122,7 @@ namespace Tests.CoreFramework
             {
                 Ids = [1001, 1002, 1003],
                 ExcludedIds = [1, 2, 3],
-                Disabled = false,
+                Enabled = true,
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 1,
@@ -154,7 +154,7 @@ namespace Tests.CoreFramework
             {
                 Id = 1001,
                 ExcludedIds = [1, 2, 3],
-                Disabled = true,
+                Enabled = false,
                 QueryPaging = new QueryPagingData
                 {
                     BatchSize = 1,
@@ -186,7 +186,7 @@ namespace Tests.CoreFramework
             var rq = new QueryRQ<int>
             {
                 Status = EntityStatus.Approved,
-                Disabled = true,
+                Enabled = false,
                 Ids = [1, 2],
                 QueryPaging = new QueryPagingData
                 {

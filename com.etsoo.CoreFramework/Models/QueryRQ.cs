@@ -19,10 +19,10 @@ namespace com.etsoo.CoreFramework.Models
         object? Id { get; }
 
         /// <summary>
-        /// Is disabled or not
-        /// 是否禁用
+        /// Is enabled or not
+        /// 是否启用
         /// </summary>
-        bool? Disabled { get; set; }
+        bool? Enabled { get; set; }
 
         /// <summary>
         /// Filter keyword
@@ -50,10 +50,10 @@ namespace com.etsoo.CoreFramework.Models
     public abstract record QueryRQBase
     {
         /// <summary>
-        /// Disabled or not, null for all, true for disabled (> EntityStatus.Approved), false for enabled (<= 100)
-        /// 是否禁用
+        /// Enabled or not, null for all, true for enabled (<= EntityStatus.Approved), false for disabled (> 100)
+        /// 是否启用
         /// </summary>
-        public bool? Disabled { get; set; }
+        public bool? Enabled { get; set; }
 
         /// <summary>
         /// Keyword to filter
