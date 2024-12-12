@@ -743,29 +743,39 @@ namespace com.etsoo.Database
             // Open connection
             await command.Connection.OpenAsync(cancellationToken);
 
-            // Execute reader
-            await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleResult, cancellationToken);
-
             // Has content
             var hasContent = false;
 
-            while (await reader.ReadAsync(cancellationToken))
+            try
             {
-                if (await reader.IsDBNullAsync(0, cancellationToken))
-                {
-                    continue;
-                }
-                else
-                {
-                    // Get the TextReader
-                    using var textReader = reader.GetTextReader(0);
+                // Execute reader
+                await using var reader = await command.ExecuteReaderAsync(CommandBehavior.SingleResult, cancellationToken);
 
-                    // Write
-                    await textReader.ReadAllBytesAsyn(writer);
+                while (await reader.ReadAsync(cancellationToken))
+                {
+                    if (await reader.IsDBNullAsync(0, cancellationToken))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        // Get the TextReader
+                        using var textReader = reader.GetTextReader(0);
 
-                    // Has content
-                    hasContent = true;
+                        // Write
+                        await textReader.ReadAllBytesAsyn(writer);
+
+                        // Has content
+                        hasContent = true;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                var newEx = new DataException("Failed to execute the command", ex);
+                newEx.Data["OriginCommandText"] = commandText;
+                newEx.Data["CommandText"] = command.CommandText;
+                throw newEx;
             }
 
             if (!hasContent && !isObject)
