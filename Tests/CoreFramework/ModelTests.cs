@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System.Buffers;
+using System.Data;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -284,6 +285,50 @@ namespace Tests.CoreFramework
                 Assert.That(rq.Sign, Has.Length.LessThan(128));
                 Assert.That(newRQ?.Sign, Is.EqualTo(rq.Sign));
             });
+        }
+
+        [Test]
+        public void ToJsonInternalAsyncLogicTest()
+        {
+            var commandText = "SELECT c1.id AS \"Id\", COALESCE(c1.local_name, c0.name) AS \"Name\", c0.identity_type AS \"IdentityType\", c0.require_local_url AS \"RequireLocalUrl\", COALESCE(c1.local_url, c0.web_url) AS \"WebUrl\", COALESCE(c1.local_help_url, c0.help_url) AS \"HelpUrl\", c0.logo AS \"Logo\", c1.expiry AS \"Expiry\", CASE\r\n    WHEN c1.expiry IS NULL OR c1.expiry <= now() + INTERVAL '-90 days' THEN NULL\r\n    ELSE CAST(date_part('epoch', c1.expiry - now()) / 86400.0 AS integer)\r\nEND AS \"ExpiryDays\", c1.status AS \"Status\", c1.creation AS \"Creation\", (SELECT name FROM user LIMIT 1) AS \"Test\"\r\nFROM (\r\n    SELECT c.id, c.core_app_id, c.creation, c.expiry, c.local_help_url, c.local_name, c.local_url, c.status\r\n    FROM core_organization_app AS c\r\n    WHERE c.core_organization_id = @__User_OrganizationInt_0\r\n    ORDER BY c.creation DESC, c.id DESC\r\n    LIMIT @__p_1\r\n) AS c1\r\nINNER JOIN core_app AS c0 ON c1.core_app_id = c0.id\r\nORDER BY c1.creation DESC, c1.id DESC";
+
+            var match = DatabaseExtensions.SelectRegex().Match(commandText);
+            if (!match.Success || match.Groups.Count < 2)
+            {
+                throw new DataException("SELECT command text is not valid");
+            }
+
+            // Columns
+            var columns = DatabaseExtensions.SplitRegex().Split(match.Groups[1].Value);
+
+            char[] trimChars = ['"', '\''];
+
+            // Fields
+            var fields = columns.Select(c =>
+            {
+                c = c.Trim('\r', '\n', '\t');
+
+                var pos = c.LastIndexOf(" AS ", StringComparison.OrdinalIgnoreCase);
+                string source;
+                if (pos == -1)
+                {
+                    source = c.Split('.').Last();
+                }
+                else
+                {
+                    source = c[(pos + 4)..];
+                }
+
+                var name = JsonNamingPolicy.CamelCase.ConvertName(source.Trim(trimChars));
+                return new { Source = source, Name = name };
+            });
+
+            // Assert
+            Assert.That(fields.Count(), Is.EqualTo(12));
+            var nameField = fields.First(f => f.Source == "\"Name\"");
+            Assert.That(nameField.Name, Is.EqualTo("name"));
+            var testField = fields.First(f => f.Source == "\"Test\"");
+            Assert.That(testField.Name, Is.EqualTo("test"));
         }
     }
 }

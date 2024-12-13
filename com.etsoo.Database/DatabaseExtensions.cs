@@ -862,27 +862,28 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
+        /// \bSELECT\b(\(((?>\((?<DEPTH>)|\)(?<-DEPTH>)|[^\(\)]+))*\)(?(DEPTH)(?!))|.+)\bFROM\b
         /// \(                   # the opening parenthesis
         /// (?>                  # open an atomic group
         ///     \(  (?<DEPTH>)   # when an opening parenthesis is encountered, then increment the stack named DEPTH
         ///   |                  # OR
         ///     \) (?<-DEPTH>)   # when a closing parenthesis is encountered, then decrement the stack named DEPTH
         ///   |                  # OR
-        ///     [^()]+           # content that is not parenthesis
+        ///     [^\(\)]+           # content that is not parenthesis
         /// )*                   # close the atomic group, repeat zero or more times
         /// \)                   # the closing parenthesis
         /// (?(DEPTH)(?!))       # conditional: if the stack named DEPTH is not empty then fail (ie: parenthesis are not balanced)
         /// </summary>
         /// <returns></returns>
-        [GeneratedRegex(@"SELECT\s+(\(((?>\((?<DEPTH>)|\)(?<-DEPTH>)|[^()]+))*\)(?(DEPTH)(?!))|.+)\s+FROM", RegexOptions.IgnoreCase)]
-        private static partial Regex SelectRegex();
+        [GeneratedRegex(@"\bSELECT\b(.+?)(?<!\([^)]*)\bFROM\b(?![^()]*\))", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+        public static partial Regex SelectRegex();
 
         /// <summary>
         /// Split items regex with comma but not inside parentheses
         /// 使用逗号（但不在括号内）拆分项目正则表达式
         /// </summary>
         /// <returns></returns>
-        [GeneratedRegex(@"\s*,\s*(?!(?:[^(]*\([^)]*\))*[^()]*\))", RegexOptions.IgnoreCase)]
+        [GeneratedRegex(@"(?<!\([^)]*)\s*,\s*(?![^()]*\))", RegexOptions.Singleline)]
         public static partial Regex SplitRegex();
 
         /// <summary>
