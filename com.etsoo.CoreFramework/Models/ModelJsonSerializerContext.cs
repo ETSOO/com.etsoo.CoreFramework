@@ -54,6 +54,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(SendEmailRQ))]
     [JsonSerializable(typeof(SignoutRQ))]
     [JsonSerializable(typeof(SortRQ))]
+    [JsonSerializable(typeof(SwitchOrgRQ))]
     [JsonSerializable(typeof(UpdateStatusRQ<int>), TypeInfoPropertyName = "UpdateStatusRQ")]
     [JsonSerializable(typeof(UpdateStatusRQ<long>), TypeInfoPropertyName = "UpdateStatusLongRQ")]
     [JsonSerializable(typeof(UpdateStatusRQ<Guid>), TypeInfoPropertyName = "UpdateStatusGuidRQ")]
