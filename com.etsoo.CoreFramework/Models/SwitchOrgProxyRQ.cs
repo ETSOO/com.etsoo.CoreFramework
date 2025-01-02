@@ -5,6 +5,10 @@ using com.etsoo.Utils.String;
 
 namespace com.etsoo.CoreFramework.Models
 {
+    /// <summary>
+    /// Switch organization proxy request
+    /// 切换机构代理请求
+    /// </summary>
     public record SwitchOrgProxyRQ
     {
         /// <summary>
