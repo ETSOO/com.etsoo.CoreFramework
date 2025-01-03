@@ -718,6 +718,8 @@ namespace com.etsoo.Database
             }
             else
             {
+                // Start from 0, 1 means reading the second page
+                // 从0开始，1表示读取第二页
                 var offset = page * size;
                 return $"LIMIT {size} OFFSET {offset}";
             }

@@ -425,10 +425,12 @@ namespace com.etsoo.Database
                 {
                     // Offset paging
                     // Skip rows
+                    // Start from 0, 1 means reading the second page
+                    // 从0开始，1表示读取第二页
                     var currentPage = data.CurrentPage.GetValueOrDefault();
                     if (currentPage > 0)
                     {
-                        source = source.Skip((int)(currentPage - 1) * data.BatchSize);
+                        source = source.Skip((int)currentPage * data.BatchSize);
                     }
                 }
             }
