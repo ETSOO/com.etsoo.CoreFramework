@@ -35,7 +35,7 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public IActionResult? Validate()
         {
-            if (Token.Length is not (>= 32 and <= 512))
+            if (Token.Length is not (>= 512 and <= 5120))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Token));
             }

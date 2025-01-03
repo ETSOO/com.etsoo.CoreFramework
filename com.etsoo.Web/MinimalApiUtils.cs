@@ -36,7 +36,14 @@ namespace com.etsoo.Web
                         if (result != null && !result.Ok)
                         {
                             var field = result.Field ?? string.Empty;
+                            var type = result.Type;
                             var title = result.Title ?? "Unknown";
+
+                            if (!string.IsNullOrEmpty(type))
+                            {
+                                title = $"{title} ({type})";
+                            }
+
                             if (errors.TryGetValue(field, out var messages))
                             {
                                 errors[field] = [.. messages, title];

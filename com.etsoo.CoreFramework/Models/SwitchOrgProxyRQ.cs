@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.Models;
 using com.etsoo.Utils.String;
 
 namespace com.etsoo.CoreFramework.Models
@@ -9,7 +10,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Switch organization proxy request
     /// 切换机构代理请求
     /// </summary>
-    public record SwitchOrgProxyRQ
+    public record SwitchOrgProxyRQ : IModelValidator
     {
         /// <summary>
         /// Application ID
