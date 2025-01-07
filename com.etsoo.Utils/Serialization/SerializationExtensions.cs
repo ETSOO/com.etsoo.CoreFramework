@@ -370,6 +370,28 @@ namespace com.etsoo.Utils.Serialization
         }
 
         /// <summary>
+        /// Serialize object to the buffer writer
+        /// 序列化对象到缓冲写入器
+        /// </summary>
+        /// <typeparam name="T">Generic input type</typeparam>
+        /// <param name="writer">Buffer writer</param>
+        /// <param name="input">Input object to write</param>
+        /// <param name="typeInfo">Input object type</param>
+        /// <param name="options">Options</param>
+        /// <returns>Task</returns>
+        public static async Task SerializeAsync<T>(this IBufferWriter<byte> writer, T input, JsonTypeInfo<T> typeInfo, JsonWriterOptions? options = null)
+        {
+            var writeOptions = options ?? new JsonWriterOptions
+            {
+                Encoder = typeInfo.Options.Encoder,
+                Indented = typeInfo.Options.WriteIndented
+            };
+
+            await using var jsonWriter = new Utf8JsonWriter(writer, writeOptions);
+            JsonSerializer.Serialize(jsonWriter, input, typeInfo);
+        }
+
+        /// <summary>
         /// Deserialize JsonElement to string dictionary
         /// 反序列化 JsonElement 为字符串字典
         /// </summary>
