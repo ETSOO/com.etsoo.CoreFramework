@@ -60,6 +60,24 @@ namespace com.etsoo.Localization
         }
 
         /// <summary>
+        /// Check the input is time zone string or not
+        /// 检查输入是否为时区字符串
+        /// </summary>
+        /// <param name="timeZone">Time zone</param>
+        /// <returns>Result</returns>
+        public static bool IsTimeZone(string? timeZone)
+        {
+            if (!string.IsNullOrEmpty(timeZone) && TZConvert.TryGetTimeZoneInfo(timeZone, out _))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Get regions by currency (USD, CNY), one currency may be used in multiple countries
         /// 从币种获取区域信息
         /// </summary>
