@@ -44,6 +44,8 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(DateTimeOffset))]
 
     [JsonSerializable(typeof(StorageEntry))]
+    [JsonSerializable(typeof(TristateEnum))]
+
     public partial class CommonJsonSerializerContext : JsonSerializerContext
     {
     }
