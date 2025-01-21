@@ -69,6 +69,7 @@ namespace com.etsoo.CoreFramework.User
                 Id = user.Id,
                 ConnectionId = user.ConnectionId,
                 Scopes = user.Scopes,
+                RoleValue = user.RoleValue,
 
                 ClientIp = ipAddress,
                 Region = region,

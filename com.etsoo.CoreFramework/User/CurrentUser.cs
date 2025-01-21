@@ -1,6 +1,4 @@
-﻿using com.etsoo.CoreFramework.Authentication;
-using com.etsoo.CoreFramework.Json;
-using com.etsoo.Utils;
+﻿using com.etsoo.CoreFramework.Json;
 using com.etsoo.Utils.String;
 using System.Globalization;
 using System.Net;
@@ -35,18 +33,6 @@ namespace com.etsoo.CoreFramework.User
         public static int ScopeToAppId(string scope)
         {
             return scope == "core" ? 1 : StringUtils.TryParse<int>(scope[3..]).GetValueOrDefault();
-        }
-
-        /// <summary>
-        /// Get role from value
-        /// 从值获取角色
-        /// </summary>
-        /// <param name="roleValue">Role value</param>
-        /// <returns>User role</returns>
-        public static UserRole? GetRole(short roleValue)
-        {
-            var userRole = (UserRole)roleValue;
-            return SharedUtils.EnumIsDefined(userRole) ? userRole : null;
         }
 
         /// <summary>
@@ -102,12 +88,6 @@ namespace com.etsoo.CoreFramework.User
         /// 机构名称申明类型
         /// </summary>
         public const string OrganizationNameClaim = "orgname";
-
-        /// <summary>
-        /// Role value claim type
-        /// 角色值声明类型
-        /// </summary>
-        public const string RoleValueClaim = "role";
 
         /// <summary>
         /// Organization user id claim type
@@ -170,7 +150,6 @@ namespace com.etsoo.CoreFramework.User
             var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
             var language = claims.FindFirstValue(LocalityClaim);
-            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault();
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
             var uid = claims.FindFirstValue(UidClaim);
@@ -187,6 +166,7 @@ namespace com.etsoo.CoreFramework.User
                 ClientIp = user.ClientIp,
                 DeviceId = user.DeviceId,
                 Id = user.Id,
+                RoleValue = user.RoleValue,
                 Scopes = user.Scopes,
                 Region = user.Region,
                 Organization = user.Organization,
@@ -197,7 +177,6 @@ namespace com.etsoo.CoreFramework.User
                 PreferredName = preferredName,
                 LatinGivenName = latinGivenName,
                 LatinFamilyName = latinFamilyName,
-                RoleValue = roleValue,
                 Language = new CultureInfo(language),
                 Oid = oid,
                 Avatar = avatar,
@@ -210,7 +189,7 @@ namespace com.etsoo.CoreFramework.User
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? Role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, int? appId, string? appKey) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, int? appId, string? appKey) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -251,7 +230,7 @@ namespace com.etsoo.CoreFramework.User
             var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appId, appKey) = GetData(data);
 
             // Validation
-            if (id == null || role == null || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
+            if (id == null || !role.HasValue || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
@@ -264,13 +243,13 @@ namespace com.etsoo.CoreFramework.User
                 Scopes = scopes,
                 Region = region,
                 Organization = organization,
+                RoleValue = role.Value,
                 Name = name,
                 GivenName = givenName,
                 FamilyName = familyName,
                 PreferredName = preferredName,
                 LatinGivenName = latinGivenName,
                 LatinFamilyName = latinFamilyName,
-                RoleValue = role.Value,
                 Language = language,
                 Oid = oid,
                 Avatar = avatar,
@@ -415,31 +394,6 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public string? Avatar { get; init; }
 
-        private short roleValue;
-
-        /// <summary>
-        /// Role value
-        /// 角色值
-        /// </summary>
-        public required short RoleValue
-        {
-            get
-            {
-                return roleValue;
-            }
-            init
-            {
-                roleValue = value;
-                Role = GetRole(roleValue);
-            }
-        }
-
-        /// <summary>
-        /// Role
-        /// 角色
-        /// </summary>
-        public UserRole? Role { get; private set; }
-
         /// <summary>
         /// Language
         /// 语言
@@ -477,7 +431,6 @@ namespace com.etsoo.CoreFramework.User
             claims.AddRange([
                 new(NameClaim, Name),
                 new(LocalityClaim, Language.Name),
-                new(RoleValueClaim, RoleValue.ToString()),
                 new(OidClaim, Oid)
             ]);
 

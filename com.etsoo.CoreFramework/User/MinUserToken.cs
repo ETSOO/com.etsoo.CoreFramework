@@ -1,4 +1,6 @@
-﻿using com.etsoo.Utils.Serialization;
+﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.Utils;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using System.Security.Claims;
 using System.Text.Json;
@@ -30,6 +32,12 @@ namespace com.etsoo.CoreFramework.User
         public const string JsonDataClaim = "jsondata";
 
         /// <summary>
+        /// Role value claim type
+        /// 角色值声明类型
+        /// </summary>
+        public const string RoleValueClaim = "role";
+
+        /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
@@ -46,6 +54,7 @@ namespace com.etsoo.CoreFramework.User
             var id = claims.FindFirstValue(IdClaim);
             var scopes = claims.FindAll(ScopeClaim).Select(claim => claim.Value);
             var jsonData = claims.FindFirstValue(JsonDataClaim);
+            var roleValue = StringUtils.TryParse<short>(claims.FindFirstValue(RoleValueClaim)).GetValueOrDefault((short)UserRole.Guest);
 
             // Validate
             if (string.IsNullOrEmpty(id))
@@ -59,8 +68,21 @@ namespace com.etsoo.CoreFramework.User
                 Id = id,
                 ConnectionId = connectionId,
                 Scopes = scopes,
-                JsonData = data == null ? [] : new StringKeyDictionaryObject(data!)
+                JsonData = data == null ? [] : new StringKeyDictionaryObject(data!),
+                RoleValue = roleValue
             };
+        }
+
+        /// <summary>
+        /// Get role from value
+        /// 从值获取角色
+        /// </summary>
+        /// <param name="roleValue">Role value</param>
+        /// <returns>User role</returns>
+        public static UserRole? GetRole(short roleValue)
+        {
+            var userRole = (UserRole)roleValue;
+            return SharedUtils.EnumIsDefined(userRole) ? userRole : null;
         }
 
         string id = default!;
@@ -103,12 +125,36 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public IEnumerable<string>? Scopes { get; init; }
 
-
         /// <summary>
         /// JSON data
         /// JSON数据
         /// </summary>
         public StringKeyDictionaryObject JsonData { get; init; } = [];
+
+        private short roleValue;
+
+        /// <summary>
+        /// Role value
+        /// 角色值
+        /// </summary>
+        public required short RoleValue
+        {
+            get
+            {
+                return roleValue;
+            }
+            init
+            {
+                roleValue = value;
+                Role = GetRole(roleValue);
+            }
+        }
+
+        /// <summary>
+        /// Role
+        /// 角色
+        /// </summary>
+        public UserRole? Role { get; private set; }
 
         /// <summary>
         /// Create claims
@@ -119,7 +165,8 @@ namespace com.etsoo.CoreFramework.User
         {
             var claims = new List<Claim>
             {
-                new(IdClaim, Id)
+                new(IdClaim, Id),
+                new(RoleValueClaim, RoleValue.ToString())
             };
 
             if (Scopes != null)
@@ -143,7 +190,7 @@ namespace com.etsoo.CoreFramework.User
         /// <returns>Identity</returns>
         public virtual ClaimsIdentity CreateIdentity()
         {
-            return new ClaimsIdentity(CreateClaims());
+            return new ClaimsIdentity(CreateClaims(), null, IdClaim, null);
         }
     }
 }

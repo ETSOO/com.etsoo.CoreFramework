@@ -175,6 +175,7 @@ namespace Tests.CoreFramework
             // Assert
             Assert.Multiple(() =>
             {
+                Assert.That(identity.Name, Is.EqualTo(user.Id));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
