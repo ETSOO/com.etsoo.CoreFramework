@@ -62,6 +62,18 @@
         Executive = 512,
 
         /// <summary>
+        /// Shareholder
+        /// 股东
+        /// </summary>
+        Shareholder = 1024,
+
+        /// <summary>
+        /// API
+        /// 接口
+        /// </summary>
+        API = 4096,
+
+        /// <summary>
         /// Administrator
         /// 管理员
         /// </summary>
