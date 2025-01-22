@@ -1,5 +1,4 @@
-﻿using com.etsoo.CoreFramework.User;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
@@ -53,14 +52,13 @@ namespace com.etsoo.Web
         {
             if (httpContext.User.Identity?.IsAuthenticated is true)
             {
-                // User
-                var user = MinUserToken.Create(httpContext.User);
-                if (user != null)
+                var partitionKey = httpContext.User.Identity.Name;
+                if (!string.IsNullOrEmpty(partitionKey))
                 {
                     var period = TimeSpan.FromMinutes(_options.ReplenishmentMinutes);
 
                     return RateLimitPartition.GetTokenBucketLimiter(
-                        user.Id,
+                        partitionKey,
                         partition => new TokenBucketRateLimiterOptions
                         {
                             AutoReplenishment = true,

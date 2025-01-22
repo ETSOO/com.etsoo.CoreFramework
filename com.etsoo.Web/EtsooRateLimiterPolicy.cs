@@ -64,7 +64,9 @@ namespace com.etsoo.Web
                 var user = MinUserToken.Create(httpContext.User);
                 if (user != null)
                 {
+                    // Check the user is API user or not
                     var isApiUser = user.Role?.HasFlag(UserRole.API) is true;
+
                     var partitionKey = isApiUser ? $"{user.Id}:api" : user.Id;
                     var permitLimit = isApiUser ? _options.PermitLimit * _options.ApiMultiplier : _options.PermitLimit;
                     var queueLimit = isApiUser ? _options.QueueLimit * _options.ApiMultiplier : _options.QueueLimit;
