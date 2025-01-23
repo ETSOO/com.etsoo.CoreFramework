@@ -13,8 +13,8 @@ namespace com.etsoo.Web
     public record EtsooRateLimiterOptions
     {
         /// <summary>
-        /// Anonymous user maximum requests limit, 0 means no limit
-        /// 匿名用户最大请求限制，0表示无限制
+        /// Anonymous user maximum requests limit, -1 means no limit, 0 means login required
+        /// 匿名用户最大请求限制，-1表示无限制，0表示需要登录
         /// </summary>
         public int AnonymousLimit { get; init; } = 0;
 
@@ -107,7 +107,7 @@ namespace com.etsoo.Web
             // https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#rate-limiting
             var anonymousLimit = _options.AnonymousLimit;
             var anonymousKey = httpContext.Request.Host.ToString();
-            if (anonymousLimit <= 0)
+            if (anonymousLimit < 0)
             {
                 return RateLimitPartition.GetNoLimiter(anonymousKey);
             }
