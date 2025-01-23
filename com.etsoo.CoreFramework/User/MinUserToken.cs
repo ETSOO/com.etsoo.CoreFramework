@@ -137,7 +137,7 @@ namespace com.etsoo.CoreFramework.User
         /// Role value
         /// 角色值
         /// </summary>
-        public required short RoleValue
+        public short RoleValue
         {
             get
             {

@@ -168,13 +168,15 @@ namespace Tests.CoreFramework
             var publicService = new JwtService(new ServiceCollection(), section.Get<JwtSettings>(), null);
 
             // Validate id token
-            var (_, securityToken) = publicService.ValidateIdToken(token, signingKey, null, "app6");
+            var (cp, securityToken) = publicService.ValidateIdToken(token, signingKey, null, "app6");
             var jwt = securityToken as JwtSecurityToken;
             var claims = jwt?.Claims;
 
             // Assert
             Assert.Multiple(() =>
             {
+                Assert.That(identity.IsAuthenticated, Is.False);
+                Assert.That(cp?.Identity?.IsAuthenticated, Is.True);
                 Assert.That(identity.Name, Is.EqualTo(user.Id));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
