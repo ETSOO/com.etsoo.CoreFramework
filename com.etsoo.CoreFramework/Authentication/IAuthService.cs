@@ -46,6 +46,14 @@ namespace com.etsoo.CoreFramework.Authentication
         string CreateIdToken(ClaimsIdentity claims, string signingKey, string? audience = null);
 
         /// <summary>
+        /// Create token validation parameters
+        /// 创建令牌验证参数
+        /// </summary>
+        /// <param name="audience">Audience</param>
+        /// <returns>Parameters</returns>
+        TokenValidationParameters CreateValidationParameters(string? audience = null);
+
+        /// <summary>
         /// Sign data
         /// 数据签名
         /// </summary>

@@ -179,7 +179,13 @@ namespace com.etsoo.CoreFramework.Authentication
             };
         }
 
-        private TokenValidationParameters CreateValidationParameters(string? audience = null)
+        /// <summary>
+        /// Create token validation parameters
+        /// 创建令牌验证参数
+        /// </summary>
+        /// <param name="audience">Audience</param>
+        /// <returns>Parameters</returns>
+        public TokenValidationParameters CreateValidationParameters(string? audience = null)
         {
             var parameters = CreateValidationParametersBase(audience);
             parameters.IssuerSigningKey = GetIssuerSigningKey();

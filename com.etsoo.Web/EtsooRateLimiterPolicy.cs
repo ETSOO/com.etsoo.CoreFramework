@@ -34,7 +34,7 @@ namespace com.etsoo.Web
         /// Maximum requests permit limit within the window
         /// 在一个时间窗口内的最大请求许可限制
         /// </summary>
-        public int PermitLimit { get; init; } = 20;
+        public int PermitLimit { get; init; } = 60;
 
         /// <summary>
         /// Maximum queued requests permit limit within the window
