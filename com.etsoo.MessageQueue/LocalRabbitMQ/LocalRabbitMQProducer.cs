@@ -32,6 +32,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
 
             if (string.IsNullOrEmpty(exchange))
             {
+                // Work Queues. Distributing tasks among workers
                 exchange = string.Empty;
 
                 var queueName = _options.QueueName;
@@ -48,6 +49,9 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
             }
             else
             {
+                // Publish/Subscribe (Fanout Exchange). Messages are broadcast to all queues bound to the exchange. The exchange doesn't care about the routing key.
+                // Routing (Direct Exchange). Messages are routed to queues based on an exact match of the routing key.
+                // Topics (Topic Exchange). Messages are routed to queues based on pattern matching with the routing key
                 var exchangeType = _options.ExchangeType ?? ExchangeType.Fanout;
 
                 if (exchangeType == ExchangeType.Fanout) routingKey = string.Empty;
