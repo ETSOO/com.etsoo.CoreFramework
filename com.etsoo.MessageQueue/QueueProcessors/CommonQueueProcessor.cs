@@ -33,10 +33,10 @@ namespace com.etsoo.MessageQueue.QueueProcessors
         /// 异步处理消息
         /// </summary>
         /// <param name="message">Message</param>
-        /// <param name="body">Source body</param>
+        /// <param name="properties">Received message properties</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        protected abstract Task ProcessMessageAsync(T message, ReadOnlyMemory<byte> body, CancellationToken cancellationToken);
+        protected abstract Task ProcessMessageAsync(T message, MessageReceivedProperties properties, CancellationToken cancellationToken);
 
         /// <summary>
         /// Determines whether the specified message with MessageProperties can be deserialized, make it as lightweight as possible
@@ -51,6 +51,25 @@ namespace com.etsoo.MessageQueue.QueueProcessors
         }
 
         /// <summary>
+        /// Parse message
+        /// 解析消息
+        /// </summary>
+        /// <param name="body">Message body</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        protected async Task<T?> ParseMessageAsync(ReadOnlyMemory<byte> body, CancellationToken cancellationToken)
+        {
+            // Mesage
+            var message = await body.ToMessageAsync(typeInfo, cancellationToken);
+            if (message == null)
+            {
+                logger.LogError("Convert body to {type} failed with NULL: {body}", typeof(T), body.ToJsonString());
+            }
+
+            return message;
+        }
+
+        /// <summary>
         /// Convert, map and process the message
         /// 转换、映射和处理消息
         /// </summary>
@@ -60,16 +79,16 @@ namespace com.etsoo.MessageQueue.QueueProcessors
         /// <returns>Task</returns>
         public virtual async Task ExecuteAsync(ReadOnlyMemory<byte> body, MessageReceivedProperties properties, CancellationToken cancellationToken)
         {
-            // Mesage
-            var message = await body.ToMessageAsync(typeInfo, cancellationToken);
+            // Parse message
+            var message = await ParseMessageAsync(body, cancellationToken);
             if (message == null)
             {
-                logger.LogError("Convert body to {type} failed with NULL: {body}", typeof(T), body.ToJsonString());
+                // Ignore the message
                 return;
             }
 
             // Process
-            await ProcessMessageAsync(message, body, cancellationToken);
+            await ProcessMessageAsync(message, properties, cancellationToken);
         }
     }
 }
