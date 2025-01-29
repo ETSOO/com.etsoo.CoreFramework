@@ -13,7 +13,7 @@ namespace Tests.MessageQueue
         [Test]
         public async Task ProducerSendAsyncTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
             Assert.That(messageId, Is.Not.Null);
@@ -22,7 +22,7 @@ namespace Tests.MessageQueue
         [Test]
         public async Task ProducerReceiveAsyncTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
 
@@ -33,7 +33,7 @@ namespace Tests.MessageQueue
             };
 
             var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "SmartERP" },
+                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Test" },
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
@@ -52,7 +52,7 @@ namespace Tests.MessageQueue
         [Test]
         public async Task ProducerReceiveAsyncStringTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "SmartERP-Hub" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Hub-Test" });
             var messageId = await producer.SendAsync(Encoding.UTF8.GetBytes("Hello"), new MessageProperties { AppId = "SmartERPTest" });
             await producer.DisposeAsync();
 
@@ -65,7 +65,7 @@ namespace Tests.MessageQueue
             };
 
             var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "SmartERP-Hub" },
+                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Hub-Test" },
                 new[] { new StringProcessor(action) },
                 Mock.Of<ILogger>()
                );
