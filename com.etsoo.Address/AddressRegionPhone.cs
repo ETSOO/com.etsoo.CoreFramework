@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.Address
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace com.etsoo.Address
 {
     /// <summary>
     /// Country or region phone
@@ -79,25 +81,30 @@
             /// Phone number
             /// 电话号码
             /// </summary>
-            public string PhoneNumber { get; init; }
+            public required string PhoneNumber { get; init; }
 
             /// <summary>
             /// Is mobile
             /// 是否为移动号码
             /// </summary>
-            public bool IsMobile { get; init; }
+            public required bool IsMobile { get; init; }
 
             /// <summary>
             /// Country or region
             /// 所在国家或地区
             /// </summary>
-            public string Region { get; init; }
+            public required string Region { get; init; }
 
+            [SetsRequiredMembers]
             internal Phone(string phoneNumber, bool isMobile, string region)
             {
                 PhoneNumber = phoneNumber;
                 IsMobile = isMobile;
                 Region = region;
+            }
+
+            public Phone()
+            {
             }
 
             /// <summary>
