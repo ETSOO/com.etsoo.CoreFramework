@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Database;
+using com.etsoo.Database.Converters;
 using NUnit.Framework;
 using System.Data;
 
@@ -132,6 +133,21 @@ namespace Tests.Utils
 
             // Assert
             Assert.That(result, Is.EqualTo("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]"));
+        }
+
+        [Test]
+        [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
+        public void GetTimeZone_Test()
+        {
+            // Correct
+            var tz = TimeZoneUtils.GetTimeZone("新西兰标准时间");
+
+            Assert.That(tz.Id, Is.EqualTo("New Zealand Standard Time"));
+
+            // Wrong
+            tz = TimeZoneUtils.GetTimeZone("China Time");
+            Assert.That(tz, Is.EqualTo(TimeZoneInfo.Local));
         }
     }
 }

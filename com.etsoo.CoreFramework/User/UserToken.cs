@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Json;
+using com.etsoo.Database.Converters;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
@@ -36,6 +37,12 @@ namespace com.etsoo.CoreFramework.User
         public const string DeviceIdClaim = "deviceid";
 
         /// <summary>
+        /// Time zone claim type
+        /// 时区声明类型
+        /// </summary>
+        public const string TimeZoneClaim = "timezone";
+
+        /// <summary>
         /// Create refresh token
         /// 创建刷新令牌
         /// </summary>
@@ -54,6 +61,7 @@ namespace com.etsoo.CoreFramework.User
             var ip = claims.FindFirstValue(IPAddressClaim);
             var deviceId = claims.FindFirstValue(DeviceIdClaim);
             var organization = claims.FindFirstValue(OrganizationClaim);
+            var timeZone = claims.FindFirstValue(TimeZoneClaim);
 
             // Validate
             if (string.IsNullOrEmpty(region)
@@ -74,7 +82,8 @@ namespace com.etsoo.CoreFramework.User
                 ClientIp = ipAddress,
                 Region = region,
                 DeviceId = deviceId,
-                Organization = organization
+                Organization = organization,
+                TimeZone = TimeZoneUtils.GetTimeZoneBase(timeZone)
             };
         }
 
@@ -142,6 +151,12 @@ namespace com.etsoo.CoreFramework.User
         public int OrganizationInt { get; init; }
 
         /// <summary>
+        /// Time zone
+        /// 时区
+        /// </summary>
+        public TimeZoneInfo? TimeZone { get; init; }
+
+        /// <summary>
         /// Create claims
         /// 创建声明
         /// </summary>
@@ -156,6 +171,11 @@ namespace com.etsoo.CoreFramework.User
                 new(DeviceIdClaim, DeviceId),
                 new(OrganizationClaim, Organization)
             ]);
+
+            if (TimeZone != null)
+            {
+                claims.Add(new(TimeZoneClaim, TimeZone.Id));
+            }
 
             return claims;
         }

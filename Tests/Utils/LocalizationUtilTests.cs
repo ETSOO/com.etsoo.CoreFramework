@@ -34,21 +34,6 @@ namespace Tests.Utils
         }
 
         [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
-        public void GetTimeZone_Test()
-        {
-            // Correct
-            var tz = LocalizationUtils.GetTimeZone("新西兰标准时间");
-
-            Assert.That(tz.Id, Is.EqualTo("New Zealand Standard Time"));
-
-            // Wrong
-            tz = LocalizationUtils.GetTimeZone("China Time");
-            Assert.That(tz, Is.EqualTo(TimeZoneInfo.Local));
-        }
-
-        [Test]
         public void JsMilisecondsToUTCTests()
         {
             // Arrange & Act
