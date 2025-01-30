@@ -19,7 +19,13 @@ namespace com.etsoo.CoreFramework.Models
         /// Timezone name
         /// 时区名称
         /// </summary>
-        public string? Timezone { get; init; }
+        public required string Timezone { get; init; }
+
+        /// <summary>
+        /// Assigned organization
+        /// 指定的机构
+        /// </summary>
+        public int? Org { get; init; }
 
         /// <summary>
         /// Authentication request
@@ -38,6 +44,11 @@ namespace com.etsoo.CoreFramework.Models
             if (Pwd.Length is not (>= 64 and <= 512))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Pwd));
+            }
+
+            if (Timezone.Length is not (>= 3 and <= 64))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(Timezone));
             }
 
             return null;
