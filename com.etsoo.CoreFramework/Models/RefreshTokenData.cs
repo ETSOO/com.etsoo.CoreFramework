@@ -23,5 +23,11 @@
         /// 刷新令牌
         /// </summary>
         public required string Token { get; init; }
+
+        /// <summary>
+        /// Time zone
+        /// 时区
+        /// </summary>
+        public required string TimeZone { get; init; }
     }
 }
