@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Database.Converters;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
 using System.Text.Json.Serialization;
@@ -19,6 +20,12 @@ namespace com.etsoo.CoreFramework.Models
         public required string Token { get; init; }
 
         /// <summary>
+        /// Timezone name
+        /// 时区名称
+        /// </summary>
+        public required string TimeZone { get; init; }
+
+        /// <summary>
         /// Validate the model
         /// 验证模块
         /// </summary>
@@ -28,6 +35,11 @@ namespace com.etsoo.CoreFramework.Models
             if (Token.Length is not (>= 32 and <= 512))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Token));
+            }
+
+            if (!TimeZoneUtils.IsTimeZone(TimeZone))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(TimeZone));
             }
 
             return null;

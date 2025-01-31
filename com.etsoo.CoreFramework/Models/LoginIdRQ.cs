@@ -32,10 +32,10 @@ namespace com.etsoo.CoreFramework.Models
         public required string Region { get; init; }
 
         /// <summary>
-        /// Timezone name
-        /// 时区名称
+        /// Time zone
+        /// 时区
         /// </summary>
-        public required string Timezone { get; init; }
+        public required string TimeZone { get; init; }
 
         /// <summary>
         /// Validate the model
@@ -59,9 +59,9 @@ namespace com.etsoo.CoreFramework.Models
                 return ApplicationErrors.NoValidData.AsResult(nameof(Region));
             }
 
-            if (!TimeZoneUtils.IsTimeZone(Timezone))
+            if (!TimeZoneUtils.IsTimeZone(TimeZone))
             {
-                return ApplicationErrors.NoValidData.AsResult(nameof(Timezone));
+                return ApplicationErrors.NoValidData.AsResult(nameof(TimeZone));
             }
 
             return null;

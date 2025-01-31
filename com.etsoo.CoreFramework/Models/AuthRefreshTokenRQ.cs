@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Database.Converters;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.Models;
@@ -31,6 +32,12 @@ namespace com.etsoo.CoreFramework.Models
         public required string RefreshToken { get; init; }
 
         /// <summary>
+        /// Time zone
+        /// 时区
+        /// </summary>
+        public required string TimeZone { get; init; }
+
+        /// <summary>
         /// Signature
         /// 签名
         /// </summary>
@@ -48,7 +55,8 @@ namespace com.etsoo.CoreFramework.Models
             {
                 [nameof(AppId)] = AppId.ToString(),
                 [nameof(AppKey)] = AppKey,
-                [nameof(RefreshToken)] = RefreshToken
+                [nameof(RefreshToken)] = RefreshToken,
+                [nameof(TimeZone)] = TimeZone
             };
 
             // With an extra '&' at the end
@@ -77,6 +85,11 @@ namespace com.etsoo.CoreFramework.Models
             if (Sign.Length is not (>= 64 and <= 1024))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Sign));
+            }
+
+            if (!TimeZoneUtils.IsTimeZone(TimeZone))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(TimeZone));
             }
 
             return null;

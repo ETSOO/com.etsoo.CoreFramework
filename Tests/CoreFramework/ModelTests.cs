@@ -64,7 +64,8 @@ namespace Tests.CoreFramework
             {
                 DeviceId = "X01/cDAy!10395F7FDE101D118CE02CEFA26B699926FE5E2F86F67E3841C1B538BD030962E5ZubItmil/PX4GNPXtOE0vl3S8g1Jgx8aISwsdbHEbE71+IOf1Udtd6xD4nw93Fdc",
                 Id = "019862b4a71672968de589405bd96f634b6e6cb4a811935f0cde67ae8239af35afyhUCWj2ZrRJ18oyOz9khHGw+oORxl4RWZiOcCOviFVA=",
-                Region = "CN"
+                Region = "CN",
+                TimeZone = "Asia/Shanghai"
             };
 
             Assert.That(loginIdRQ.Validate(), Is.Null);
@@ -272,6 +273,7 @@ namespace Tests.CoreFramework
             {
                 AppId = 1,
                 AppKey = "",
+                TimeZone = "Asia/Shanghai",
                 RefreshToken = "v0ezp)kemg4j4Uegu3Y~pO-Ty4>o286RuTuxfs<Wd0rR4JsVX79Rad8L1I@de~>k"
             };
             rq.Sign = rq.SignWith("JwANgd$v=U*cW9-Dg7DA=jejn2UN<t-S");
