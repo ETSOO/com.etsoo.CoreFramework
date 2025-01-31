@@ -20,11 +20,13 @@ namespace com.etsoo.Web
         /// </summary>
         /// <param name="templateFile">Template file</param>
         /// <param name="model">Data model</param>
+        /// <param name="types">Assembly types</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<string> RenderAsync<M>(string templateFile, M model) where M : class
+        public static async Task<string> RenderAsync<M>(string templateFile, M model, IEnumerable<Type>? types = null, CancellationToken cancellationToken = default) where M : class
         {
-            var template = await File.ReadAllTextAsync(templateFile);
-            return await RenderAsync(templateFile, template, model);
+            var template = await File.ReadAllTextAsync(templateFile, cancellationToken);
+            return await RenderAsync(templateFile, template, model, types, cancellationToken);
         }
 
         /// <summary>
@@ -34,8 +36,10 @@ namespace com.etsoo.Web
         /// <param name="key">Identifier key</param>
         /// <param name="template">Template content</param>
         /// <param name="model">Data model</param>
+        /// <param name="types">Assembly types</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<string> RenderAsync<M>(string key, string template, M model) where M : class
+        public static async Task<string> RenderAsync<M>(string key, string template, M model, IEnumerable<Type>? types = null, CancellationToken cancellationToken = default) where M : class
         {
             // Get or add the compiled version
             if (!templateCache.TryGetValue(key, out var compiledTemplate))
@@ -47,7 +51,15 @@ namespace com.etsoo.Web
                 compiledTemplate = await razorEngine.CompileAsync(template, builder =>
                 {
                     builder.AddAssemblyReference(typeof(M));
-                });
+
+                    if (types != null)
+                    {
+                        foreach (var assembly in types)
+                        {
+                            builder.AddAssemblyReference(assembly);
+                        }
+                    }
+                }, cancellationToken);
 
                 templateCache.TryAdd(key, compiledTemplate);
             }
@@ -63,12 +75,14 @@ namespace com.etsoo.Web
         /// <param name="key">Identifier key</param>
         /// <param name="template">Template content</param>
         /// <param name="jsonData">JSON data</param>
+        /// <param name="types">Assembly types</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static Task<string> RenderAsync(string key, string template, string jsonData)
+        public static Task<string> RenderAsync(string key, string template, string jsonData, IEnumerable<Type>? types = null, CancellationToken cancellationToken = default)
         {
             var doc = JsonDocument.Parse(jsonData);
             var dic = doc.RootElement.ToDictionary();
-            return RenderAsync(key, template, dic);
+            return RenderAsync(key, template, dic, types, cancellationToken);
         }
     }
 }
