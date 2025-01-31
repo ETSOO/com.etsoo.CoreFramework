@@ -39,10 +39,33 @@ namespace Tests.Web
             };
 
             // Act
-            var result = (await RazorUtils.RenderAsync("test", template, model)).Trim();
+            var result = (await RazorUtils.RenderAsync(nameof(RenderAsync_Test), template, model)).Trim();
 
             // Assert
             Assert.That(result, Is.EqualTo("<p>Hello, ETSOO</p><h1>Item 1</h1><h1>Item 2</h1>"));
+        }
+
+        [Test]
+        public async Task HtmlSafeRenderAsync_Test()
+        {
+            // Arrange
+            var template = """
+                @{
+                  var model = @Model as Tests.Web.TestModel;
+                }
+                <p>@model.Name, @Raw(model.Name)</p>
+            """;
+
+            var model = new TestModel
+            {
+                Name = "<b>ETSOO</b>"
+            };
+
+            // Act
+            var result = (await RazorUtils.RenderAsync(nameof(HtmlSafeRenderAsync_Test), template, model)).Trim();
+
+            // Assert
+            Assert.That(result, Is.EqualTo("<p>&lt;b&gt;ETSOO&lt;/b&gt;, <b>ETSOO</b></p>"));
         }
     }
 }

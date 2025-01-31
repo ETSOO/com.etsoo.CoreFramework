@@ -12,7 +12,7 @@ namespace com.etsoo.Web
     /// </summary>
     public static class RazorUtils
     {
-        private static readonly ConcurrentDictionary<string, IRazorEngineCompiledTemplate> templateCache = new();
+        private static readonly ConcurrentDictionary<string, IRazorEngineCompiledTemplate<RazorHtmlSafeTemplate>> templateCache = new();
 
         /// <summary>
         /// Render Razor template to string
@@ -48,7 +48,7 @@ namespace com.etsoo.Web
                 var razorEngine = new RazorEngine();
 
                 // Compile
-                compiledTemplate = await razorEngine.CompileAsync(template, builder =>
+                compiledTemplate = await razorEngine.CompileAsync<RazorHtmlSafeTemplate>(template, builder =>
                 {
                     builder.AddAssemblyReference(typeof(M));
 
@@ -65,7 +65,7 @@ namespace com.etsoo.Web
             }
 
             // Run and return the result
-            return await compiledTemplate.RunAsync(model);
+            return await compiledTemplate.RunAsync(template => template.Model = model);
         }
 
         /// <summary>
