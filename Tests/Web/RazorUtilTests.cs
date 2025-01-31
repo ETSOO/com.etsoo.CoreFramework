@@ -53,7 +53,7 @@ namespace Tests.Web
                 @{
                   var model = @Model as Tests.Web.TestModel;
                 }
-                <p>@model.Name, @Raw(model.Name)</p>
+                <p>@model.Name, @Html.Raw(model.Name)</p>
             """;
 
             var model = new TestModel
