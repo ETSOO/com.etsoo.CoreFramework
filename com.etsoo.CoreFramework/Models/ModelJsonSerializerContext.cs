@@ -1,6 +1,7 @@
 ﻿using com.etsoo.CoreFramework.Business;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
+using com.etsoo.Database;
 using System.Text.Json.Serialization;
 
 namespace com.etsoo.CoreFramework.Models
@@ -68,6 +69,8 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(ApiTokenData))]
     [JsonSerializable(typeof(AppTokenData))]
     [JsonSerializable(typeof(IUserToken))]
+
+    [JsonSerializable(typeof(IEnumerable<EntityChangedProperty>))]
     public partial class ModelJsonSerializerContext : JsonSerializerContext
     {
     }

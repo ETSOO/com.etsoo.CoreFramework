@@ -6,6 +6,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Npgsql;
 using System.Buffers;
 using System.Data;
@@ -39,6 +40,19 @@ namespace com.etsoo.Database
         public static IEnumerable<string> GetColumnNames(this IDataReader reader)
         {
             return Enumerable.Range(0, reader.FieldCount).Select(reader.GetName);
+        }
+
+        /// <summary>
+        /// Get changed properties
+        /// 获取改变了的属性
+        /// </summary>
+        /// <param name="entries">Entity entries</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<EntityChangedProperty> GetChangedProperties(this IEnumerable<EntityEntry> entries)
+        {
+            return entries.SelectMany(e => e.Properties)
+                .Where(p => p.IsModified)
+                .Select(p => new EntityChangedProperty { Name = p.Metadata.Name, OriginalValue = p.OriginalValue, CurrentValue = p.CurrentValue });
         }
 
         /// <summary>

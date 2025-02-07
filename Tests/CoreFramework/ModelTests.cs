@@ -40,7 +40,9 @@ namespace Tests.CoreFramework
 
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired();
-                entity.Property(e => e.Status).HasConversion<byte>().HasDefaultValue(EntityStatus.Normal);
+                entity.Property(e => e.Status)
+                    .HasConversion<byte>()
+                    .HasDefaultValue(EntityStatus.Normal);
             });
         }
     }
@@ -87,6 +89,37 @@ namespace Tests.CoreFramework
             var sql = db.Users.QueryEtsoo(rq, (u) => u.Id).ToQueryString();
 
             Assert.That(sql, Does.Contain("ORDER BY \"u\".\"Id\" DESC"));
+        }
+
+        [Test]
+        public async Task UpdateTestAsync()
+        {
+            var db = CreateDbContext();
+
+            // Update
+            await db.Database.ExecuteSqlRawAsync("UPDATE \"User\" SET \"Status\" = 0 WHERE (\"Status\" IS NULL OR \"Status\" <> 0)");
+
+            var user = await db.Users.FirstOrDefaultAsync();
+            if (user == null)
+            {
+                Assert.Inconclusive("No user data");
+                return;
+            }
+
+            user.Name = "Admin Changed";
+            user.Status = EntityStatus.Deleted;
+
+            var changedProperties = db.ChangeTracker.Entries().GetChangedProperties();
+
+            db.ChangeTracker.Clear();
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(changedProperties.Count(), Is.EqualTo(2));
+                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Name")?.CurrentValue, Is.EqualTo("Admin Changed"));
+                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.OriginalValue, Is.EqualTo(EntityStatus.Normal));
+                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.CurrentValue, Is.EqualTo(EntityStatus.Deleted));
+            });
         }
 
         [Test]
