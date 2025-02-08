@@ -41,7 +41,15 @@ namespace com.etsoo.MessageQueue
         {
             await using var stream = SharedUtils.GetStream();
             await JsonSerializer.SerializeAsync(stream, model, options, cancellationToken);
-            return stream.ToArray().AsMemory();
+
+            if (stream.TryGetBuffer(out var buffer))
+            {
+                return buffer.AsMemory();
+            }
+            else
+            {
+                return stream.ToArray().AsMemory();
+            }
         }
 
         /// <summary>
@@ -57,7 +65,14 @@ namespace com.etsoo.MessageQueue
         {
             await using var stream = SharedUtils.GetStream();
             await JsonSerializer.SerializeAsync(stream, model, typeInfo, cancellationToken);
-            return stream.ToArray().AsMemory();
+            if (stream.TryGetBuffer(out var buffer))
+            {
+                return buffer.AsMemory();
+            }
+            else
+            {
+                return stream.ToArray().AsMemory();
+            }
         }
 
         /// <summary>

@@ -167,6 +167,24 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Get system primitive type value, same list in CommonJsonSerializerContext
+        /// 获取系统基本类型值
+        /// </summary>
+        /// <param name="value">Input value</param>
+        /// <returns>Result</returns>
+        public static object? GetPrimitiveValue(object? value)
+        {
+            return value switch
+            {
+                null or string or bool
+                or byte or short or ushort or int or uint or long or ulong
+                or float or double or decimal or DateTime or DateTimeOffset
+                or Guid or char => value,
+                _ => value.ToString()
+            };
+        }
+
+        /// <summary>
         /// Number to base64 chars
         /// 数字转换为Base64字符
         /// </summary>

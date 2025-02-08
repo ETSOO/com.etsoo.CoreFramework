@@ -374,5 +374,22 @@ namespace Tests.Utils
 
             Assert.That(json, Is.EqualTo("""{"test":{"Brand":"亿速"}}"""));
         }
+
+        [Test]
+        public void GetPrimitiveValueTests()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(StringUtils.GetPrimitiveValue(1.0), Is.EqualTo(1.0));
+
+                var guid = Guid.NewGuid();
+                Assert.That(StringUtils.GetPrimitiveValue(guid), Is.EqualTo(guid));
+
+                var dt = DateTime.Now;
+                Assert.That(StringUtils.GetPrimitiveValue(dt), Is.EqualTo(dt));
+
+                Assert.That(StringUtils.GetPrimitiveValue(new Uri("https://etsoo.com/")), Is.EqualTo("https://etsoo.com/"));
+            });
+        }
     }
 }
