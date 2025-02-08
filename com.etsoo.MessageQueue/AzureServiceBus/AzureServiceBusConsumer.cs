@@ -14,14 +14,26 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {
-            using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(args.CancellationToken);
+            //using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(args.CancellationToken);
 
             var message = args.Message;
             var properties = new MessageReceivedProperties();
             try
             {
                 properties = AzureServiceBusUtils.CreatePropertiesFromMessage(message);
-                await ProcessAsync(message.Body.ToMemory(), properties, cancellationTokenSource.Token);
+                var count = await ProcessAsync(message.Body.ToMemory(), properties, args.CancellationToken);
+
+                if (count == 0)
+                {
+                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                    await args.DeadLetterMessageAsync(args.Message, "NoProcessor", cancellationToken: args.CancellationToken);
+                    return;
+                }
+                else if (count > 1)
+                {
+                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                }
+
                 if (!_processor.AutoCompleteMessages)
                 {
                     // By default or when AutoCompleteMessages is set to true, the processor will complete the message after executing the message handler
@@ -29,19 +41,18 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
                     // In both cases, if the message handler throws an exception without settling the message, the processor will abandon the message.
                     await args.CompleteMessageAsync(args.Message, args.CancellationToken);
                 }
+
+                // Log success
+                Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
             }
             catch (Exception ex)
             {
-                cancellationTokenSource.Cancel();
-
                 Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
 
                 await args.RenewMessageLockAsync(args.Message, args.CancellationToken);
 
                 if (_processor.AutoCompleteMessages) throw;
             }
-
-            cancellationTokenSource.Dispose();
         }
 
         private Task ErrorHandler(ProcessErrorEventArgs args)

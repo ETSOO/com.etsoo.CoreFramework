@@ -37,11 +37,12 @@ namespace com.etsoo.MessageQueue
         /// <param name="body">Message body</param>
         /// <param name="properties">Message properties</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Task</returns>
+        /// <returns>Execution count</returns>
         /// <exception cref="AggregateException">Aggregate exception</exception>
-        protected async Task ProcessAsync(ReadOnlyMemory<byte> body, MessageReceivedProperties properties, CancellationToken cancellationToken)
+        protected async Task<int> ProcessAsync(ReadOnlyMemory<byte> body, MessageReceivedProperties properties, CancellationToken cancellationToken)
         {
             var exceptions = new ConcurrentQueue<Exception>();
+            var count = 0;
 
             await Parallel.ForEachAsync(_processors, cancellationToken, async (processor, cancellationToken) =>
             {
@@ -52,6 +53,9 @@ namespace com.etsoo.MessageQueue
 
                     // Convert, map and process
                     await processor.ExecuteAsync(body, properties, cancellationToken);
+
+                    // Increase execution count
+                    Interlocked.Increment(ref count);
                 }
                 catch (Exception ex)
                 {
@@ -63,6 +67,8 @@ namespace com.etsoo.MessageQueue
             {
                 throw new AggregateException(exceptions);
             }
+
+            return count;
         }
 
         /// <summary>

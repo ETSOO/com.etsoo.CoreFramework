@@ -23,28 +23,40 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
 
         private async Task MessageHandler(object sender, BasicDeliverEventArgs e)
         {
-            var consumer = sender as AsyncEventingBasicConsumer;
-            if (consumer == null) return;
-            var channel = consumer.Channel;
+            if (sender is not AsyncEventingBasicConsumer consumer) return;
 
-            using var cancellationTokenSource = new CancellationTokenSource();
+            var channel = consumer.Channel;
 
             var properties = new MessageReceivedProperties();
             try
             {
                 properties = LocalRabbitMQUtils.CreatePropertiesFromArgs(e);
-                await ProcessAsync(e.Body, properties, cancellationTokenSource.Token);
-                await channel.BasicAckAsync(e.DeliveryTag, false, cancellationTokenSource.Token);
+                var count = await ProcessAsync(e.Body, properties, e.CancellationToken);
+                if (count == 0)
+                {
+                    await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
+
+                    // Log warning
+                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", e.Body.ToString(), properties);
+
+                    return;
+                }
+                else if (count > 1)
+                {
+                    // Log warning
+                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", e.Body.ToString(), properties);
+                }
+
+                await channel.BasicAckAsync(e.DeliveryTag, false, e.CancellationToken);
+
+                // Log success
+                Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
             }
             catch (Exception ex)
             {
-                cancellationTokenSource.Cancel();
-
                 Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
-                await channel.BasicNackAsync(e.DeliveryTag, false, true, cancellationTokenSource.Token);
+                await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
             }
-
-            cancellationTokenSource.Dispose();
         }
 
         /// <summary>

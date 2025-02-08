@@ -28,16 +28,29 @@ namespace com.etsoo.MessageQueue.GooglePubSub
             await _subscriberClient.StartAsync(async (message, cancel) =>
             {
                 var properties = new MessageReceivedProperties();
-                using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancel);
+                // using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancel);
                 try
                 {
                     properties = GooglePubSubUtils.CreatePropertiesFromMessage(message);
-                    await ProcessAsync(message.Data.ToByteArray(), properties, cancellationTokenSource.Token);
+                    var count = await ProcessAsync(message.Data.ToByteArray(), properties, cancel);
+
+                    if (count == 0)
+                    {
+                        Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                        return SubscriberClient.Reply.Nack;
+                    }
+                    else if (count > 1)
+                    {
+                        Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                    }
+
+                    // Log success
+                    Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+
                     return SubscriberClient.Reply.Ack;
                 }
                 catch (Exception ex)
                 {
-                    cancellationTokenSource.Cancel();
                     Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
                     return SubscriberClient.Reply.Nack;
                 }
