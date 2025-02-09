@@ -117,8 +117,8 @@ namespace Tests.CoreFramework
             {
                 Assert.That(changedProperties.Count(), Is.EqualTo(2));
                 Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Name")?.CurrentValue, Is.EqualTo("Admin Changed"));
-                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.OriginalValue, Is.EqualTo(EntityStatus.Normal));
-                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.CurrentValue, Is.EqualTo(EntityStatus.Deleted));
+                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.OriginalValue, Is.EqualTo("Normal"));
+                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.CurrentValue, Is.EqualTo("Deleted"));
             });
         }
 

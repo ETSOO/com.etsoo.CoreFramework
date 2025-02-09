@@ -1,4 +1,5 @@
-﻿using com.etsoo.MessageQueue;
+﻿using com.etsoo.CoreFramework.Models;
+using com.etsoo.MessageQueue;
 using NUnit.Framework;
 
 namespace Tests.MessageQueue
@@ -20,6 +21,30 @@ namespace Tests.MessageQueue
                 Assert.That(message, Is.Not.Null);
                 Assert.That(message?.Num, Is.EqualTo(data.Num));
                 Assert.That(message?.Bool, Is.EqualTo(data.Bool));
+            });
+        }
+
+        [Test]
+        public async Task MessageQueueUtilsTests()
+        {
+            var data = new AuthRequest
+            {
+                AppId = 1,
+                AppKey = Guid.NewGuid().ToString(),
+                RedirectUri = new Uri("http://localhost"),
+                ResponseType = "code",
+                Scope = "core super app1",
+                State = "state"
+            };
+
+            var bytes = await MessageQueueUtils.ToJsonBytesAsync(data, ModelJsonSerializerContext.Default.AuthRequest);
+            var message = await MessageQueueUtils.FromJsonBytesAsync(bytes, ModelJsonSerializerContext.Default.AuthRequest);
+            Assert.Multiple(() =>
+            {
+                Assert.That(message, Is.Not.Null);
+                Assert.That(message?.AppId, Is.EqualTo(data.AppId));
+                Assert.That(message?.AppKey, Is.EqualTo(data.AppKey));
+                Assert.That(message?.RedirectUri, Is.EqualTo(data.RedirectUri));
             });
         }
     }
