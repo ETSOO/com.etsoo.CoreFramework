@@ -17,9 +17,9 @@ namespace com.etsoo.CoreFramework.User
         /// 从声明创建用户
         /// </summary>
         /// <param name="claims">Claims</param>
-        /// <param name="connectionId">Connection id</param>
+        /// <param name="reason">Failure reason</param>
         /// <returns>User</returns>
-        static abstract TSelf? Create(ClaimsPrincipal? claims, string? connectionId = null);
+        static abstract TSelf? Create(ClaimsPrincipal? claims, out string? reason);
     }
 
     /// <summary>
@@ -37,8 +37,7 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="ip">Ip address</param>
         /// <param name="language">Language</param>
         /// <param name="region">Country or region</param>
-        /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        static abstract TSelf? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null);
+        static abstract TSelf? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region);
     }
 }

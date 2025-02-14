@@ -114,30 +114,25 @@ namespace com.etsoo.CoreFramework.User
         public const string UidClaim = "uid";
 
         /// <summary>
-        /// App id claim type
-        /// 程序编号值声明类型
+        /// App claim type
+        /// 程序声明类型
         /// </summary>
-        public const string AppIdClaim = "appid";
-
-        /// <summary>
-        /// App key claim type
-        /// 程序键值声明类型
-        /// </summary>
-        public const string AppKeyClaim = "appkey";
+        public const string AppClaim = "app";
 
         /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>
         /// <param name="claims">Claims</param>
-        /// <param name="connectionId">Connection id</param>
+        /// <param name="reason">Failure reason</param>
         /// <returns>User</returns>
-        public new static CurrentUser? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public new static CurrentUser? Create(ClaimsPrincipal? claims, out string? reason)
         {
-            if (claims == null) return null;
-
-            var user = UserToken.Create(claims, connectionId);
-            if (user == null) return null;
+            var user = UserToken.Create(claims, out reason);
+            if (user == null || claims == null)
+            {
+                return null;
+            }
 
             // Claims
             var name = claims.FindFirstValue(NameClaim);
@@ -153,12 +148,26 @@ namespace com.etsoo.CoreFramework.User
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
             var uid = claims.FindFirstValue(UidClaim);
-            var appKey = claims.FindFirstValue(AppKeyClaim);
-            var appId = StringUtils.TryParse<int>(claims.FindFirstValue(AppIdClaim));
+            var app = claims.FindFirstValue(AppClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(language))
+            if (string.IsNullOrEmpty(name))
+            {
+                reason = "NoName";
                 return null;
+            }
+
+            if (string.IsNullOrEmpty(oid))
+            {
+                reason = "NoOid";
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(language))
+            {
+                reason = "NoLanguage";
+                return null;
+            }
 
             // New user
             return new CurrentUser
@@ -184,12 +193,11 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
-                AppId = appId,
-                AppKey = appKey
+                App = app
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, int? appId, string? appKey) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? app) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -209,8 +217,7 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("ChannelOrganization"),
                 data.Get("ParentOrganization"),
                 data.Get("Uid"),
-                data.Get<int>("AppId"),
-                data.Get("AppKey")
+                data.Get("App")
             );
         }
 
@@ -224,10 +231,10 @@ namespace com.etsoo.CoreFramework.User
         /// <param name="region">Country or region</param>
         /// <param name="connectionId">Connection id</param>
         /// <returns>User</returns>
-        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region, string? connectionId = null)
+        public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, appId, appKey) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, app) = GetData(data);
 
             // Validation
             if (id == null || !role.HasValue || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
@@ -239,7 +246,6 @@ namespace com.etsoo.CoreFramework.User
                 ClientIp = ip,
                 DeviceId = deviceId,
                 Id = id,
-                ConnectionId = connectionId,
                 Scopes = scopes,
                 Region = region,
                 Organization = organization,
@@ -257,8 +263,7 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
-                AppId = appId,
-                AppKey = appKey
+                App = app
             };
         }
 
@@ -407,17 +412,33 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public string? Uid { get; init; }
 
+        private string? app;
+
+        /// <summary>
+        /// App
+        /// 程序
+        /// </summary>
+        public string? App
+        {
+            get
+            {
+                return app;
+            }
+            init
+            {
+                app = value;
+                if (int.TryParse(app, out var appId))
+                {
+                    AppId = appId;
+                }
+            }
+        }
+
         /// <summary>
         /// App id
         /// 程序编号
         /// </summary>
         public int? AppId { get; init; }
-
-        /// <summary>
-        /// App key
-        /// 程序键值
-        /// </summary>
-        public string? AppKey { get; init; }
 
         /// <summary>
         /// Create claims
@@ -461,11 +482,8 @@ namespace com.etsoo.CoreFramework.User
             if (!string.IsNullOrEmpty(Uid))
                 claims.Add(new(UidClaim, Uid));
 
-            if (AppId.HasValue)
-                claims.Add(new(AppIdClaim, AppId.Value.ToString()));
-
-            if (!string.IsNullOrEmpty(AppKey))
-                claims.Add(new(AppKeyClaim, AppKey));
+            if (!string.IsNullOrEmpty(App))
+                claims.Add(new(AppClaim, App));
 
             if (Avatar != null)
                 claims.Add(new(AvatarClaim, Avatar));

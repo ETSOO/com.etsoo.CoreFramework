@@ -121,6 +121,12 @@ namespace com.etsoo.CoreFramework.User
         /// App key
         /// 程序键值
         /// </summary>
-        string? AppKey { get; init; }
+        string? App { get; init; }
+
+        /// <summary>
+        /// App id
+        /// 程序编号
+        /// </summary>
+        int? AppId { get; init; }
     }
 }

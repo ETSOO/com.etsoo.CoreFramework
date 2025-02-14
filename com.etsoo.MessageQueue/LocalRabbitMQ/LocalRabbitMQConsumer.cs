@@ -37,14 +37,14 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                     await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
 
                     // Log warning
-                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", e.Body.ToString(), properties);
+                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
 
                     return;
                 }
                 else if (count > 1)
                 {
                     // Log warning
-                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", e.Body.ToString(), properties);
+                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
                 }
 
                 await channel.BasicAckAsync(e.DeliveryTag, false, e.CancellationToken);

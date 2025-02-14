@@ -140,7 +140,7 @@ namespace Tests.CoreFramework
         {
             // Arrange
             var userName = "Etsoo User";
-            var appKey = "#xaa";
+            var app = "#xaa";
             string[] userScopes = ["core", "crm"];
             var user = new CurrentUser
             {
@@ -154,7 +154,7 @@ namespace Tests.CoreFramework
                 Oid = "0",
                 DeviceId = "1",
                 Language = CultureInfo.CurrentCulture,
-                AppKey = appKey
+                App = app
             };
 
             // Act
@@ -181,7 +181,7 @@ namespace Tests.CoreFramework
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == CurrentUser.AppKeyClaim)?.Value, Is.EqualTo(appKey));
+                Assert.That(claims?.FirstOrDefault(c => c.Type == CurrentUser.AppClaim)?.Value, Is.EqualTo(app));
             });
         }
 
@@ -194,7 +194,7 @@ namespace Tests.CoreFramework
 
             var (cp, token) = publicService.ValidateIdToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxMDEwIiwic2NvcGUiOiJjb3JlIiwicmVnaW9uIjoiQ04iLCJpcGFkZHJlc3MiOiI6OjEiLCJkZXZpY2VpZCI6IjEwMDYiLCJvcmdhbml6YXRpb24iOiIwIiwibmFtZSI6IuiClui1niIsImxvY2FsaXR5IjoiemgtQ04iLCJyb2xlIjoiMTYiLCJvaWQiOiIwIiwibmJmIjoxNzI3MTQ4NDA2LCJleHAiOjE3MjcxNDg3MDYsImlhdCI6MTcyNzE0ODQwNiwiaXNzIjoiU21hcnRFUlAiLCJhdWQiOiJBTEwifQ.2zODXPP5NMz_zMKOoWeydzkbZUizFyFrkbvWAZVc2_g", "JwANgd$v=U*cW9-Dg7DA=jejn2UN<t-S", null, null, false);
 
-            var user = CurrentUser.Create(cp);
+            var user = CurrentUser.Create(cp, out _);
 
             Assert.Multiple(() =>
             {

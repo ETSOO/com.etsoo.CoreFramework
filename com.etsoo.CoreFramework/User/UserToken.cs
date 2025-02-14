@@ -47,14 +47,12 @@ namespace com.etsoo.CoreFramework.User
         /// 创建刷新令牌
         /// </summary>
         /// <param name="claims">Claims</param>
-        /// <param name="connectionId">Connection id</param>
+        /// <param name="reason">Failure reason</param>
         /// <returns>Refresh token</returns>
-        public new static UserToken? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public new static UserToken? Create(ClaimsPrincipal? claims, out string? reason)
         {
-            if (claims == null) return null;
-
-            var user = MinUserToken.Create(claims, connectionId);
-            if (user == null) return null;
+            var user = MinUserToken.Create(claims, out reason);
+            if (user == null || claims == null) return null;
 
             // Claims
             var region = claims.FindFirstValue(RegionClaim);
@@ -64,18 +62,40 @@ namespace com.etsoo.CoreFramework.User
             var timeZone = claims.FindFirstValue(TimeZoneClaim);
 
             // Validate
-            if (string.IsNullOrEmpty(region)
-                || string.IsNullOrEmpty(ip)
-                || !IPAddress.TryParse(ip, out var ipAddress)
-                || string.IsNullOrEmpty(deviceId)
-                || string.IsNullOrEmpty(organization))
+            if (string.IsNullOrEmpty(region))
+            {
+                reason = "NoRegion";
                 return null;
+            }
+
+            if (string.IsNullOrEmpty(ip))
+            {
+                reason = "NoIPAddress";
+                return null;
+            }
+
+            if (!IPAddress.TryParse(ip, out var ipAddress))
+            {
+                reason = "InvalidIPAddress:" + ip;
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(deviceId))
+            {
+                reason = "NoDeviceId";
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(organization))
+            {
+                reason = "NoOrganization";
+                return null;
+            }
 
             // New object
             return new UserToken
             {
                 Id = user.Id,
-                ConnectionId = user.ConnectionId,
                 Scopes = user.Scopes,
                 RoleValue = user.RoleValue,
 

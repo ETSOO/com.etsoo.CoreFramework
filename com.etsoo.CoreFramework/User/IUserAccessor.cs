@@ -33,10 +33,10 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         /// <typeparam name="U">Generic user type</typeparam>
         /// <param name="authService">Authorization service</param>
+        /// <param name="reason">Failure reason</param>
         /// <param name="audience">Token audience</param>
         /// <param name="schema">Authorization schema</param>
-        /// <param name="connectionId">Connection id</param>
-        U? CreateUserFromAuthorization<U>(IAuthService authService, string? audience = null, string schema = "Bearer", string? connectionId = null) where U : MinUserToken, IMinUserCreator<U>;
+        U? CreateUserFromAuthorization<U>(IAuthService authService, out string? reason, string? audience = null, string schema = "Bearer") where U : MinUserToken, IMinUserCreator<U>;
 
         /// <summary>
         /// Create user from authorization token
@@ -45,9 +45,9 @@ namespace com.etsoo.CoreFramework.User
         /// <typeparam name="U">Generic user type</typeparam>
         /// <param name="authService">Authorization service</param>
         /// <param name="token">Token</param>
+        /// <param name="reason">Failure reason</param>
         /// <param name="audience">Audience</param>
-        /// <param name="connectionId">Connection id</param>
         /// <returns>Result</returns>
-        U? CreateUserFromToken<U>(IAuthService authService, string token, string? audience = null, string? connectionId = null) where U : MinUserToken, IMinUserCreator<U>;
+        U? CreateUserFromToken<U>(IAuthService authService, string token, out string? reason, string? audience = null) where U : MinUserToken, IMinUserCreator<U>;
     }
 }

@@ -21,12 +21,6 @@ namespace com.etsoo.CoreFramework.User
         int IdInt { get; }
 
         /// <summary>
-        /// Unique connection id
-        /// 唯一连接编号
-        /// </summary>
-        string? ConnectionId { get; }
-
-        /// <summary>
         /// Scopes
         /// 范围
         /// </summary>

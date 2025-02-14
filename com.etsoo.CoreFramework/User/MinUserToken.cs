@@ -42,13 +42,28 @@ namespace com.etsoo.CoreFramework.User
         /// 创建刷新令牌
         /// </summary>
         /// <param name="claims">Claims</param>
-        /// <param name="connectionId">Connection id</param>
+        /// <param name="reason">Failure reason</param>
         /// <returns>Refresh token</returns>
-        public static MinUserToken? Create(ClaimsPrincipal? claims, string? connectionId = null)
+        public static MinUserToken? Create(ClaimsPrincipal? claims, out string? reason)
         {
             // Basic check
-            if (claims == null || claims.Identity == null || !claims.Identity.IsAuthenticated)
+            if (claims == null)
+            {
+                reason = "NoClaims";
                 return null;
+            }
+
+            if (claims.Identity == null)
+            {
+                reason = "NoIdentity";
+                return null;
+            }
+
+            if (!claims.Identity.IsAuthenticated)
+            {
+                reason = "NotAuthenticated";
+                return null;
+            }
 
             // Claims
             var id = claims.FindFirstValue(IdClaim);
@@ -58,15 +73,20 @@ namespace com.etsoo.CoreFramework.User
 
             // Validate
             if (string.IsNullOrEmpty(id))
+            {
+                reason = "NoId";
                 return null;
+            }
 
             var data = string.IsNullOrEmpty(jsonData) ? null : JsonSerializer.Deserialize(jsonData, CommonJsonSerializerContext.Default.DictionaryStringObject);
+
+            // Success
+            reason = null;
 
             // New object
             return new MinUserToken
             {
                 Id = id,
-                ConnectionId = connectionId,
                 Scopes = scopes,
                 JsonData = data == null ? [] : new StringKeyDictionaryObject(data!),
                 RoleValue = roleValue
@@ -112,12 +132,6 @@ namespace com.etsoo.CoreFramework.User
         /// 整数编号
         /// </summary>
         public int IdInt { get; init; }
-
-        /// <summary>
-        /// Connection id
-        /// 链接编号
-        /// </summary>
-        public string? ConnectionId { get; init; }
 
         /// <summary>
         /// Scopes

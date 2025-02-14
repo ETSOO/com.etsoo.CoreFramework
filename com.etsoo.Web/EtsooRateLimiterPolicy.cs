@@ -97,7 +97,7 @@ namespace com.etsoo.Web
             if (httpContext.User.Identity?.IsAuthenticated is true)
             {
                 // User
-                var user = MinUserToken.Create(httpContext.User);
+                var user = MinUserToken.Create(httpContext.User, out _);
                 if (user != null)
                 {
                     // Limit Delete requests rate
