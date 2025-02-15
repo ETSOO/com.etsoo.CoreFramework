@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Primitives;
 using System.Net.Http.Headers;
 
-namespace com.etsoo.HTTP
+namespace com.etsoo.Utils
 {
     /// <summary>
     /// HTTP client extensions
