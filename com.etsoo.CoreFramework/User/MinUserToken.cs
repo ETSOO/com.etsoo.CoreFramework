@@ -47,15 +47,10 @@ namespace com.etsoo.CoreFramework.User
         public static MinUserToken? Create(ClaimsPrincipal? claims, out string? reason)
         {
             // Basic check
-            if (claims == null)
+            if (claims == null || claims.Identity == null)
             {
-                reason = "NoClaims";
-                return null;
-            }
-
-            if (claims.Identity == null)
-            {
-                reason = "NoIdentity";
+                // Ignore the reason
+                reason = null;
                 return null;
             }
 

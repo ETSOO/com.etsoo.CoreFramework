@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.WebUtils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -39,9 +40,12 @@ namespace com.etsoo.CoreFramework.User
         {
             var user = U.Create(context.User, out var reason);
 
-            if (user == null)
+            if (reason != null && context.GetEndpoint()?.Metadata.GetMetadata<IAllowAnonymous>() == null)
             {
-                logger.LogWarning("Create user failed: {reason}", reason);
+                // Ignored the meanless reason when no user
+                var claims = context.User?.Claims.Select(claim => $"{claim.Type} = {claim.Value}");
+                var claimsString = claims == null ? null : string.Join(", ", claims);
+                logger.LogWarning("Create user failed: {reason} with {isAuthenticated} claims {claims}", reason, context.User?.Identity?.IsAuthenticated, claimsString);
             }
 
             return user;
@@ -83,7 +87,8 @@ namespace com.etsoo.CoreFramework.User
             }
             else
             {
-                reason = "NoAuthorizationHeader";
+                // Ignore no authorization header
+                reason = null;
             }
 
             return default;
@@ -206,7 +211,7 @@ namespace com.etsoo.CoreFramework.User
             var context = httpContextAccessor.HttpContext;
             if (context == null)
             {
-                reason = "NoHttpContext";
+                reason = null;
                 return default;
             }
 
