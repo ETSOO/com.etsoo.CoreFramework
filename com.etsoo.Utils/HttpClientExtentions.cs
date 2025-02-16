@@ -16,9 +16,21 @@ namespace com.etsoo.Utils
         /// <param name="client">HTTP client</param>
         /// <param name="scheme">Scheme</param>
         /// <param name="token">Token</param>
-        public static void AddAuthorization(this HttpClient client, string scheme, string token)
+        public static void AddAuthorizationHeader(this HttpClient client, string scheme, string token)
         {
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme, token);
+        }
+
+        /// <summary>
+        /// Add content language header
+        /// 添加内容语言头
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="contentLanguage"></param>
+        public static void AddContentLanguageHeader(this HttpClient client, string contentLanguage)
+        {
+            // com.etsoo.WebUtils\ContentLanguageHeaderRequestCultureProvider.cs to determine the culture
+            client.DefaultRequestHeaders.Add("Content-Language", contentLanguage);
         }
 
         /// <summary>
@@ -40,8 +52,7 @@ namespace com.etsoo.Utils
 
             if (contentLanguage != null)
             {
-                // com.etsoo.WebUtils\ContentLanguageHeaderRequestCultureProvider.cs to determine the culture
-                client.DefaultRequestHeaders.Add("Content-Language", contentLanguage);
+                client.AddContentLanguageHeader(contentLanguage);
             }
         }
     }
