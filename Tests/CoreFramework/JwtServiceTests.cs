@@ -3,6 +3,7 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Crypto;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -142,6 +143,11 @@ namespace Tests.CoreFramework
             var userName = "Etsoo User";
             var app = "#xaa";
             string[] userScopes = ["core", "crm"];
+            var timezone = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");
+            var jsonData = new StringKeyDictionaryObject
+            {
+                { "CustomAmount", 12 }
+            };
             var user = new CurrentUser
             {
                 Id = "1",
@@ -154,7 +160,9 @@ namespace Tests.CoreFramework
                 Oid = "0",
                 DeviceId = "1",
                 Language = CultureInfo.CurrentCulture,
-                App = app
+                App = app,
+                TimeZone = timezone,
+                JsonData = jsonData
             };
 
             // Act
@@ -182,6 +190,8 @@ namespace Tests.CoreFramework
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == CurrentUser.AppClaim)?.Value, Is.EqualTo(app));
+                Assert.That(claims?.FirstOrDefault(c => c.Type == UserToken.TimeZoneClaim)?.Value, Is.EqualTo(timezone.Id));
+                Assert.That(claims?.FirstOrDefault(c => c.Type == MinUserToken.JsonDataClaim)?.Value, Is.EqualTo("{\"customAmount\":12}"));
             });
         }
 

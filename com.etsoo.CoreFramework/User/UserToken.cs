@@ -98,6 +98,7 @@ namespace com.etsoo.CoreFramework.User
                 Id = user.Id,
                 Scopes = user.Scopes,
                 RoleValue = user.RoleValue,
+                JsonData = user.JsonData,
 
                 ClientIp = ipAddress,
                 Region = region,

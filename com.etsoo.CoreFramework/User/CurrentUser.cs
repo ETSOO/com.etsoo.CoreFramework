@@ -179,6 +179,8 @@ namespace com.etsoo.CoreFramework.User
                 Scopes = user.Scopes,
                 Region = user.Region,
                 Organization = user.Organization,
+                TimeZone = user.TimeZone,
+                JsonData = user.JsonData,
 
                 Name = name,
                 GivenName = givenName,
