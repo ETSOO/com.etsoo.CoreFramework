@@ -14,15 +14,12 @@ namespace com.etsoo.Localization
         /// 设置文化
         /// </summary>
         /// <param name="language">Language</param>
+        /// <param name="onlyThread">Only set thead</param>
         /// <returns>Changed or not</returns>
-        public static CultureInfo SetCulture(string language)
+        public static CultureInfo SetCulture(string language, bool onlyThread = false)
         {
-            if (CultureInfo.CurrentCulture.Name == language && CultureInfo.CurrentUICulture.Name == language)
-                return CultureInfo.CurrentCulture;
-
-            // Set related cultures
             var ci = new CultureInfo(language);
-            SetCulture(ci);
+            SetCulture(ci, onlyThread);
 
             return ci;
         }
@@ -32,12 +29,16 @@ namespace com.etsoo.Localization
         /// 设置文化
         /// </summary>
         /// <param name="ci">Culture info</param>
+        /// <param name="onlyThread">Only set thead</param>
         /// <returns>Changed or not</returns>
-        public static void SetCulture(CultureInfo ci)
+        public static void SetCulture(CultureInfo ci, bool onlyThread = false)
         {
-            // Set related cultures
-            CultureInfo.CurrentCulture = ci;
-            CultureInfo.CurrentUICulture = ci;
+            if (!onlyThread)
+            {
+                CultureInfo.CurrentCulture = ci;
+                CultureInfo.CurrentUICulture = ci;
+            }
+
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
         }
