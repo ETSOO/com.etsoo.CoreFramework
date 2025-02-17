@@ -21,7 +21,12 @@ namespace com.etsoo.CoreFramework.User
         /// <returns>Scope</returns>
         public static string AppIdToScope(int appId)
         {
-            return appId == 1 ? "core" : $"app{appId}";
+            return appId switch
+            {
+                1 => "core",
+                2 => "admin",
+                _ => $"app{appId}"
+            };
         }
 
         /// <summary>
@@ -32,7 +37,12 @@ namespace com.etsoo.CoreFramework.User
         /// <returns>App id</returns>
         public static int ScopeToAppId(string scope)
         {
-            return scope == "core" ? 1 : StringUtils.TryParse<int>(scope[3..]).GetValueOrDefault();
+            return scope switch
+            {
+                "core" => 1,
+                "admin" => 2,
+                _ => StringUtils.TryParse<int>(scope[3..]).GetValueOrDefault()
+            };
         }
 
         /// <summary>
