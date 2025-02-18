@@ -47,19 +47,21 @@ namespace com.etsoo.Database
         /// 获取改变了的属性
         /// </summary>
         /// <param name="entries">Entity entries</param>
+        /// <param name="formatter">Value formatter</param>
         /// <returns>Result</returns>
-        public static EntityChangedProperty[] GetChangedProperties(this IEnumerable<EntityEntry> entries)
+        public static EntityChangedProperty[] GetChangedProperties(this IEnumerable<EntityEntry> entries, Func<string, object?, object?>? formatter = null)
         {
+            formatter ??= (name, value) => StringUtils.GetPrimitiveValue(value);
+
             // StringUtils.GetPrimitiveValue helps to reduce the complex of serialization with unknown JSON type info
-            return entries.SelectMany(e => e.Properties)
+            return [.. entries.SelectMany(e => e.Properties)
                 .Where(p => p.IsModified)
                 .Select(p => new EntityChangedProperty
                 {
                     Name = p.Metadata.Name,
-                    OriginalValue = StringUtils.GetPrimitiveValue(p.OriginalValue),
-                    CurrentValue = StringUtils.GetPrimitiveValue(p.CurrentValue)
-                })
-                .ToArray(); // ToArray to avoid the empty Properties after the SaveChangesAsync of Entity Framework
+                    OriginalValue = formatter(p.Metadata.Name, p.OriginalValue),
+                    CurrentValue = formatter(p.Metadata.Name, p.CurrentValue)
+                })]; // ToArray to avoid the empty Properties after the SaveChangesAsync of Entity Framework
         }
 
         /// <summary>
