@@ -126,7 +126,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int id
         /// 整数编号
         /// </summary>
-        public int IdInt { get; init; }
+        public int IdInt { get; private init; }
 
         /// <summary>
         /// Scopes

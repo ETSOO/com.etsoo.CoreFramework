@@ -341,7 +341,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int organization user id
         /// 整数机构用户编号
         /// </summary>
-        public int OidInt { get; init; }
+        public int OidInt { get; private init; }
 
         /// <summary>
         /// Organization name
@@ -375,7 +375,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int channel organization id
         /// 整数渠道机构编号
         /// </summary>
-        public int? ChannelOrganizationInt { get; init; }
+        public int? ChannelOrganizationInt { get; private init; }
 
         private string? parentOrganization;
 
@@ -403,7 +403,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int parent organization id
         /// 整数父机构编号
         /// </summary>
-        public int? ParentOrganizationInt { get; init; }
+        public int? ParentOrganizationInt { get; private init; }
 
         /// <summary>
         /// Avatar
@@ -450,7 +450,7 @@ namespace com.etsoo.CoreFramework.User
         /// App id
         /// 程序编号
         /// </summary>
-        public int? AppId { get; init; }
+        public int? AppId { get; private init; }
 
         /// <summary>
         /// Create claims

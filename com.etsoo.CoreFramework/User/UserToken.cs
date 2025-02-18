@@ -144,7 +144,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int device id
         /// 整数设备编号
         /// </summary>
-        public int DeviceIdInt { get; init; }
+        public int DeviceIdInt { get; private init; }
 
         private string organization = default!;
 
@@ -169,7 +169,7 @@ namespace com.etsoo.CoreFramework.User
         /// Int organization id, default 0
         /// 整数机构编号，默认为0
         /// </summary>
-        public int OrganizationInt { get; init; }
+        public int OrganizationInt { get; private init; }
 
         /// <summary>
         /// Time zone

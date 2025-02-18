@@ -115,18 +115,18 @@ namespace com.etsoo.CoreFramework.User
         /// User uid
         /// 用户uid
         /// </summary>
-        string? Uid { get; init; }
+        string? Uid { get; }
 
         /// <summary>
         /// App key
         /// 程序键值
         /// </summary>
-        string? App { get; init; }
+        string? App { get; }
 
         /// <summary>
         /// App id
         /// 程序编号
         /// </summary>
-        int? AppId { get; init; }
+        int? AppId { get; }
     }
 }

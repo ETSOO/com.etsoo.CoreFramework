@@ -76,7 +76,7 @@ namespace Tests.CoreFramework
                 Organization = "0",
                 Oid = "0",
                 DeviceId = "1",
-                AppId = 1,
+                App = "1",
                 Language = CultureInfo.CurrentCulture
             };
 
