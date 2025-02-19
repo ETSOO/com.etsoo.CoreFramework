@@ -12,6 +12,12 @@ namespace com.etsoo.CoreFramework.Application
     public interface ICoreApplicationBase
     {
         /// <summary>
+        /// Application id
+        /// 应用编号
+        /// </summary>
+        int AppId { get; }
+
+        /// <summary>
         /// Application configuration
         /// 程序配置
         /// </summary>

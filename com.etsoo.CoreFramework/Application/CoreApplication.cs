@@ -84,6 +84,12 @@ namespace com.etsoo.CoreFramework.Application
         }
 
         /// <summary>
+        /// Application id
+        /// 应用编号
+        /// </summary>
+        public int AppId { get; protected init; }
+
+        /// <summary>
         /// Application configuration
         /// 程序配置
         /// </summary>
@@ -141,7 +147,6 @@ namespace com.etsoo.CoreFramework.Application
         public CoreApplication((S configuration,
             IDatabase<C> db) init, bool modelValidated = false) : this(init.configuration, init.db, modelValidated)
         {
-
         }
 
         /// <summary>
