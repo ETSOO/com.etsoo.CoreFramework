@@ -51,22 +51,15 @@ namespace Tests.CoreFramework
         }
 
         [Test]
-        public async Task EncryptionTest()
+        public void EncryptionTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
             var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
             var text = "Hello, world!";
-            var encrypted = app.EncriptData(text, "a", 1);
+            var encrypted = app.EncriptData(text, "a");
             var decrypted = app.DecriptData(encrypted, "a");
 
             Assert.That(decrypted, Is.EqualTo(text));
-
-            await Task.Delay(1000);
-
-            Assert.Catch<Exception>(() =>
-            {
-                app.DecriptData(encrypted, "a");
-            });
         }
     }
 }

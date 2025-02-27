@@ -4,34 +4,22 @@ using com.etsoo.Utils.Actions;
 namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
-    /// Authentication token creation request
-    /// 认证令牌创建请求
+    /// Login state request data
+    /// 登录状态请求数据
     /// </summary>
-    public record AuthCreateTokenRQ : SignModel
+    public record LoginStateRQ : SignModel
     {
         /// <summary>
-        /// Application ID
-        /// 应用编号
+        /// Region
+        /// 地区
         /// </summary>
-        public required int AppId { get; init; }
+        public required string Region { get; init; }
 
         /// <summary>
-        /// Application key
-        /// 应用键值
+        /// Device
+        /// 设备
         /// </summary>
-        public required string AppKey { get; init; }
-
-        /// <summary>
-        /// Authorization code
-        /// 授权代码
-        /// </summary>
-        public required string Code { get; init; }
-
-        /// <summary>
-        /// Redirect URI
-        /// 重定向URI
-        /// </summary>
-        public required Uri RedirectUri { get; init; }
+        public required string Device { get; init; }
 
         /// <summary>
         /// Sign the request with the app secret
@@ -43,10 +31,8 @@ namespace com.etsoo.CoreFramework.Models
         {
             var rq = new SortedDictionary<string, string>
             {
-                [nameof(AppId)] = AppId.ToString(),
-                [nameof(AppKey)] = AppKey,
-                [nameof(Code)] = Code,
-                [nameof(RedirectUri)] = RedirectUri.ToString()
+                [nameof(Device)] = Device,
+                [nameof(Region)] = Region
             };
 
             return SignWith(rq, appSecret);
@@ -65,14 +51,14 @@ namespace com.etsoo.CoreFramework.Models
                 return result;
             }
 
-            if (AppKey.Length > 0 && AppKey.Length is not (>= 32 and <= 128))
+            if (Device.Length is not (>= 2 and <= 256))
             {
-                return ApplicationErrors.NoValidData.AsResult(nameof(AppKey));
+                return ApplicationErrors.NoValidData.AsResult(nameof(Device));
             }
 
-            if (Code.Length is not (>= 32 and <= 128))
+            if (Region.Length is not 2)
             {
-                return ApplicationErrors.NoValidData.AsResult(nameof(Code));
+                return ApplicationErrors.NoValidData.AsResult(nameof(Region));
             }
 
             return null;

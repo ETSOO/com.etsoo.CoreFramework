@@ -1,6 +1,5 @@
-﻿using com.etsoo.Utils.Crypto;
-using com.etsoo.Utils.String;
-using System.ComponentModel.DataAnnotations;
+﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Utils.Actions;
 
 namespace com.etsoo.CoreFramework.Models
 {
@@ -8,7 +7,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Authentication request
     /// 认证请求
     /// </summary>
-    public record AuthRequest
+    public record AuthRequest : SignModel
     {
         /// <summary>
         /// Code response type
@@ -62,7 +61,7 @@ namespace com.etsoo.CoreFramework.Models
         /// Response type, code or token
         /// 响应类型，代码或令牌
         /// </summary>
-        [AllowedValues(CodeResponseType, TokenResponseType)]
+        // [AllowedValues(CodeResponseType, TokenResponseType)]
         public required string ResponseType { get; init; }
 
         /// <summary>
@@ -94,12 +93,6 @@ namespace com.etsoo.CoreFramework.Models
         public required string State { get; init; }
 
         /// <summary>
-        /// Signature
-        /// 签名
-        /// </summary>
-        public string Sign { get; set; } = string.Empty;
-
-        /// <summary>
         /// Sign the request with the app secret
         /// 对请求使用应用密钥签名
         /// </summary>
@@ -127,10 +120,48 @@ namespace com.etsoo.CoreFramework.Models
                 rq.Add(nameof(LoginHint), LoginHint);
             }
 
-            // With an extra '&' at the end
-            var query = rq.JoinAsString().TrimEnd('&');
+            return SignWith(rq, appSecret);
+        }
 
-            return Convert.ToHexString(CryptographyUtils.HMACSHA256(query, appSecret));
+        /// <summary>
+        /// Validate the model
+        /// 验证模块
+        /// </summary>
+        /// <returns>Result</returns>
+        public override IActionResult? Validate()
+        {
+            var result = base.Validate();
+            if (result != null)
+            {
+                return result;
+            }
+
+            if (AppKey.Length > 0 && AppKey.Length is not (>= 32 and <= 128))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(AppKey));
+            }
+
+            if (LoginHint != null && LoginHint.Length is not (>= 1 and <= 256))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(LoginHint));
+            }
+
+            if (AccessType != null && AccessType.Length is not (>= 1 and <= 32))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(AccessType));
+            }
+
+            if (ResponseType != CodeResponseType && ResponseType != TokenResponseType)
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(ResponseType));
+            }
+
+            if (State.Length is not (>= 1 and <= 512))
+            {
+                return ApplicationErrors.NoValidData.AsResult(nameof(State));
+            }
+
+            return null;
         }
     }
 }

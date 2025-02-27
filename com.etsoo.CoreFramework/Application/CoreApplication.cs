@@ -184,24 +184,7 @@ namespace com.etsoo.CoreFramework.Application
         public string DecriptData(string cipherText, string key = "")
         {
             var bytes = CryptographyUtils.AESDecrypt(cipherText, key + Configuration.PrivateKey) ?? throw new ApplicationException("Decript Data Failed");
-            var text = Encoding.UTF8.GetString(bytes);
-
-            // Check timestamp
-            var tsIndex = text.LastIndexOf("`TS");
-            if (tsIndex > 0)
-            {
-                var ts = text[(tsIndex + 3)..];
-                if (long.TryParse(ts, out var tsValue))
-                {
-                    text = text[..tsIndex];
-                    if (DateTime.FromBinary(tsValue) < DateTime.UtcNow)
-                    {
-                        throw new ApplicationException("Decript Data Time Expired");
-                    }
-                }
-            }
-
-            return text;
+            return Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
@@ -210,16 +193,9 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="plainText">Plain text</param>
         /// <param name="key">Key</param>
-        /// <param name="seconds">Valid in seconds, default is 3 hours</param>
         /// <returns>Result</returns>
-        public string EncriptData(string plainText, string key = "", int seconds = 10800)
+        public string EncriptData(string plainText, string key = "")
         {
-            if (seconds > 0)
-            {
-                // Add timestamp
-                plainText += "`TS" + DateTime.UtcNow.AddSeconds(seconds).ToBinary();
-            }
-
             return CryptographyUtils.AESEncrypt(plainText, key + Configuration.PrivateKey);
         }
 
