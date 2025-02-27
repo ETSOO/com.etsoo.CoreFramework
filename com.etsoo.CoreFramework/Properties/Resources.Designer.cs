@@ -412,6 +412,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The signature has expired.
+        /// </summary>
+        public static string SignExpired {
+            get {
+                return ResourceManager.GetString("SignExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your token has expired.
         /// </summary>
         public static string TokenExpired {

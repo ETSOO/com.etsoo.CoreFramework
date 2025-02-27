@@ -243,4 +243,7 @@
   <data name="DataNotReady" xml:space="preserve">
     <value>数据尚未准备就绪</value>
   </data>
+  <data name="SignExpired" xml:space="preserve">
+    <value>签名已过期</value>
+  </data>
 </root>

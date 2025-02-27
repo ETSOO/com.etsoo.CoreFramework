@@ -261,6 +261,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError SchemaValidationError => new(nameof(SchemaValidationError), Resources.SchemaValidationError);
 
         /// <summary>
+        /// Sign expired error
+        /// 签名已过期错误
+        /// </summary>
+        public static ApplicationError SignExpired => new(nameof(SignExpired), Resources.SignExpired);
+
+        /// <summary>
         /// User name and password do not match error
         /// 您的令牌已过期错误
         /// </summary>
@@ -325,6 +331,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(OrgExists) => OrgExists,
                 nameof(OrgExpired) => OrgExpired,
                 nameof(OutOfMemory) => OutOfMemory,
+                nameof(SignExpired) => SignExpired,
                 nameof(TokenExpired) => TokenExpired,
                 nameof(UserFrozen) => UserFrozen,
                 nameof(UserRegistered) => UserRegistered,
