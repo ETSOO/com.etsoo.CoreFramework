@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.Utils;
 using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.Models;
@@ -19,10 +20,10 @@ namespace com.etsoo.CoreFramework.Models
     public abstract record SignModel : IModelValidator
     {
         /// <summary>
-        /// Timestamp
-        /// 时间戳
+        /// Timestamp, long big number may cause JSON serialization issue
+        /// 时间戳，长整数可能导致JSON序列化问题
         /// </summary>
-        public long Timestamp { get; set; }
+        public string Timestamp { get; set; } = string.Empty;
 
         /// <summary>
         /// Signature
@@ -38,11 +39,11 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public string SignWith(SortedDictionary<string, string> rq, string appSecret)
         {
-            if (Timestamp == 0)
+            if (string.IsNullOrEmpty(Timestamp))
             {
-                Timestamp = DateTime.UtcNow.ToBinary();
+                Timestamp = SharedUtils.UTCToUnixSeconds().ToString();
             }
-            rq[nameof(Timestamp)] = Timestamp.ToString();
+            rq[nameof(Timestamp)] = Timestamp;
 
             // With an extra '&' at the end
             var query = rq.JoinAsString().TrimEnd('&');
@@ -54,7 +55,8 @@ namespace com.etsoo.CoreFramework.Models
         /// Total minutes from the timestamp
         /// 从时间戳获取总分钟数
         /// </summary>
-        public double TotalMinutes => DateTime.UtcNow.Subtract(DateTime.FromBinary(Timestamp)).TotalMinutes;
+        /// <returns>Total minutes</returns>
+        public double TotalMinutes() => DateTime.UtcNow.Subtract(SharedUtils.UnixSecondsToUTC(long.Parse(Timestamp))).TotalMinutes;
 
         /// <summary>
         /// Validate the model
@@ -63,7 +65,7 @@ namespace com.etsoo.CoreFramework.Models
         /// <returns>Result</returns>
         public virtual IActionResult? Validate()
         {
-            if (Timestamp < 1)
+            if (!long.TryParse(Timestamp, out _))
             {
                 return ApplicationErrors.NoValidData.AsResult(nameof(Timestamp));
             }

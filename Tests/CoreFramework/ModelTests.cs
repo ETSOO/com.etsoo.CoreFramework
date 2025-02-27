@@ -319,7 +319,7 @@ namespace Tests.CoreFramework
                 Assert.That(rq.Validate(), Is.Null);
                 Assert.That(rq.Sign, Has.Length.LessThan(128));
                 Assert.That(newRQ?.Sign, Is.EqualTo(rq.Sign));
-                Assert.That(newRQ?.TotalMinutes, Is.InRange(0.00001, 1));
+                Assert.That(newRQ?.TotalMinutes(), Is.InRange(0.00001, 1));
             });
         }
 
