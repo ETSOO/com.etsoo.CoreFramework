@@ -25,22 +25,22 @@ namespace com.etsoo.Utils
         /// Add content language header
         /// 添加内容语言头
         /// </summary>
-        /// <param name="client"></param>
-        /// <param name="contentLanguage"></param>
-        public static void AddContentLanguageHeader(this HttpClient client, string contentLanguage)
+        /// <param name="content">HTTP content</param>
+        /// <param name="contentLanguage">Content language</param>
+        public static void AddContentLanguageHeader(this HttpContent content, string contentLanguage)
         {
             // com.etsoo.WebUtils\ContentLanguageHeaderRequestCultureProvider.cs to determine the culture
-            client.DefaultRequestHeaders.Add("Content-Language", contentLanguage);
+            // System.InvalidOperationException: Misused header name, 'Content-Language'. Make sure request headers are used with HttpRequestMessage, response headers with HttpResponseMessage, and content headers with HttpContent objects.
+            content.Headers.ContentLanguage.Add(contentLanguage);
         }
 
         /// <summary>
-        /// Add language headers
-        /// 添加语言头
+        /// Add accept-language header
+        /// 添加接受语言头
         /// </summary>
         /// <param name="client">HTTP client</param>
         /// <param name="acceptLanguage">Accept language</param>
-        /// <param name="contentLanguage">Content language</param>
-        public static void AddLanguageHeaders(this HttpClient client, StringValues? acceptLanguage, string? contentLanguage = null)
+        public static void AddAcceptLanguageHeader(this HttpClient client, StringValues? acceptLanguage)
         {
             if (acceptLanguage.HasValue)
             {
@@ -48,11 +48,6 @@ namespace com.etsoo.Utils
                 {
                     client.DefaultRequestHeaders.AcceptLanguage.TryParseAdd(item);
                 }
-            }
-
-            if (contentLanguage != null)
-            {
-                client.AddContentLanguageHeader(contentLanguage);
             }
         }
     }
