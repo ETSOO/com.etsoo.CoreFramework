@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.Utils.Actions
+﻿using System.Text.Json.Serialization.Metadata;
+
+namespace com.etsoo.Utils.Actions
 {
     /// <summary>
     /// Abstract action result
@@ -90,6 +92,37 @@
         /// 数据
         /// </summary>
         public required D Data { get; init; }
+
+        /// <summary>
+        /// To action result
+        /// 转为操作结果
+        /// </summary>
+        /// <param name="typeInfo">Json type info for the Data transformation</param>
+        /// <returns>Result</returns>
+        public async ValueTask<ActionResult> ToActionResultAsync(JsonTypeInfo<D>? typeInfo = null)
+        {
+            var result = new ActionResult
+            {
+                Ok = Ok,
+                Type = Type,
+                Title = Title,
+                Field = Field,
+                Status = Status,
+                Detail = Detail,
+                TraceId = TraceId
+            };
+
+            if (typeInfo != null)
+            {
+                var data = await SharedUtils.ObjectToDictionaryAsync(Data, typeInfo);
+                foreach (var item in data)
+                {
+                    result.Data[item.Key] = item.Value;
+                }
+            }
+
+            return result;
+        }
     }
 
     /// <summary>
