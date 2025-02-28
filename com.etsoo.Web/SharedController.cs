@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Text.Json.Serialization.Metadata;
 using IActionResult = com.etsoo.Utils.Actions.IActionResult;
 
 namespace com.etsoo.Web
@@ -107,22 +106,14 @@ namespace com.etsoo.Web
         /// 直接写操作结果
         /// </summary>
         /// <param name="result">Action result</param>
-        /// <param name="typeInfo">JSON type info</param>
         /// <returns>Task</returns>
-        protected async Task WriteResultAsync(IActionResult result, JsonTypeInfo<Utils.Actions.ActionResult>? typeInfo = null)
+        protected async Task WriteResultAsync(IActionResult result)
         {
             // Content type
             Response.JsonContentType();
 
             // Write
-            if (typeInfo == null)
-            {
-                await result.ToJsonAsync(Response.BodyWriter, CoreApp.DefaultJsonSerializerOptions);
-            }
-            else
-            {
-                await result.ToJsonAsync(Response.Body, typeInfo, CancellationToken);
-            }
+            await result.ToJsonAsync(Response.BodyWriter, CoreApp.DefaultJsonSerializerOptions);
         }
     }
 }

@@ -65,8 +65,7 @@ namespace com.etsoo.Utils.Actions
         /// 转化为 Json
         /// </summary>
         /// <param name="utf8Stream">Stream to writer</param>
-        /// <param name="typeInfo">JSON type info</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        Task ToJsonAsync(Stream utf8Stream, JsonTypeInfo<ActionResult> typeInfo, CancellationToken cancellationToken = default);
+        Task ToJsonAsync(Stream utf8Stream, CancellationToken cancellationToken = default);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using com.etsoo.Utils;
-using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using NUnit.Framework;
 using System.Buffers;
@@ -81,14 +80,15 @@ namespace Tests.ActionResult
             };
 
             // Act
-            var stream = SharedUtils.GetStream();
-            await result.ToJsonAsync(stream, CommonJsonSerializerContext.Default.ActionResult);
-            var json = Encoding.UTF8.GetString(stream.ToArray());
+            await using var stream = SharedUtils.GetStream();
+            await result.ToJsonAsync(stream);
+            stream.TryGetBuffer(out var bytes);
+            var json = Encoding.UTF8.GetString(bytes);
 
             Assert.Multiple(() =>
             {
                 // Assert
-                Assert.That(json, Is.EqualTo("{\"ok\":true,\"title\":\"Success\",\"data\":{\"id\":1,\"enabled\":true,\"guid\":\"00000000-0000-0000-0000-000000000000\",\"creation\":\"2024-05-18T00:00:00+00:00\"}}"));
+                Assert.That(json, Is.EqualTo("{\"data\":{\"id\":1,\"enabled\":true,\"guid\":\"00000000-0000-0000-0000-000000000000\",\"creation\":\"2024-05-18T00:00:00+00:00\"},\"ok\":true,\"title\":\"Success\"}"));
             });
         }
     }

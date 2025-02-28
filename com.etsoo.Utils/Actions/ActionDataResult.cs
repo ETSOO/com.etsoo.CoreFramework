@@ -4,25 +4,6 @@ using System.Text.Json.Serialization.Metadata;
 namespace com.etsoo.Utils.Actions
 {
     /// <summary>
-    /// Id and message action data
-    /// 编号和消息操作数据
-    /// </summary>
-    public record IdMsgActionData
-    {
-        /// <summary>
-        /// Id
-        /// 编号
-        /// </summary>
-        public long? Id { get; init; }
-
-        /// <summary>
-        /// Message
-        /// 消息
-        /// </summary>
-        public string? Msg { get; init; }
-    }
-
-    /// <summary>
     /// Action data result
     /// 操作数据结果
     /// </summary>

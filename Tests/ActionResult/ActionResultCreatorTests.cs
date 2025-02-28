@@ -1,6 +1,9 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.SourceGenerators.Attributes;
+using com.etsoo.Utils;
+using com.etsoo.Utils.Serialization;
 using NUnit.Framework;
+using System.Text.Json;
 
 namespace Tests.ActionResult
 {
@@ -103,6 +106,27 @@ namespace Tests.ActionResult
                 Assert.That(result?.Data?.Count, Is.EqualTo(2));
                 Assert.That(result?.Data?.ContainsValue(1234), Is.True);
                 Assert.That(result?.Data?.ContainsKey("amount"), Is.True);
+            });
+        }
+
+
+        [Test]
+        public async Task Transform_WithSolidData_Test()
+        {
+            var id = 123;
+            var msg = "Success";
+            var result = com.etsoo.Utils.Actions.ActionResult.Succeed(id, msg);
+            await using var stream = SharedUtils.GetStream();
+            await result.ToJsonAsync(stream);
+            stream.Position = 0;
+            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData);
+
+            Assert.Multiple(() =>
+            {
+                // Assert
+                Assert.That(dataResult?.Ok, Is.True);
+                Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
+                Assert.That(dataResult?.Data.Msg, Is.EqualTo(msg));
             });
         }
     }

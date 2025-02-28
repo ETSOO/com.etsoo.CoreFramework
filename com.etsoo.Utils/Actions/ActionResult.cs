@@ -4,7 +4,6 @@ using System.Buffers;
 using System.Collections;
 using System.Data.Common;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -13,7 +12,7 @@ namespace com.etsoo.Utils.Actions
     /// https://tools.ietf.org/html/rfc7807
     /// 操作结果
     /// </summary>
-    public record ActionResult : IActionResult
+    public record ActionResult : ActionResultAbstract, IActionResult
     {
         /// <summary>
         /// Is auto set datetime to Utc kind
@@ -235,77 +234,6 @@ namespace com.etsoo.Utils.Actions
         };
 
         /// <summary>
-        /// Ok or not
-        /// 是否成功
-        /// </summary>
-        public bool Ok { get; init; }
-
-        string? type;
-        /// <summary>
-        /// Type
-        /// 类型
-        /// </summary>
-        public string? Type
-        {
-            get { return type; }
-            init
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    // Support type/field format
-                    var items = value.Split('/');
-                    if (items.Length > 1)
-                    {
-                        type = items[0];
-                        field = items[1];
-                        return;
-                    }
-                }
-
-                type = value;
-            }
-        }
-
-        /// <summary>
-        /// Title
-        /// 标题
-        /// </summary>
-        public string? Title { get; set; }
-
-        string? field;
-        /// <summary>
-        /// Field
-        /// 字段
-        /// </summary>
-        public string? Field
-        {
-            get { return field; }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    field = value;
-            }
-        }
-
-        /// <summary>
-        /// Status code
-        /// 状态码
-        /// </summary>
-        public int? Status { get; init; }
-
-        /// <summary>
-        /// Detail
-        /// 细节
-        /// </summary>
-        public string? Detail { get; set; }
-
-        /// <summary>
-        /// Trace id
-        /// 跟踪编号
-        /// </summary>
-        public string? TraceId { get; set; }
-
-        /// <summary>
         /// Data
         /// 数据
         /// </summary>
@@ -414,11 +342,10 @@ namespace com.etsoo.Utils.Actions
         /// 转化为 Json
         /// </summary>
         /// <param name="utf8Stream">Stream to writer</param>
-        /// <param name="typeInfo">JSON type info</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public async Task ToJsonAsync(Stream utf8Stream, JsonTypeInfo<ActionResult> typeInfo, CancellationToken cancellationToken = default)
+        public async Task ToJsonAsync(Stream utf8Stream, CancellationToken cancellationToken = default)
         {
-            await JsonSerializer.SerializeAsync(utf8Stream, this, typeInfo, cancellationToken);
+            await JsonSerializer.SerializeAsync(utf8Stream, this, CommonJsonSerializerContext.Default.ActionResult, cancellationToken);
         }
     }
 }

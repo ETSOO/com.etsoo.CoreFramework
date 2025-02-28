@@ -38,7 +38,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<decimal>))]
     [JsonSerializable(typeof(IEnumerable<float>))]
     [JsonSerializable(typeof(IActionResult))]
-    [JsonSerializable(typeof(ActionDataResult<IdMsgActionData>))]
+    [JsonSerializable(typeof(ActionResult<IdMsgData>))]
     [JsonSerializable(typeof(JsonElement))]
     [JsonSerializable(typeof(bool))]
     [JsonSerializable(typeof(DateTime))]
