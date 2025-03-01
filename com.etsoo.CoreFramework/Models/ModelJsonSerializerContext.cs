@@ -35,6 +35,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(EmailTemplateDto))]
     [JsonSerializable(typeof(ExchangeTokenRQ))]
     [JsonSerializable(typeof(ErrorLogData))]
+    [JsonSerializable(typeof(GetAuthRequestRQ))]
     [JsonSerializable(typeof(IEnumerable<IdNameItem>))]
     [JsonSerializable(typeof(IEnumerable<IdTitleItem>))]
     [JsonSerializable(typeof(InitCallRQ))]
