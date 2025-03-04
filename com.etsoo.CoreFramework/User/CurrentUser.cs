@@ -152,7 +152,6 @@ namespace com.etsoo.CoreFramework.User
             var latinGivenName = claims.FindFirstValue(LatinGivenNameClaim);
             var latinFamilyName = claims.FindFirstValue(LatinFamilyNameClaim);
             var orgName = claims.FindFirstValue(OrganizationNameClaim);
-            var oid = claims.FindFirstValue(OidClaim);
             var avatar = claims.FindFirstValue(AvatarClaim);
             var language = claims.FindFirstValue(LocalityClaim);
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
@@ -164,12 +163,6 @@ namespace com.etsoo.CoreFramework.User
             if (string.IsNullOrEmpty(name))
             {
                 reason = "NoName";
-                return null;
-            }
-
-            if (string.IsNullOrEmpty(oid))
-            {
-                reason = "NoOid";
                 return null;
             }
 
@@ -199,7 +192,6 @@ namespace com.etsoo.CoreFramework.User
                 LatinGivenName = latinGivenName,
                 LatinFamilyName = latinFamilyName,
                 Language = new CultureInfo(language),
-                Oid = oid,
                 Avatar = avatar,
                 OrganizationName = orgName,
                 ChannelOrganization = channelOrganization,
@@ -269,7 +261,6 @@ namespace com.etsoo.CoreFramework.User
                 LatinGivenName = latinGivenName,
                 LatinFamilyName = latinFamilyName,
                 Language = language,
-                Oid = oid,
                 Avatar = avatar,
                 OrganizationName = orgName,
                 ChannelOrganization = channelOrganization,
@@ -314,34 +305,6 @@ namespace com.etsoo.CoreFramework.User
         /// 拉丁姓
         /// </summary>
         public string? LatinFamilyName { get; init; }
-
-        private string oid = default!;
-
-        /// <summary>
-        /// Organization user Id
-        /// 机构用户编号
-        /// </summary>
-        public required string Oid
-        {
-            get
-            {
-                return oid;
-            }
-            init
-            {
-                oid = value;
-                if (int.TryParse(oid, out var oidValue))
-                {
-                    OidInt = oidValue;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Int organization user id
-        /// 整数机构用户编号
-        /// </summary>
-        public int OidInt { get; private init; }
 
         /// <summary>
         /// Organization name
@@ -463,8 +426,7 @@ namespace com.etsoo.CoreFramework.User
 
             claims.AddRange([
                 new(NameClaim, Name),
-                new(LocalityClaim, Language.Name),
-                new(OidClaim, Oid)
+                new(LocalityClaim, Language.Name)
             ]);
 
             if (!string.IsNullOrEmpty(GivenName))

@@ -10,18 +10,6 @@ namespace com.etsoo.CoreFramework.User
     public interface ICurrentUser : IUserToken
     {
         /// <summary>
-        /// Organization user Id
-        /// 机构用户编号
-        /// </summary>
-        string Oid { get; }
-
-        /// <summary>
-        /// Int organization user id
-        /// 整数机构用户编号
-        /// </summary>
-        int OidInt { get; }
-
-        /// <summary>
         /// Name
         /// 姓名
         /// </summary>

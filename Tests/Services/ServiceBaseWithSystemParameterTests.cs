@@ -27,7 +27,6 @@ namespace Tests.Services
                 ClientIp = IPAddress.Parse("127.0.0.1"),
                 Region = "CN",
                 Organization = "0",
-                Oid = "0",
                 DeviceId = "1",
                 Language = CultureInfo.CurrentCulture
             }, flag, logger)
