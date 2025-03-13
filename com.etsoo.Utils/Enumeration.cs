@@ -15,10 +15,36 @@ namespace com.etsoo.Utils
     public abstract class Enumeration<T> : IComparable where T : struct, IComparable
     {
         /// <summary>
+        /// Implicit operator to convert to value
+        /// </summary>
+        /// <param name="item">Current type item</param>
+        public static implicit operator T(Enumeration<T> item) => item.Value;
+
+        /// <summary>
         /// All items created
         /// 所有创建的项目
         /// </summary>
         public static readonly List<Enumeration<T>> Items = [];
+
+        /// <summary>
+        /// Parse item with value
+        /// 通过值解析项目
+        /// </summary>
+        /// <typeparam name="E">Generic return type</typeparam>
+        /// <param name="value">Value</param>
+        /// <returns>Result</returns>
+        public static E? Parse<E>(T? value)
+            where E : Enumeration<T>
+        {
+            if (TryParse(value, out E? item))
+            {
+                return item;
+            }
+            else
+            {
+                return default;
+            }
+        }
 
         /// <summary>
         /// Try to parse item with value
@@ -28,9 +54,15 @@ namespace com.etsoo.Utils
         /// <param name="value">Value</param>
         /// <param name="item">Parsed item</param>
         /// <returns>Success or not</returns>
-        public static bool TryParse<E>(T value, [NotNullWhen(true)] out E? item)
+        public static bool TryParse<E>(T? value, [NotNullWhen(true)] out E? item)
             where E : Enumeration<T>
         {
+            if (value == null)
+            {
+                item = default;
+                return false;
+            }
+
             item = Items.FirstOrDefault(item => item.Value.Equals(value) && item.GetType().IsSubclassOf(typeof(E))) as E;
             return item != null;
         }
