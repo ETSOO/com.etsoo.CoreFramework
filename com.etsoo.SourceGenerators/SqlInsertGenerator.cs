@@ -14,10 +14,10 @@ namespace com.etsoo.SourceGenerators
     /// SQL Insert command generator
     /// SQL 插入命令生成器
     /// </summary>
-    [Generator]
-    public class SqlInsertGenerator : ISourceGenerator
+    [Generator(LanguageNames.CSharp)]
+    public class SqlInsertGenerator : IIncrementalGenerator
     {
-        private IEnumerable<string> GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, string primaryKey, bool ignoreExists, NamingPolicy? namingPlicy, DatabaseName database)
+        private IEnumerable<string> GenerateBody(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, List<string> externalInheritances, string tableName, string primaryKey, bool ignoreExists, NamingPolicy? namingPlicy, DatabaseName database)
         {
             var body = new List<string>();
             var columns = new List<string>();
@@ -30,7 +30,7 @@ namespace com.etsoo.SourceGenerators
             string? idField = null;
             string? idParameter = null;
 
-            var members = context.ParseMembers(tds, true, list, out _);
+            var members = context.ParseMembers(compilation, tds, true, list, out _);
             if (!context.CancellationToken.IsCancellationRequested)
             {
                 var propertyType = typeof(SqlColumnAttribute);
@@ -114,10 +114,10 @@ namespace com.etsoo.SourceGenerators
             return body;
         }
 
-        private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
+        private void GenerateCode(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, Type attributeType)
         {
             // Field symbol
-            var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
+            var symbol = compilation.ParseSyntaxNode<INamedTypeSymbol>(tds);
             if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
@@ -156,15 +156,15 @@ namespace com.etsoo.SourceGenerators
             var bodies = new Dictionary<DatabaseName, IEnumerable<string>>();
             if (database.HasFlag(DatabaseName.SQLServer))
             {
-                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLServer));
+                bodies.Add(DatabaseName.SQLServer, GenerateBody(context, compilation, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLServer));
             }
             if (database.HasFlag(DatabaseName.PostgreSQL))
             {
-                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.PostgreSQL));
+                bodies.Add(DatabaseName.PostgreSQL, GenerateBody(context, compilation, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.PostgreSQL));
             }
             if (database.HasFlag(DatabaseName.SQLite))
             {
-                bodies.Add(DatabaseName.SQLite, GenerateBody(context, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLite));
+                bodies.Add(DatabaseName.SQLite, GenerateBody(context, compilation, tds, externals, tableName, primaryKey, ignoreExists, namingPolicy, DatabaseName.SQLite));
             }
 
             var body = bodies.Select((b, index) => @$"
@@ -233,43 +233,24 @@ namespace com.etsoo.SourceGenerators
             context.AddSource($"{ns}.{className}.SqlInsert.Generated.cs", SourceText.From(source, Encoding.UTF8));
         }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            // The generator infrastructure will create a receiver and populate it
-            // We can retrieve the populated instance via the context
-            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
-            {
-                return;
-            }
-
-            // Records
-            foreach (var rds in syntaxReceiver.RecordCandidates)
-            {
-                GenerateCode(context, rds, syntaxReceiver.AttributeType);
-            }
-
-            // Structs
-            foreach (var sds in syntaxReceiver.StructCandidates)
-            {
-                GenerateCode(context, sds, syntaxReceiver.AttributeType);
-            }
-
-            // Classes
-            foreach (var cds in syntaxReceiver.ClassCandidates)
-            {
-                GenerateCode(context, cds, syntaxReceiver.AttributeType);
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{
             //    System.Diagnostics.Debugger.Launch();
             //}
 
-            // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(SqlInsertCommandAttribute)));
+            var attributeType = typeof(SqlInsertCommandAttribute);
+            var provider = context.CreateGeneratorProvider(attributeType);
+            context.RegisterSourceOutput(provider, (context, source) =>
+            {
+                var (compilation, syntaxNodes) = source;
+                foreach (var syntaxNode in syntaxNodes)
+                {
+                    if (syntaxNode == null) continue;
+                    GenerateCode(context, compilation, syntaxNode, attributeType);
+                }
+            });
         }
     }
 }

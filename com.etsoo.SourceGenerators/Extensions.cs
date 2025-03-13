@@ -192,6 +192,65 @@ namespace com.etsoo.SourceGenerators
         }
 
         /// <summary>
+        /// Create generator provider
+        /// 创建生成器提供者
+        /// </summary>
+        /// <param name="context">Context</param>
+        /// <param name="attributeType">Filter attribute type</param>
+        /// <returns>Result</returns>
+        public static IncrementalValueProvider<(Compilation Left, ImmutableArray<TypeDeclarationSyntax?> Right)> CreateGeneratorProvider(this IncrementalGeneratorInitializationContext context, Type attributeType)
+        {
+            // Create a syntax provider to filter and transform syntax nodes
+            var syntaxProvider = context.SyntaxProvider
+                .CreateSyntaxProvider(
+                    predicate: (s, _) => s.IsGeneratorCandidate(),
+                    transform: (ctx, _) => ctx.GetGeneratorTransform(attributeType))
+                .Where(m => m is not null);
+
+            // Combine the syntax provider with the compilation
+            return context.CompilationProvider.Combine(syntaxProvider.Collect());
+        }
+
+        /// <summary>
+        /// Get the generator transform
+        /// 获取生成器转换
+        /// </summary>
+        /// <param name="context">Context</param>
+        /// <param name="attributeType">Attribute type</param>
+        /// <returns>Result</returns>
+        public static TypeDeclarationSyntax? GetGeneratorTransform(this GeneratorSyntaxContext context, Type attributeType)
+        {
+            // Get the type declaration syntax
+            var typeDeclarationSyntax = (TypeDeclarationSyntax)context.Node;
+
+            // Check if the type has the attribute
+            if (typeDeclarationSyntax.AttributeLists.HasAttribute(attributeType))
+            {
+                return typeDeclarationSyntax;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Is the node a candidate for the generator
+        /// 节点是否为生成器的候选
+        /// </summary>
+        /// <param name="node">Node</param>
+        /// <returns>Result</returns>
+        public static bool IsGeneratorCandidate(this SyntaxNode node)
+        {
+            if (node is TypeDeclarationSyntax tds
+                && (tds is ClassDeclarationSyntax || tds is RecordDeclarationSyntax || tds is StructDeclarationSyntax))
+            {
+                return tds.Modifiers.Any(SyntaxKind.PartialKeyword) &&
+                       (tds.Modifiers.Any(SyntaxKind.PublicKeyword) || tds.Modifiers.Any(SyntaxKind.InternalKeyword));
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Get attribute data value
         /// 获取属性数据字段值
         /// </summary>
@@ -272,12 +331,12 @@ namespace com.etsoo.SourceGenerators
         /// Parse SyntaxNode
         /// 解析 SyntaxNode
         /// </summary>
-        /// <param name="context">Context</param>
+        /// <param name="compilation">Compilation</param>
         /// <param name="sn">SyntaxNode</param>
         /// <returns>Symbol</returns>
-        public static T? ParseSyntaxNode<T>(this GeneratorExecutionContext context, SyntaxNode sn) where T : ISymbol
+        public static T? ParseSyntaxNode<T>(this Compilation compilation, SyntaxNode sn) where T : ISymbol
         {
-            var model = context.Compilation.GetSemanticModel(sn.SyntaxTree);
+            var model = compilation.GetSemanticModel(sn.SyntaxTree);
             return (T?)model.GetDeclaredSymbol(sn);
         }
 
@@ -301,12 +360,12 @@ namespace com.etsoo.SourceGenerators
         /// Parse SyntaxNode with name space and class name
         /// 解析 SyntaxNode 为命名空间和类名
         /// </summary>
-        /// <param name="context">Context</param>
+        /// <param name="compilation">Compilation</param>
         /// <param name="sn">SyntaxNode</param>
         /// <returns>Name space and class name</returns>
-        public static (string nameSpace, string className) ParseSyntaxNodeNames(this GeneratorExecutionContext context, SyntaxNode sn)
+        public static (string nameSpace, string className) ParseSyntaxNodeNames(this Compilation compilation, SyntaxNode sn)
         {
-            var symbol = context.ParseSyntaxNode<ISymbol>(sn)!;
+            var symbol = compilation.ParseSyntaxNode<ISymbol>(sn)!;
             return (symbol.ContainingNamespace.ToDisplayString(), symbol.Name);
         }
 
@@ -315,13 +374,14 @@ namespace com.etsoo.SourceGenerators
         /// 解析 SyntaxNode 为命名空间和类名
         /// </summary>
         /// <param name="context">Context</param>
-        /// <param name="td">TypeDeclarationSyntax</param>
+        /// <param name="compilation">Compilation</param>
+        /// <param name="tds">Type declaration syntax</param>
         /// <param name="isRead">Is read, otherwise, is write</param>
-        /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="externalInheritances">External inheritance</param>
+        /// <param name="isPositionalRecord">Is positional record</param>
         /// <param name="depth">Inheritance depth</param>
         /// <returns>Public properties and fields</returns>
-        public static IEnumerable<ParsedMember> ParseMembers(this GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool isRead, List<string> externalInheritances, out bool isPositionalRecord, int depth = 0)
+        public static IEnumerable<ParsedMember> ParseMembers(this SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, bool isRead, List<string> externalInheritances, out bool isPositionalRecord, int depth = 0)
         {
             var items = new List<ParsedMember>();
 
@@ -336,7 +396,7 @@ namespace com.etsoo.SourceGenerators
                     if (p.Type == null)
                         continue;
 
-                    var pSymbol = context.ParseSyntaxNode<IParameterSymbol>(p);
+                    var pSymbol = compilation.ParseSyntaxNode<IParameterSymbol>(p);
                     if (pSymbol != null)
                     {
                         items.Add(new ParsedMember(pSymbol, pSymbol.Type));
@@ -358,7 +418,7 @@ namespace com.etsoo.SourceGenerators
                     {
                         // Property
                         // Symbol
-                        var pSymbol = context.ParseSyntaxNode<IPropertySymbol>(p);
+                        var pSymbol = compilation.ParseSyntaxNode<IPropertySymbol>(p);
                         if (pSymbol != null)
                         {
                             if ((isRead && pSymbol.IsWriteOnly) || (!isRead && pSymbol.IsReadOnly))
@@ -377,7 +437,7 @@ namespace com.etsoo.SourceGenerators
                         foreach (var variable in f.Declaration.Variables)
                         {
                             // Symbol
-                            var fSymbol = context.ParseSyntaxNode<IFieldSymbol>(variable);
+                            var fSymbol = compilation.ParseSyntaxNode<IFieldSymbol>(variable);
                             if (fSymbol != null)
                             {
                                 items.Add(new ParsedMember(fSymbol, fSymbol.Type));
@@ -399,7 +459,7 @@ namespace com.etsoo.SourceGenerators
                     // GenericNameSyntax
                     if (bt.Type is NameSyntax nameSyntax)
                     {
-                        var sm = context.Compilation.GetSemanticModel(nameSyntax.SyntaxTree);
+                        var sm = compilation.GetSemanticModel(nameSyntax.SyntaxTree);
                         var symbol = sm.GetSymbolInfo(nameSyntax).Symbol;
                         if (symbol == null || symbol is not INamedTypeSymbol namedSymbol || namedSymbol.TypeKind == TypeKind.Interface || namedSymbol.Locations == null) continue;
 
@@ -424,7 +484,7 @@ namespace com.etsoo.SourceGenerators
 
                                 if (declare != null)
                                 {
-                                    var declareItems = ParseMembers(context, declare, isRead, externalInheritances, out _, depth + 1);
+                                    var declareItems = ParseMembers(context, compilation, declare, isRead, externalInheritances, out _, depth + 1);
                                     items.AddRange(declareItems);
                                 }
                             }

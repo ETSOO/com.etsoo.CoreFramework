@@ -12,14 +12,14 @@ namespace com.etsoo.SourceGenerators
     /// <summary>
     /// Auto Dictionary initialization generator
     /// </summary>
-    [Generator]
-    public class AutoDictionaryGenerator : ISourceGenerator
+    [Generator(LanguageNames.CSharp)]
+    public class AutoDictionaryGenerator : IIncrementalGenerator
     {
-        private string GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool snakeCase, List<string> externalInheritances, string ns)
+        private string GenerateBody(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, bool snakeCase, List<string> externalInheritances, string ns)
         {
             var body = new List<string>();
 
-            var members = context.ParseMembers(tds, false, externalInheritances, out bool isPositionalRecord);
+            var members = context.ParseMembers(compilation, tds, false, externalInheritances, out bool isPositionalRecord);
 
             if (!context.CancellationToken.IsCancellationRequested)
             {
@@ -121,10 +121,10 @@ namespace com.etsoo.SourceGenerators
             return "{\n" + string.Join(",\n", body) + "\n}";
         }
 
-        private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
+        private void GenerateCode(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, Type attributeType)
         {
             // Field symbol
-            var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
+            var symbol = compilation.ParseSyntaxNode<INamedTypeSymbol>(tds);
             if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
@@ -150,7 +150,7 @@ namespace com.etsoo.SourceGenerators
             var externals = new List<string>();
 
             // Body
-            var body = GenerateBody(context, tds, snakeCase.GetValueOrDefault(), externals, ns);
+            var body = GenerateBody(context, compilation, tds, snakeCase.GetValueOrDefault(), externals, ns);
             if (context.CancellationToken.IsCancellationRequested)
                 return;
 
@@ -178,35 +178,7 @@ namespace com.etsoo.SourceGenerators
             context.AddSource($"{ns}.{className}.Dictionary.Generated.cs", SourceText.From(source, Encoding.UTF8));
         }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            // The generator infrastructure will create a receiver and populate it
-            // We can retrieve the populated instance via the context
-            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
-            {
-                return;
-            }
-
-            // Records
-            foreach (var rds in syntaxReceiver.RecordCandidates)
-            {
-                GenerateCode(context, rds, syntaxReceiver.AttributeType);
-            }
-
-            // Structs
-            foreach (var sds in syntaxReceiver.StructCandidates)
-            {
-                GenerateCode(context, sds, syntaxReceiver.AttributeType);
-            }
-
-            // Classes
-            foreach (var cds in syntaxReceiver.ClassCandidates)
-            {
-                GenerateCode(context, cds, syntaxReceiver.AttributeType);
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             /*
             if (!System.Diagnostics.Debugger.IsAttached)
@@ -215,8 +187,17 @@ namespace com.etsoo.SourceGenerators
             }
             */
 
-            // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(AutoDictionaryGeneratorAttribute)));
+            var attributeType = typeof(AutoDictionaryGeneratorAttribute);
+            var provider = context.CreateGeneratorProvider(attributeType);
+            context.RegisterSourceOutput(provider, (context, source) =>
+            {
+                var (compilation, syntaxNodes) = source;
+                foreach (var syntaxNode in syntaxNodes)
+                {
+                    if (syntaxNode == null) continue;
+                    GenerateCode(context, compilation, syntaxNode, attributeType);
+                }
+            });
         }
     }
 }

@@ -14,8 +14,8 @@ namespace com.etsoo.SourceGenerators
     /// SQL Select generic return type command generator
     /// SQL 选择通用返回类型命令生成器
     /// </summary>
-    [Generator]
-    public class SqlSelectGenericGenerator : ISourceGenerator
+    [Generator(LanguageNames.CSharp)]
+    public class SqlSelectGenericGenerator : IIncrementalGenerator
     {
         private Dictionary<DatabaseName, List<(string, string, string)>> GenerateResultCode(INamedTypeSymbol smbol, DatabaseName database, NamingPolicy? namingPlicy, NamingPolicy? jsonNamingPolicy)
         {
@@ -122,13 +122,13 @@ namespace com.etsoo.SourceGenerators
             return codeLines;
         }
 
-        private (Dictionary<DatabaseName, List<string>> Condtions, IEnumerable<string> Parameters) GenerateConditions(GeneratorExecutionContext context, TypeDeclarationSyntax tds, List<string> externalInheritances, NamingPolicy? namingPlicy, DatabaseName database, ref bool hasPagingData)
+        private (Dictionary<DatabaseName, List<string>> Condtions, IEnumerable<string> Parameters) GenerateConditions(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, List<string> externalInheritances, NamingPolicy? namingPlicy, DatabaseName database, ref bool hasPagingData)
         {
             // Conditions
             var parameters = new List<string>();
             var conditions = database.SetupConditions();
 
-            var members = context.ParseMembers(tds, true, externalInheritances, out _);
+            var members = context.ParseMembers(compilation, tds, true, externalInheritances, out _);
             if (!context.CancellationToken.IsCancellationRequested)
             {
                 var propertyType = typeof(SqlColumnAttribute);
@@ -307,10 +307,10 @@ namespace com.etsoo.SourceGenerators
             return (conditions, parameters);
         }
 
-        private void GenerateCode(GeneratorExecutionContext context, TypeDeclarationSyntax tds, Type attributeType)
+        private void GenerateCode(SourceProductionContext context, Compilation compilation, TypeDeclarationSyntax tds, Type attributeType)
         {
             // Field symbol
-            var symbol = context.ParseSyntaxNode<INamedTypeSymbol>(tds);
+            var symbol = compilation.ParseSyntaxNode<INamedTypeSymbol>(tds);
             if (symbol == null || context.CancellationToken.IsCancellationRequested)
                 return;
 
@@ -357,7 +357,7 @@ namespace com.etsoo.SourceGenerators
 
             // Conditions
             var hasPagingData = false;
-            var (conditions, parameters) = GenerateConditions(context, tds, externals, namingPolicy, database, ref hasPagingData);
+            var (conditions, parameters) = GenerateConditions(context, compilation, tds, externals, namingPolicy, database, ref hasPagingData);
 
             var body = conditions.Select((b, index) => @$"
                 {(index > 0 ? "else " : "")}if(name == DatabaseName.{b.Key})
@@ -594,43 +594,24 @@ namespace com.etsoo.SourceGenerators
             context.AddSource($"{ns}.{className}.SqlGenericSelect.Generated.cs", SourceText.From(source, Encoding.UTF8));
         }
 
-        public void Execute(GeneratorExecutionContext context)
-        {
-            // The generator infrastructure will create a receiver and populate it
-            // We can retrieve the populated instance via the context
-            if (context.SyntaxReceiver is not SyntaxReceiver syntaxReceiver)
-            {
-                return;
-            }
-
-            // Records
-            foreach (var rds in syntaxReceiver.RecordCandidates)
-            {
-                GenerateCode(context, rds, syntaxReceiver.AttributeType);
-            }
-
-            // Structs
-            foreach (var sds in syntaxReceiver.StructCandidates)
-            {
-                GenerateCode(context, sds, syntaxReceiver.AttributeType);
-            }
-
-            // Classes
-            foreach (var cds in syntaxReceiver.ClassCandidates)
-            {
-                GenerateCode(context, cds, syntaxReceiver.AttributeType);
-            }
-        }
-
-        public void Initialize(GeneratorInitializationContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             //if (!System.Diagnostics.Debugger.IsAttached)
             //{
             //    System.Diagnostics.Debugger.Launch();
             //}
 
-            // Register a factory that can create our custom syntax receiver
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver(typeof(SqlSelectGenericCommandAttribute)));
+            var attributeType = typeof(SqlSelectGenericCommandAttribute);
+            var provider = context.CreateGeneratorProvider(attributeType);
+            context.RegisterSourceOutput(provider, (context, source) =>
+            {
+                var (compilation, syntaxNodes) = source;
+                foreach (var syntaxNode in syntaxNodes)
+                {
+                    if (syntaxNode == null) continue;
+                    GenerateCode(context, compilation, syntaxNode, attributeType);
+                }
+            });
         }
     }
 }
