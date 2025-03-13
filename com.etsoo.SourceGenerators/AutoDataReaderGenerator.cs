@@ -13,7 +13,7 @@ namespace com.etsoo.SourceGenerators
     /// Auto DbDataReader initialization generator
     /// </summary>
     [Generator]
-    public class AutoDataReaderGenerator : ISourceGenerator
+    public class AutoDataReaderGenerator : IIncrementalGenerator
     {
         private (string, List<string>) GenerateBody(GeneratorExecutionContext context, TypeDeclarationSyntax tds, bool utcDateTime, List<string> externalInheritances, string ns)
         {
