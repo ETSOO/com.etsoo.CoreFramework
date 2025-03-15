@@ -12,11 +12,11 @@
     <RepositoryType>Git</RepositoryType>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <Company>ETSOO / 亿速思维</Company>
-    <Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
+    <Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO Shared Core Framework
 亿速思维共享核心框架</Description>
-    <Version>1.5.42</Version>
+    <Version>1.5.43</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>

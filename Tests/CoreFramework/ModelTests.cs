@@ -151,6 +151,39 @@ namespace Tests.CoreFramework
         }
 
         [Test]
+        public void SelectRegexAndSplitRegexTests()
+        {
+            var sql = """
+                SELECT c.id AS "Id", c.name AS "Name", c.preferred_name AS "PreferredName", hide_data(c.pin, NULL) AS "Pin", c.status AS "Status", c.creation AS "Creation", (
+                    SELECT count(*)::int
+                    FROM (
+                        SELECT DISTINCT p.org_id
+                        FROM person AS p
+                        WHERE c.id = p.core_user_id
+                    ) AS p0) AS "Orgs"
+                FROM core_user AS c
+                ORDER BY c.creation DESC, c.id DESC
+                LIMIT @__p_0
+                """;
+
+            var match = DatabaseExtensions.SelectRegex().Match(sql);
+            if (!match.Success || match.Groups.Count < 2)
+            {
+                throw new DataException("SELECT command text is not valid");
+            }
+
+            // Columns
+            var columns = DatabaseExtensions.SplitRegex().Split(match.Groups[1].Value);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(columns, Has.Length.EqualTo(7));
+                Assert.That(columns.First().Trim(), Is.EqualTo("c.id AS \"Id\""));
+            });
+        }
+
+        [Test]
         public async Task QueryJsonSimpleLikeTest()
         {
             var rq = new QueryRQ<int>

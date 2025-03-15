@@ -887,20 +887,23 @@ namespace com.etsoo.Database
         }
 
         /// <summary>
-        /// \bSELECT\b(\(((?>\((?<DEPTH>)|\)(?<-DEPTH>)|[^\(\)]+))*\)(?(DEPTH)(?!))|.+)\bFROM\b
-        /// \(                   # the opening parenthesis
-        /// (?>                  # open an atomic group
-        ///     \(  (?<DEPTH>)   # when an opening parenthesis is encountered, then increment the stack named DEPTH
-        ///   |                  # OR
-        ///     \) (?<-DEPTH>)   # when a closing parenthesis is encountered, then decrement the stack named DEPTH
-        ///   |                  # OR
-        ///     [^\(\)]+           # content that is not parenthesis
-        /// )*                   # close the atomic group, repeat zero or more times
-        /// \)                   # the closing parenthesis
-        /// (?(DEPTH)(?!))       # conditional: if the stack named DEPTH is not empty then fail (ie: parenthesis are not balanced)
+        /// Match the first top level SELECT command
+        /// 匹配第一个顶级SELECT命令
+        /// (?=                    # only if it's possible to match the following:
+        ///     (?>                # Atomic group (used to avoid catastrophic backtracking):
+        ///        [^()]+          # Match any characters except parens
+        ///     |                  # or
+        ///        \(  (?<DEPTH>)  # a (, increasing the depth counter
+        ///     |                  # or
+        ///        \)  (?<-DEPTH>) # a ), decreasing the depth counter
+        ///     (?(DEPTH)(?!))     # Then make sure the depth counter is zero again
+        ///     $                  # at the end of the string    
+        ///     )*                 # any number of times.
+        ///     
+        /// )                      # (End of lookahead assertion)"
         /// </summary>
         /// <returns></returns>
-        [GeneratedRegex(@"\bSELECT\b(.+?)(?<!\([^)]*)\bFROM\b(?![^()]*\))", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+        [GeneratedRegex(@"\bSELECT\b(.*)\bFROM\b(?=(?>[^()]+|\((?<DEPTH>)|\)(?<-DEPTH>))*(?(DEPTH)(?!))$)", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
         public static partial Regex SelectRegex();
 
         /// <summary>
