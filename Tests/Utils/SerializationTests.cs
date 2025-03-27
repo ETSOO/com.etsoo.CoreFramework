@@ -194,6 +194,9 @@ namespace Tests.Utils
         [Test]
         public void DataFormatParseTests()
         {
+            // For reference check
+            var json = DataFormat.Json;
+
             var result = DataFormat.TryParse<DataFormat>(1, out var item);
             Assert.Multiple(() =>
             {

@@ -156,6 +156,7 @@ namespace com.etsoo.CoreFramework.User
             var language = claims.FindFirstValue(LocalityClaim);
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
+            var oid = StringUtils.TryParse<long>(claims.FindFirstValue(OidClaim));
             var uid = claims.FindFirstValue(UidClaim);
             var app = claims.FindFirstValue(AppClaim);
 
@@ -197,11 +198,12 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
+                Oid = oid.GetValueOrDefault(),
                 App = app
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, string? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? app) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, long? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? app) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -216,7 +218,7 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("LatinGivenName"),
                 data.Get("LatinFamilyName"),
                 data.Get("OrgName"),
-                data.Get("Oid"),
+                data.Get<long>("Oid"),
                 data.Get("Avatar"),
                 data.Get("ChannelOrganization"),
                 data.Get("ParentOrganization"),
@@ -241,7 +243,7 @@ namespace com.etsoo.CoreFramework.User
             var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, app) = GetData(data);
 
             // Validation
-            if (id == null || !role.HasValue || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(oid) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
+            if (id == null || !role.HasValue || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
                 return null;
 
             // New user
@@ -266,6 +268,7 @@ namespace com.etsoo.CoreFramework.User
                 ChannelOrganization = channelOrganization,
                 ParentOrganization = parentOrganization,
                 Uid = uid,
+                Oid = oid.GetValueOrDefault(),
                 App = app
             };
         }
@@ -387,6 +390,12 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public string? Uid { get; init; }
 
+        /// <summary>
+        /// Organization user id, default is 0
+        /// 机构用户编号，默认为0
+        /// </summary>
+        public long Oid { get; init; }
+
         private string? app;
 
         /// <summary>
@@ -426,7 +435,8 @@ namespace com.etsoo.CoreFramework.User
 
             claims.AddRange([
                 new(NameClaim, Name),
-                new(LocalityClaim, Language.Name)
+                new(LocalityClaim, Language.Name),
+                new(OidClaim, Oid.ToString())
             ]);
 
             if (!string.IsNullOrEmpty(GivenName))
