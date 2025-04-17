@@ -109,27 +109,51 @@ namespace com.etsoo.Localization
         public static IEnumerable<CurrencyItem> GetCurrencies(this Dictionary<string, RegionItem> regions, IEnumerable<string>? ids = null)
         {
             var currencies = regions.Select(regions => regions.Value.Currency).DistinctBy(currency => currency.Id);
-
-            if (ids != null)
+            if (ids == null)
             {
-                // Sort by the occurance in the ids
-                var sorts = ids.ToList();
-                return currencies.Where(currency => sorts.Contains(currency.Id)).OrderBy(currency => sorts.IndexOf(currency.Id));
+                return currencies;
             }
 
-            return currencies;
+            // Sort by the occurance in the ids
+            var sorts = ids.ToList();
+            return currencies.Where(currency => sorts.Contains(currency.Id)).OrderBy(currency => sorts.IndexOf(currency.Id));
         }
 
         /// <summary>
         /// Get regions
+        /// 获取地区信息
         /// </summary>
         /// <param name="regions">Regions returned with "GetAllRegions"</param>
         /// <param name="ids">Region ids to include</param>
         /// <returns>Result</returns>
-        public static IEnumerable<RegionItem> GetRegions(this Dictionary<string, RegionItem> regions, IEnumerable<string> ids)
+        public static IEnumerable<RegionItem> GetRegions(this Dictionary<string, RegionItem> regions, IEnumerable<string>? ids = null)
         {
+            var items = regions.Select(region => region.Value);
+            if (ids == null)
+            {
+                return items;
+            }
+
             var sort = ids.ToList();
-            return regions.Where(region => sort.Contains(region.Key)).Select(region => region.Value).OrderBy(region => sort.IndexOf(region.Id));
+            return items.Where(item => sort.Contains(item.Id)).OrderBy(item => sort.IndexOf(item.Id));
+        }
+
+        /// <summary>
+        /// Sort regions
+        /// 地区排序
+        /// </summary>
+        /// <param name="regions">Regions returned with "GetAllRegions"</param>
+        /// <param name="ids">Region ids to include</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<RegionItem> SortRegions(this IEnumerable<RegionItem> regions, IEnumerable<string>? ids = null)
+        {
+            if (ids == null)
+            {
+                return regions;
+            }
+
+            var sort = ids.ToList();
+            return regions.OrderBy(item => sort.IndexOf(item.Id));
         }
 
         /// <summary>
