@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace com.etsoo.Address.Validators
 {
@@ -12,37 +13,38 @@ namespace com.etsoo.Address.Validators
         /// Valid form or not
         /// 是否形式有效
         /// </summary>
-        public readonly bool Valid;
+        [MemberNotNullWhen(true, nameof(StateNum), nameof(CityNum), nameof(DistrictNum), nameof(Birthday), nameof(IsFemale))]
+        public bool Valid { get; }
 
         /// <summary>
-        /// State num id
-        /// 州省数字编号
+        /// State num id, like Hunan is 43
+        /// 州省数字编号，比如湖南是 43
         /// </summary>
-        public readonly string? StateNum;
+        public string? StateNum { get; }
 
         /// <summary>
-        /// City num id
-        /// 城市数字编号
+        /// City num id, like Changsha is 4301
+        /// 城市数字编号，比如长沙是 4301
         /// </summary>
-        public readonly string? CityNum;
+        public string? CityNum { get; }
 
         /// <summary>
-        /// District number id
-        /// 区县数字编号
+        /// District number id, like Ningxiang is 430124
+        /// 区县数字编号，比如宁乡是 430124
         /// </summary>
-        public readonly string? DistrictNum;
+        public string? DistrictNum { get; }
 
         /// <summary>
         /// Birthday
         /// 出生日期
         /// </summary>
-        public readonly DateTimeOffset? Birthday;
+        public DateTimeOffset? Birthday { get; }
 
         /// <summary>
-        /// Gender
-        /// 性别
+        /// Is female
+        /// 是否为女性
         /// </summary>
-        public readonly string? Gender;
+        public bool? IsFemale { get; }
 
         /// <summary>
         /// Constructor
@@ -79,10 +81,10 @@ namespace com.etsoo.Address.Validators
 
             if (len >= 17 && int.TryParse(pin.AsSpan(14, 3), out var g))
             {
-                Gender = g % 2 == 0 ? "F" : "M";
+                IsFemale = g % 2 == 0;
             }
 
-            if (StateNum == null || CityNum == null || DistrictNum == null || Birthday == null || Gender == null || len != 18) return;
+            if (StateNum == null || CityNum == null || DistrictNum == null || Birthday == null || IsFemale == null || len != 18) return;
 
             var coefficients = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2 };
             var sum = pin[..17].Select((c, index) => (c - '0') * coefficients[index]).Sum() % 11;

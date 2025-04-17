@@ -13,7 +13,7 @@ namespace Tests.Address
             Assert.Multiple(() =>
             {
                 Assert.That(validator.Valid, Is.False);
-                Assert.That(validator.Gender, Is.EqualTo("M"));
+                Assert.That(validator.IsFemale, Is.False);
                 Assert.That(validator.Birthday?.Month, Is.EqualTo(12));
                 Assert.That(validator.Birthday?.Day, Is.EqualTo(8));
             });
@@ -25,9 +25,16 @@ namespace Tests.Address
             var validator = new ChinaPinValidator("53010219200508011x");
             Assert.Multiple(() =>
             {
-                Assert.That(validator.Valid);
-                Assert.That(validator.Gender, Is.EqualTo("M"));
-                Assert.That(validator.Birthday?.Month, Is.EqualTo(5));
+                Assert.That(validator.Valid, Is.True);
+
+                if (validator.Valid)
+                {
+                    Assert.That(validator.StateNum, Is.EqualTo("53"));
+                    Assert.That(validator.CityNum, Is.EqualTo("5301"));
+                    Assert.That(validator.DistrictNum, Is.EqualTo("530102"));
+                    Assert.That(validator.IsFemale, Is.False);
+                    Assert.That(validator.Birthday?.Month, Is.EqualTo(5));
+                }
             });
         }
     }
