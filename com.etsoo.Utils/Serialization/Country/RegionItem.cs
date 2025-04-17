@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.Localization.Country
+﻿namespace com.etsoo.Utils.Serialization.Country
 {
     /// <summary>
     /// Region item

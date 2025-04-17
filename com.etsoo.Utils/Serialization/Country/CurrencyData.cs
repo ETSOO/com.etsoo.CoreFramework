@@ -1,10 +1,14 @@
-﻿namespace com.etsoo.Localization.Country
+﻿using System.Text.Json.Serialization;
+
+namespace com.etsoo.Utils.Serialization.Country
 {
     /// <summary>
-    /// Currency item
-    /// 币种项目
+    /// Currency data
+    /// 币种数据
     /// </summary>
-    public record CurrencyItem
+    [JsonDerivedType(typeof(CurrencyItem))]
+    [JsonDerivedType(typeof(CurrencyExchangeData))]
+    public record CurrencyData
     {
         /// <summary>
         /// Id, like CNY
@@ -17,12 +21,6 @@
         /// 名称，如人民币
         /// </summary>
         public required string Name { get; init; }
-
-        /// <summary>
-        /// Native name, like 人民币
-        /// 原生名
-        /// </summary>
-        public required string NativeName { get; init; }
 
         /// <summary>
         /// English name, like Chinese Yuan

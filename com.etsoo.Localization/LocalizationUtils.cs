@@ -1,4 +1,4 @@
-﻿using com.etsoo.Localization.Country;
+﻿using com.etsoo.Utils.Serialization.Country;
 using System.Globalization;
 
 namespace com.etsoo.Localization

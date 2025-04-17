@@ -1,4 +1,4 @@
-﻿namespace com.etsoo.MessageQueue
+﻿namespace com.etsoo.Utils.Serialization
 {
     /// <summary>
     /// Message queue message interface

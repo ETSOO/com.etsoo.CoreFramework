@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using com.etsoo.Utils.Serialization;
+using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.MessageQueue.QueueProcessors

@@ -23,7 +23,6 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(EntityStatus))]
     [JsonSerializable(typeof(IdentityType))]
     [JsonSerializable(typeof(IdentityTypeFlags))]
-    [JsonSerializable(typeof(PinyinFormatType))]
     [JsonSerializable(typeof(ProductUnit))]
     [JsonSerializable(typeof(RepeatOption))]
 
@@ -41,7 +40,6 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(InitCallRQ))]
     [JsonSerializable(typeof(LoginIdRQ))]
     [JsonSerializable(typeof(MergeRQ))]
-    [JsonSerializable(typeof(PinyinRQ))]
     [JsonSerializable(typeof(PublicServiceUserData))]
     [JsonSerializable(typeof(PublicUserData))]
     [JsonSerializable(typeof(QueryRQ))]

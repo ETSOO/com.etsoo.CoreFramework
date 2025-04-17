@@ -47,6 +47,11 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(StorageEntry))]
     [JsonSerializable(typeof(TristateEnum))]
 
+    [JsonSerializable(typeof(IEnumerable<Country.CultureItem>))]
+    [JsonSerializable(typeof(IEnumerable<Country.CurrencyData>))]
+    [JsonSerializable(typeof(IEnumerable<Country.CurrencyItem>))]
+    [JsonSerializable(typeof(IEnumerable<Country.RegionItem>))]
+
     public partial class CommonJsonSerializerContext : JsonSerializerContext
     {
     }
