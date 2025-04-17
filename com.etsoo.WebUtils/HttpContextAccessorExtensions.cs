@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.IO.Pipelines;
 using System.Net;
+using System.Text;
 
 namespace com.etsoo.WebUtils
 {
@@ -19,6 +20,22 @@ namespace com.etsoo.WebUtils
         public static CancellationToken CancellationToken(this IHttpContextAccessor accessor)
         {
             return accessor.HttpContext?.RequestAborted ?? default;
+        }
+
+        /// <summary>
+        /// Get body content
+        /// 获取请求体内容
+        /// </summary>
+        /// <param name="accessor">Http Accessor</param>
+        /// <param name="encoding">Encoding, default is UTF8</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public static async Task<string?> GetBodyAsync(this IHttpContextAccessor accessor, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        {
+            var context = accessor.HttpContext;
+            if (context == null)
+                return null;
+            return await context.GetBodyAsync(encoding, cancellationToken);
         }
 
         /// <summary>

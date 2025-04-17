@@ -456,7 +456,7 @@ namespace com.etsoo.HTTP
         public async Task<T?> PostFormAsync<D, T>(string requestUri, D data, JsonTypeInfo<D> dataTypeInfo, JsonTypeInfo<T> resultTypeInfo, Func<KeyValuePair<string, object>, KeyValuePair<string, string?>>? formatter = null, CancellationToken cancellationToken = default)
         {
             // Deserialize
-            var result = await SharedUtils.ObjectToDictionaryAsync(data, dataTypeInfo);
+            var result = await SharedUtils.ObjectToDictionaryAsync(data, dataTypeInfo, cancellationToken);
 
             // Filter and format data
             IEnumerable<KeyValuePair<string, string?>> items;

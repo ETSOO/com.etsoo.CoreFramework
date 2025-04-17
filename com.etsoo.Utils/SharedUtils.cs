@@ -232,8 +232,9 @@ namespace com.etsoo.Utils
         /// <param name="data">Data</param>
         /// <param name="typeInfo">Json type info</param>
         /// <param name="fields">Fields allowed</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task JsonSerializeAsync<D>(RecyclableMemoryStream stream, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        public static async Task JsonSerializeAsync<D>(RecyclableMemoryStream stream, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null, CancellationToken cancellationToken = default)
         {
             if (data is IJsonSerialization di)
             {
@@ -241,15 +242,15 @@ namespace com.etsoo.Utils
             }
             else if (fields == null)
             {
-                await JsonSerializer.SerializeAsync(stream, data, typeInfo);
+                await JsonSerializer.SerializeAsync(stream, data, typeInfo, cancellationToken);
             }
             else
             {
                 await using var ms = GetStream();
-                await JsonSerializer.SerializeAsync(ms, data, typeInfo);
+                await JsonSerializer.SerializeAsync(ms, data, typeInfo, cancellationToken);
                 ms.Position = 0;
                 await using var newStream = await JsonKeepNodesAsync(ms, fields);
-                await newStream.CopyToAsync(stream);
+                await newStream.CopyToAsync(stream, cancellationToken);
             }
         }
 
@@ -384,11 +385,12 @@ namespace com.etsoo.Utils
         /// <param name="data">Data</param>
         /// <param name="typeInfo">Json type info</param>
         /// <param name="fields">Fields allowed</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task<string> JsonSerializeAsync<D>(D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        public static async Task<string> JsonSerializeAsync<D>(D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null, CancellationToken cancellationToken = default)
         {
             await using var ms = GetStream();
-            await JsonSerializeAsync(ms, data, typeInfo, fields);
+            await JsonSerializeAsync(ms, data, typeInfo, fields, cancellationToken);
             return Encoding.UTF8.GetString(ms.GetReadOnlySequence());
         }
 
@@ -420,11 +422,12 @@ namespace com.etsoo.Utils
         /// <param name="data">Data</param>
         /// <param name="typeInfo">Json type info</param>
         /// <param name="fields">Fields allowed</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Task</returns>
-        public static async Task JsonSerializeAsync<D>(Utf8JsonWriter writer, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null)
+        public static async Task JsonSerializeAsync<D>(Utf8JsonWriter writer, D data, JsonTypeInfo<D> typeInfo, IEnumerable<string>? fields = null, CancellationToken cancellationToken = default)
         {
             await using var ms = GetStream();
-            await JsonSerializeAsync(ms, data, typeInfo, fields);
+            await JsonSerializeAsync(ms, data, typeInfo, fields, cancellationToken);
             writer.WriteRawValue(ms.GetReadOnlySequence(), true);
         }
 
@@ -502,8 +505,9 @@ namespace com.etsoo.Utils
         /// <param name="fields">Fields allowed</param>
         /// <param name="oldDataName">Old data Json node name</param>
         /// <param name="newDataName">New data Json node name</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Json string</returns>
-        public static async Task<string> JoinAsAuditJsonAsync<O, N>(O oldData, JsonTypeInfo<O> oldDataTypeInfo, N newData, JsonTypeInfo<N> newDataTypeInfo, IEnumerable<string> fields, string? oldDataName = null, string? newDataName = null)
+        public static async Task<string> JoinAsAuditJsonAsync<O, N>(O oldData, JsonTypeInfo<O> oldDataTypeInfo, N newData, JsonTypeInfo<N> newDataTypeInfo, IEnumerable<string> fields, string? oldDataName = null, string? newDataName = null, CancellationToken cancellationToken = default)
         {
             oldDataName ??= nameof(oldData);
             newDataName ??= nameof(newData);
@@ -515,30 +519,30 @@ namespace com.etsoo.Utils
             ms.WriteByte(123);
 
             // Old data
-            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{oldDataName}\":"));
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{oldDataName}\":"), cancellationToken);
 
             if (oldData is string oldJson)
             {
-                await ms.WriteAsync(Encoding.UTF8.GetBytes(oldJson));
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(oldJson), cancellationToken);
             }
             else
             {
-                await JsonSerializeAsync(ms, oldData, oldDataTypeInfo, fields);
+                await JsonSerializeAsync(ms, oldData, oldDataTypeInfo, fields, cancellationToken);
             }
 
             // ,
             ms.WriteByte(44);
 
             // New data
-            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{newDataName}\":"));
+            await ms.WriteAsync(Encoding.UTF8.GetBytes($"\"{newDataName}\":"), cancellationToken);
 
             if (newData is string newJson)
             {
-                await ms.WriteAsync(Encoding.UTF8.GetBytes(newJson));
+                await ms.WriteAsync(Encoding.UTF8.GetBytes(newJson), cancellationToken);
             }
             else
             {
-                await JsonSerializeAsync(ms, newData, newDataTypeInfo, fields);
+                await JsonSerializeAsync(ms, newData, newDataTypeInfo, fields, cancellationToken);
             }
 
             // Object end }
@@ -576,18 +580,19 @@ namespace com.etsoo.Utils
         /// <typeparam name="D">Generic object type</typeparam>
         /// <param name="obj">Object</param>
         /// <param name="typeInfo">Json type info</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Result</returns>
-        public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj, JsonTypeInfo<D> typeInfo)
+        public static async Task<Dictionary<string, object>> ObjectToDictionaryAsync<D>(D obj, JsonTypeInfo<D> typeInfo, CancellationToken cancellationToken = default)
         {
             // Stream
             await using var ms = GetStream();
 
             // Serialize
-            await JsonSerializer.SerializeAsync(ms, obj, typeInfo);
+            await JsonSerializer.SerializeAsync(ms, obj, typeInfo, cancellationToken);
 
             // Deserialize
             ms.Position = 0;
-            return (await JsonSerializer.DeserializeAsync(ms, CommonJsonSerializerContext.Default.DictionaryStringObject)) ?? [];
+            return (await JsonSerializer.DeserializeAsync(ms, CommonJsonSerializerContext.Default.DictionaryStringObject, cancellationToken)) ?? [];
         }
 
         /// <summary>
@@ -637,12 +642,13 @@ namespace com.etsoo.Utils
         /// 异步流到字节
         /// </summary>
         /// <param name="stream">Input stream</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Bytes</returns>
-        public static async Task<ReadOnlyMemory<byte>> StreamToBytesAsync(Stream stream)
+        public static async Task<ReadOnlyMemory<byte>> StreamToBytesAsync(Stream stream, CancellationToken cancellationToken = default)
         {
             var writer = new ArrayBufferWriter<byte>(defaultBufferSize);
             int bytesRead;
-            while ((bytesRead = await stream.ReadAsync(writer.GetMemory(defaultBufferSize))) > 0)
+            while ((bytesRead = await stream.ReadAsync(writer.GetMemory(defaultBufferSize), cancellationToken)) > 0)
             {
                 writer.Advance(bytesRead);
             }
@@ -667,10 +673,11 @@ namespace com.etsoo.Utils
         /// 异步流到UTF8字符串
         /// </summary>
         /// <param name="stream">Input stream</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>String</returns>
-        public static async Task<string> StreamToStringAsync(Stream stream)
+        public static async Task<string> StreamToStringAsync(Stream stream, CancellationToken cancellationToken = default)
         {
-            var bytes = await StreamToBytesAsync(stream);
+            var bytes = await StreamToBytesAsync(stream, cancellationToken);
             return Encoding.UTF8.GetString(bytes.Span);
         }
 

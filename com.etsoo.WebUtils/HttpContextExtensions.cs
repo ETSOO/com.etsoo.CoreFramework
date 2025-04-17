@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Net.Sockets;
 using System.Security.Claims;
+using System.Text;
 
 namespace com.etsoo.WebUtils
 {
@@ -24,6 +25,38 @@ namespace com.etsoo.WebUtils
         public static IPAddress? LocalIpAddress(this HttpContext context)
         {
             return context.Connection.LocalIpAddress;
+        }
+
+        /// <summary>
+        /// Get body content
+        /// 获取请求体内容
+        /// </summary>
+        /// <param name="context">Http Context</param>
+        /// <param name="encoding">Encoding, default is UTF8</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Result</returns>
+        public static async Task<string> GetBodyAsync(this HttpContext context, Encoding? encoding = null, CancellationToken cancellationToken = default)
+        {
+            encoding ??= Encoding.UTF8;
+
+            var sb = new StringBuilder();
+
+            var reader = context.Request.BodyReader;
+
+            while (true)
+            {
+                var result = await reader.ReadAsync(cancellationToken);
+                var buffer = result.Buffer;
+
+                sb.Append(encoding.GetString(buffer));
+
+                reader.AdvanceTo(buffer.End);
+
+                if (result.IsCompleted)
+                    break;
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

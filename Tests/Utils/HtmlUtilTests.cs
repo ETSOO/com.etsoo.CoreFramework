@@ -261,23 +261,23 @@ namespace Tests.Utils
         }
 
         [Test]
-        public void MakeStartHtmlTagTests()
+        public void ClearTagsTests()
         {
             var html = " Hello, world! ";
-            var result = HtmlIOUtils.MakeStartHtmlTag(html);
+            var result = HtmlIOUtils.ClearTags(html);
             Assert.That(result, Is.EqualTo("<p>Hello, world!</p>"));
         }
 
         [Test]
-        public void MakeStartHtmlTagWithTagsTests()
+        public void ClearTagsAddBlockTests()
         {
-            var html = " Hello, world! <p>Facilities Offered:</p><hr>";
-            var result = HtmlIOUtils.MakeStartHtmlTag(html);
-            Assert.That(result, Is.EqualTo("<p>Hello, world! </p><p>Facilities Offered:</p><hr>"));
+            var html = " <b>Hello, world! </b><p>Facilities Offered:</p><hr>";
+            var result = HtmlIOUtils.ClearTags(html);
+            Assert.That(result, Is.EqualTo("<p><b>Hello, world! </b></p><p>Facilities Offered:</p><hr>"));
         }
 
         [Test]
-        public void ClearTagsTests()
+        public void ClearTagsRemoveTests()
         {
             var html = "<p><br></p><ul><li>Guest laundry facility</li></ul><p><br></p><p><br></p><p><br></p>";
             var result = HtmlIOUtils.ClearTags(html);

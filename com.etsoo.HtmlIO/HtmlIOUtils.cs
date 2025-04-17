@@ -4,13 +4,14 @@ using com.etsoo.ImageUtils;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Storage;
 using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace com.etsoo.HtmlIO
 {
     /// <summary>
     /// HTML IO Utilities
     /// </summary>
-    public static class HtmlIOUtils
+    public static partial class HtmlIOUtils
     {
         /// <summary>
         /// Clear unnecessary tags
@@ -18,9 +19,38 @@ namespace com.etsoo.HtmlIO
         /// </summary>
         /// <param name="content">Content</param>
         /// <returns>Result</returns>
-        public static string ClearTags(string content)
+        public static string? ClearTags(string? content)
         {
-            return content.Replace("<p><br></p>", "");
+            // Remove blanks
+            content = content?.Trim();
+            if (string.IsNullOrEmpty(content)) return null;
+
+            // Remove empty style property inside tags
+            content = StyleRegex().Replace(content, "$1");
+
+            // Remove all "<p><br></p>"
+            content = BrRegex().Replace(content, "");
+
+            // Remove empty <p> tags
+            content = PgRegex().Replace(content, "").Trim();
+
+            // Return null if no content
+            if (string.IsNullOrEmpty(content)) return null;
+
+            // Supplement "<p>" for the first one
+            var firstMatch = BlockRegex().Match(content);
+            if (!firstMatch.Success)
+            {
+                content = $"<p>{content}</p>";
+            }
+            else if (firstMatch.Index > 0)
+            {
+                var prev = content[..firstMatch.Index];
+                var next = content[firstMatch.Index..];
+                content = $"<p>{prev}</p>{next}";
+            }
+
+            return content;
         }
 
         /// <summary>
@@ -35,13 +65,10 @@ namespace com.etsoo.HtmlIO
         /// <returns>Result</returns>
         public static async Task<string?> FormatEditorContentAsync(IStorage storage, string path, string? content, ILogger? logger = null, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(content)) return null;
-
             // Clear tags
             content = ClearTags(content);
 
-            // Start with HTML tag
-            content = MakeStartHtmlTag(content);
+            if (string.IsNullOrEmpty(content)) return null;
 
             await using var stream = SharedUtils.GetStream(content);
 
@@ -77,28 +104,16 @@ namespace com.etsoo.HtmlIO
             return doc.Body?.InnerHtml ?? content;
         }
 
-        /// <summary>
-        /// Make start HTML tag
-        /// 添加开始 HTML 标签
-        /// </summary>
-        /// <param name="content">Raw content</param>
-        /// <returns>Result</returns>
-        public static string MakeStartHtmlTag(string content)
-        {
-            // Start with HTML tag
-            content = content.Trim();
+        [GeneratedRegex(@"(<[^<>]+)\s+style\s*=\s*(['""])\2")]
+        private static partial Regex StyleRegex();
 
-            if (!content.StartsWith('<'))
-            {
-                var index = content.IndexOf('<');
-                if (index == -1) content = $"<p>{content}</p>";
-                else
-                {
-                    content = $"<p>{content[0..index]}</p>{content[index..]}";
-                }
-            }
+        [GeneratedRegex(@"<p><br\/?><\/p>")]
+        private static partial Regex BrRegex();
 
-            return content;
-        }
+        [GeneratedRegex(@"<p><\/p>")]
+        private static partial Regex PgRegex();
+
+        [GeneratedRegex(@"<(p|div|h[1-6]|table|section|header|footer|article|nav|main|form|ul|ol|fieldset|blockquote|pre)[^>]*>")]
+        private static partial Regex BlockRegex();
     }
 }
