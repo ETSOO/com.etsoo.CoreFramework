@@ -126,6 +126,19 @@ namespace com.etsoo.Utils.Actions
     }
 
     /// <summary>
+    /// Id action result data
+    /// 编号结果数据
+    /// </summary>
+    public record IdData
+    {
+        /// <summary>
+        /// Id
+        /// 编号
+        /// </summary>
+        public long Id { get; init; }
+    }
+
+    /// <summary>
     /// Id and message action result data
     /// 编号和消息操作结果数据
     /// </summary>
@@ -135,12 +148,44 @@ namespace com.etsoo.Utils.Actions
         /// Id
         /// 编号
         /// </summary>
-        public long? Id { get; init; }
+        public long Id { get; init; }
 
         /// <summary>
         /// Message
         /// 消息
         /// </summary>
-        public string? Msg { get; init; }
+        public required string Msg { get; init; }
+    }
+
+    /// <summary>
+    /// String action result data
+    /// 字符串编号操作结果数据
+    /// </summary>
+    public record StringIdData
+    {
+        /// <summary>
+        /// Id
+        /// 编号
+        /// </summary>
+        public required string Id { get; init; }
+    }
+
+    /// <summary>
+    /// String id and message action result data
+    /// 字符串编号和消息操作结果数据
+    /// </summary>
+    public record StringIdMsgData
+    {
+        /// <summary>
+        /// Id
+        /// 编号
+        /// </summary>
+        public required string Id { get; init; }
+
+        /// <summary>
+        /// Message
+        /// 消息
+        /// </summary>
+        public required string Msg { get; init; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using com.etsoo.Utils;
+using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
 using NUnit.Framework;
 using System.Buffers;
@@ -89,6 +90,39 @@ namespace Tests.ActionResult
             {
                 // Assert
                 Assert.That(json, Is.EqualTo("{\"data\":{\"id\":1,\"enabled\":true,\"guid\":\"00000000-0000-0000-0000-000000000000\",\"creation\":\"2024-05-18T00:00:00+00:00\"},\"ok\":true,\"title\":\"Success\"}"));
+            });
+        }
+
+        [Test]
+        public async Task StringIdDataResultTests()
+        {
+            var id = "ABC";
+            var result = com.etsoo.Utils.Actions.ActionResult.Succeed(id);
+
+            await using var stream = SharedUtils.GetStream();
+            await result.ToJsonAsync(stream);
+            stream.Position = 0;
+
+            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultStringIdData);
+            Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
+        }
+
+        [Test]
+        public async Task IdMsgDataResultTests()
+        {
+            var id = 12345;
+            var msg = "Hello, world!";
+            var result = com.etsoo.Utils.Actions.ActionResult.Succeed(id, msg);
+
+            await using var stream = SharedUtils.GetStream();
+            await result.ToJsonAsync(stream);
+            stream.Position = 0;
+
+            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData);
+            Assert.Multiple(() =>
+            {
+                Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
+                Assert.That(dataResult?.Data.Msg, Is.EqualTo(msg));
             });
         }
     }
