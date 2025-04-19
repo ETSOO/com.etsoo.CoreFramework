@@ -104,7 +104,7 @@ namespace Tests.ActionResult
             stream.Position = 0;
 
             var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultStringIdData);
-            Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
+            Assert.That(dataResult?.Data?.Id, Is.EqualTo(id));
         }
 
         [Test]
@@ -119,10 +119,20 @@ namespace Tests.ActionResult
             stream.Position = 0;
 
             var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData);
-            Assert.Multiple(() =>
+            Assert.Multiple(async () =>
             {
-                Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
-                Assert.That(dataResult?.Data.Msg, Is.EqualTo(msg));
+                Assert.That(dataResult, Is.Not.Null);
+                Assert.That(dataResult!.Ok, Is.True);
+
+                if (dataResult.Ok is true)
+                {
+                    Assert.That(dataResult.Data.Id, Is.EqualTo(id));
+                    Assert.That(dataResult.Data.Msg, Is.EqualTo(msg));
+                }
+
+                var newResult = await dataResult.ToActionResultAsync(CommonJsonSerializerContext.Default.IdMsgData);
+                Assert.That(newResult.Data.Get<int>(nameof(id)), Is.EqualTo(id));
+                Assert.That(newResult.Data.Get(nameof(msg)), Is.EqualTo(msg));
             });
         }
     }

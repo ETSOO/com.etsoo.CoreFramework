@@ -39,6 +39,7 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(IEnumerable<IdTitleItem>))]
     [JsonSerializable(typeof(InitCallRQ))]
     [JsonSerializable(typeof(LoginIdRQ))]
+    [JsonSerializable(typeof(LongIdItem))]
     [JsonSerializable(typeof(MergeRQ))]
     [JsonSerializable(typeof(PublicServiceUserData))]
     [JsonSerializable(typeof(PublicUserData))]

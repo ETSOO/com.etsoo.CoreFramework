@@ -11,12 +11,12 @@
 		<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.HtmlUtils</RepositoryUrl>
 		<Authors>ETSOO SmartERP NextGen Team</Authors>
 		<Company>ETSOO / 亿速思维</Company>
-		<Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
+		<Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>ETSOO Html Utilities
 亿速思维 Html 工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.62</Version>
+		<Version>1.0.63</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.2.0" />
+    <PackageReference Include="AngleSharp" Version="1.3.0" />
     <PackageReference Include="AngleSharp.Css" Version="1.0.0-beta.144" />
   </ItemGroup>
 

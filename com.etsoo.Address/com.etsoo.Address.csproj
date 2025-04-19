@@ -11,12 +11,12 @@
 		<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Address</RepositoryUrl>
 		<Authors>ETSOO SmartERP NextGen Team</Authors>
 		<Company>ETSOO / 亿速思维</Company>
-		<Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
+		<Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>ETSOO Address Utilities
 亿速思维地址工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.16</Version>
+		<Version>1.0.17</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>

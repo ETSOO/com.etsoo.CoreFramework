@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization.Metadata;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -6,6 +8,11 @@ namespace com.etsoo.Utils.Actions
     /// Abstract action result
     /// 抽象操作结果
     /// </summary>
+    [JsonDerivedType(typeof(ActionResult))]
+    [JsonDerivedType(typeof(ActionResult<IdData>))]
+    [JsonDerivedType(typeof(ActionResult<IdMsgData>))]
+    [JsonDerivedType(typeof(ActionResult<StringIdData>))]
+    [JsonDerivedType(typeof(ActionResult<StringIdMsgData>))]
     public abstract record ActionResultAbstract
     {
         /// <summary>
@@ -88,10 +95,17 @@ namespace com.etsoo.Utils.Actions
     public record ActionResult<D> : ActionResultAbstract
     {
         /// <summary>
+        /// Ok or not
+        /// 是否成功
+        /// </summary>
+        [MemberNotNullWhen(true, nameof(Data))]
+        public new bool Ok { get; set; } // 'init' will cause "Duplicate initialization of member 'Ok'" in NET 8
+
+        /// <summary>
         /// Data
         /// 数据
         /// </summary>
-        public required D Data { get; init; }
+        public D? Data { get; set; }
 
         /// <summary>
         /// To action result
@@ -112,7 +126,7 @@ namespace com.etsoo.Utils.Actions
                 TraceId = TraceId
             };
 
-            if (typeInfo != null)
+            if (typeInfo != null && Data != null)
             {
                 var data = await SharedUtils.ObjectToDictionaryAsync(Data, typeInfo);
                 foreach (var item in data)

@@ -1,7 +1,5 @@
 ﻿using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 
 namespace com.etsoo.Utils.Actions
 {
@@ -9,7 +7,6 @@ namespace com.etsoo.Utils.Actions
     /// Action result interface
     /// 操作结果接口
     /// </summary>
-    [JsonDerivedType(typeof(ActionResult))]
     public interface IActionResult : IJsonSerialization
     {
         /// <summary>
