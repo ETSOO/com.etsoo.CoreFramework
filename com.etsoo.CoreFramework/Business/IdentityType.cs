@@ -22,7 +22,7 @@
         /// Supplier
         /// 供应商
         /// </summary>
-        Supplier = 4,
+        Supplier = 4
     }
 
     /// <summary>
@@ -49,5 +49,17 @@
         /// 供应商
         /// </summary>
         Supplier = 4,
+
+        /// <summary>
+        /// Contact
+        /// 联系人
+        /// </summary>
+        Contact = 8,
+
+        /// <summary>
+        /// Organization
+        /// 机构
+        /// </summary>
+        Org = 16
     }
 }
