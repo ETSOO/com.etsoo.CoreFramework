@@ -88,6 +88,19 @@ namespace com.etsoo.WebUtils
         }
 
         /// <summary>
+        /// Set status code and write error message
+        /// 设置状态码并写入错误消息
+        /// </summary>
+        /// <param name="accessor">HTTP accessor</param>
+        /// <param name="statusCode">Status code</param>
+        /// <param name="error">Error message</param>
+        /// <returns>Task</returns>
+        public static ValueTask SetStatusCodeAsync(this IHttpContextAccessor accessor, HttpStatusCode statusCode, string? error = null)
+        {
+            return accessor.HttpContext?.Response.SetStatusCodeAsync(statusCode, error) ?? ValueTask.CompletedTask;
+        }
+
+        /// <summary>
         /// Get user agent
         /// 获取用户代理信息
         /// </summary>

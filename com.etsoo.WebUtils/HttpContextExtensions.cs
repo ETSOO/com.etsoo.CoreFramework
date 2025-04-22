@@ -160,6 +160,31 @@ namespace com.etsoo.WebUtils
         }
 
         /// <summary>
+        /// Set status code and write error message
+        /// 设置状态码并写入错误消息
+        /// </summary>
+        /// <param name="response">HTTP response</param>
+        /// <param name="statusCode">Status code</param>
+        /// <param name="error">Error message</param>
+        /// <returns>Task</returns>
+        public static async ValueTask SetStatusCodeAsync(this HttpResponse response, HttpStatusCode statusCode, string? error = null)
+        {
+            response.StatusCode = (int)statusCode;
+            if (!string.IsNullOrEmpty(error))
+            {
+                if (error.StartsWith('{') && error.EndsWith('}'))
+                {
+                    response.ContentType = "application/json";
+                }
+                else
+                {
+                    response.ContentType = "text/plain";
+                }
+                await response.BodyWriter.WriteAsync(Encoding.UTF8.GetBytes(error));
+            }
+        }
+
+        /// <summary>
         /// Get user agent
         /// 获取用户代理信息
         /// </summary>
