@@ -31,6 +31,12 @@
         public required string Parent { get; init; }
 
         /// <summary>
+        /// Name
+        /// 名称
+        /// </summary>
+        public required string Name { get; init; }
+
+        /// <summary>
         /// Native name, like 中文(简体，中国)
         /// 原生名
         /// </summary>

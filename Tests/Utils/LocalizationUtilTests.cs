@@ -61,6 +61,22 @@ namespace Tests.Utils
         }
 
         [Test]
+        [SetCulture("zh-CN")]
+        [SetUICulture("zh-CN")]
+        public void GetCulturesTests()
+        {
+            var cultures = LocalizationUtils.GetCultures(["zh-CN", "zh-Hans", "en-US", "ar"]);
+            Assert.Multiple(() =>
+            {
+                Assert.That(cultures.Count(), Is.EqualTo(4));
+                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("zh-CN"))?.Name, Is.EqualTo("中文 (中国)"));
+                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("zh-Hans"))?.Name, Is.EqualTo("简体中文"));
+                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("en-US"))?.Name, Is.EqualTo("英语 (美国)"));
+                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("ar"))?.Name, Is.EqualTo("阿拉伯语"));
+            });
+        }
+
+        [Test]
         public void GetCulturesByCountryTests()
         {
             var cultures = LocalizationUtils.GetCulturesByCountry("SG");

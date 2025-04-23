@@ -1326,4 +1326,85 @@
   <data name="TW" xml:space="preserve">
     <value>中国台湾</value>
   </data>
+  <data name="Culture_en" xml:space="preserve">
+    <value>英语</value>
+  </data>
+  <data name="Culture_en_US" xml:space="preserve">
+    <value>英语 (美国)</value>
+  </data>
+  <data name="Culture_en_GB" xml:space="preserve">
+    <value>英语 (英国)</value>
+  </data>
+  <data name="Culture_en_AU" xml:space="preserve">
+    <value>英语 (澳大利亚)</value>
+  </data>
+  <data name="Culture_en_CA" xml:space="preserve">
+    <value>英语 (加拿大)</value>
+  </data>
+  <data name="Culture_en_IE" xml:space="preserve">
+    <value>英语 (爱尔兰)</value>
+  </data>
+  <data name="Culture_en_NZ" xml:space="preserve">
+    <value>英语 (新西兰)</value>
+  </data>
+  <data name="Culture_en_ZA" xml:space="preserve">
+    <value>英语 (南非)</value>
+  </data>
+  <data name="Culture_zh_Hans" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="Culture_zh-Hant" xml:space="preserve">
+    <value>繁体中文</value>
+  </data>
+  <data name="Culture_fr" xml:space="preserve">
+    <value>法语</value>
+  </data>
+  <data name="Culture_fr_BE" xml:space="preserve">
+    <value>法语 (比利时)</value>
+  </data>
+  <data name="Culture_fr_CA" xml:space="preserve">
+    <value>法语 (加拿大)</value>
+  </data>
+  <data name="Culture_fr_CH" xml:space="preserve">
+    <value>法语 (瑞士)</value>
+  </data>
+  <data name="Culture_de" xml:space="preserve">
+    <value>德语</value>
+  </data>
+  <data name="Culture_de_AT" xml:space="preserve">
+    <value>德语 (奥地利)</value>
+  </data>
+  <data name="Culture_de_CH" xml:space="preserve">
+    <value>德语 (瑞士)</value>
+  </data>
+  <data name="Culture_es" xml:space="preserve">
+    <value>西班牙语</value>
+  </data>
+  <data name="Culture_es_AR" xml:space="preserve">
+    <value>西班牙语 (阿根廷)</value>
+  </data>
+  <data name="Culture_es_CL" xml:space="preserve">
+    <value>西班牙语 (智利)</value>
+  </data>
+  <data name="Culture_es_MX" xml:space="preserve">
+    <value>西班牙语 (墨西哥)</value>
+  </data>
+  <data name="Culture_ar" xml:space="preserve">
+    <value>阿拉伯语</value>
+  </data>
+  <data name="Culture_ru" xml:space="preserve">
+    <value>俄语</value>
+  </data>
+  <data name="Culture_ja" xml:space="preserve">
+    <value>日语</value>
+  </data>
+  <data name="Culture_ko" xml:space="preserve">
+    <value>韩语</value>
+  </data>
+  <data name="Culture_id" xml:space="preserve">
+    <value>印尼语</value>
+  </data>
+  <data name="Culture_zh_CN" xml:space="preserve">
+    <value>中文 (中国)</value>
+  </data>
 </root>

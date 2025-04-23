@@ -1326,4 +1326,85 @@
   <data name="TW" xml:space="preserve">
     <value>Taiwan</value>
   </data>
+  <data name="Culture_en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Culture_en_US" xml:space="preserve">
+    <value>English (United States)</value>
+  </data>
+  <data name="Culture_en_GB" xml:space="preserve">
+    <value>English (United Kingdom)</value>
+  </data>
+  <data name="Culture_en_AU" xml:space="preserve">
+    <value>English (Australia)</value>
+  </data>
+  <data name="Culture_en_CA" xml:space="preserve">
+    <value>English (Canada)</value>
+  </data>
+  <data name="Culture_en_IE" xml:space="preserve">
+    <value>English (Ireland)</value>
+  </data>
+  <data name="Culture_en_NZ" xml:space="preserve">
+    <value>English (New Zealand)</value>
+  </data>
+  <data name="Culture_en_ZA" xml:space="preserve">
+    <value>English (South Africa)</value>
+  </data>
+  <data name="Culture_zh_Hans" xml:space="preserve">
+    <value>Chinese Simplified</value>
+  </data>
+  <data name="Culture_zh-Hant" xml:space="preserve">
+    <value>Chinese Traditional</value>
+  </data>
+  <data name="Culture_fr" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="Culture_fr_BE" xml:space="preserve">
+    <value>French (Belgium)</value>
+  </data>
+  <data name="Culture_fr_CA" xml:space="preserve">
+    <value>French (Canada)</value>
+  </data>
+  <data name="Culture_fr_CH" xml:space="preserve">
+    <value>French (Switzerland)</value>
+  </data>
+  <data name="Culture_de" xml:space="preserve">
+    <value>German</value>
+  </data>
+  <data name="Culture_de_AT" xml:space="preserve">
+    <value>German (Austria)</value>
+  </data>
+  <data name="Culture_de_CH" xml:space="preserve">
+    <value>German (Switzerland)</value>
+  </data>
+  <data name="Culture_es" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="Culture_es_AR" xml:space="preserve">
+    <value>Spanish (Argentina)</value>
+  </data>
+  <data name="Culture_es_CL" xml:space="preserve">
+    <value>Spanish (Chile)</value>
+  </data>
+  <data name="Culture_es_MX" xml:space="preserve">
+    <value>Spanish (Mexico)</value>
+  </data>
+  <data name="Culture_ar" xml:space="preserve">
+    <value>Arabic</value>
+  </data>
+  <data name="Culture_ru" xml:space="preserve">
+    <value>Russian</value>
+  </data>
+  <data name="Culture_ja" xml:space="preserve">
+    <value>Japanese</value>
+  </data>
+  <data name="Culture_ko" xml:space="preserve">
+    <value>Korean</value>
+  </data>
+  <data name="Culture_id" xml:space="preserve">
+    <value>Indonesian</value>
+  </data>
+  <data name="Culture_zh_CN" xml:space="preserve">
+    <value>Chinese (China)</value>
+  </data>
 </root>

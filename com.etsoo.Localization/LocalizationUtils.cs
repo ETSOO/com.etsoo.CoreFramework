@@ -76,7 +76,7 @@ namespace com.etsoo.Localization
         /// </summary>
         /// <param name="currency">Curency code</param>
         /// <returns>Result</returns>
-        public static (string Symbol, string Name, string EnglishName)? GetCurrencyData(string currency)
+        public static CurrencyData? GetCurrencyData(string currency)
         {
             return GetAllRegions().GetCurrencyData(currency);
         }
@@ -88,15 +88,40 @@ namespace com.etsoo.Localization
         /// <param name="regions">Regions returned with "GetRegions"</param>
         /// <param name="currency">Curency code</param>
         /// <returns>Result</returns>
-        public static (string Symbol, string Name, string EnglishName)? GetCurrencyData(this Dictionary<string, RegionItem> regions, string currency)
+        public static CurrencyData? GetCurrencyData(this Dictionary<string, RegionItem> regions, string currency)
         {
             var item = regions.FirstOrDefault(r => r.Value.Currency.Id.Equals(currency)).Value?.Currency;
             if (item != null)
             {
-                return (item.Symbol, item.Name, item.EnglishName);
+                return item;
             }
 
             return null;
+        }
+
+        private static string GetCultureResourceName(string culture)
+        {
+            return $"Culture_{culture.Replace('-', '_')}";
+        }
+
+        /// <summary>
+        /// Get culture items
+        /// 获取文化信息
+        /// </summary>
+        /// <param name="ids">Ids, like zh-Hant, en-US</param>
+        /// <returns>Result</returns>
+        public static IEnumerable<CultureItem> GetCultures(IEnumerable<string> ids)
+        {
+            return ids.Select(id => CultureInfo.GetCultureInfo(id, true)).Select(c => new CultureItem
+            {
+                Id = c.Name,
+                Id2 = c.TwoLetterISOLanguageName,
+                Id3 = c.ThreeLetterISOLanguageName,
+                Parent = c.Parent.Name,
+                Name = Resources.ResourceManager.GetString(GetCultureResourceName(c.Name)) ?? c.Name,
+                NativeName = c.NativeName,
+                EnglishName = c.EnglishName
+            });
         }
 
         /// <summary>
@@ -208,6 +233,7 @@ namespace com.etsoo.Localization
                         Id2 = culture.TwoLetterISOLanguageName,
                         Id3 = culture.ThreeLetterISOLanguageName,
                         Parent = culture.Parent.Name,
+                        Name = Resources.ResourceManager.GetString(GetCultureResourceName(culture.Name)) ?? culture.Name,
                         NativeName = culture.NativeName,
                         EnglishName = culture.EnglishName
                     });
@@ -218,7 +244,7 @@ namespace com.etsoo.Localization
                     {
                         Id = id,
                         Id3 = id3,
-                        Name = Resources.ResourceManager.GetString(id) ?? ri.CurrencyNativeName,
+                        Name = Resources.ResourceManager.GetString(id) ?? ri.NativeName,
                         NativeName = ri.NativeName,
                         EnglishName = ri.EnglishName,
                         Currency = new CurrencyItem
@@ -236,6 +262,7 @@ namespace com.etsoo.Localization
                                     Id2 = culture.TwoLetterISOLanguageName,
                                     Id3 = culture.ThreeLetterISOLanguageName,
                                     Parent = culture.Parent.Name,
+                                    Name = Resources.ResourceManager.GetString(GetCultureResourceName(culture.Name)) ?? culture.Name,
                                     NativeName = culture.NativeName,
                                     EnglishName = culture.EnglishName
                                 }

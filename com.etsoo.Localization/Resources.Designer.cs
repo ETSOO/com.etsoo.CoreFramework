@@ -790,6 +790,249 @@ namespace com.etsoo.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Arabic.
+        /// </summary>
+        internal static string Culture_ar {
+            get {
+                return ResourceManager.GetString("Culture_ar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to German.
+        /// </summary>
+        internal static string Culture_de {
+            get {
+                return ResourceManager.GetString("Culture_de", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to German (Austria).
+        /// </summary>
+        internal static string Culture_de_AT {
+            get {
+                return ResourceManager.GetString("Culture_de_AT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to German (Switzerland).
+        /// </summary>
+        internal static string Culture_de_CH {
+            get {
+                return ResourceManager.GetString("Culture_de_CH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English.
+        /// </summary>
+        internal static string Culture_en {
+            get {
+                return ResourceManager.GetString("Culture_en", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (Australia).
+        /// </summary>
+        internal static string Culture_en_AU {
+            get {
+                return ResourceManager.GetString("Culture_en_AU", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (Canada).
+        /// </summary>
+        internal static string Culture_en_CA {
+            get {
+                return ResourceManager.GetString("Culture_en_CA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (United Kingdom).
+        /// </summary>
+        internal static string Culture_en_GB {
+            get {
+                return ResourceManager.GetString("Culture_en_GB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (Ireland).
+        /// </summary>
+        internal static string Culture_en_IE {
+            get {
+                return ResourceManager.GetString("Culture_en_IE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (New Zealand).
+        /// </summary>
+        internal static string Culture_en_NZ {
+            get {
+                return ResourceManager.GetString("Culture_en_NZ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (United States).
+        /// </summary>
+        internal static string Culture_en_US {
+            get {
+                return ResourceManager.GetString("Culture_en_US", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to English (South Africa).
+        /// </summary>
+        internal static string Culture_en_ZA {
+            get {
+                return ResourceManager.GetString("Culture_en_ZA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spanish.
+        /// </summary>
+        internal static string Culture_es {
+            get {
+                return ResourceManager.GetString("Culture_es", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spanish (Argentina).
+        /// </summary>
+        internal static string Culture_es_AR {
+            get {
+                return ResourceManager.GetString("Culture_es_AR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spanish (Chile).
+        /// </summary>
+        internal static string Culture_es_CL {
+            get {
+                return ResourceManager.GetString("Culture_es_CL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spanish (Mexico).
+        /// </summary>
+        internal static string Culture_es_MX {
+            get {
+                return ResourceManager.GetString("Culture_es_MX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to French.
+        /// </summary>
+        internal static string Culture_fr {
+            get {
+                return ResourceManager.GetString("Culture_fr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to French (Belgium).
+        /// </summary>
+        internal static string Culture_fr_BE {
+            get {
+                return ResourceManager.GetString("Culture_fr_BE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to French (Canada).
+        /// </summary>
+        internal static string Culture_fr_CA {
+            get {
+                return ResourceManager.GetString("Culture_fr_CA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to French (Switzerland).
+        /// </summary>
+        internal static string Culture_fr_CH {
+            get {
+                return ResourceManager.GetString("Culture_fr_CH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Indonesian.
+        /// </summary>
+        internal static string Culture_id {
+            get {
+                return ResourceManager.GetString("Culture_id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Japanese.
+        /// </summary>
+        internal static string Culture_ja {
+            get {
+                return ResourceManager.GetString("Culture_ja", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Korean.
+        /// </summary>
+        internal static string Culture_ko {
+            get {
+                return ResourceManager.GetString("Culture_ko", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Russian.
+        /// </summary>
+        internal static string Culture_ru {
+            get {
+                return ResourceManager.GetString("Culture_ru", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chinese (China).
+        /// </summary>
+        internal static string Culture_zh_CN {
+            get {
+                return ResourceManager.GetString("Culture_zh_CN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chinese Simplified.
+        /// </summary>
+        internal static string Culture_zh_Hans {
+            get {
+                return ResourceManager.GetString("Culture_zh_Hans", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chinese Traditional.
+        /// </summary>
+        internal static string Culture_zh_Hant {
+            get {
+                return ResourceManager.GetString("Culture_zh-Hant", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cuban Peso.
         /// </summary>
         internal static string CUP {
