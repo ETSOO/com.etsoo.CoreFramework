@@ -60,6 +60,12 @@
         /// Organization
         /// 机构
         /// </summary>
-        Org = 16
+        Org = 16,
+
+        /// <summary>
+        /// Department
+        /// 部门
+        /// </summary>
+        Dept = 32
     }
 }

@@ -1353,7 +1353,7 @@
   <data name="Culture_zh_Hans" xml:space="preserve">
     <value>簡體中文</value>
   </data>
-  <data name="Culture_zh-Hant" xml:space="preserve">
+  <data name="Culture_zh_Hant" xml:space="preserve">
     <value>繁體中文</value>
   </data>
   <data name="Culture_fr" xml:space="preserve">

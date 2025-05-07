@@ -1028,7 +1028,7 @@ namespace com.etsoo.Localization {
         /// </summary>
         internal static string Culture_zh_Hant {
             get {
-                return ResourceManager.GetString("Culture_zh-Hant", resourceCulture);
+                return ResourceManager.GetString("Culture_zh_Hant", resourceCulture);
             }
         }
         
