@@ -106,6 +106,12 @@ namespace com.etsoo.CoreFramework.User
         string? Uid { get; }
 
         /// <summary>
+        /// Organization user id, default is 0
+        /// 机构用户编号，默认为0
+        /// </summary>
+        long Oid { get; }
+
+        /// <summary>
         /// App key
         /// 程序键值
         /// </summary>
