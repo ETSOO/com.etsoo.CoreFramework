@@ -33,6 +33,12 @@
     public enum IdentityTypeFlags : byte
     {
         /// <summary>
+        /// None
+        /// 无标识
+        /// </summary>
+        None = 0,
+
+        /// <summary>
         /// User
         /// 用户
         /// </summary>
