@@ -130,6 +130,12 @@ namespace com.etsoo.CoreFramework.User
         public const string AppClaim = "app";
 
         /// <summary>
+        /// Person id (organization) claim type
+        /// 人员编号（机构）声明类型
+        /// </summary>
+        public const string PersonIdClaim = "pid";
+
+        /// <summary>
         /// Create user
         /// 创建用户
         /// </summary>
@@ -157,6 +163,7 @@ namespace com.etsoo.CoreFramework.User
             var channelOrganization = claims.FindFirstValue(ChannelOrganizationClaim);
             var parentOrganization = claims.FindFirstValue(ParentOrganizationClaim);
             var oid = StringUtils.TryParse<long>(claims.FindFirstValue(OidClaim));
+            var pid = StringUtils.TryParse<long>(claims.FindFirstValue(PersonIdClaim));
             var uid = claims.FindFirstValue(UidClaim);
             var app = claims.FindFirstValue(AppClaim);
 
@@ -199,11 +206,12 @@ namespace com.etsoo.CoreFramework.User
                 ParentOrganization = parentOrganization,
                 Uid = uid,
                 Oid = oid.GetValueOrDefault(),
+                Pid = pid.GetValueOrDefault(),
                 App = app
             };
         }
 
-        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, long? oid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? app) GetData(StringKeyDictionaryObject data)
+        private static (string? id, IEnumerable<string>? scopes, string? organization, short? role, string? deviceId, string? name, string? givenName, string? familyName, string? preferredName, string? latinGivenName, string? latinFamilyName, string? orgName, long? oid, long? pid, string? avatar, string? channelOrganization, string? parentOrganization, string? uid, string? app) GetData(StringKeyDictionaryObject data)
         {
             return (
                 data.Get("Id"),
@@ -219,6 +227,7 @@ namespace com.etsoo.CoreFramework.User
                 data.Get("LatinFamilyName"),
                 data.Get("OrgName"),
                 data.Get<long>("Oid"),
+                data.Get<long>("Pid"),
                 data.Get("Avatar"),
                 data.Get("ChannelOrganization"),
                 data.Get("ParentOrganization"),
@@ -240,7 +249,7 @@ namespace com.etsoo.CoreFramework.User
         public static CurrentUser? Create(StringKeyDictionaryObject data, IPAddress ip, CultureInfo language, string region)
         {
             // Get data
-            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, avatar, channelOrganization, parentOrganization, uid, app) = GetData(data);
+            var (id, scopes, organization, role, deviceId, name, givenName, familyName, preferredName, latinGivenName, latinFamilyName, orgName, oid, pid, avatar, channelOrganization, parentOrganization, uid, app) = GetData(data);
 
             // Validation
             if (id == null || !role.HasValue || string.IsNullOrEmpty(organization) || string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(name))
@@ -269,6 +278,7 @@ namespace com.etsoo.CoreFramework.User
                 ParentOrganization = parentOrganization,
                 Uid = uid,
                 Oid = oid.GetValueOrDefault(),
+                Pid = pid.GetValueOrDefault(),
                 App = app
             };
         }
@@ -396,6 +406,12 @@ namespace com.etsoo.CoreFramework.User
         /// </summary>
         public long Oid { get; init; }
 
+        /// <summary>
+        /// Person id (organization)
+        /// 人员编号（机构）
+        /// </summary>
+        public long Pid { get; init; }
+
         private string? app;
 
         /// <summary>
@@ -471,6 +487,11 @@ namespace com.etsoo.CoreFramework.User
 
             if (Avatar != null)
                 claims.Add(new(AvatarClaim, Avatar));
+
+            if (Pid > 0)
+            {
+                claims.Add(new(PersonIdClaim, Pid.ToString()));
+            }
 
             return claims;
         }

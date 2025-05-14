@@ -112,6 +112,12 @@ namespace com.etsoo.CoreFramework.User
         long Oid { get; }
 
         /// <summary>
+        /// Person id (organization)
+        /// 人员编号（机构）
+        /// </summary>
+        long Pid { get; }
+
+        /// <summary>
         /// App key
         /// 程序键值
         /// </summary>
