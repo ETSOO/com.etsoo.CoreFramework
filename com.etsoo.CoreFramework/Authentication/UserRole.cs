@@ -14,12 +14,6 @@
         Guest = 1,
 
         /// <summary>
-        /// Outsourcing
-        /// 外包
-        /// </summary>
-        Outsourcing = 2,
-
-        /// <summary>
         /// Operator
         /// 操作员
         /// </summary>
@@ -41,13 +35,19 @@
         /// Team leader
         /// 团队负责人
         /// </summary>
-        Leader = 64,
+        Leader = 32,
 
         /// <summary>
         /// Manager
         /// 经理
         /// </summary>
-        Manager = 128,
+        Manager = 64,
+
+        /// <summary>
+        /// HR Manager
+        /// 人事经理
+        /// </summary>
+        HRManager = 128,
 
         /// <summary>
         /// Finance
@@ -56,16 +56,16 @@
         Finance = 256,
 
         /// <summary>
+        /// Director
+        /// 总监
+        /// </summary>
+        Director = 512,
+
+        /// <summary>
         /// Executives
         /// 高管
         /// </summary>
-        Executive = 512,
-
-        /// <summary>
-        /// Shareholder
-        /// 股东
-        /// </summary>
-        Shareholder = 1024,
+        Executive = 1024,
 
         /// <summary>
         /// API

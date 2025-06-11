@@ -12,7 +12,7 @@ namespace Tests.Utils
             var item = (UserRole)0;
             Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.False);
 
-            item = (UserRole)3;
+            item = (UserRole)5;
             Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.True);
         }
     }

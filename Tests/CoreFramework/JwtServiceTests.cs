@@ -1,4 +1,5 @@
-﻿using com.etsoo.CoreFramework.Authentication;
+﻿using com.etsoo.CoreFramework.Application;
+using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Utils;
@@ -152,7 +153,7 @@ namespace Tests.CoreFramework
                 Id = "1",
                 Scopes = userScopes,
                 Name = userName,
-                RoleValue = (short)(UserRole.Founder | UserRole.Admin | UserRole.Manager | UserRole.User | UserRole.Guest),
+                RoleValue = (short)Constants.UserRoles,
                 ClientIp = IPAddress.Parse("127.0.0.1"),
                 Region = "CN",
                 Organization = "0",

@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.CoreFramework.Application
+﻿using com.etsoo.CoreFramework.Authentication;
+
+namespace com.etsoo.CoreFramework.Application
 {
     /// <summary>
     /// Constants
@@ -26,5 +28,30 @@
         /// Current organization id parameter name
         /// </summary>
         public const string CurrentOrgField = "CurrentOrg";
+
+        /// <summary>
+        /// Admin users roles
+        /// </summary>
+        public const UserRole AdminRoles = UserRole.Executive | UserRole.Admin | UserRole.Founder;
+
+        /// <summary>
+        /// Finance users roles
+        /// </summary>
+        public const UserRole FinanceRoles = UserRole.Finance | AdminRoles;
+
+        /// <summary>
+        /// HR users roles
+        /// </summary>
+        public const UserRole HRRoles = UserRole.HRManager | AdminRoles;
+
+        /// <summary>
+        /// Manager users roles
+        /// </summary>
+        public const UserRole ManagerRoles = UserRole.Manager | UserRole.HRManager | UserRole.Director | UserRole.API | FinanceRoles;
+
+        /// <summary>
+        /// User roles
+        /// </summary>
+        public const UserRole UserRoles = UserRole.User | UserRole.Leader | ManagerRoles;
     }
 }
