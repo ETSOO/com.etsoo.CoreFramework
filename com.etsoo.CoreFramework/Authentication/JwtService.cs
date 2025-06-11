@@ -163,6 +163,9 @@ namespace com.etsoo.CoreFramework.Authentication
                 RequireExpirationTime = true,
                 RequireAudience = true,
 
+                // Custom claim type for role
+                RoleClaimType = MinUserToken.RolesClaim,
+
                 // false to valid additional data
                 ValidateLifetime = true,
 

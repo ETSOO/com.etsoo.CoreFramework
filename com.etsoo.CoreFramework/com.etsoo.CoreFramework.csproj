@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO Shared Core Framework
 亿速思维共享核心框架</Description>
-    <Version>1.5.53</Version>
+    <Version>1.5.54</Version>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <PackageIcon>logo.png</PackageIcon>
@@ -34,8 +34,8 @@
 
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" Version="7.3.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
   </ItemGroup>
 

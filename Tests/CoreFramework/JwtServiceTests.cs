@@ -152,7 +152,7 @@ namespace Tests.CoreFramework
                 Id = "1",
                 Scopes = userScopes,
                 Name = userName,
-                RoleValue = 1,
+                RoleValue = (short)(UserRole.Founder | UserRole.Admin | UserRole.Manager | UserRole.User | UserRole.Guest),
                 ClientIp = IPAddress.Parse("127.0.0.1"),
                 Region = "CN",
                 Organization = "0",
@@ -183,6 +183,9 @@ namespace Tests.CoreFramework
             {
                 Assert.That(identity.IsAuthenticated, Is.False);
                 Assert.That(cp?.Identity?.IsAuthenticated, Is.True);
+                Assert.That(cp?.IsInRole("Admin"), Is.True);
+                Assert.That(cp?.IsInRole("Manager"), Is.True);
+                Assert.That(cp?.IsInRole("User"), Is.True);
                 Assert.That(identity.Name, Is.EqualTo(user.Id));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
                 Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));

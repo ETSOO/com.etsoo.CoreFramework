@@ -2,6 +2,7 @@
 using com.etsoo.Utils;
 using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
+using System.Data;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -36,6 +37,12 @@ namespace com.etsoo.CoreFramework.User
         /// 角色值声明类型
         /// </summary>
         public const string RoleValueClaim = "role";
+
+        /// <summary>
+        /// Roles claim type
+        /// 角色声明类型
+        /// </summary>
+        public const string RolesClaim = "roles";
 
         /// <summary>
         /// Create refresh token
@@ -177,6 +184,12 @@ namespace com.etsoo.CoreFramework.User
                 new(IdClaim, Id),
                 new(RoleValueClaim, RoleValue.ToString())
             };
+
+            if (Role.HasValue)
+            {
+                var keys = Role.Value.GetKeys();
+                claims.AddRange(keys.Select(role => new Claim("roles", role)));
+            }
 
             if (Scopes != null)
             {
