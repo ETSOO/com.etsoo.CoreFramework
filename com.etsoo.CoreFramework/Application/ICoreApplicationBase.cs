@@ -1,6 +1,5 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
-using com.etsoo.Utils.Actions;
 using System.Text.Json;
 
 namespace com.etsoo.CoreFramework.Application
@@ -76,17 +75,6 @@ namespace com.etsoo.CoreFramework.Application
         /// <param name="key">Key</param>
         /// <returns>Result</returns>
         string EncriptData(string plainText, string key = "");
-
-        /// <summary>
-        /// Get API user data
-        /// 获取API用户数据
-        /// </summary>
-        /// <param name="organizationId">Organization id</param>
-        /// <param name="userId">User id</param>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Action result</returns>
-        Task<IActionResult?> GetApiUserDataAsync(int organizationId, int userId, int deviceId = 0, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get exchange key

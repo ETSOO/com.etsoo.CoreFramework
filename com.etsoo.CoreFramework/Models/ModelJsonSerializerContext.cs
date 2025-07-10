@@ -68,7 +68,9 @@ namespace com.etsoo.CoreFramework.Models
     [JsonSerializable(typeof(AppTokenData))]
     [JsonSerializable(typeof(IUserToken))]
 
+    // https://docs.json-everything.net/schema/basics/
     [JsonSerializable(typeof(JsonSchema))]
+    [JsonSerializable(typeof(EvaluationResults))]
 
     [JsonSerializable(typeof(IEnumerable<EntityChangedProperty>))]
     public partial class ModelJsonSerializerContext : JsonSerializerContext

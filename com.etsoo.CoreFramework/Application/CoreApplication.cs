@@ -1,11 +1,7 @@
 ﻿using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
-using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
-using com.etsoo.Utils.String;
-using Dapper;
-using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Text.Json;
@@ -22,45 +18,6 @@ namespace com.etsoo.CoreFramework.Application
         where S : AppConfiguration
         where C : DbConnection
     {
-        /// <summary>
-        /// Get secret data
-        /// 获取秘密数据
-        /// </summary>
-        /// <param name="appName">Application name</param>
-        /// <returns>Result</returns>
-        /// <exception cref="ApplicationException"></exception>
-        protected static string GetSecretData(string appName)
-        {
-            var guid = Environment.GetEnvironmentVariable(appName, EnvironmentVariableTarget.Machine);
-            if (string.IsNullOrEmpty(guid)) throw new ApplicationException($"Secret data for {appName} is not defined");
-
-            guid = guid.Replace("-", "");
-            guid = (char)((guid[0] + guid.Last()) / 2) + guid[2..];
-
-            if (appName != "SmartERP") guid += appName;
-
-            return guid;
-        }
-
-        /// <summary>
-        /// Unseal data
-        /// 解密信息
-        /// </summary>
-        /// <param name="secretData">Secret data</param>
-        /// <param name="field">Field name</param>
-        /// <param name="input">Input data</param>
-        /// <returns>Unsealed data</returns>
-        protected static string UnsealData(string secretData, string field, string? input)
-        {
-            if (string.IsNullOrEmpty(input)) throw new ApplicationException($"Empty input for {field}");
-
-            var bytes = CryptographyUtils.AESDecrypt(input, secretData);
-
-            return bytes == null
-                ? throw new ApplicationException($"Unseal input {StringUtils.HideData(input)} for {field} failed")
-                : Encoding.UTF8.GetString(bytes);
-        }
-
         private JsonSerializerOptions? _defaultJsonSerializerOptions;
         /// <summary>
         /// Default Json serializer options
@@ -263,26 +220,6 @@ namespace com.etsoo.CoreFramework.Application
         protected virtual JsonSerializerOptions ConfigureJsonSerializerOptions(JsonSerializerOptions options)
         {
             return SharedUtils.JsonDefaultSerializerOptionsSetup(options);
-        }
-
-        /// <summary>
-        /// Get API user data
-        /// 获取API用户数据
-        /// </summary>
-        /// <param name="organizationId">Organization id</param>
-        /// <param name="userId">User id</param>
-        /// <param name="deviceId">Device id</param>
-        /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Action result</returns>
-        public virtual async Task<IActionResult?> GetApiUserDataAsync(int organizationId, int userId, int deviceId, CancellationToken cancellationToken = default)
-        {
-            var parameters = new DbParameters();
-            parameters.Add("CurrentOrg", organizationId);
-            parameters.Add("CurrentUser", userId);
-            parameters.Add("CurrentDevice", deviceId);
-
-            var command = new CommandDefinition("ep_auth_get_api_user_data", parameters, commandType: CommandType.StoredProcedure, cancellationToken: cancellationToken);
-            return await DB.QueryAsResultAsync(command);
         }
     }
 }

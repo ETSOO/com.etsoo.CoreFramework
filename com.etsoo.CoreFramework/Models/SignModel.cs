@@ -12,6 +12,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Sign model
     /// 签名模型
     /// </summary>
+    [JsonDerivedType(typeof(AppActionData))]
     [JsonDerivedType(typeof(AuthCreateTokenRQ))]
     [JsonDerivedType(typeof(AuthRefreshTokenRQ))]
     [JsonDerivedType(typeof(AuthRequest))]
