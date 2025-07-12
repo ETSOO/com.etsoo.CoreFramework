@@ -30,12 +30,20 @@ namespace com.etsoo.CoreFramework.Json
                     ),
                     ("cc", new JsonSchemaBuilder()
                         .Type(SchemaValueType.Array)
-                        .Format("email")
+                        .Items(
+                            new JsonSchemaBuilder()
+                                .Type(SchemaValueType.String)
+                                .Format("email")
+                        )
                         .UniqueItems(true)
                     ),
                     ("bcc", new JsonSchemaBuilder()
                         .Type(SchemaValueType.Array)
-                        .Format("email")
+                        .Items(
+                            new JsonSchemaBuilder()
+                                .Type(SchemaValueType.String)
+                                .Format("email")
+                        )
                         .UniqueItems(true)
                     ),
                     ("successMessage", new JsonSchemaBuilder()
