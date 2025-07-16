@@ -27,6 +27,83 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Get longest common substring (dynamic programming instead of recursion)
+        /// 获取最长公共子串 (动态编程而不是递归)
+        /// </summary>
+        /// <param name="s1">First string</param>
+        /// <param name="s2">Second string</param>
+        /// <returns>Result</returns>
+        public static ReadOnlySpan<char> GetLCS(ReadOnlySpan<char> s1, ReadOnlySpan<char> s2)
+        {
+            var table = new int[s1.Length + 1, s2.Length + 1];
+            var maxLength = 0;
+            var endIndexS1 = 0;
+
+            for (var i = 1; i <= s1.Length; i++)
+            {
+                for (var j = 1; j <= s2.Length; j++)
+                {
+                    if (s1[i - 1] == s2[j - 1])
+                    {
+                        var newLength = table[i - 1, j - 1] + 1;
+                        table[i, j] = newLength;
+
+                        if (newLength > maxLength)
+                        {
+                            maxLength = newLength;
+                            endIndexS1 = i;
+                        }
+                    }
+                    else
+                    {
+                        table[i, j] = 0;
+                    }
+                }
+            }
+
+            return maxLength > 0 ? s1.Slice(endIndexS1 - maxLength, maxLength) : [];
+        }
+
+        /// <summary>
+        /// Get same parts (dynamic programming instead of recursion)
+        /// 获取相同部分 (动态编程而不是递归)
+        /// </summary>
+        /// <param name="s1">First string</param>
+        /// <param name="s2">Second string</param>
+        /// <param name="minChars">Minimum characters to consider a part</param>
+        /// <returns>Result</returns>
+        public static string[] GetSameParts(ReadOnlySpan<char> s1, ReadOnlySpan<char> s2, int minChars = 1)
+        {
+            var result = new Dictionary<int, int>();
+
+            var table = new int[s1.Length + 1, s2.Length + 1];
+
+            for (var i = 1; i <= s1.Length; i++)
+            {
+                for (var j = 1; j <= s2.Length; j++)
+                {
+                    if (s1[i - 1] == s2[j - 1])
+                    {
+                        var newLength = table[i - 1, j - 1] + 1;
+                        table[i, j] = newLength;
+
+                        result[i - newLength] = newLength;
+                    }
+                    else
+                    {
+                        table[i, j] = 0;
+                    }
+                }
+            }
+
+            var s = s1.ToArray();
+
+            return [.. result.Where(kv => kv.Value >= minChars && !result.Any(r => kv.Key > r.Key && kv.Key + kv.Value <= r.Key + r.Value))
+                .OrderByDescending(kv => kv.Value)
+                .Select(result => s.AsSpan(result.Key, result.Value).ToString())];
+        }
+
+        /// <summary>
         /// Hide normal data
         /// 隐藏一般信息
         /// </summary>

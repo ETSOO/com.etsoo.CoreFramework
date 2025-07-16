@@ -74,6 +74,50 @@ namespace Tests.Utils
         }
 
         [Test]
+        public void GetLCSTests()
+        {
+            // Arrange
+            var input1 = "广东省佛山市季华西路中国陶瓷总部基地中区E座";
+            var input2 = "中国陶瓷产业总部基地中区-E座";
+
+            // Act
+            var result = StringUtils.GetLCS(input1, input2);
+
+            // Assert
+            Assert.That(result.ToString(), Is.EqualTo("总部基地中区"));
+        }
+
+        [Test]
+        public void GetSamePartsTest()
+        {
+            // Arrange
+            var input1 = "广东省佛山市季华西路中国陶瓷总部基地中区E座";
+            var input2 = "中国陶瓷产业总部基地中区-E座";
+
+            // Act
+            var result = StringUtils.GetSameParts(input1, input2);
+
+            // Assert
+            var expected = new[] { "总部基地中区", "中国陶瓷", "E座" };
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void GetSamePartsMinCharsTest()
+        {
+            // Arrange
+            var input1 = "1abcdefh";
+            var input2 = "ab123de4h";
+
+            // Act
+            var result = StringUtils.GetSameParts(input1, input2, 2);
+
+            // Assert
+            var expected = new[] { "ab", "de" };
+            Assert.That(result, Is.EqualTo(expected));
+        }
+
+        [Test]
         public void HideData_Test()
         {
             // Act 1
