@@ -141,7 +141,7 @@ namespace Tests.Utils
         public void GetTimeZone_Test()
         {
             // Correct
-            var tz = TimeZoneUtils.GetTimeZone("新西兰标准时间");
+            var tz = TimeZoneUtils.GetTimeZone("Pacific/Auckland");
 
             Assert.That(tz.Id, Is.EqualTo("New Zealand Standard Time"));
 
