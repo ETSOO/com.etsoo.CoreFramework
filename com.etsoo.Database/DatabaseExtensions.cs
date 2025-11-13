@@ -318,6 +318,7 @@ namespace com.etsoo.Database
         /// <param name="data">Paging data</param>
         /// <returns>Result</returns>
         [RequiresUnreferencedCode("Expression requires unreferenced code")]
+        [RequiresDynamicCode("Expression requires dynamic code")]
         public static IQueryable<TSource> QueryEtsooPaging<TSource>(this IQueryable<TSource> source, QueryPagingData data)
         {
             if (data.OrderBy?.Any() is true)
@@ -546,6 +547,7 @@ namespace com.etsoo.Database
         /// <param name="likeMethod">Like type and method name, custom ILike for PostgreSQL</param>
         /// <param name="fields">Fields</param>
         /// <returns>Result</returns>
+        [RequiresDynamicCode("Expression requires dynamic code")]
         public static Expression<Func<TSource, bool>> ToEtsooKeywords<TSource>(this string keywords, (Type type, string method)? likeMethod, params Expression<Func<TSource, string?>>[] fields)
         {
             var parts = keywords.ParseQueryKeywords();
