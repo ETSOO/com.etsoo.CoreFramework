@@ -21,14 +21,13 @@ namespace com.etsoo.Utils.Actions
         /// </summary>
         public bool Ok { get; init; }
 
-        string? type;
         /// <summary>
         /// Type
         /// 类型
         /// </summary>
         public string? Type
         {
-            get { return type; }
+            get;
             init
             {
                 if (!string.IsNullOrEmpty(value))
@@ -37,13 +36,13 @@ namespace com.etsoo.Utils.Actions
                     var items = value.Split('/');
                     if (items.Length > 1)
                     {
-                        type = items[0];
-                        field = items[1];
+                        field = items[0];
+                        Field = items[1];
                         return;
                     }
                 }
 
-                type = value;
+                field = value;
             }
         }
 
@@ -53,14 +52,13 @@ namespace com.etsoo.Utils.Actions
         /// </summary>
         public string? Title { get; set; }
 
-        string? field;
         /// <summary>
         /// Field
         /// 字段
         /// </summary>
         public string? Field
         {
-            get { return field; }
+            get;
             set
             {
                 if (!string.IsNullOrEmpty(value))
@@ -99,7 +97,7 @@ namespace com.etsoo.Utils.Actions
         /// 是否成功
         /// </summary>
         [MemberNotNullWhen(true, nameof(Data))]
-        public new bool Ok { get; set; } // 'init' will cause "Duplicate initialization of member 'Ok'" in NET 8
+        public new bool Ok { get; init; }
 
         /// <summary>
         /// Data

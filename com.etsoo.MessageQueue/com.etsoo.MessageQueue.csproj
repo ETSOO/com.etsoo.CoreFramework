@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <SignAssembly>true</SignAssembly>
@@ -11,12 +11,12 @@
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.MessageQueue</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
 	  <Company>ETSOO / 亿速思维</Company>
-	  <Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
+	  <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Description>ETSOO Messge Queue Utilities
 亿速思维消息队列工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.96</Version>
+	  <Version>1.0.97</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -35,11 +35,10 @@
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="Cronos" Version="0.11.1" />
-    <PackageReference Include="Google.Cloud.PubSub.V1" Version="3.28.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />
-    <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
-    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+    <PackageReference Include="Google.Cloud.PubSub.V1" Version="3.30.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>

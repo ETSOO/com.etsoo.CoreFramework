@@ -1,4 +1,5 @@
-﻿using Google.Cloud.PubSub.V1;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Cloud.PubSub.V1;
 
 namespace com.etsoo.MessageQueue.GooglePubSub
 {
@@ -8,6 +9,11 @@ namespace com.etsoo.MessageQueue.GooglePubSub
     /// </summary>
     public static class GooglePubSubUtils
     {
+        private static void SetupClientBuilder()
+        {
+
+        }
+
         /// <summary>
         /// Setup publisher client builder
         /// 设置发布者客户端生成器
@@ -17,8 +23,8 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         public static void SetupPublisherClientBuilder(PublisherClientBuilder builder, GooglePubSubProducerOptions options)
         {
             if (options.Endpoint != null) builder.Endpoint = options.Endpoint;
-            if (options.CredentialsPath != null) builder.CredentialsPath = options.CredentialsPath;
-            if (options.JsonCredentials != null) builder.JsonCredentials = options.JsonCredentials;
+            if (options.CredentialsPath != null) builder.Credential = CredentialFactory.FromFile<ServiceAccountCredential>(options.CredentialsPath);
+            if (options.JsonCredentials != null) builder.Credential = CredentialFactory.FromJson<ServiceAccountCredential>(options.JsonCredentials);
             if (options.ClientCount.HasValue) builder.ClientCount = options.ClientCount.Value;
             if (options.QuotaProject != null) builder.QuotaProject = options.QuotaProject;
             if (options.UserAgent != null) builder.UserAgent = options.UserAgent;
@@ -35,8 +41,8 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         public static void SetupSubscriberClientBuilder(SubscriberClientBuilder builder, GooglePubSubConsumerOptions options)
         {
             if (options.Endpoint != null) builder.Endpoint = options.Endpoint;
-            if (options.CredentialsPath != null) builder.CredentialsPath = options.CredentialsPath;
-            if (options.JsonCredentials != null) builder.JsonCredentials = options.JsonCredentials;
+            if (options.CredentialsPath != null) builder.Credential = CredentialFactory.FromFile<ServiceAccountCredential>(options.CredentialsPath);
+            if (options.JsonCredentials != null) builder.Credential = CredentialFactory.FromJson<ServiceAccountCredential>(options.JsonCredentials);
             if (options.ClientCount.HasValue) builder.ClientCount = options.ClientCount.Value;
             if (options.QuotaProject != null) builder.QuotaProject = options.QuotaProject;
             if (options.UserAgent != null) builder.UserAgent = options.UserAgent;

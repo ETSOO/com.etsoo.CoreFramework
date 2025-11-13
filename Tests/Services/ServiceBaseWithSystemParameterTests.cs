@@ -64,6 +64,7 @@ namespace Tests.Services
             {
                 var sql = @"
                     CREATE TABLE IF NOT EXISTS User (id int PRIMARY KEY, name nvarchar(128), status int) WITHOUT ROWID;
+                    DELETE FROM User;
                     INSERT OR IGNORE INTO User (id, name) VALUES(1002, 'Admin 2');
                     INSERT OR IGNORE INTO User (id, name) VALUES(1001, 'Admin 1');
                 ";

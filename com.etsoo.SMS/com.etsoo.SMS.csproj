@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <SignAssembly>true</SignAssembly>
@@ -11,12 +11,12 @@
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SMS</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
 	  <Company>ETSOO / 亿速思维</Company>
-	  <Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
+	  <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Description>ETSOO SMS Utilities
 亿速思维短信工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.0.71</Version>
+	  <Version>1.0.72</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>

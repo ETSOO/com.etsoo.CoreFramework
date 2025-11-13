@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <SignAssembly>true</SignAssembly>
@@ -11,12 +11,12 @@
 	  <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.Database</RepositoryUrl>
 	  <Authors>ETSOO SmartERP NextGen Team</Authors>
 	  <Company>ETSOO / 亿速思维</Company>
-	  <Copyright>Copyright © ETSOO 2004 - 2025</Copyright>
+	  <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <Description>ETSOO Database Utilities
 亿速思维数据库工具</Description>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	  <Version>1.1.68</Version>
+	  <Version>1.1.69</Version>
 	  <AssemblyVersion>1.0.1.0</AssemblyVersion>
 	  <FileVersion>1.0.1.0</FileVersion>
 	  <PackageIcon>logo.png</PackageIcon>
@@ -35,10 +35,9 @@
     <PackageReference Include="Azure.Identity" Version="1.17.0" />
     <PackageReference Include="Dapper.StrongName" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
     <PackageReference Include="Npgsql" Version="9.0.4" />
-    <PackageReference Include="System.Text.Json" Version="9.0.9" />
-    <PackageReference Include="TimeZoneConverter" Version="7.0.0" />
+    <PackageReference Include="TimeZoneConverter" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.SourceGenerators</RepositoryUrl>
     <RepositoryType></RepositoryType>
     <Company>ETSOO / 亿速思维</Company>
-    <Copyright>Copyright © ETSOO 2004 - 2024</Copyright>
+    <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
     <Authors>ETSOO SmartERP NextGen Team</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO Shared Source Generators
@@ -16,7 +16,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.92</Version>
+    <Version>1.0.93</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

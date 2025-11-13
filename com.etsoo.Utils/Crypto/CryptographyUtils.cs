@@ -50,10 +50,7 @@ namespace com.etsoo.Utils.Crypto
             // Hash the user password along with the salt
             // 由密匙创建加密的键，而不要直接使用密匙
             // https://stackoverflow.com/questions/2659214/why-do-i-need-to-use-the-rfc2898derivebytes-class-in-net-instead-of-directly
-            using var password = new Rfc2898DeriveBytes(passphrase, salt, iterations, HashAlgorithmName.SHA256);
-
-            // Key: 32 x 8 = 256 bits
-            return password.GetBytes(bytes);
+            return Rfc2898DeriveBytes.Pbkdf2(passphrase, salt, iterations, HashAlgorithmName.SHA256, bytes);
         }
 
         /// <summary>

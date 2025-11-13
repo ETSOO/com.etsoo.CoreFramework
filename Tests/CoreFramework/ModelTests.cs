@@ -145,7 +145,7 @@ namespace Tests.CoreFramework
             Assert.Multiple(() =>
             {
                 Assert.That(hasContent, Is.True);
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
                 Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
             });
         }
@@ -211,7 +211,7 @@ namespace Tests.CoreFramework
 
             Assert.Multiple(() =>
             {
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" IN (1001, 1002, 1003) AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" <= 100 AND \"u\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_1)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" IN (1001, 1002, 1003) AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" <= 100 AND \"u\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
             });
         }
 
@@ -244,7 +244,7 @@ namespace Tests.CoreFramework
             Assert.Multiple(() =>
             {
                 Assert.That(hasContent, Is.True); // Empty array
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" = 1001 AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" > 100 AND ((\"u\".\"Name\" LIKE '%肖%' AND \"u\".\"Name\" NOT LIKE '%赞%') OR \"u\".\"Name\" LIKE '%肖必须%')\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_1)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" = 1001 AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" > 100 AND ((\"u\".\"Name\" LIKE '%肖%' AND \"u\".\"Name\" NOT LIKE '%赞%') OR \"u\".\"Name\" LIKE '%肖必须%')\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
             });
         }
 
@@ -299,7 +299,7 @@ namespace Tests.CoreFramework
             Assert.Multiple(() =>
             {
                 Assert.That(hasContent, Is.True);
-                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
                 Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
             });
         }
@@ -328,7 +328,7 @@ namespace Tests.CoreFramework
             Assert.Multiple(() =>
             {
                 Assert.That(hasContent, Is.False);
-                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3) AND (\"u\".\"Name\" > '肖赞' OR (\"u\".\"Name\" = '肖赞' AND \"u\".\"Id\" < 1))\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @__p_0)"));
+                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3) AND (\"u\".\"Name\" > '肖赞' OR (\"u\".\"Name\" = '肖赞' AND \"u\".\"Id\" < 1))\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
             });
         }
 

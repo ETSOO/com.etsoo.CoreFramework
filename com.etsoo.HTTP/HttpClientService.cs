@@ -643,6 +643,23 @@ namespace com.etsoo.HTTP
             return await response.Content.ReadFromJsonAsync(typeInfo, cancellationToken);
         }
 
+        private async ValueTask<bool> IsStreamJsonDataAsync(Stream stream, string dataField, CancellationToken cancellationToken)
+        {
+            // Read first bytes
+            var len = Math.Min(dataField.Length + 64, stream.Length);
+
+            Memory<byte> bytes = new byte[len];
+            await stream.ReadExactlyAsync(bytes, cancellationToken);
+
+            // Characters
+            var chars = Encoding.UTF8.GetString(bytes.Span);
+
+            // Back to the beginning
+            stream.Position = 0;
+
+            return Regex.IsMatch(chars, "[\\{\"\\s](" + dataField + ")[\"]?:", RegexOptions.Multiline);
+        }
+
         /// <summary>
         /// Http Response to data/error 2 conditions object
         /// HTTP回应转换为 数据/错误 两种情况对象
@@ -662,14 +679,8 @@ namespace com.etsoo.HTTP
             // Get stream
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-            // Test first 128-byte characters only
-            Memory<byte> bytes = new byte[128];
-            await stream.ReadAsync(bytes, cancellationToken);
-
-            var chars = Encoding.UTF8.GetString(bytes.Span);
-            stream.Position = 0;
-
-            if (Regex.IsMatch(chars, "[\\{\"\\s](" + dataField + ")[\"]?:", RegexOptions.Multiline))
+            // Check
+            if (await IsStreamJsonDataAsync(stream, dataField, cancellationToken))
             {
                 var data = await JsonSerializer.DeserializeAsync<D>(stream, Options, cancellationToken);
                 return new HttpClientResult<D, E>(data, default);
@@ -700,14 +711,8 @@ namespace com.etsoo.HTTP
             // Get stream
             await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-            // Test first 128-byte characters only
-            Memory<byte> bytes = new byte[128];
-            await stream.ReadAsync(bytes, cancellationToken);
-
-            var chars = Encoding.UTF8.GetString(bytes.Span);
-            stream.Position = 0;
-
-            if (Regex.IsMatch(chars, "[\\{\"\\s](" + dataField + ")[\"]?:", RegexOptions.Multiline))
+            // Check
+            if (await IsStreamJsonDataAsync(stream, dataField, cancellationToken))
             {
                 var data = await JsonSerializer.DeserializeAsync(stream, dataTypeInfo, cancellationToken);
                 return new HttpClientResult<D, E>(data, default);

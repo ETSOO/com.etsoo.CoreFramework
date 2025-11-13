@@ -125,8 +125,8 @@ namespace Tests.ActionResult
             {
                 // Assert
                 Assert.That(dataResult?.Ok, Is.True);
-                Assert.That(dataResult?.Data.Id, Is.EqualTo(id));
-                Assert.That(dataResult?.Data.Msg, Is.EqualTo(msg));
+                Assert.That(dataResult?.Data?.Id, Is.EqualTo(id));
+                Assert.That(dataResult?.Data?.Msg, Is.EqualTo(msg));
             });
         }
     }
