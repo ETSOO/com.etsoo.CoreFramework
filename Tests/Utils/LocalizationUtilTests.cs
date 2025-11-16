@@ -158,13 +158,13 @@ namespace Tests.Utils
             var py4 = ChineseUtils.GetPinyin("青岛亿速思维网络科技有限公司").ToPinyin(true);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(py1, Is.EqualTo("Chong Qing Ai Hao Zhen Hao Zhong"));
                 Assert.That(py2, Is.EqualTo("Chong2 Qing4 Ai4 Hao4 Zhen1 Hao3 Zhong4"));
                 Assert.That(py3, Is.EqualTo("CQAHZHZ"));
                 Assert.That(py4, Is.EqualTo("Qing1 Dao3 Yi4 Su4 Si1 Wei2 Wang3 Luo4 Ke1 Ji4 You3 Xian4 Gong1 Si1"));
-            });
+            }
         }
 
         [Test]
@@ -176,12 +176,108 @@ namespace Tests.Utils
             var py3 = ChineseUtils.GetPinyin("肖赞长沙人是会长", true).ToPinyin(true);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(py1, Is.EqualTo("Yu4 Chi2 Jing4 De2"));
                 Assert.That(py2, Is.EqualTo("Piao2 Jing4 Ye4"));
                 Assert.That(py3, Is.EqualTo("Xiao1 Zan4 Chang2 Sha1 Ren2 Shi4 Hui4 Zhang3"));
-            });
+            }
+        }
+
+        [Test]
+        public void GetPinyinNameMixedTests()
+        {
+            // Arrange & Act
+            var py1 = ChineseUtils.GetPinyin("肖赞Garry Xiao", true).ToPinyin(true);
+            var py2 = ChineseUtils.GetPinyin("肖 赞", true).ToPinyin(true);
+
+            // Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(py1, Is.EqualTo("Xiao1 Zan4"));
+                Assert.That(py2, Is.EqualTo("Xiao1 Zan4"));
+            }
+        }
+
+        [Test]
+        public void ContainsChineseTests()
+        {
+            // Arrange & Act
+            var result1 = LocalizationUtils.ContainsChinese("Hello, 世界!");
+            var result2 = LocalizationUtils.ContainsChinese("Hello, World!");
+
+            // Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result1, Is.True);
+                Assert.That(result2, Is.False);
+            }
+        }
+
+        [Test]
+        public void ContainsKoreanTests()
+        {
+            // Arrange & Act
+            var result1 = LocalizationUtils.ContainsKorean("Hello, 세계!");
+            var result2 = LocalizationUtils.ContainsKorean("Hello, 世界！");
+
+            // Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result1, Is.True);
+                Assert.That(result2, Is.False);
+            }
+        }
+
+        [Test]
+        public void ContainsJapaneseTests()
+        {
+            // Arrange & Act
+            var result1 = LocalizationUtils.ContainsJapanese("Hello, 世界!");
+            var result2 = LocalizationUtils.ContainsJapanese("Hello, ワールド!");
+            var result3 = LocalizationUtils.ContainsJapanese("Hello, 세계!");
+
+            // Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result1, Is.True);
+                Assert.That(result2, Is.True);
+                Assert.That(result3, Is.False);
+            }
+        }
+
+        [Test]
+        public void ParseNameTests()
+        {
+            // Arrange & Act
+            var name1 = LocalizationUtils.ParseName("张伟");
+            var name2 = LocalizationUtils.ParseName("李小龙");
+            var name3 = LocalizationUtils.ParseName("王  芳");
+            var name4 = LocalizationUtils.ParseName("John Smith");
+
+            // Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(name1.FamilyName, Is.EqualTo("张"));
+                Assert.That(name1.GivenName, Is.EqualTo("伟"));
+                Assert.That(name1.LatinFamilyName, Is.EqualTo("Zhang"));
+                Assert.That(name1.LatinGivenName, Is.EqualTo("Wei"));
+
+                Assert.That(name2.FamilyName, Is.EqualTo("李"));
+                Assert.That(name2.GivenName, Is.EqualTo("小龙"));
+                Assert.That(name2.LatinFamilyName, Is.EqualTo("Li"));
+                Assert.That(name2.LatinGivenName, Is.EqualTo("Xiao Long"));
+
+                Assert.That(name3.FamilyName, Is.EqualTo("王"));
+                Assert.That(name3.GivenName, Is.EqualTo("芳"));
+                Assert.That(name3.LatinFamilyName, Is.EqualTo("Wang"));
+                Assert.That(name3.LatinGivenName, Is.EqualTo("Fang"));
+
+                Assert.That(name4.FamilyName, Is.EqualTo("Smith"));
+                Assert.That(name4.GivenName, Is.EqualTo("John"));
+                Assert.That(name4.LatinFamilyName, Is.Null);
+                Assert.That(name4.LatinGivenName, Is.Null);
+            }
         }
     }
 }

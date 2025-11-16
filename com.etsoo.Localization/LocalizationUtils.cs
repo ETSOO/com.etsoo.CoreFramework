@@ -7,7 +7,7 @@ namespace com.etsoo.Localization
     /// Localization utilities
     /// 本地化工具
     /// </summary>
-    public static class LocalizationUtils
+    public static partial class LocalizationUtils
     {
         /// <summary>
         /// Set culture
@@ -287,5 +287,139 @@ namespace com.etsoo.Localization
             return CultureInfo.GetCultures(CultureTypes.SpecificCultures)
                               .Where(c => c.Name.EndsWith(ends));
         }
+
+        /// <summary>
+        /// Parse name data
+        /// 解析姓名信息
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <returns>Result</returns>
+        public static NameData ParseName(string name)
+        {
+            string? familyName = null;
+            string? givenName = null;
+            return ParseName(name, ref familyName, ref givenName);
+        }
+
+        /// <summary>
+        /// Parse name data
+        /// 解析姓名信息
+        /// </summary>
+        /// <param name="name">Name</param>
+        /// <param name="familyName">Family name</param>
+        /// <param name="givenName">Given name</param>
+        /// <returns>Result</returns>
+        public static NameData ParseName(string name, ref string? familyName, ref string? givenName)
+        {
+            name = name.Trim();
+
+            string? latinFamilyName = null;
+            string? latinGivenName = null;
+
+            var containsChinese = ContainsChinese(name);
+
+            if (containsChinese || ContainsJapanese(name) || ContainsKorean(name))
+            {
+                // CJK name, family name first
+                if (name.Length >= 2)
+                {
+                    if (string.IsNullOrEmpty(familyName)) familyName = name[..1];
+                    if (string.IsNullOrEmpty(givenName)) givenName = name[1..].Trim();
+                }
+                else if (string.IsNullOrEmpty(familyName))
+                {
+                    familyName = name;
+                }
+
+                if (containsChinese)
+                {
+                    if (!string.IsNullOrEmpty(familyName))
+                    {
+                        latinFamilyName = ChineseUtils.GetPinyin(familyName, true).ToPinyin();
+                    }
+
+                    if (!string.IsNullOrEmpty(givenName))
+                    {
+                        latinGivenName = ChineseUtils.GetPinyin(givenName, true).ToPinyin();
+                    }
+                }
+            }
+            else
+            {
+                // Other languages, given name first
+                var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    if (string.IsNullOrEmpty(givenName)) givenName = parts[0];
+                    if (string.IsNullOrEmpty(familyName)) familyName = parts.Last();
+                }
+                else if (string.IsNullOrEmpty(givenName))
+                {
+                    givenName = parts[0];
+                }
+            }
+
+            return new NameData
+            {
+                FamilyName = familyName,
+                GivenName = givenName,
+                LatinFamilyName = latinFamilyName,
+                LatinGivenName = latinGivenName
+            };
+        }
+
+        /// <summary>
+        /// Check if the input string contains Chinese characters
+        /// Refer to @shared/Utils.ts
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>True if contains Chinese characters, false otherwise</returns>
+        public static bool ContainsChinese(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            var regExp = ChineseRegex();
+            return regExp.IsMatch(input);
+        }
+
+        /// <summary>
+        /// Check if the input string contains Korean characters
+        /// Refer to @shared/Utils.ts
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>True if contains Korean characters, false otherwise</returns>
+        public static bool ContainsKorean(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            var regExp = KoreanRegex();
+            return regExp.IsMatch(input);
+        }
+
+        /// <summary>
+        /// Check if the input string contains Japanese characters
+        /// Refer to @shared/Utils.ts
+        /// </summary>
+        /// <param name="input">Input string</param>
+        /// <returns>True if contains Japanese characters, false otherwise</returns>
+        public static bool ContainsJapanese(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            var regExp = JapaneseRegex();
+            return regExp.IsMatch(input);
+        }
+
+        [System.Text.RegularExpressions.GeneratedRegex(@"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]")]
+        private static partial System.Text.RegularExpressions.Regex ChineseRegex();
+
+        [System.Text.RegularExpressions.GeneratedRegex(@"[\uac00-\ud7af\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\ud7b0-\ud7ff\u3400-\u4dbf]")]
+        private static partial System.Text.RegularExpressions.Regex KoreanRegex();
+
+        [System.Text.RegularExpressions.GeneratedRegex(@"[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf]")]
+        private static partial System.Text.RegularExpressions.Regex JapaneseRegex();
     }
 }
