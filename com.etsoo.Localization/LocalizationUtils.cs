@@ -293,23 +293,10 @@ namespace com.etsoo.Localization
         /// 解析姓名信息
         /// </summary>
         /// <param name="name">Name</param>
-        /// <returns>Result</returns>
-        public static NameData ParseName(string name)
-        {
-            string? familyName = null;
-            string? givenName = null;
-            return ParseName(name, ref familyName, ref givenName);
-        }
-
-        /// <summary>
-        /// Parse name data
-        /// 解析姓名信息
-        /// </summary>
-        /// <param name="name">Name</param>
         /// <param name="familyName">Family name</param>
         /// <param name="givenName">Given name</param>
         /// <returns>Result</returns>
-        public static NameData ParseName(string name, ref string? familyName, ref string? givenName)
+        public static NameData ParseName(string name, string? familyName = null, string? givenName = null)
         {
             name = name.Trim();
 
