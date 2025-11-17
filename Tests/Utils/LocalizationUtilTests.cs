@@ -258,21 +258,25 @@ namespace Tests.Utils
             // Assert
             using (Assert.EnterMultipleScope())
             {
+                Assert.That(name1.PinyinInitials, Is.EqualTo("ZW"));
                 Assert.That(name1.FamilyName, Is.EqualTo("张"));
                 Assert.That(name1.GivenName, Is.EqualTo("伟"));
                 Assert.That(name1.LatinFamilyName, Is.EqualTo("Zhang"));
                 Assert.That(name1.LatinGivenName, Is.EqualTo("Wei"));
 
+                Assert.That(name2.PinyinInitials, Is.EqualTo("LXL"));
                 Assert.That(name2.FamilyName, Is.EqualTo("李"));
                 Assert.That(name2.GivenName, Is.EqualTo("小龙"));
                 Assert.That(name2.LatinFamilyName, Is.EqualTo("Li"));
                 Assert.That(name2.LatinGivenName, Is.EqualTo("Xiao Long"));
-
+                
+                Assert.That(name3.PinyinInitials, Is.EqualTo("WF"));
                 Assert.That(name3.FamilyName, Is.EqualTo("王"));
                 Assert.That(name3.GivenName, Is.EqualTo("芳"));
                 Assert.That(name3.LatinFamilyName, Is.EqualTo("Wang"));
                 Assert.That(name3.LatinGivenName, Is.EqualTo("Fang"));
 
+                Assert.That(name4.PinyinInitials, Is.Null);
                 Assert.That(name4.FamilyName, Is.EqualTo("Smith"));
                 Assert.That(name4.GivenName, Is.EqualTo("John"));
                 Assert.That(name4.LatinFamilyName, Is.Null);

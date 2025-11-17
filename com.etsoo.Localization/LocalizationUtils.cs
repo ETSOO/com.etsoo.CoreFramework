@@ -300,6 +300,7 @@ namespace com.etsoo.Localization
         {
             name = name.Trim();
 
+            string? pinyinInitials = null;
             string? latinFamilyName = null;
             string? latinGivenName = null;
 
@@ -320,6 +321,8 @@ namespace com.etsoo.Localization
 
                 if (containsChinese)
                 {
+                    pinyinInitials = ChineseUtils.GetPinyin(name, true).ToInitials();
+
                     if (!string.IsNullOrEmpty(familyName))
                     {
                         latinFamilyName = ChineseUtils.GetPinyin(familyName, true).ToPinyin();
@@ -348,6 +351,7 @@ namespace com.etsoo.Localization
 
             return new NameData
             {
+                PinyinInitials = pinyinInitials,
                 FamilyName = familyName,
                 GivenName = givenName,
                 LatinFamilyName = latinFamilyName,
