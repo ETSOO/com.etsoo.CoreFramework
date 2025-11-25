@@ -16,7 +16,7 @@
 		<Description>ETSOO Html Utilities
 亿速思维 Html 工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.70</Version>
+		<Version>1.0.71</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>
@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.4.0" />
-    <PackageReference Include="AngleSharp.Css" Version="1.0.0-beta.144" />
+    <PackageReference Include="AngleSharp.Css" Version="1.0.0-beta.159" />
   </ItemGroup>
 
 </Project>
