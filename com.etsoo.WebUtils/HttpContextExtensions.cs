@@ -1,4 +1,6 @@
-﻿using com.etsoo.Utils.String;
+﻿using com.etsoo.Utils.Actions;
+using com.etsoo.Utils.Serialization;
+using com.etsoo.Utils.String;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -250,6 +252,19 @@ namespace com.etsoo.WebUtils
             }
 
             /// <summary>
+            /// Write object as JSON to the response body
+            /// 输出对象为 JSON 到响应体
+            /// </summary>
+            /// <typeparam name="T">Generic data type</typeparam>
+            /// <param name="data">Data</param>
+            /// <param name="typeInfo">JSON type info</param>
+            /// <returns>Task</returns>
+            public Task WriteAsJsonAsync<T>(T data, JsonTypeInfo<T> typeInfo)
+            {
+                return context.Response.WriteAsJsonAsync(data, typeInfo, cancellationToken: context.RequestAborted);
+            }
+
+            /// <summary>
             /// Async write raw JSON string
             /// 异步输出原始 JSON 字符串
             /// </summary>
@@ -346,6 +361,20 @@ namespace com.etsoo.WebUtils
                     await response.WriteAsync(raw, cancellationToken);
                 else
                     response.StatusCode = (int)HttpStatusCode.NoContent;
+            }
+        }
+
+        extension(IActionResult result)
+        {
+            /// <summary>
+            /// Execute action result
+            /// 执行动作结果
+            /// </summary>
+            /// <param name="context">HTTP context</param>
+            /// <returns>Task</returns>
+            public Task ExecuteAsync(HttpContext context)
+            {
+                return context.WriteAsJsonAsync(result, CommonJsonSerializerContext.Default.IActionResult);
             }
         }
 
