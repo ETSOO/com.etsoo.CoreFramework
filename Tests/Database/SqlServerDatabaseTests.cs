@@ -1,12 +1,11 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.Utils;
 using Dapper;
-using NUnit.Framework;
 using System.Data;
 
 namespace Tests.Database
 {
-    [TestFixture]
+    [TestClass]
     public class SqlServerDatabaseTests
     {
         readonly SqlServerDatabase db;
@@ -22,7 +21,7 @@ namespace Tests.Database
         /// Setup
         /// 初始化
         /// </summary>
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
         }
@@ -31,65 +30,62 @@ namespace Tests.Database
         /// Constructor test
         /// 构造函数测试
         /// </summary>
-        [Test]
+        [TestMethod]
         public void SqliteDatabase_Constructor_Test()
         {
             // Act & Asset
-            Assert.DoesNotThrowAsync(async () =>
-            {
-                await using var connection = db.NewConnection();
-                await connection.OpenAsync();
-                await connection.CloseAsync();
-            });
+            using var connection = db.NewConnection();
+            connection.OpenAsync().GetAwaiter().GetResult();
+            connection.CloseAsync().GetAwaiter().GetResult();
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsBoolTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["u.Id", "u.Shared:boolean"], mapping, null, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, true);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("u.[Id], u.[Shared]"));
-                Assert.That(mapping, Does.ContainKey("shared").WithValue("Shared"));
-                Assert.That(json, Is.EqualTo("Id AS [id], Shared AS [shared]"));
-            });
+
+            // Assert
+            Assert.AreEqual("u.[Id], u.[Shared]", result);
+            Assert.IsTrue(mapping.ContainsKey("shared"));
+            Assert.AreEqual("Shared", mapping["shared"]);
+            Assert.AreEqual("Id AS [id], Shared AS [shared]", json);
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsJsonTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["u.Id", "u.JsonData:json"], mapping, null, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, true);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("u.[Id], u.[JsonData]"));
-                Assert.That(mapping, Does.ContainKey("jsonData").WithValue("JsonData:json"));
-                Assert.That(json, Is.EqualTo("Id AS [id], JSON_QUERY(JsonData) AS [jsonData]"));
-            });
+
+            // Assert
+            Assert.AreEqual("u.[Id], u.[JsonData]", result);
+            Assert.IsTrue(mapping.ContainsKey("jsonData"));
+            Assert.AreEqual("JsonData:json", mapping["jsonData"]);
+            Assert.AreEqual("Id AS [id], JSON_QUERY(JsonData) AS [jsonData]", json);
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsEqualTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["Author", "IIF(u.id = @UserId, TRUE, FALSE):boolean AS isSelf"], mapping, null, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, false);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("[Author], CAST(IIF(u.id = @UserId, 1, 0) AS bit) AS [isSelf]"));
-                Assert.That(mapping, Does.ContainKey("isSelf").WithValue("isSelf"));
-                Assert.That(json, Is.EqualTo("Author AS [author], isSelf"));
-            });
+
+            // Assert
+            Assert.AreEqual("[Author], CAST(IIF(u.id = @UserId, 1, 0) AS bit) AS [isSelf]", result);
+            Assert.IsTrue(mapping.ContainsKey("isSelf"));
+            Assert.AreEqual("isSelf", mapping["isSelf"]);
+            Assert.AreEqual("Author AS [author], isSelf", json);
         }
 
         /// <summary>
         /// Async Test Executing SQL Command
         /// 异步测试执行SQL 命令
         /// </summary>
-        [Test]
+        [TestMethod]
         public void ExecuteAsync_Test()
         {
             // Arrange
@@ -102,14 +98,11 @@ namespace Tests.Database
             // Insert rows
             var sql = "IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user1) INSERT INTO [User] (Id, Name) VALUES(@user1, @name1); IF NOT EXISTS (SELECT * FROM [User] WHERE Id = @user2) INSERT INTO [User] (Id, Name) VALUES(@user2, @name2)";
 
-            // Result
-            Assert.DoesNotThrowAsync(async () =>
-            {
-                await connection.ExecuteAsync(sql, paras);
-            });
+            // Result: execute and wait for completion
+            connection.ExecuteAsync(sql, paras).GetAwaiter().GetResult();
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExecuteAsync_ReturnAndOutputTest()
         {
             // Arrange
@@ -130,13 +123,13 @@ namespace Tests.Database
             await connection.ExecuteAsync("ep_user_return", parameters, commandType: CommandType.StoredProcedure);
 
             var result = parameters.Get<int>(name);
-            Assert.That(result, Is.EqualTo(value));
+            Assert.AreEqual(value, result);
 
             var outputValue = parameters.Get<short>(output);
-            Assert.That(outputValue, Is.EqualTo(2 * result));
+            Assert.AreEqual((short)(2 * result), outputValue);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExecuteReader_Test()
         {
             // Arrange
@@ -150,16 +143,16 @@ namespace Tests.Database
             var users = await TestUserModule.CreateListAsync(reader);
 
             // Assert
-            Assert.That(users.Count, Is.EqualTo(1));
-            Assert.That(users[0].Id, Is.EqualTo(1001));
-            Assert.That(users[0].Friends?.Length, Is.EqualTo(3));
+            Assert.AreEqual(1, users.Count);
+            Assert.AreEqual(1001, users[0].Id);
+            Assert.AreEqual(3, users[0].Friends?.Length);
         }
 
         /// <summary>
         /// Async test Executing SQL Command to return first row first column value
         /// 测试异步执行SQL命令，返回第一行第一列的值
         /// </summary>
-        [Test]
+        [TestMethod]
         public async Task ExecuteScalarAsync_Test()
         {
             // Arrange
@@ -169,10 +162,10 @@ namespace Tests.Database
             var result = await connection.ExecuteScalarAsync("SELECT Name FROM [User] WHERE Id = 1001");
 
             // Assert
-            Assert.That(result, Is.EqualTo("Admin 1"));
+            Assert.AreEqual("Admin 1", result);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExecuteScalarAsync_DynamicTest()
         {
             // Arrange
@@ -185,14 +178,14 @@ namespace Tests.Database
             var result = await connection.ExecuteScalarAsync("SELECT @Prefix + Name FROM [User] WHERE Id = @Id", parameters);
 
             // Assert
-            Assert.That(result, Is.EqualTo("DynamicAdmin 1"));
+            Assert.AreEqual("DynamicAdmin 1", result);
         }
 
         /// <summary>
         /// Async test executing SQL Command to return TextReader of first row first column value, used to read huge text data like json/xml
         /// 异步测试执行SQL命令，返回第一行第一列的TextReader值，用于读取大文本字段，比如返回的JSON/XML数据
         /// </summary>
-        [Test]
+        [TestMethod]
         public async Task ExecuteToStreamAsync_Test()
         {
             // Arrange
@@ -204,10 +197,10 @@ namespace Tests.Database
             await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 1001 FOR JSON PATH, WITHOUT_ARRAY_WRAPPER"), stream);
 
             // Assert
-            Assert.That(stream.Length, Is.EqualTo("{\"Name\":\"Admin 1\"}".Length));
+            Assert.AreEqual("{\"Name\":\"Admin 1\"}".Length, stream.Length);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExecuteToStreamAsyncWithEmpty_Test()
         {
             // Arrange
@@ -219,7 +212,7 @@ namespace Tests.Database
             var result = await connection.QueryToStreamAsync(new("SELECT TOP 1 Name FROM [User] WHERE Id = 0 FOR JSON PATH"), stream);
 
             // Assert
-            Assert.That(result, Is.False);
+            Assert.IsFalse(result);
         }
     }
 }

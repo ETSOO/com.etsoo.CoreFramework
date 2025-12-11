@@ -2,24 +2,23 @@
 using com.etsoo.MessageQueue.LocalRabbitMQ;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.MessageQueue
 {
-    [TestFixture]
-    internal class LocalRabbitMQTests
+    [TestClass]
+    public class LocalRabbitMQTests
     {
-        [Test]
+        [TestMethod]
         public async Task ProducerSendAsyncTest()
         {
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
-            Assert.That(messageId, Is.Not.Null);
+            Assert.IsNotNull(messageId);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ProducerReceiveAsyncTest()
         {
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
@@ -41,15 +40,12 @@ namespace Tests.MessageQueue
             await Task.Delay(1000);
             await consumer.StopAsync(default);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(messages, Is.Not.Empty);
-                Assert.That(messages.Any(m => "GUID".Equals(m.UserId)), Is.True);
-                Assert.That(messages.Any(m => messageId.Equals(m.MessageId)), Is.True);
-            });
+            Assert.IsTrue(messages.Any());
+            Assert.IsTrue(messages.Any(m => "GUID".Equals(m.UserId)));
+            Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
         }
 
-        [Test]
+        [TestMethod]
         public async Task ProducerReceiveAsyncStringTest()
         {
             var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Hub-Test" });
@@ -73,12 +69,9 @@ namespace Tests.MessageQueue
             await Task.Delay(1000);
             await consumer.StopAsync(source.Token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(messages, Is.Not.Empty);
-                Assert.That(messages.Any(m => "Hello".Equals(m.Item2)), Is.True);
-                Assert.That(messages.Any(m => messageId.Equals(m.Item1.MessageId)), Is.True);
-            });
+            Assert.IsTrue(messages.Any());
+            Assert.IsTrue(messages.Any(m => "Hello".Equals(m.Item2)));
+            Assert.IsTrue(messages.Any(m => messageId.Equals(m.Item1.MessageId)));
         }
     }
 }

@@ -1,70 +1,71 @@
 ﻿using com.etsoo.Database;
-using NUnit.Framework;
 using System.Data;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class SqlServerUtilTests
     {
-        private static IEnumerable<TestCaseData> DbTypeToSqlBulkTestData
+        private static IEnumerable<object[]> DbTypeToSqlBulkTestData
         {
             get
             {
-                yield return new TestCaseData(DbType.Byte, SqlDbType.TinyInt);
-                yield return new TestCaseData(DbType.AnsiString, SqlDbType.VarChar);
-                yield return new TestCaseData(DbType.AnsiStringFixedLength, SqlDbType.Char);
-                yield return new TestCaseData(DbType.String, SqlDbType.NVarChar);
-                yield return new TestCaseData(DbType.StringFixedLength, SqlDbType.NChar);
-                yield return new TestCaseData(DbType.Byte, SqlDbType.TinyInt);
-                yield return new TestCaseData(DbType.Currency, SqlDbType.Money);
-                yield return new TestCaseData(DbType.VarNumeric, SqlDbType.Decimal);
-                yield return new TestCaseData(DbType.SByte, SqlDbType.SmallInt);
-                yield return new TestCaseData(DbType.Object, SqlDbType.Variant);
-                yield return new TestCaseData(DbType.Int16, SqlDbType.SmallInt);
-                yield return new TestCaseData(DbType.Int64, SqlDbType.BigInt);
-                yield return new TestCaseData(DbType.UInt64, SqlDbType.BigInt);
-                yield return new TestCaseData(DbType.Date, SqlDbType.Date);
-                yield return new TestCaseData(DbType.Time, SqlDbType.Time);
-                yield return new TestCaseData(DbType.Guid, SqlDbType.UniqueIdentifier);
+                yield return new object[] { DbType.Byte, SqlDbType.TinyInt };
+                yield return new object[] { DbType.AnsiString, SqlDbType.VarChar };
+                yield return new object[] { DbType.AnsiStringFixedLength, SqlDbType.Char };
+                yield return new object[] { DbType.String, SqlDbType.NVarChar };
+                yield return new object[] { DbType.StringFixedLength, SqlDbType.NChar };
+                yield return new object[] { DbType.Byte, SqlDbType.TinyInt };
+                yield return new object[] { DbType.Currency, SqlDbType.Money };
+                yield return new object[] { DbType.VarNumeric, SqlDbType.Decimal };
+                yield return new object[] { DbType.SByte, SqlDbType.SmallInt };
+                yield return new object[] { DbType.Object, SqlDbType.Variant };
+                yield return new object[] { DbType.Int16, SqlDbType.SmallInt };
+                yield return new object[] { DbType.Int64, SqlDbType.BigInt };
+                yield return new object[] { DbType.UInt64, SqlDbType.BigInt };
+                yield return new object[] { DbType.Date, SqlDbType.Date };
+                yield return new object[] { DbType.Time, SqlDbType.Time };
+                yield return new object[] { DbType.Guid, SqlDbType.UniqueIdentifier };
             }
         }
 
-        [Test, TestCaseSource(nameof(DbTypeToSqlBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(DbTypeToSqlBulkTestData))]
         public void DbTypeToSql_All_Test(DbType type, SqlDbType sqlType)
         {
             // Arrange & act
             var result = SqlServerUtils.GetSqlType(type);
 
             // Assert
-            Assert.That(result, Is.EqualTo(sqlType), $"{type} is not converted with {sqlType}");
+            Assert.AreEqual(sqlType, result, $"{type} is not converted with {sqlType}");
         }
 
-        private static IEnumerable<TestCaseData> ToSqlDateTimeBulkTestData
+        private static IEnumerable<object[]> ToSqlDateTimeBulkTestData
         {
             get
             {
-                yield return new TestCaseData("2009-04-03 15:41:27.370", 370);
-                yield return new TestCaseData("2009-04-03 15:41:27.371", 370);
-                yield return new TestCaseData("2009-04-03 15:41:27.372", 373);
-                yield return new TestCaseData("2009-04-03 15:41:27.373", 373);
-                yield return new TestCaseData("2009-04-03 15:41:27.374", 373);
-                yield return new TestCaseData("2009-04-03 15:41:27.375", 377);
-                yield return new TestCaseData("2009-04-03 15:41:27.376", 377);
-                yield return new TestCaseData("2009-04-03 15:41:27.377", 377);
-                yield return new TestCaseData("2009-04-03 15:41:27.378", 377);
-                yield return new TestCaseData("2009-04-03 15:41:27.379", 380);
+                yield return new object[] { "2009-04-03 15:41:27.370", 370 };
+                yield return new object[] { "2009-04-03 15:41:27.371", 370 };
+                yield return new object[] { "2009-04-03 15:41:27.372", 373 };
+                yield return new object[] { "2009-04-03 15:41:27.373", 373 };
+                yield return new object[] { "2009-04-03 15:41:27.374", 373 };
+                yield return new object[] { "2009-04-03 15:41:27.375", 377 };
+                yield return new object[] { "2009-04-03 15:41:27.376", 377 };
+                yield return new object[] { "2009-04-03 15:41:27.377", 377 };
+                yield return new object[] { "2009-04-03 15:41:27.378", 377 };
+                yield return new object[] { "2009-04-03 15:41:27.379", 380 };
             }
         }
 
-        [Test, TestCaseSource(nameof(ToSqlDateTimeBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(ToSqlDateTimeBulkTestData))]
         public void ToSqlDateTime_All_Test(string input, int milliseconds)
         {
             // Arrange & act
             var date = DateTime.Parse(input).ToSqlDateTime();
 
             // Assert
-            Assert.That(milliseconds, Is.EqualTo(date.Millisecond), "No match for milliseconds");
+            Assert.AreEqual(milliseconds, date.Millisecond, "No match for milliseconds");
         }
     }
 }

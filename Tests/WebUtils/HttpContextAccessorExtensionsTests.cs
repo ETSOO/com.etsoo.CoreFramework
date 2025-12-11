@@ -1,14 +1,13 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
 using com.etsoo.WebUtils;
-using NUnit.Framework;
 using System.Security.Claims;
 
 namespace Tests.WebUtils
 {
-    [TestFixture]
+    [TestClass]
     public class HttpContextAccessorExtensionsTests
     {
-        [Test]
+        [TestMethod]
         public void GetEnumClaimTest()
         {
             // Arrange
@@ -25,8 +24,8 @@ namespace Tests.WebUtils
             var roleValue = principal.GetEnumClaim<UserRole>(ClaimTypes.Role);
 
             // Assert
-            Assert.That(roleValue, Is.Not.Null);
-            Assert.That(roleValue.GetValueOrDefault().HasFlag(UserRole.Operator), Is.True);
+            Assert.IsNotNull(roleValue);
+            Assert.IsTrue(roleValue.GetValueOrDefault().HasFlag(UserRole.Operator));
         }
     }
 }

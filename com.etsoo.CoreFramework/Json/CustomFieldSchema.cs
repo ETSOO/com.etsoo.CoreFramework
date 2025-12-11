@@ -61,8 +61,8 @@ namespace com.etsoo.CoreFramework.Json
                             ),
                             ("refs", new JsonSchemaBuilder()
                                 .Type(SchemaValueType.Array)
-                                .Items(new JsonSchemaBuilder().Type(SchemaValueType.String))
-                                .AdditionalItems(new JsonSchemaBuilder().Type(SchemaValueType.String | SchemaValueType.Number))
+                                .PrefixItems(new JsonSchemaBuilder().Type(SchemaValueType.String))
+                                .Items(new JsonSchemaBuilder().Type(SchemaValueType.String | SchemaValueType.Number))
                             ),
                             ("space", new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)

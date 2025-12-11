@@ -1,13 +1,12 @@
 ﻿using com.etsoo.Utils;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class XmlUtilsTests
     {
-        [Test]
+        [TestMethod]
         public async Task ParseXmlAsyncTests()
         {
             // Arrange
@@ -26,15 +25,12 @@ namespace Tests.Utils
             var dic = await XmlUtils.ParseXmlAsync(input);
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(dic, Has.Count.EqualTo(7));
-                Assert.That(dic["Event"], Is.EqualTo("scancode_push"));
-                Assert.That(dic["ScanCodeInfo"], Is.EqualTo("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[条形码1]]></ScanResult>"));
-            });
+            Assert.HasCount(7, dic);
+            Assert.AreEqual("scancode_push", dic["Event"]);
+            Assert.AreEqual("<ScanType><![CDATA[qrcode]]></ScanType><ScanResult><![CDATA[条形码1]]></ScanResult>", dic["ScanCodeInfo"]);
         }
 
-        [Test]
+        [TestMethod]
         public void GetValueTests()
         {
             var dic = new Dictionary<string, string>
@@ -45,33 +41,30 @@ namespace Tests.Utils
             };
 
             var v1 = XmlUtils.GetValue<bool>(dic, "boolean");
-            Assert.That(v1, Is.EqualTo(true));
+            Assert.IsTrue(v1);
 
             var v2 = XmlUtils.GetValue<int>(dic, "int");
-            Assert.That(v2, Is.EqualTo(123));
+            Assert.AreEqual(123, v2);
 
             var v3 = XmlUtils.GetValue<DateTime>(dic, "int1");
-            Assert.That(v3, Is.Null);
+            Assert.IsNull(v3);
 
             var v4 = XmlUtils.GetValue<DateTime>(dic, "nofield");
-            Assert.That(v4, Is.Null);
+            Assert.IsNull(v4);
 
             var v5 = XmlUtils.GetValue(dic, "boolean");
-            Assert.That(v5, Is.EqualTo("true"));
+            Assert.AreEqual("true", v5);
         }
 
-        [Test]
+        [TestMethod]
         public void GetListTests()
         {
             // Arrage & act
             var items = XmlUtils.GetList("<item><field1>1</field1><field2><![CDATA[a1]]></field2></item><item><field1>2</field1><field2><![CDATA[亿速]]></field2></item>");
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(items.Count(), Is.EqualTo(2));
-                Assert.That(items.Any(item => item.ContainsKey("field2") && item["field2"] == "亿速"), Is.True);
-            });
+            // Assert
+            Assert.AreEqual(2, items.Count());
+            Assert.IsTrue(items.Any(item => item.ContainsKey("field2") && item["field2"] == "亿速"));
         }
     }
 }

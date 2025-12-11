@@ -1,13 +1,13 @@
 ﻿using com.etsoo.Localization;
 using com.etsoo.Utils;
-using NUnit.Framework;
+using System.Globalization;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class LocalizationUtilTests
     {
-        [Test]
+        [TestMethod]
         public void SetUtcKind_ChangedTest()
         {
             // Arrange
@@ -17,10 +17,10 @@ namespace Tests.Utils
             var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Utc));
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
         }
 
-        [Test]
+        [TestMethod]
         public void SetUtcKind_NoChangedTest()
         {
             // Arrange
@@ -30,122 +30,98 @@ namespace Tests.Utils
             var result = SharedUtils.SetUtcKind(dt);
 
             // Assert
-            Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Local));
+            Assert.AreEqual(DateTimeKind.Local, result.Kind);
         }
 
-        [Test]
+        [TestMethod]
         public void JsMilisecondsToUTCTests()
         {
             // Arrange & Act
             // 2021/12/6 19:35:52 UTC, 2021/12/7 8:35:52 NZ time
             var result = SharedUtils.JsMilisecondsToUTC(1638819352807);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result.Kind, Is.EqualTo(DateTimeKind.Utc));
-                Assert.That(result.Day, Is.EqualTo(6));
-            });
+            // Assert
+            Assert.AreEqual(DateTimeKind.Utc, result.Kind);
+            Assert.AreEqual(6, result.Day);
         }
 
-        [Test]
+        [TestMethod]
         public void GetRegionsByCurrencyTests()
         {
             var (region, culture) = LocalizationUtils.GetRegionsByCurrency("CNY").FirstOrDefault(item => item.Culture.Name.StartsWith("zh-"));
-            Assert.Multiple(() =>
-            {
-                Assert.That(region?.TwoLetterISORegionName, Is.EqualTo("CN"));
-                Assert.That(culture?.Name, Is.EqualTo("zh-Hans-CN"));
-                Assert.That(LocalizationUtils.GetRegionsByCurrency("EUR").Count(), Is.GreaterThan(3));
-            });
+            Assert.AreEqual("CN", region?.TwoLetterISORegionName);
+            Assert.AreEqual("zh-Hans-CN", culture?.Name);
+            Assert.IsGreaterThan(3, LocalizationUtils.GetRegionsByCurrency("EUR").Count());
         }
 
-        [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
+        [TestMethod]
         public void GetCulturesTests()
         {
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
             var cultures = LocalizationUtils.GetCultures(["zh-CN", "zh-Hans", "en-US", "ar"]);
-            Assert.Multiple(() =>
-            {
-                Assert.That(cultures.Count(), Is.EqualTo(4));
-                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("zh-CN"))?.Name, Is.EqualTo("中文 (中国)"));
-                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("zh-Hans"))?.Name, Is.EqualTo("简体中文"));
-                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("en-US"))?.Name, Is.EqualTo("英语 (美国)"));
-                Assert.That(cultures.FirstOrDefault(c => c.Id.Equals("ar"))?.Name, Is.EqualTo("阿拉伯语"));
-            });
+            Assert.AreEqual(4, cultures.Count());
+            Assert.AreEqual("中文 (中国)", cultures.FirstOrDefault(c => c.Id.Equals("zh-CN"))?.Name);
+            Assert.AreEqual("简体中文", cultures.FirstOrDefault(c => c.Id.Equals("zh-Hans"))?.Name);
+            Assert.AreEqual("英语 (美国)", cultures.FirstOrDefault(c => c.Id.Equals("en-US"))?.Name);
+            Assert.AreEqual("阿拉伯语", cultures.FirstOrDefault(c => c.Id.Equals("ar"))?.Name);
         }
 
-        [Test]
+        [TestMethod]
         public void GetCulturesByCountryTests()
         {
             var cultures = LocalizationUtils.GetCulturesByCountry("SG");
-            Assert.Multiple(() =>
-            {
-                Assert.That(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")), Is.True);
-                Assert.That(cultures.Count(), Is.EqualTo(4));
-            });
+            Assert.IsTrue(cultures.Any(culture => culture.TwoLetterISOLanguageName.Equals("en")));
+            Assert.AreEqual(4, cultures.Count());
         }
 
-        [Test]
+        [TestMethod]
         public void GetCurrencyDataTests()
         {
             var data = LocalizationUtils.GetCurrencyData("CNY");
-            Assert.Multiple(() =>
-            {
-                Assert.That(data?.Symbol, Is.EqualTo("¥"));
-                Assert.That(data?.EnglishName, Is.EqualTo("Chinese Yuan"));
-            });
+            Assert.AreEqual("¥", data?.Symbol);
+            Assert.AreEqual("Chinese Yuan", data?.EnglishName);
         }
 
-        [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
+        [TestMethod]
         public void RegionChineseTest()
         {
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
             var regions = LocalizationUtils.GetAllRegions();
             var region = regions.FirstOrDefault(r => r.Key.Equals("US")).Value;
-            Assert.Multiple(() =>
-            {
-                Assert.That(region?.Name, Is.EqualTo("美国"));
-                Assert.That(region?.Currency.Name, Is.EqualTo("美元"));
-            });
+            Assert.AreEqual("美国", region?.Name);
+            Assert.AreEqual("美元", region?.Currency.Name);
         }
 
-        [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
+        [TestMethod]
         public void CurrenciesByIdsTest()
         {
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
             var currencies = LocalizationUtils.GetAllRegions().GetCurrencies(["CNY", "USD", "NZD"]).ToArray();
-            Assert.Multiple(() =>
-            {
-                Assert.That(currencies, Has.Length.EqualTo(3));
-                Assert.That(currencies[2].Name, Is.EqualTo("新西兰元"));
-            });
+            Assert.HasCount(3, currencies);
+            Assert.AreEqual("新西兰元", currencies[2].Name);
         }
 
-        [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
+        [TestMethod]
         public void RegionsByIdsTest()
         {
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
             var regions = LocalizationUtils.GetAllRegions().GetRegions(["CN", "US", "NZ"]).ToArray();
-            Assert.Multiple(() =>
-            {
-                Assert.That(regions, Has.Length.EqualTo(3));
-                Assert.That(regions[1].Name, Is.EqualTo("美国"));
-            });
+            Assert.HasCount(3, regions);
+            Assert.AreEqual("美国", regions[1].Name);
         }
 
-        [Test]
+        [TestMethod]
         public void GetCurrencyDataNullTests()
         {
             var data = LocalizationUtils.GetCurrencyData("CNY1");
-            Assert.That(data, Is.Null);
+            Assert.IsNull(data);
         }
 
-        [Test]
+        [TestMethod]
         public void GetPinyinTests()
         {
             // Arrange
@@ -158,16 +134,13 @@ namespace Tests.Utils
             var py4 = ChineseUtils.GetPinyin("青岛亿速思维网络科技有限公司").ToPinyin(true);
 
             // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(py1, Is.EqualTo("Chong Qing Ai Hao Zhen Hao Zhong"));
-                Assert.That(py2, Is.EqualTo("Chong2 Qing4 Ai4 Hao4 Zhen1 Hao3 Zhong4"));
-                Assert.That(py3, Is.EqualTo("CQAHZHZ"));
-                Assert.That(py4, Is.EqualTo("Qing1 Dao3 Yi4 Su4 Si1 Wei2 Wang3 Luo4 Ke1 Ji4 You3 Xian4 Gong1 Si1"));
-            }
+            Assert.AreEqual("Chong Qing Ai Hao Zhen Hao Zhong", py1);
+            Assert.AreEqual("Chong2 Qing4 Ai4 Hao4 Zhen1 Hao3 Zhong4", py2);
+            Assert.AreEqual("CQAHZHZ", py3);
+            Assert.AreEqual("Qing1 Dao3 Yi4 Su4 Si1 Wei2 Wang3 Luo4 Ke1 Ji4 You3 Xian4 Gong1 Si1", py4);
         }
 
-        [Test]
+        [TestMethod]
         public void GetPinyinNameTests()
         {
             // Arrange & Act
@@ -176,15 +149,12 @@ namespace Tests.Utils
             var py3 = ChineseUtils.GetPinyin("肖赞长沙人是会长", true).ToPinyin(true);
 
             // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(py1, Is.EqualTo("Yu4 Chi2 Jing4 De2"));
-                Assert.That(py2, Is.EqualTo("Piao2 Jing4 Ye4"));
-                Assert.That(py3, Is.EqualTo("Xiao1 Zan4 Chang2 Sha1 Ren2 Shi4 Hui4 Zhang3"));
-            }
+            Assert.AreEqual("Yu4 Chi2 Jing4 De2", py1);
+            Assert.AreEqual("Piao2 Jing4 Ye4", py2);
+            Assert.AreEqual("Xiao1 Zan4 Chang2 Sha1 Ren2 Shi4 Hui4 Zhang3", py3);
         }
 
-        [Test]
+        [TestMethod]
         public void GetPinyinNameMixedTests()
         {
             // Arrange & Act
@@ -192,44 +162,33 @@ namespace Tests.Utils
             var py2 = ChineseUtils.GetPinyin("肖 赞", true).ToPinyin(true);
 
             // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(py1, Is.EqualTo("Xiao1 Zan4"));
-                Assert.That(py2, Is.EqualTo("Xiao1 Zan4"));
-            }
+            Assert.AreEqual("Xiao1 Zan4", py1);
+            Assert.AreEqual("Xiao1 Zan4", py2);
         }
 
-        [Test]
+        [TestMethod]
         public void ContainsChineseTests()
         {
             // Arrange & Act
             var result1 = LocalizationUtils.ContainsChinese("Hello, 世界!");
             var result2 = LocalizationUtils.ContainsChinese("Hello, World!");
 
-            // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result1, Is.True);
-                Assert.That(result2, Is.False);
-            }
+            Assert.IsTrue(result1);
+            Assert.IsFalse(result2);
         }
 
-        [Test]
+        [TestMethod]
         public void ContainsKoreanTests()
         {
             // Arrange & Act
             var result1 = LocalizationUtils.ContainsKorean("Hello, 세계!");
             var result2 = LocalizationUtils.ContainsKorean("Hello, 世界！");
 
-            // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result1, Is.True);
-                Assert.That(result2, Is.False);
-            }
+            Assert.IsTrue(result1);
+            Assert.IsFalse(result2);
         }
 
-        [Test]
+        [TestMethod]
         public void ContainsJapaneseTests()
         {
             // Arrange & Act
@@ -237,16 +196,12 @@ namespace Tests.Utils
             var result2 = LocalizationUtils.ContainsJapanese("Hello, ワールド!");
             var result3 = LocalizationUtils.ContainsJapanese("Hello, 세계!");
 
-            // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(result1, Is.True);
-                Assert.That(result2, Is.True);
-                Assert.That(result3, Is.False);
-            }
+            Assert.IsTrue(result1);
+            Assert.IsTrue(result2);
+            Assert.IsFalse(result3);
         }
 
-        [Test]
+        [TestMethod]
         public void ParseNameTests()
         {
             // Arrange & Act
@@ -255,33 +210,29 @@ namespace Tests.Utils
             var name3 = LocalizationUtils.ParseName("王  芳");
             var name4 = LocalizationUtils.ParseName("John Smith");
 
-            // Assert
-            using (Assert.EnterMultipleScope())
-            {
-                Assert.That(name1.PinyinInitials, Is.EqualTo("ZW"));
-                Assert.That(name1.FamilyName, Is.EqualTo("张"));
-                Assert.That(name1.GivenName, Is.EqualTo("伟"));
-                Assert.That(name1.LatinFamilyName, Is.EqualTo("Zhang"));
-                Assert.That(name1.LatinGivenName, Is.EqualTo("Wei"));
+            Assert.AreEqual("ZW", name1.PinyinInitials);
+            Assert.AreEqual("张", name1.FamilyName);
+            Assert.AreEqual("伟", name1.GivenName);
+            Assert.AreEqual("Zhang", name1.LatinFamilyName);
+            Assert.AreEqual("Wei", name1.LatinGivenName);
 
-                Assert.That(name2.PinyinInitials, Is.EqualTo("LXL"));
-                Assert.That(name2.FamilyName, Is.EqualTo("李"));
-                Assert.That(name2.GivenName, Is.EqualTo("小龙"));
-                Assert.That(name2.LatinFamilyName, Is.EqualTo("Li"));
-                Assert.That(name2.LatinGivenName, Is.EqualTo("Xiao Long"));
-                
-                Assert.That(name3.PinyinInitials, Is.EqualTo("WF"));
-                Assert.That(name3.FamilyName, Is.EqualTo("王"));
-                Assert.That(name3.GivenName, Is.EqualTo("芳"));
-                Assert.That(name3.LatinFamilyName, Is.EqualTo("Wang"));
-                Assert.That(name3.LatinGivenName, Is.EqualTo("Fang"));
+            Assert.AreEqual("LXL", name2.PinyinInitials);
+            Assert.AreEqual("李", name2.FamilyName);
+            Assert.AreEqual("小龙", name2.GivenName);
+            Assert.AreEqual("Li", name2.LatinFamilyName);
+            Assert.AreEqual("Xiao Long", name2.LatinGivenName);
 
-                Assert.That(name4.PinyinInitials, Is.Null);
-                Assert.That(name4.FamilyName, Is.EqualTo("Smith"));
-                Assert.That(name4.GivenName, Is.EqualTo("John"));
-                Assert.That(name4.LatinFamilyName, Is.Null);
-                Assert.That(name4.LatinGivenName, Is.Null);
-            }
+            Assert.AreEqual("WF", name3.PinyinInitials);
+            Assert.AreEqual("王", name3.FamilyName);
+            Assert.AreEqual("芳", name3.GivenName);
+            Assert.AreEqual("Wang", name3.LatinFamilyName);
+            Assert.AreEqual("Fang", name3.LatinGivenName);
+
+            Assert.IsNull(name4.PinyinInitials);
+            Assert.AreEqual("Smith", name4.FamilyName);
+            Assert.AreEqual("John", name4.GivenName);
+            Assert.IsNull(name4.LatinFamilyName);
+            Assert.IsNull(name4.LatinGivenName);
         }
     }
 }

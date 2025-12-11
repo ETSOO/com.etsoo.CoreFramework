@@ -1,19 +1,18 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
-using NUnit.Framework;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class UtilTests
     {
-        [Test]
+        [TestMethod]
         public void ValueToEnumTests()
         {
             var item = (UserRole)0;
-            Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.False);
+            Assert.IsFalse(com.etsoo.Utils.SharedUtils.EnumIsDefined(item));
 
             item = (UserRole)5;
-            Assert.That(com.etsoo.Utils.SharedUtils.EnumIsDefined(item), Is.True);
+            Assert.IsTrue(com.etsoo.Utils.SharedUtils.EnumIsDefined(item));
         }
     }
 }

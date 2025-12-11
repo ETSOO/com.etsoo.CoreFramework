@@ -1,7 +1,6 @@
 ﻿using com.etsoo.Utils;
 using com.etsoo.Utils.Models;
 using com.etsoo.Utils.Serialization;
-using NUnit.Framework;
 using System.Text;
 using System.Text.Json;
 
@@ -19,19 +18,19 @@ namespace Tests.Utils
         }
     }
 
-    [TestFixture]
+    [TestClass]
     public class SharedUtilTests
     {
-        [Test]
+        [TestMethod]
         public void GetAccordingValueTests()
         {
             var fields = new List<string> { "日期", "美元", "欧元", "日元", "港元", "英镑", "林吉特", "卢布", "澳元", "加元", "新西兰元", "新加坡元", "瑞士法郎", "兰特", "韩元", "迪拉姆", "里亚尔", "福林", "兹罗提", "丹麦克朗", "瑞典克朗", "挪威克朗", "里拉", "比索", "泰铢" };
             var values = new List<string> { "2022-02-24", "632.8", "715.14", "5.5079", "81.079", "856.99", "66.144", "1283.55", "457.16", "496.96", "428.31", "470.01", "689.73", "239.05", "18889.0", "58.039", "59.287", "5046.66", "64.149", "104.02", "148.4", "140.58", "218.486", "319.98", "509.91" };
             var value = SharedUtils.GetAccordingValue<decimal>(fields, values, "港元", 4);
-            Assert.That(value, Is.EqualTo(81.079));
+            Assert.AreEqual(81.079m, value);
         }
 
-        [Test]
+        [TestMethod]
         public async Task JsonSerializeAsyncTests()
         {
             // Arrange
@@ -47,10 +46,10 @@ namespace Tests.Utils
             var result = Encoding.UTF8.GetString(stream.GetReadOnlySequence());
 
             // Assert
-            Assert.That(result, Is.EqualTo("""{"id":0,"name":"Etsoo"}"""));
+            Assert.AreEqual("""{"id":0,"name":"Etsoo"}""", result);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ObjectToDictionaryAsyncTests()
         {
             // Arrange
@@ -59,15 +58,12 @@ namespace Tests.Utils
             // Act
             var dic = await SharedUtils.ObjectToDictionaryAsync(data);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(dic.Keys.Count, Is.EqualTo(2));
-                Assert.That(dic.ContainsKey("Name"), Is.True);
-            });
+            // Assert
+            Assert.HasCount(2, dic.Keys);
+            Assert.IsTrue(dic.ContainsKey("Name"));
         }
 
-        [Test]
+        [TestMethod]
         public async Task StreamToSequenceAsyncTests()
         {
             // Arrange
@@ -75,26 +71,23 @@ namespace Tests.Utils
             var stream = SharedUtils.GetStream(source);
             var result = await SharedUtils.StreamToStringAsync(stream);
 
-            Assert.That(result, Is.EqualTo(source));
+            Assert.AreEqual(source, result);
         }
 
-        [Test]
+        [TestMethod]
         public void TruncateDateTimeTests()
         {
             var now = DateTime.Now;
             var now1 = SharedUtils.TruncateDateTime(now);
-            Assert.That(now1.Millisecond, Is.EqualTo(0));
+            Assert.AreEqual(0, now1.Millisecond);
 
             var utc = DateTime.UtcNow;
             var utc1 = SharedUtils.TruncateDateTime(utc);
-            Assert.Multiple(() =>
-            {
-                Assert.That(utc1.Millisecond, Is.EqualTo(0));
-                Assert.That(utc1.Kind, Is.EqualTo(DateTimeKind.Utc));
-            });
+            Assert.AreEqual(0, utc1.Millisecond);
+            Assert.AreEqual(DateTimeKind.Utc, utc1.Kind);
         }
 
-        [Test]
+        [TestMethod]
         public async Task JsonSerializeAsync_SourceGeneratorTests()
         {
             var model = new UserModel
@@ -107,12 +100,12 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions { IncludeFields = true }, ["Id", "name", "Valid", "Date"]);
-            Assert.That(json, Does.Contain("Name"));
-            Assert.That(json, Does.Contain("Valid"));
-            Assert.That(json, Does.Not.Contain("DecimalValue"));
+            Assert.Contains("Name", json);
+            Assert.Contains("Valid", json);
+            Assert.DoesNotContain("DecimalValue", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task JsonSerializeAsync_TextJsonTests()
         {
             var model = new UserUpdateModule
@@ -122,11 +115,11 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, new JsonSerializerOptions(), ["Id"]);
-            Assert.That(json, Does.Contain("Id"));
-            Assert.That(json, Does.Not.Contain("Name"));
+            Assert.Contains("Id", json);
+            Assert.DoesNotContain("Name", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task JsonSerializeAsync_TypeInfoTests()
         {
             var model = new GuidItem
@@ -136,11 +129,11 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JsonSerializeAsync(model, CommonJsonSerializerContext.Default.GuidItem, ["id"]);
-            Assert.That(json, Does.Contain("id"));
-            Assert.That(json, Does.Not.Contain("label"));
+            Assert.Contains("id", json);
+            Assert.DoesNotContain("label", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task JoinAsAuditJsonTests()
         {
             var oldData = new UserModel
@@ -159,7 +152,7 @@ namespace Tests.Utils
             };
 
             var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, ["Id", "Name"]);
-            Assert.That(json, Is.EqualTo("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}"));
+            Assert.AreEqual("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}", json);
         }
     }
 }

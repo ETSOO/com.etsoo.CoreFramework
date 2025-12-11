@@ -202,7 +202,7 @@ namespace com.etsoo.CoreFramework.User
     /// </summary>
     public class UserAccessor<T>(IHttpContextAccessor httpContextAccessor, ILogger logger)
         : UserAccessorAbstract<T>(
-            httpContextAccessor.HttpContext?.RemoteIpAddress() ?? throw new Exception("No IP for user accessor"),
+            httpContextAccessor.HttpContext?.GetRemoteIpAddress() ?? throw new Exception("No IP for user accessor"),
             httpContextAccessor.HttpContext.CreateUser<T>(logger)
         ) where T : IUserCreator<T>
     {
@@ -247,7 +247,7 @@ namespace com.etsoo.CoreFramework.User
     /// </summary>
     public class UserAccessorMinimal<T>(HttpContext context, ILogger logger)
         : UserAccessorAbstract<T>(
-            context.RemoteIpAddress() ?? throw new Exception("No IP for user accessor"),
+            context.GetRemoteIpAddress() ?? throw new Exception("No IP for user accessor"),
             context.CreateUser<T>(logger)
         ) where T : IUserCreator<T>
     {

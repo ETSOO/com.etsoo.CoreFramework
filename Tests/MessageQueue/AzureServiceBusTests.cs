@@ -4,12 +4,11 @@ using com.etsoo.MessageQueue.GooglePubSub;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 
 namespace Tests.MessageQueue
 {
-    [TestFixture]
-    internal class AzureServiceBusTests
+    [TestClass]
+    public class AzureServiceBusTests
     {
         private IConfigurationRoot _configuration;
 
@@ -20,7 +19,7 @@ namespace Tests.MessageQueue
                .Build();
         }
 
-        [Test]
+        [TestMethod]
         public async Task ProducerSendAsyncTest()
         {
             var client = AzureServiceBusUtils.CreateServiceBusSender(new AzureServiceBusProducerOptions
@@ -35,10 +34,10 @@ namespace Tests.MessageQueue
             await producer.DisposeAsync();
             await client.DisposeAsync();
 
-            Assert.That(messageId, Is.Not.Null);
+            Assert.IsNotNull(messageId);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ProducerReceiveAsyncTest()
         {
             var sender = AzureServiceBusUtils.CreateServiceBusSender(new AzureServiceBusProducerOptions
@@ -75,8 +74,8 @@ namespace Tests.MessageQueue
 
             await subscriber.DisposeAsync();
 
-            Assert.That(messages, Is.Not.Empty);
-            Assert.That(messages.Any(m => messageId.Equals(m.MessageId)), Is.True);
+            Assert.IsTrue(messages.Any());
+            Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
         }
     }
 }

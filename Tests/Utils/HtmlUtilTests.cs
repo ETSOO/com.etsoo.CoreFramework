@@ -4,13 +4,13 @@ using AngleSharp.Html.Dom;
 using com.etsoo.HtmlIO;
 using com.etsoo.HtmlUtils;
 using com.etsoo.Utils;
-using NUnit.Framework;
 
 namespace Tests.Utils
 {
-    internal class HtmlUtilTests
+    [TestClass]
+    public class HtmlUtilTests
     {
-        [Test]
+        [TestMethod]
         public async Task ManipulateElementsAsyncTests()
         {
             var html = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock 2</span></p>""";
@@ -24,14 +24,11 @@ namespace Tests.Utils
                 count++;
                 await Task.CompletedTask;
             });
-            Assert.Multiple(() =>
-            {
-                Assert.That(count, Is.EqualTo(2));
-                Assert.That(doc.Body?.InnerHtml, Is.EqualTo(htmlUpdated));
-            });
+            Assert.AreEqual(2, count);
+            Assert.AreEqual(htmlUpdated, doc.Body?.InnerHtml);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ManipulateElementsAsyncGenericTests()
         {
             var html = """<p><span class="eo-lock" contenteditable="false">Lock 1</span></p><p><span class="eo-lock" contenteditable="false">Lock 2</span></p>""";
@@ -45,21 +42,18 @@ namespace Tests.Utils
                 count++;
                 await Task.CompletedTask;
             });
-            Assert.Multiple(() =>
-            {
-                Assert.That(count, Is.EqualTo(2));
-                Assert.That(doc.Body?.InnerHtml, Is.EqualTo(htmlUpdated));
-            });
+            Assert.AreEqual(2, count);
+            Assert.AreEqual(htmlUpdated, doc.Body?.InnerHtml);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExternalLinkLoadTests()
         {
             var html = """<html><head><title>External Link Test</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" /></head><body><h1>Hello, world!</h1></body></html>""";
             await using var stream = SharedUtils.GetStream(html);
             var doc = await HtmlParserExtended.CreateWithCssAndDownloadAsync(stream, "", (evt) =>
             {
-                Assert.That(evt.Response?.Address.Href.Contains("bootstrap.min.css"), Is.True);
+                Assert.IsTrue(evt.Response?.Address.Href.Contains("bootstrap.min.css") ?? false);
                 return Task.CompletedTask;
             });
             await doc.WaitForReadyAsync();
@@ -67,18 +61,15 @@ namespace Tests.Utils
             var link = doc.Head?.GetElementsByTagName("link").First() as IHtmlLinkElement;
             var h1 = doc.GetElementsByTagName("h1").First() as IHtmlHeadingElement;
             var h1Style = h1.ComputeCurrentStyle();
-            Assert.Multiple(() =>
-            {
-                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
-                Assert.That(downloads.Count(), Is.EqualTo(1));
-                Assert.That(h1Style.Count, Is.AtLeast(10));
-                Assert.That(doc.Title, Is.EqualTo("External Link Test"));
-                Assert.That(link, Is.Not.Null);
-                Assert.That(h1, Is.Not.Null);
-            });
+            Assert.AreEqual(1, doc.StyleSheets.Length);
+            Assert.AreEqual(1, downloads.Count());
+            Assert.IsGreaterThanOrEqualTo(10, h1Style.Length);
+            Assert.AreEqual("External Link Test", doc.Title);
+            Assert.IsNotNull(link);
+            Assert.IsNotNull(h1);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExternalLocalLinkLoadTests()
         {
             var html = """<html><head><link href="file:///D:/Etsoo/com.etsoo.EasyPdf/com.etsoo.EasyPdf.Tests/Resources/html/etsoo.css" rel="stylesheet" /></head><body></body></html>""";
@@ -87,15 +78,12 @@ namespace Tests.Utils
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var docStyle = doc.DocumentElement.ComputeCurrentStyle();
-            Assert.Multiple(() =>
-            {
-                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
-                Assert.That(downloads.Count(), Is.EqualTo(1));
-                Assert.That(docStyle.Count, Is.AtLeast(10));
-            });
+            Assert.AreEqual(1, doc.StyleSheets.Length);
+            Assert.AreEqual(1, downloads.Count());
+            Assert.IsGreaterThanOrEqualTo(10, docStyle.Length);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ExternalLocalAboutLinkLoadTests()
         {
             var html = """<html><head><link href="etsoo.css" rel="stylesheet" /></head><body></body></html>""";
@@ -104,26 +92,20 @@ namespace Tests.Utils
             await doc.WaitForReadyAsync();
             var downloads = doc.GetDownloads();
             var docStyle = doc.DocumentElement.ComputeCurrentStyle();
-            Assert.Multiple(() =>
-            {
-                Assert.That(doc.StyleSheets.Length, Is.EqualTo(1));
-                Assert.That(downloads.Count(), Is.EqualTo(1));
-                Assert.That(docStyle.Count, Is.AtLeast(10));
-            });
+            Assert.AreEqual(1, doc.StyleSheets.Length);
+            Assert.AreEqual(1, downloads.Count());
+            Assert.IsGreaterThanOrEqualTo(10, docStyle.Length);
         }
 
-        [Test]
+        [TestMethod]
         public async Task LoadExternalUrlTests()
         {
             var doc = await HtmlParserExtended.CreateAsync("https://www.etsoo.com/");
-            Assert.Multiple(() =>
-            {
-                Assert.That(doc.ContentType, Is.EqualTo("text/html"));
-                Assert.That(doc.Title?.Contains("亿速"), Is.True);
-            });
+            Assert.AreEqual("text/html", doc.ContentType);
+            Assert.IsTrue(doc.Title?.Contains("亿速") ?? false);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroduction_NoLookupText_ReturnsIntroductionWithinMaxChars()
         {
             // Arrange
@@ -134,10 +116,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, null, true);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("This is a sample HTML string. It contains some content."));
+            Assert.AreEqual("This is a sample HTML string. It contains some content.", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroduction_NoLookupText_ContentExceedsMaxChars_ReturnsTrimmedIntroduction()
         {
             // Arrange
@@ -148,10 +130,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, null, true);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("This is a..."));
+            Assert.AreEqual("This is a...", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroduction_LookupTextFound_LessCharsThanMaxChars_ReturnsLookupText()
         {
             // Arrange
@@ -163,10 +145,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText, true);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("This is a sample..."));
+            Assert.AreEqual("This is a sample...", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroduction_LookupTextFound_MoreCharsThanMaxChars_ReturnsLookupText()
         {
             // Arrange
@@ -178,10 +160,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText, true);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("...is a sample HTML..."));
+            Assert.AreEqual("...is a sample HTML...", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroductionChinese_LookupTextFound_MoreCharsThanMaxChars_ReturnsLookupText()
         {
             // Arrange
@@ -193,10 +175,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("这是样本HTML字符..."));
+            Assert.AreEqual("这是样本HTML字符...", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public void GetIntroduction_RealCase_ReturnsLookupText()
         {
             // Arrange
@@ -208,10 +190,10 @@ namespace Tests.Utils
             string introduction = HtmlSharedUtils.GetIntroduction(html, maxChars, lookupText);
 
             // Assert
-            Assert.That(introduction, Is.EqualTo("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw=="));
+            Assert.AreEqual("...ator服务器密码：$EL~10364A37B087CE71093647B200C6031415F9CF6A45F8E2C1AFFCD64D34C3CDADA7+CslGCkWvYrnoNBllHqBpw==", introduction);
         }
 
-        [Test]
+        [TestMethod]
         public async Task GetStyleSizeTests()
         {
             var html = """<p><img src="a.jpg" style="width: 10%; height: 20%"/><img src="b.png" height="240" style="width: 120px"/><img src="c.bmp" width="200" style="height: 100pt;"/></p>""";
@@ -227,19 +209,16 @@ namespace Tests.Utils
 
             var width = HtmlSharedUtils.DefaultDeviceWidth;
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(sizes, Has.Count.EqualTo(3));
-                Assert.That(sizes[0].Width, Is.EqualTo(width * 0.1));
-                Assert.That(sizes[0].Height, Is.EqualTo(width * 0.2));
-                Assert.That(sizes[1].Width, Is.EqualTo(120));
-                Assert.That(sizes[1].Height, Is.EqualTo(240));
-                Assert.That(sizes[2].Width, Is.EqualTo(200));
-                Assert.That(Math.Round(sizes[2].Height, 2), Is.EqualTo(133.33));
-            });
+            Assert.HasCount(3, sizes);
+            Assert.AreEqual(width * 0.1, sizes[0].Width);
+            Assert.AreEqual(width * 0.2, sizes[0].Height);
+            Assert.AreEqual(120, sizes[1].Width);
+            Assert.AreEqual(240, sizes[1].Height);
+            Assert.AreEqual(200, sizes[2].Width);
+            Assert.AreEqual(133.33, Math.Round(sizes[2].Height, 2));
         }
 
-        [Test]
+        [TestMethod]
         public async Task SizeUnitTests()
         {
             var html = """<style>img { width: 10%; height: 50em; opacity: 0.85}</style><p><img src="a.jpg"/></p>""";
@@ -248,40 +227,36 @@ namespace Tests.Utils
             var img = doc.GetElementsByTagName("img").First() as IHtmlImageElement;
             var css = img.ComputeCurrentStyle();
             var width = HtmlSharedUtils.DefaultDeviceWidth;
-            Assert.Multiple(() =>
-            {
-                Assert.That(css.GetFloatValue(PropertyNames.Opacity), Is.EqualTo(0.85f));
-
-                Assert.That(css.GetPropertyValue("width"), Is.EqualTo($"{width * 0.1}px"));
-                Assert.That(css.GetPixel(PropertyNames.Width), Is.EqualTo(width * 0.1));
-                Assert.That(css.GetPropertyValue("height"), Is.EqualTo("800px"));
-                Assert.That(css.GetPixel(PropertyNames.Height), Is.EqualTo(800));
-                Assert.That(css.GetPoint(PropertyNames.Height), Is.EqualTo(600));
-            });
+            Assert.AreEqual(0.85f, css.GetFloatValue(PropertyNames.Opacity));
+            Assert.AreEqual($"{width * 0.1}px", css.GetPropertyValue("width"));
+            Assert.AreEqual(width * 0.1, css.GetPixel(PropertyNames.Width));
+            Assert.AreEqual("800px", css.GetPropertyValue("height"));
+            Assert.AreEqual(800, css.GetPixel(PropertyNames.Height));
+            Assert.AreEqual(600, css.GetPoint(PropertyNames.Height));
         }
 
-        [Test]
+        [TestMethod]
         public void ClearTagsTests()
         {
             var html = " Hello, world! ";
             var result = HtmlIOUtils.ClearTags(html);
-            Assert.That(result, Is.EqualTo("<p>Hello, world!</p>"));
+            Assert.AreEqual("<p>Hello, world!</p>", result);
         }
 
-        [Test]
+        [TestMethod]
         public void ClearTagsAddBlockTests()
         {
             var html = " <b>Hello, world! </b><p>Facilities Offered:</p><hr>";
             var result = HtmlIOUtils.ClearTags(html);
-            Assert.That(result, Is.EqualTo("<p><b>Hello, world! </b></p><p>Facilities Offered:</p><hr>"));
+            Assert.AreEqual("<p><b>Hello, world! </b></p><p>Facilities Offered:</p><hr>", result);
         }
 
-        [Test]
+        [TestMethod]
         public void ClearTagsRemoveTests()
         {
             var html = "<p><br></p><ul><li>Guest laundry facility</li></ul><p><br></p><p><br></p><p><br></p>";
             var result = HtmlIOUtils.ClearTags(html);
-            Assert.That(result, Is.EqualTo("<ul><li>Guest laundry facility</li></ul>"));
+            Assert.AreEqual("<ul><li>Guest laundry facility</li></ul>", result);
         }
     }
 }

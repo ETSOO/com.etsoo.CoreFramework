@@ -1,30 +1,27 @@
 ﻿using com.etsoo.CoreFramework.Models;
 using com.etsoo.MessageQueue;
-using NUnit.Framework;
 
 namespace Tests.MessageQueue
 {
-    [TestFixture]
-    internal class MessageQueueExtensionsTests
+    [TestClass]
+    public class MessageQueueExtensionsTests
     {
-        [Test]
+        [TestMethod]
         public async Task BytesTransformationTest()
         {
             var data = new SimpleData { Num = 1, Bool = true };
             var bytes = await MessageQueueUtils.ToJsonBytesAsync(data, default);
             var json = bytes.ToJsonString();
-            Assert.That(json, Is.EqualTo("""{"num":1,"bool":true}"""));
+            Assert.AreEqual("""{"num":1,"bool":true}""", json);
 
             var message = await bytes.ToMessageAsync<SimpleData>(default);
-            Assert.Multiple(() =>
-            {
-                Assert.That(message, Is.Not.Null);
-                Assert.That(message?.Num, Is.EqualTo(data.Num));
-                Assert.That(message?.Bool, Is.EqualTo(data.Bool));
-            });
+
+            Assert.IsNotNull(message);
+            Assert.AreEqual(data.Num, message?.Num);
+            Assert.AreEqual(data.Bool, message?.Bool);
         }
 
-        [Test]
+        [TestMethod]
         public async Task MessageQueueUtilsTests()
         {
             var data = new AuthRequest
@@ -39,13 +36,11 @@ namespace Tests.MessageQueue
 
             var bytes = await MessageQueueUtils.ToJsonBytesAsync(data, ModelJsonSerializerContext.Default.AuthRequest);
             var message = await MessageQueueUtils.FromJsonBytesAsync(bytes, ModelJsonSerializerContext.Default.AuthRequest);
-            Assert.Multiple(() =>
-            {
-                Assert.That(message, Is.Not.Null);
-                Assert.That(message?.AppId, Is.EqualTo(data.AppId));
-                Assert.That(message?.AppKey, Is.EqualTo(data.AppKey));
-                Assert.That(message?.RedirectUri, Is.EqualTo(data.RedirectUri));
-            });
+
+            Assert.IsNotNull(message);
+            Assert.AreEqual(data.AppId, message?.AppId);
+            Assert.AreEqual(data.AppKey, message?.AppKey);
+            Assert.AreEqual(data.RedirectUri, message?.RedirectUri);
         }
     }
 }

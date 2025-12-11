@@ -2,12 +2,11 @@
 using com.etsoo.SourceGenerators.Attributes;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Serialization;
-using NUnit.Framework;
 using System.Text.Json;
 
 namespace Tests.ActionResult
 {
-    [TestFixture]
+    [TestClass]
     public class ActionResultCreatorTests
     {
         readonly SqlServerDatabase db;
@@ -23,13 +22,13 @@ namespace Tests.ActionResult
         /// Setup
         /// 初始化
         /// </summary>
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
 
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_NoResult_Test()
         {
             // Arrange
@@ -39,10 +38,10 @@ namespace Tests.ActionResult
             var result = await connection.QueryAsResultAsync(new("SELECT TOP 0 NULL"));
 
             // Assert
-            Assert.That(result, Is.Null);
+            Assert.IsNull(result);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_NoData_Test()
         {
             // Arrange
@@ -51,16 +50,13 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 'NoId/Organization' AS [type]"));
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result?.Ok, Is.False);
-                Assert.That(result?.Type, Is.EqualTo("NoId"));
-                Assert.That(result?.Field, Is.EqualTo("Organization"));
-            });
+            // Assert
+            Assert.IsFalse(result?.Ok ?? false);
+            Assert.AreEqual("NoId", result?.Type);
+            Assert.AreEqual("Organization", result?.Field);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_SuccessData_Test()
         {
             // Arrange
@@ -69,27 +65,22 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 90900 as traceId, 1234 AS id, 44.3 AS amount, CAST(0 AS bit) AS ok"));
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result?.Type, Is.Null);
-                Assert.That(result?.Ok, Is.True);
-                Assert.That(result?.TraceId, Is.EqualTo("90900"));
-            });
+            // Assert
+            Assert.IsNull(result?.Type);
+            Assert.IsTrue(result?.Ok ?? false);
+            Assert.AreEqual("90900", result?.TraceId);
 
             var data = result.Data.As<ActionResultTestData>("id", "ok");
-            Assert.Multiple(() =>
-            {
-                Assert.That(data?.Id, Is.EqualTo(1234));
-                Assert.That(data?.Amount, Is.EqualTo(44.3M));
+            // Assert
+            Assert.AreEqual(1234, data?.Id);
+            Assert.AreEqual(44.3M, data?.Amount);
 
-                // Support same name property
-                // Should after all ActionResult fields
-                Assert.That(data?.Ok, Is.False);
-            });
+            // Support same name property
+            // Should after all ActionResult fields
+            Assert.IsFalse(data?.Ok ?? false);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_StringKeyDictionary_Test()
         {
             // Arrange
@@ -98,19 +89,16 @@ namespace Tests.ActionResult
             // Act
             var result = await connection.QueryAsResultAsync(new("SELECT 1 AS ok, 'test' AS field, 1234 AS id, 44.3 AS amount"));
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result?.Ok, Is.True);
-                Assert.That(result?.Field, Is.EqualTo("test"));
-                Assert.That(result?.Data?.Count, Is.EqualTo(2));
-                Assert.That(result?.Data?.ContainsValue(1234), Is.True);
-                Assert.That(result?.Data?.ContainsKey("amount"), Is.True);
-            });
+            // Assert
+            Assert.IsTrue(result?.Ok ?? false);
+            Assert.AreEqual("test", result?.Field);
+            Assert.AreEqual(2, result?.Data?.Count);
+            Assert.IsTrue(result?.Data?.ContainsValue(1234) ?? false);
+            Assert.IsTrue(result?.Data?.ContainsKey("amount") ?? false);
         }
 
 
-        [Test]
+        [TestMethod]
         public async Task Transform_WithSolidData_Test()
         {
             var id = 123;
@@ -121,13 +109,10 @@ namespace Tests.ActionResult
             stream.Position = 0;
             var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(dataResult?.Ok, Is.True);
-                Assert.That(dataResult?.Data?.Id, Is.EqualTo(id));
-                Assert.That(dataResult?.Data?.Msg, Is.EqualTo(msg));
-            });
+            // Assert
+            Assert.IsTrue(dataResult?.Ok ?? false);
+            Assert.AreEqual(id, dataResult?.Data?.Id);
+            Assert.AreEqual(msg, dataResult?.Data?.Msg);
         }
     }
 

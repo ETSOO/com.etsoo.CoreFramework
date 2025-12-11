@@ -1,11 +1,10 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.Utils;
 using Dapper;
-using NUnit.Framework;
 
 namespace Tests.Database
 {
-    [TestFixture]
+    [TestClass]
     public class SqliteDatabaseTests
     {
         readonly SqliteDatabase db;
@@ -22,79 +21,76 @@ namespace Tests.Database
         /// Setup
         /// 初始化
         /// </summary>
-        [SetUp]
-        public async Task Setup()
+        [TestInitialize]
+        public void Setup()
         {
             // Connection to the DB
             using var connection = db.NewConnection();
 
-            // Create table 'User' when not exists
-            await connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS User (Id int, Name nvarchar(128), Status int)");
+            // Create table 'User' when not exists (synchronously wait)
+            connection.ExecuteScalarAsync("CREATE TABLE IF NOT EXISTS User (Id int, Name nvarchar(128), Status int)").GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Constructor test
         /// 构造函数测试
         /// </summary>
-        [Test]
+        [TestMethod]
         public void SqliteDatabase_Constructor_Test()
         {
             // Act & Asset
-            Assert.DoesNotThrowAsync(async () =>
-            {
-                await using var connection = db.NewConnection();
-                await connection.OpenAsync();
-                await connection.CloseAsync();
-            });
+            using var connection = db.NewConnection();
+            connection.OpenAsync().GetAwaiter().GetResult();
+            connection.CloseAsync().GetAwaiter().GetResult();
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsBoolTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["u.Id", "u.Shared:boolean"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, true);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("u.\"id\", u.\"shared\""));
-                Assert.That(mapping, Does.ContainKey("shared").WithValue("shared:boolean"));
-                Assert.That(json, Is.EqualTo("json_object('id', id, 'shared', json(IIF(shared, 'true', 'false')))"));
-            });
+
+            // Assert
+            Assert.AreEqual("u.\"id\", u.\"shared\"", result);
+            Assert.IsTrue(mapping.ContainsKey("shared"));
+            Assert.AreEqual("shared:boolean", mapping["shared"]);
+            Assert.AreEqual("json_object('id', id, 'shared', json(IIF(shared, 'true', 'false')))", json);
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsJsonTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["u.Id", "u.JsonData:json"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, true);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("u.\"id\", u.\"jsonData\""));
-                Assert.That(mapping, Does.ContainKey("jsonData").WithValue("jsonData:json"));
-                Assert.That(json, Is.EqualTo("json_object('id', id, 'jsonData', json(jsonData))"));
-            });
+
+            // Assert
+            Assert.AreEqual("u.\"id\", u.\"jsonData\"", result);
+            Assert.IsTrue(mapping.ContainsKey("jsonData"));
+            Assert.AreEqual("jsonData:json", mapping["jsonData"]);
+            Assert.AreEqual("json_object('id', id, 'jsonData', json(jsonData))", json);
         }
 
-        [Test]
+        [TestMethod]
         public void JoinJsonFieldsEqualTest()
         {
             var mapping = new Dictionary<string, string>();
             var result = db.JoinJsonFields(["Author", "IIF(u.id = @UserId, TRUE, FALSE):boolean AS isSelf"], mapping, NamingPolicy.CamelCase, NamingPolicy.CamelCase);
             var json = db.JoinJsonFields(mapping, false);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.EqualTo("\"author\", IIF(u.id = @UserId, TRUE, FALSE) AS \"isSelf\""));
-                Assert.That(mapping, Does.ContainKey("isSelf").WithValue("isSelf:boolean"));
-                Assert.That(json, Is.EqualTo("json_group_array(json_object('author', author, 'isSelf', json(IIF(isSelf, 'true', 'false'))))"));
-            });
+
+            // Assert
+            Assert.AreEqual("\"author\", IIF(u.id = @UserId, TRUE, FALSE) AS \"isSelf\"", result);
+            Assert.IsTrue(mapping.ContainsKey("isSelf"));
+            Assert.AreEqual("isSelf:boolean", mapping["isSelf"]);
+            Assert.AreEqual("json_group_array(json_object('author', author, 'isSelf', json(IIF(isSelf, 'true', 'false'))))", json);
         }
 
         /// <summary>
         /// Async Test Executing SQL Command
         /// 异步测试执行SQL 命令
         /// </summary>
-        [Test]
+        [TestMethod]
         public void ExecuteAsync_Test()
         {
             // Arrange
@@ -108,14 +104,15 @@ namespace Tests.Database
             var sql = "INSERT OR IGNORE INTO User (Id, Name) VALUES(@user1, @name1), (@user2, @name2)";
 
             // Result
-            Assert.DoesNotThrowAsync(async () => await connection.ExecuteAsync(sql, paras));
+            // Execute and ensure no exception (synchronously wait)
+            connection.ExecuteAsync(sql, paras).GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Async test Executing SQL Command to return first row first column value
         /// 测试异步执行SQL命令，返回第一行第一列的值
         /// </summary>
-        [Test]
+        [TestMethod]
         public async Task ExecuteScalarAsync_Test()
         {
             // Arrange
@@ -128,14 +125,14 @@ namespace Tests.Database
             var result = await connection.ExecuteScalarAsync("SELECT Name FROM User WHERE Id = 1003");
 
             // Assert
-            Assert.That(result, Is.EqualTo("Admin 3"));
+            Assert.AreEqual("Admin 3", result);
         }
 
         /// <summary>
         /// Async test executing SQL Command to return TextReader of first row first column value, used to read huge text data like json/xml
         /// 异步测试执行SQL命令，返回第一行第一列的TextReader值，用于读取大文本字段，比如返回的JSON/XML数据
         /// </summary>
-        [Test]
+        [TestMethod]
         public async Task ExecuteToStreamAsync_Test()
         {
             // Arrange
@@ -150,45 +147,45 @@ namespace Tests.Database
             await connection.QueryToStreamAsync(new("SELECT Name FROM User WHERE id = 1001 LIMIT 1"), stream);
 
             // Assert
-            Assert.That(stream.Length, Is.EqualTo("Admin 1".Length));
+            Assert.AreEqual("Admin 1".Length, stream.Length);
         }
 
-        [Test]
+        [TestMethod]
         public void ListToParameterTests()
         {
             var json = db.ListToParameter(new int[] { 1, 3, 5 });
             if (json is DbString ds)
             {
-                Assert.That(ds.Value, Is.EqualTo("[1,3,5]"));
+                Assert.AreEqual("[1,3,5]", ds.Value);
             }
         }
 
-        [Test]
+        [TestMethod]
         public void SqliteUtilsToJsonBool()
         {
             var command = "@a = 1".ToJsonBool();
-            Assert.That(command, Is.EqualTo("json(IIF(@a = 1, 'true', 'false'))"));
+            Assert.AreEqual("json(IIF(@a = 1, 'true', 'false'))", command);
         }
 
-        [Test]
+        [TestMethod]
         public void SqliteUtilsToJsonCommandTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage");
-            Assert.That(command, Is.EqualTo("json_group_array(json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12)))"));
+            Assert.AreEqual("json_group_array(json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12)))", command);
         }
 
-        [Test]
+        [TestMethod]
         public void SqliteUtilsToJsonCommandWithoutArrayTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id) AS subValue, (u.wage * 12) AS yearWage", true);
-            Assert.That(command, Is.EqualTo("json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12))"));
+            Assert.AreEqual("json_object('id', u.id, 'name', name, 'subValue', (SELECT IIF(t.deleted, 1, 0) FROM tabs AS t WHERE t.author = u.id), 'yearWage', (u.wage * 12))", command);
         }
 
-        [Test]
+        [TestMethod]
         public void SqliteUtilsToJsonCommandWithFunctionTest()
         {
             var command = SqliteUtils.ToJsonCommand("u.id, name, json(jsonData) AS jsonData, (u.wage * 12) AS yearWage", true);
-            Assert.That(command, Is.EqualTo("json_object('id', u.id, 'name', name, 'jsonData', json(jsonData), 'yearWage', (u.wage * 12))"));
+            Assert.AreEqual("json_object('id', u.id, 'name', name, 'jsonData', json(jsonData), 'yearWage', (u.wage * 12))", command);
         }
     }
 }

@@ -3,12 +3,11 @@ using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MimeKit.Text;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class NetTests
     {
         MimeMessage message => new MimeMessage
@@ -18,24 +17,21 @@ namespace Tests.Utils
             To = { MailboxAddress.Parse("xz@etsoo.com") }
         };
 
-        [Test]
-        public void EmailUtilSend_Test()
+        [TestMethod]
+        public async Task EmailUtilSend_Test()
         {
             // Arrange
             var client = new SMTPClient(new SMTPClientOptions("smtp.exmail.qq.com", 465, true, "ETSOO <info@etsoo.com>", "info@etsoo.com", "***"));
 
             // Act
-            var result = Assert.ThrowsAsync<AuthenticationException>(async () =>
-            {
-                await client.SendAsync(message);
-            });
+            var result = await Assert.ThrowsAsync<AuthenticationException>(async () => await client.SendAsync(message));
 
             // Assert
-            Assert.That(result?.Message.StartsWith("535:"), Is.True);
+            Assert.IsTrue(result?.Message.StartsWith("535:") ?? false);
         }
 
-        [Test]
-        public void SMTPClient_ConfigurationInit_Tests()
+        [TestMethod]
+        public async Task SMTPClient_ConfigurationInit_Tests()
         {
             // Arrange
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(@"{
@@ -51,13 +47,10 @@ namespace Tests.Utils
             var client = new SMTPClient(section.Get<SMTPClientOptions>()!);
 
             // Act
-            var result = Assert.ThrowsAsync<AuthenticationException>(async () =>
-            {
-                await client.SendAsync(message);
-            });
+            var result = await Assert.ThrowsAsync<AuthenticationException>(async () => await client.SendAsync(message));
 
             // Assert
-            Assert.That(result?.Message.StartsWith("535:"), Is.True);
+            Assert.IsTrue(result?.Message.StartsWith("535:") ?? false);
         }
     }
 }

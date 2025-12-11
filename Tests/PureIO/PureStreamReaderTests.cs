@@ -1,14 +1,13 @@
 ﻿using com.etsoo.PureIO;
 using com.etsoo.Utils;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.PureIO
 {
-    [TestFixture]
+    [TestClass]
     public class PureStreamReaderTests
     {
-        [Test]
+        [TestMethod]
         public void ReadLine_FinishinTest()
         {
             // Arrange
@@ -19,10 +18,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
+            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_FinishOutTest()
         {
             // Arrange
@@ -33,10 +32,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速Hello，亿速"));
+            Assert.AreEqual("Hello，亿速Hello，亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_WithinTest()
         {
             // Arrange
@@ -47,10 +46,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
+            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_WithoutTest()
         {
             // Arrange
@@ -61,10 +60,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello，亿速"));
+            Assert.AreEqual("Hello，亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_TwoLinesTest()
         {
             // Arrange
@@ -73,14 +72,14 @@ namespace Tests.PureIO
 
             // Act
             reader.ReadLine();
-            Assert.That(reader.CurrentPosition, Is.EqualTo(16));
+            Assert.AreEqual(16, reader.CurrentPosition);
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("下一行数据"));
+            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public async Task ReadLineAsync_TwoLinesTest()
         {
             // Arrange
@@ -91,15 +90,12 @@ namespace Tests.PureIO
             var l1 = await reader.ReadLineAsync();
             var l2 = await reader.ReadLineAsync();
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(Encoding.UTF8.GetString(l1.Span), Is.EqualTo("Hello，亿速 "));
-                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("下一行数据"));
-            });
+            // Assert
+            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l1.Span));
+            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(l2.Span));
         }
 
-        [Test]
+        [TestMethod]
         public async Task BackwardReadLineAsync_TwoLinesTest()
         {
             // Arrange
@@ -108,23 +104,20 @@ namespace Tests.PureIO
 
             // Read
             var r = await reader.ReadLineAsync();
-            Assert.That(Encoding.UTF8.GetString(r.Span), Is.EqualTo("Hello，亿速 "));
+            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(r.Span));
 
             // Act
             reader.ToStreamEnd();
             var l1 = await reader.BackwardReadLineAsync();
-            Assert.That(reader.CurrentPosition, Is.EqualTo(15));
+            Assert.AreEqual(15, reader.CurrentPosition);
             var l2 = await reader.BackwardReadLineAsync();
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(Encoding.UTF8.GetString(l1.Span), Is.EqualTo("下一行数据"));
-                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("Hello，亿速 "));
-            });
+            // Assert
+            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(l1.Span));
+            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l2.Span));
         }
 
-        [Test]
+        [TestMethod]
         public async Task BackwardReadLineWithEndsAsync_TwoLinesTest()
         {
             // Arrange
@@ -133,24 +126,21 @@ namespace Tests.PureIO
 
             // Read
             var r = await reader.ReadLineAsync(PureStreamReadWay.ReturnAll);
-            Assert.That(Encoding.UTF8.GetString(r.Span), Is.EqualTo("Hello，亿速 \r\n"));
+            Assert.AreEqual("Hello，亿速 \r\n", Encoding.UTF8.GetString(r.Span));
 
             // Act
             reader.ToStreamEnd();
             var l1 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
-            Assert.That(reader.CurrentPosition, Is.EqualTo(15));
+            Assert.AreEqual(15, reader.CurrentPosition);
             var l2 = await reader.BackwardReadLineAsync(PureStreamReadWay.ReturnAll);
 
             // Assert
             var bytes = Encoding.UTF8.GetBytes("\r\n下一行数据");
-            Assert.Multiple(() =>
-            {
-                Assert.That(l1.Span.SequenceEqual(bytes), Is.True);
-                Assert.That(Encoding.UTF8.GetString(l2.Span), Is.EqualTo("Hello，亿速 "));
-            });
+            Assert.IsTrue(l1.Span.SequenceEqual(bytes));
+            Assert.AreEqual("Hello，亿速 ", Encoding.UTF8.GetString(l2.Span));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_StartEOLTest()
         {
             // Arrange
@@ -163,15 +153,12 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
             var str = Encoding.UTF8.GetString(bytes);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(len, Is.EqualTo(0));
-                Assert.That(str, Is.EqualTo("Hello，亿速"));
-            });
+            // Assert
+            Assert.AreEqual(0, len);
+            Assert.AreEqual("Hello，亿速", str);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_TwoLinesMoveTest()
         {
             // Arrange
@@ -183,10 +170,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadLine();
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("下一行数据"));
+            Assert.AreEqual("下一行数据", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_ReadByteTest()
         {
             // Arrange
@@ -197,10 +184,10 @@ namespace Tests.PureIO
             var b = reader.ReadByte();
 
             // Assert
-            Assert.That(b, Is.EqualTo((byte)'H'));
+            Assert.AreEqual((byte)'H', b);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBytesWithCount()
         {
             // Arrange
@@ -209,17 +196,15 @@ namespace Tests.PureIO
 
             var bytes = reader.ReadBytes(4);
             var str = Encoding.ASCII.GetString(bytes);
-            Assert.Multiple(() =>
-            {
-                Assert.That(str, Is.EqualTo("true"));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)' '));
-            });
+            // Assert
+            Assert.AreEqual("true", str);
+            Assert.AreEqual((byte)' ', reader.Peek());
 
             reader.ReadBytes([0, 32]);
-            Assert.That(reader.Peek(), Is.EqualTo((byte)'f'));
+            Assert.AreEqual((byte)'f', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBytesWithRange()
         {
             // Arrange
@@ -228,14 +213,13 @@ namespace Tests.PureIO
 
             var bytes = reader.ReadBytes([46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);
             var str = Encoding.ASCII.GetString(bytes);
-            Assert.Multiple(() =>
-            {
-                Assert.That(str, Is.EqualTo("34."));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
-            });
+
+            // Assert
+            Assert.AreEqual("34.", str);
+            Assert.AreEqual((byte)'>', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadBytesWithRangeMultiple()
         {
             // Arrange
@@ -246,14 +230,13 @@ namespace Tests.PureIO
 
             var bytes = reader.ReadBytes([46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);
             var str = Encoding.ASCII.GetString(bytes);
-            Assert.Multiple(() =>
-            {
-                Assert.That(str, Is.EqualTo("734."));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
-            });
+
+            // Assert
+            Assert.AreEqual("734.", str);
+            Assert.AreEqual((byte)'>', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLine_PeekTest()
         {
             // Arrange
@@ -265,15 +248,12 @@ namespace Tests.PureIO
             var b = reader.ReadByte();
             var c = reader.ReadByte();
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(b, Is.EqualTo(p));
-                Assert.That(c, Is.EqualTo((byte)'e'));
-            });
+            // Assert
+            Assert.AreEqual(b, p);
+            Assert.AreEqual((byte)'e', c);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToWithinTest()
         {
             // Arrange
@@ -285,10 +265,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadTo((byte)'>');
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello, 亿速"));
+            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToWithoutTest()
         {
             // Arrange
@@ -300,10 +280,10 @@ namespace Tests.PureIO
             var bytes = reader.ReadTo((byte)'>');
 
             // Assert
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("Hello, 亿速"));
+            Assert.AreEqual("Hello, 亿速", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToMoveToNextTest()
         {
             // Arrange
@@ -315,15 +295,12 @@ namespace Tests.PureIO
             var bytes = reader.ReadTo((byte)'>');
             var str = Encoding.UTF8.GetString(bytes);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(str, Is.EqualTo("Hello-"));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)'0'));
-            });
+            // Assert
+            Assert.AreEqual("Hello-", str);
+            Assert.AreEqual((byte)'0', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToTargetsTest()
         {
             // Arrange
@@ -332,14 +309,13 @@ namespace Tests.PureIO
 
             var bytes = reader.ReadTo([(byte)'>', (byte)']'], false);
             var str = Encoding.UTF8.GetString(bytes);
-            Assert.Multiple(() =>
-            {
-                Assert.That(str, Is.EqualTo("[<<Hello, 亿速"));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)'>'));
-            });
+
+            // Assert
+            Assert.AreEqual("[<<Hello, 亿速", str);
+            Assert.AreEqual((byte)'>', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToTargetsIgnoreTest()
         {
             // Arrange
@@ -351,14 +327,13 @@ namespace Tests.PureIO
 
             var bytes = reader.ReadTo([(byte)'>', (byte)']'], true);
             var str = Encoding.UTF8.GetString(bytes);
-            Assert.Multiple(() =>
-            {
-                Assert.That(str, Is.EqualTo("Hello, 亿速"));
-                Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
-            });
+
+            // Assert
+            Assert.AreEqual("Hello, 亿速", str);
+            Assert.AreEqual((byte)'a', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadToTargetsEmptyTest()
         {
             // Arrange
@@ -366,19 +341,19 @@ namespace Tests.PureIO
             using var reader = new PureStreamReader(stream);
 
             var first = reader.Peek();
-            Assert.That(first, Is.EqualTo((byte)'t'));
+            Assert.AreEqual((byte)'t', first);
 
             var bytes = reader.ReadTo([(byte)' '], true);
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("true"));
+            Assert.AreEqual("true", Encoding.UTF8.GetString(bytes));
 
             first = reader.Peek();
-            Assert.That(first, Is.EqualTo((byte)'f'));
+            Assert.AreEqual((byte)'f', first);
 
             bytes = reader.ReadTo([(byte)' '], true);
-            Assert.That(Encoding.UTF8.GetString(bytes), Is.EqualTo("false"));
+            Assert.AreEqual("false", Encoding.UTF8.GetString(bytes));
         }
 
-        [Test]
+        [TestMethod]
         public void DiscardMoreReadTest()
         {
             // Arrange
@@ -387,10 +362,10 @@ namespace Tests.PureIO
 
             reader.Discard(9);
 
-            Assert.That(reader.Peek(), Is.EqualTo((byte)'0'));
+            Assert.AreEqual((byte)'0', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void DiscardBytesTest()
         {
             // Arrange
@@ -400,10 +375,10 @@ namespace Tests.PureIO
             reader.Discard(7);
             reader.Discard([32, PureStreamReader.LineFeedByte, PureStreamReader.CarriageReturnByte]);
 
-            Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
+            Assert.AreEqual((byte)'a', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadWhileTest()
         {
             // Arrange
@@ -414,10 +389,10 @@ namespace Tests.PureIO
                 if (one == (byte)'+') return true;
                 return false;
             });
-            Assert.That(reader.Peek(), Is.EqualTo((byte)'a'));
+            Assert.AreEqual((byte)'a', reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadWhileFailedTest()
         {
             // Arrange
@@ -428,10 +403,10 @@ namespace Tests.PureIO
                 if (one == (byte)'-') return true;
                 return false;
             });
-            Assert.That(reader.Peek(), Is.Null);
+            Assert.IsNull(reader.Peek());
         }
 
-        [Test]
+        [TestMethod]
         public void ReadByteAndSbyteTest()
         {
             // Arrange
@@ -443,11 +418,11 @@ namespace Tests.PureIO
             var value2 = reader.ReadSbyte();
 
             // Assert
-            Assert.That(value1, Is.EqualTo(128));
-            Assert.That(value2, Is.EqualTo(-128));
+            Assert.AreEqual(128, value1);
+            Assert.AreEqual(-128, value2);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadNegativeIntTest()
         {
             // Arrange
@@ -463,10 +438,10 @@ namespace Tests.PureIO
             var value = reader.ReadInt();
 
             // Assert
-            Assert.That(value, Is.EqualTo(negativeInt));
+            Assert.AreEqual(negativeInt, value);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadUintTest()
         {
             // Arrange
@@ -480,10 +455,10 @@ namespace Tests.PureIO
 
             // Assert
             bytes.SequenceEqual<byte>([14, 17, 0, 0]);
-            Assert.That(value, Is.EqualTo(4366));
+            Assert.AreEqual((uint)4366, value);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadUintBETest()
         {
             // Arrange
@@ -497,11 +472,11 @@ namespace Tests.PureIO
             var value2 = reader.ReadUint(true);
 
             // Assert
-            Assert.That(value1, Is.EqualTo(4366));
-            Assert.That(value2, Is.EqualTo(4366));
+            Assert.AreEqual((uint)4366, value1);
+            Assert.AreEqual((uint)4366, value2);
         }
 
-        [Test]
+        [TestMethod]
         public void SeekAndCurrentPositionTest()
         {
             // Arrange
@@ -532,21 +507,21 @@ namespace Tests.PureIO
             var a = Encoding.ASCII.GetString(bytes);
 
             // Assert
-            Assert.That(mainTag, Is.EqualTo("ttcf"));
-            Assert.That(numFonts, Is.EqualTo(2));
-            Assert.That(currentPos, Is.EqualTo(20));
-            Assert.That(newPos, Is.EqualTo(32));
-            Assert.That(ttId, Is.EqualTo(0x00010000));
-            Assert.That(tableCount, Is.EqualTo(25));
-            Assert.That(tag, Is.EqualTo("GDEF"));
+            Assert.AreEqual("ttcf", mainTag);
+            Assert.AreEqual((uint)2, numFonts);
+            Assert.AreEqual(20, currentPos);
+            Assert.AreEqual(32, newPos);
+            Assert.AreEqual(0x00010000, ttId);
+            Assert.AreEqual(25, tableCount);
+            Assert.AreEqual("GDEF", tag);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadLongTest()
         {
             // Arrange
-            long actualLong = 1;
-            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualLong));
+            long expectedLong = 1;
+            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(expectedLong));
             using var reader = new PureStreamReader(stream)
             {
                 IsLittleEndian = true
@@ -556,15 +531,15 @@ namespace Tests.PureIO
             var value = reader.ReadLong();
 
             // Assert
-            Assert.That(value, Is.EqualTo(actualLong));
+            Assert.AreEqual(expectedLong, value);
         }
 
-        [Test]
+        [TestMethod]
         public void ReadDoubleTest()
         {
             // Arrange
-            double actualDouble = 12345678901.12345892;
-            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(actualDouble));
+            double expectedDouble = 12345678901.12345892;
+            using var stream = SharedUtils.GetStream(BitConverter.GetBytes(expectedDouble));
             using var reader = new PureStreamReader(stream)
             {
                 IsLittleEndian = true
@@ -574,7 +549,7 @@ namespace Tests.PureIO
             var value = reader.ReadDouble();
 
             // Assert
-            Assert.That(value, Is.EqualTo(actualDouble));
+            Assert.AreEqual(expectedDouble, value);
         }
     }
 }

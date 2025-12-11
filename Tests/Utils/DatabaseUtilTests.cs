@@ -1,11 +1,11 @@
 ﻿using com.etsoo.Database;
 using com.etsoo.Database.Converters;
-using NUnit.Framework;
 using System.Data;
+using System.Globalization;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class DatabaseUtilTests
     {
         private enum TestEnum
@@ -15,49 +15,51 @@ namespace Tests.Utils
             Sunday
         }
 
-        private static IEnumerable<TestCaseData> TypeToDbTypeBulkTestData
+        private static IEnumerable<object[]> TypeToDbTypeBulkTestData
         {
             get
             {
-                yield return new TestCaseData(typeof(byte), DbType.Byte);
-                yield return new TestCaseData(typeof(sbyte), DbType.SByte);
-                yield return new TestCaseData(typeof(short), DbType.Int16);
-                yield return new TestCaseData(typeof(ushort), DbType.UInt16);
-                yield return new TestCaseData(typeof(bool?), DbType.Boolean);
-                yield return new TestCaseData(typeof(bool), DbType.Boolean);
-                yield return new TestCaseData(typeof(TimeSpan), DbType.Time);
-                yield return new TestCaseData(typeof(float), DbType.Single);
-                yield return new TestCaseData(typeof(TestEnum), null);
+                yield return new object[] { typeof(byte), DbType.Byte };
+                yield return new object[] { typeof(sbyte), DbType.SByte };
+                yield return new object[] { typeof(short), DbType.Int16 };
+                yield return new object[] { typeof(ushort), DbType.UInt16 };
+                yield return new object[] { typeof(bool?), DbType.Boolean };
+                yield return new object[] { typeof(bool), DbType.Boolean };
+                yield return new object[] { typeof(TimeSpan), DbType.Time };
+                yield return new object[] { typeof(float), DbType.Single };
+                yield return new object[] { typeof(TestEnum), null };
             }
         }
 
-        [Test, TestCaseSource(nameof(TypeToDbTypeBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(TypeToDbTypeBulkTestData))]
         public void TypeToDbType_All_Test(Type type, DbType? dbType)
         {
             // Arrange & act
             var result = DatabaseUtils.TypeToDbType(type);
 
             // Assert
-            Assert.That(result, Is.EqualTo(dbType), $"{type.Name} is not converted with {dbType}");
+            Assert.AreEqual(dbType, result, $"{type.Name} is not converted with {dbType}");
         }
 
-        private static IEnumerable<TestCaseData> IsAnsiBulkTestData
+        private static IEnumerable<object[]> IsAnsiBulkTestData
         {
             get
             {
-                yield return new TestCaseData("abc123", true);
-                yield return new TestCaseData("abc,;-$%", true);
-                yield return new TestCaseData("亿速ab", false);
+                yield return new object[] { "abc123", true };
+                yield return new object[] { "abc,;-$%", true };
+                yield return new object[] { "亿速ab", false };
             }
         }
 
-        [Test, TestCaseSource(nameof(IsAnsiBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(IsAnsiBulkTestData))]
         public void IsAnsi_Test(string input, bool isAnsi)
         {
-            Assert.That(input.IsAnsi(), Is.EqualTo(isAnsi));
+            Assert.AreEqual(isAnsi, input.IsAnsi());
         }
 
-        [Test]
+        [TestMethod]
         public void ListItemsToJsonString_EmptyList_ReturnsEmptyArray()
         {
             // Arrange
@@ -68,10 +70,10 @@ namespace Tests.Utils
             string result = DatabaseUtils.ListItemsToJsonString(emptyList, type);
 
             // Assert
-            Assert.That(result, Is.EqualTo("[]"));
+            Assert.AreEqual("[]", result);
         }
 
-        [Test]
+        [TestMethod]
         public void ListItemsToJsonString_SingleItem_ReturnsValidJsonArray()
         {
             // Arrange
@@ -82,10 +84,10 @@ namespace Tests.Utils
             var result = DatabaseUtils.ListItemsToJsonString(singleItemList, type);
 
             // Assert
-            Assert.That(result, Is.EqualTo("[42]"));
+            Assert.AreEqual("[42]", result);
         }
 
-        [Test]
+        [TestMethod]
         public void ListItemsToJsonString_MultipleItems_ReturnsValidJsonArray()
         {
             // Arrange
@@ -96,10 +98,10 @@ namespace Tests.Utils
             var result = DatabaseUtils.ListItemsToJsonString(stringList, type);
 
             // Assert
-            Assert.That(result, Is.EqualTo("[\"apple\",\"orange\",\"banana\"]"));
+            Assert.AreEqual("[\"apple\",\"orange\",\"banana\"]", result);
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryToJsonString_NullDictionary_ReturnsEmptyArray()
         {
             // Arrange
@@ -111,10 +113,10 @@ namespace Tests.Utils
             var result = DatabaseUtils.DictionaryToJsonString(emptyDictionary, keyType, valueType);
 
             // Assert
-            Assert.That(result, Is.EqualTo("[]"));
+            Assert.AreEqual("[]", result);
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryToJsonString_IntegerStringDictionary_ReturnsValidJsonArray()
         {
             // Arrange
@@ -132,22 +134,23 @@ namespace Tests.Utils
             string result = DatabaseUtils.DictionaryToJsonString(intStringDictionary, keyType, valueType);
 
             // Assert
-            Assert.That(result, Is.EqualTo("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]"));
+            Assert.AreEqual("[{\"key\":1,\"value\":\"One\"},{\"key\":2,\"value\":\"Two\"},{\"key\":3,\"value\":\"Three\"}]", result);
         }
 
-        [Test]
-        [SetCulture("zh-CN")]
-        [SetUICulture("zh-CN")]
+        [TestMethod]
         public void GetTimeZone_Test()
         {
+            // Arrange set culture for test
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
+
             // Correct
             var tz = TimeZoneUtils.GetTimeZone("Pacific/Auckland");
-
-            Assert.That(tz.Id, Is.EqualTo("New Zealand Standard Time"));
+            Assert.AreEqual("New Zealand Standard Time", tz.Id);
 
             // Wrong
             tz = TimeZoneUtils.GetTimeZone("China Time");
-            Assert.That(tz, Is.EqualTo(TimeZoneInfo.Local));
+            Assert.AreEqual(TimeZoneInfo.Local, tz);
         }
     }
 }

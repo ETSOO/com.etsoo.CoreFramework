@@ -58,7 +58,7 @@ namespace com.etsoo.Web
             this.context = context;
 
             // Remote IP
-            var ip = context.RemoteIpAddress();
+            var ip = context.GetRemoteIpAddress();
             if (ip == null)
             {
                 throw new NullReferenceException(nameof(ip));
@@ -66,10 +66,10 @@ namespace com.etsoo.Web
             Ip = ip;
 
             // IHeaderDictionary will return StringValues.Empty for missing entries
-            UserAgent = context.UserAgent();
+            UserAgent = context.UserAgent;
 
             // Cancellation token
-            CancellationToken = context.CancellationToken();
+            CancellationToken = context.CancellationToken;
 
             // App reference
             CoreApp = coreApp;
@@ -110,7 +110,7 @@ namespace com.etsoo.Web
         protected async Task WriteResultAsync(IActionResult result)
         {
             // Content type
-            Response.JsonContentType();
+            Response.SetJsonType();
 
             // Write
             await result.ToJsonAsync(Response.BodyWriter, CoreApp.DefaultJsonSerializerOptions);

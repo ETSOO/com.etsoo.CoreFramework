@@ -1,16 +1,13 @@
 ﻿using com.etsoo.CoreFramework.Json;
 using com.etsoo.CoreFramework.Models;
-using com.etsoo.Utils;
-using NUnit.Framework;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace Tests.CoreFramework
 {
-    [TestFixture]
+    [TestClass]
     public class JsonTests
     {
-        [Test]
+        [TestMethod]
         public async Task CustomFieldSchemaSuccessTest()
         {
             // Arrange
@@ -31,7 +28,8 @@ namespace Tests.CoreFramework
                     }
                 ]
             }]";
-            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+
+            var json = JsonElement.Parse(jsonText);
 
             // Act
             var result = schema.Evaluate(json);
@@ -40,11 +38,11 @@ namespace Tests.CoreFramework
             var source = JsonSerializer.Serialize(schema);
 
             // Assert
-            Assert.That(source, Does.Contain("\"oneOf\""));
-            Assert.That(result.IsValid, Is.True);
+            Assert.Contains("\"oneOf\"", source);
+            Assert.IsTrue(result.IsValid);
         }
 
-        [Test]
+        [TestMethod]
         public async Task CustomFieldSchemaFailedWithSpaceTest()
         {
             // Arrange
@@ -65,16 +63,17 @@ namespace Tests.CoreFramework
                     }
                 ]
             }]";
-            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+
+            var json = JsonElement.Parse(jsonText);
 
             // Act
             var result = schema.Evaluate(json);
 
             // Assert
-            Assert.That(result.IsValid, Is.False);
+            Assert.IsFalse(result.IsValid);
         }
 
-        [Test]
+        [TestMethod]
         public async Task CustomFieldSchemaFailedWithOptionsTest()
         {
             // Arrange
@@ -94,16 +93,17 @@ namespace Tests.CoreFramework
                     }
                 ]
             }]";
-            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+
+            var json = JsonElement.Parse(jsonText);
 
             // Act
             var result = schema.Evaluate(json);
 
             // Assert
-            Assert.That(result.IsValid, Is.False);
+            Assert.IsFalse(result.IsValid);
         }
 
-        [Test]
+        [TestMethod]
         public async Task EmailTemplateSchemaSuccessTest()
         {
             // Arrange
@@ -113,21 +113,48 @@ namespace Tests.CoreFramework
             {
                 Subject = "Test",
                 Template = "Test",
-                Cc = ["info@etsoo.com", "ETSOO Sales <sales@etsoo.com>"]
+                Cc = ["info@etsoo.com", "ETSOO Sales <sales@etsoo.com>"],
+                Bcc = ["ETSOO Support <support@etsoo.com>"]
             };
 
             var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);
 
-            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+            var json = JsonElement.Parse(jsonText);
 
             // Act
             var result = schema.Evaluate(json);
 
             // Assert
-            Assert.That(result.IsValid, Is.True);
+            Assert.IsTrue(result.IsValid);
         }
 
-        [Test]
+        [TestMethod]
+        public async Task EmailTemplateSchemaEmailFailedTest()
+        {
+            // Arrange
+            var schema = EmailTemplateSchema.Create();
+
+            var template = new EmailTemplateDto
+            {
+                Subject = "Test",
+                Template = "Test",
+                IsRazor = true,
+                Cc = ["info@etsoo."],
+                Bcc = ["abc"]
+            };
+
+            var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);
+
+            var json = JsonElement.Parse(jsonText);
+
+            // Act
+            var result = schema.Evaluate(json);
+
+            // Assert
+            Assert.IsFalse(result.IsValid);
+        }
+
+        [TestMethod]
         public async Task EmailTemplateSchemaDuplicateCcFailedTest()
         {
             // Arrange
@@ -143,13 +170,13 @@ namespace Tests.CoreFramework
 
             var jsonText = JsonSerializer.Serialize(template, ModelJsonSerializerContext.Default.EmailTemplateDto);
 
-            var json = await JsonNode.ParseAsync(SharedUtils.GetStream(jsonText));
+            var json = JsonElement.Parse(jsonText);
 
             // Act
             var result = schema.Evaluate(json);
 
             // Assert
-            Assert.That(result.IsValid, Is.False);
+            Assert.IsFalse(result.IsValid);
         }
     }
 }

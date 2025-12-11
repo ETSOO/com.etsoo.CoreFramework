@@ -3,7 +3,6 @@ using com.etsoo.Utils.Models;
 using com.etsoo.Utils.Serialization;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using System.Buffers;
 using System.Text;
 using System.Text.Json;
@@ -17,7 +16,7 @@ namespace Tests.Utils
         public DataFormat? Format { get; set; }
     }
 
-    [TestFixture]
+    [TestClass]
     public class SerializationTests
     {
         private IDistributedCache CreateDistributedCache()
@@ -30,7 +29,7 @@ namespace Tests.Utils
             return serviceProvider.GetRequiredService<IDistributedCache>();
         }
 
-        [Test]
+        [TestMethod]
         public async Task CacheFactoryDoStringAsyncTest()
         {
             // Arrange
@@ -46,11 +45,11 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(result, Is.EqualTo(value));
-            Assert.That(cache.GetString(key), Is.EqualTo(value));
+            Assert.AreEqual(value, result);
+            Assert.AreEqual(value, cache.GetString(key));
         }
 
-        [Test]
+        [TestMethod]
         public async Task CacheFactoryDoStringAsyncDisabledTest()
         {
             // Arrange
@@ -65,15 +64,12 @@ namespace Tests.Utils
                 return value;
             });
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result, Is.EqualTo(value));
-                Assert.That(string.IsNullOrEmpty(cache.GetString(key)), Is.True);
-            });
+            // Assert
+            Assert.AreEqual(value, result);
+            Assert.IsTrue(string.IsNullOrEmpty(cache.GetString(key)));
         }
 
-        [Test]
+        [TestMethod]
         public async Task CacheFactoryDoAsyncTest()
         {
             // Arrange
@@ -94,7 +90,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(result, Is.EqualTo(value));
+            Assert.AreEqual(value, result);
 
             // Act
             var resultCached = await CacheFactory.DoAsync(cache, 1, () => key, async () =>
@@ -105,10 +101,10 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(resultCached, Is.Not.EqualTo(value));
+            Assert.AreNotEqual(value, resultCached);
         }
 
-        [Test]
+        [TestMethod]
         public async Task CacheFactoryDoBytesAsyncTest()
         {
             // Arrange
@@ -124,7 +120,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(cached, Is.True);
+            Assert.IsTrue(cached);
 
             // Act
             var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
@@ -135,10 +131,10 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(cached1, Is.False);
+            Assert.IsFalse(cached1);
         }
 
-        [Test]
+        [TestMethod]
         public async Task CacheFactoryDoBytesAsyncEmptyTest()
         {
             // Arrange
@@ -154,7 +150,7 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(cached, Is.True);
+            Assert.IsTrue(cached);
 
             // Act
             var (resultCached, cached1) = await CacheFactory.DoBytesAsync(cache, 1, () => key, async () =>
@@ -164,10 +160,10 @@ namespace Tests.Utils
             });
 
             // Assert
-            Assert.That(cached1, Is.True);
+            Assert.IsTrue(cached1);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ToJsonTest()
         {
             // Arrange
@@ -188,74 +184,67 @@ namespace Tests.Utils
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
             // Assert
-            Assert.That(json, Does.Contain("keys"));
+            Assert.Contains("keys", json);
         }
 
-        [Test]
+        [TestMethod]
         public void DataFormatParseTests()
         {
             // For reference check
             var json = DataFormat.Json;
 
             var result = DataFormat.TryParse<DataFormat>(1, out var item);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.True);
-                Assert.That(item, Is.EqualTo(DataFormat.Json));
-            });
+            Assert.IsTrue(result);
+            Assert.AreEqual(DataFormat.Json, item);
 
             var result1 = DataFormat.TryParse<DataFormat>(2, out var item1);
-            Assert.Multiple(() =>
-            {
-                Assert.That(result1, Is.False);
-                Assert.That(item1, Is.Null);
-            });
+            Assert.IsFalse(result1);
+            Assert.IsNull(item1);
         }
 
-        [Test]
+        [TestMethod]
         public void GetPropertyCaseInsensitiveTests()
         {
             var json = """{"contactTemplate": "abc"}""";
             var doc = JsonDocument.Parse(json);
             var template = doc.RootElement.GetPropertyCaseInsensitive("ContactTemplate");
-            Assert.That(template?.GetString(), Is.EqualTo("abc"));
+            Assert.AreEqual("abc", template?.GetString());
         }
 
-        [Test]
+        [TestMethod]
         public void GetValueTests()
         {
             var json = """{"stringItem": "abc", "boolItem1": "true", "boolItem2": true, "intItem": 12.5}""";
             var root = JsonDocument.Parse(json).RootElement;
 
             var boolItem1 = root.GetProperty("boolItem1");
-            Assert.Multiple(() =>
-            {
-                Assert.That(boolItem1.GetValue<bool>(), Is.Null);
-                Assert.That(boolItem1.GetValue<bool>(true), Is.True);
-            });
+            Assert.IsNull(boolItem1.GetValue<bool>());
+            Assert.IsTrue(boolItem1.GetValue<bool>(true));
 
             var boolItem2 = root.GetProperty("boolItem2");
-            Assert.That(boolItem2.GetValue<bool>(), Is.True);
+            Assert.IsTrue(boolItem2.GetValue<bool>());
 
             var intItem = root.GetProperty("intItem");
-            Assert.That(intItem.GetValue<int>(), Is.Null);
+            Assert.IsNull(intItem.GetValue<int>());
         }
 
-        [Test]
+        [TestMethod]
         public void Utf8JsonReaderGetValueTests()
         {
+            var jsonFormat = DataFormat.Json;
+
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
             var json = """{"format":1}""";
             var result = JsonSerializer.Deserialize<FormatTest>(json, options);
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result?.Format, Is.EqualTo(DataFormat.Json));
+            Assert.IsNotNull(result);
+            Assert.AreEqual(jsonFormat, result?.Format);
 
             var jsonResult = JsonSerializer.Serialize(result, options);
-            Assert.That(jsonResult, Is.Not.Null);
-            Assert.That(jsonResult, Is.EqualTo(json));
+            Assert.IsNotNull(jsonResult);
+            Assert.AreEqual(json, jsonResult);
         }
 
-        [Test]
+        [TestMethod]
         public void GetArrayTests()
         {
             var json = """{"stringItem": "abc", "stringArray": ["a", "b", "c"], "intArray": [1, 2, "3", "a"], "object": [{"id": "1", "label": "Label"}]}""";
@@ -263,38 +252,26 @@ namespace Tests.Utils
 
             var stringItem = doc.RootElement.GetProperty("stringItem");
             var testArray = stringItem.GetArray<string>();
-            Assert.That(testArray.Count(), Is.EqualTo(0));
+            Assert.AreEqual(0, testArray.Count());
 
             var stringArray = doc.RootElement.GetProperty("stringArray").GetArray<string>();
-            Assert.Multiple(() =>
-            {
-                Assert.That(stringArray.Count(), Is.EqualTo(3));
-                Assert.That(stringArray.Last(), Is.EqualTo("c"));
-            });
+            Assert.AreEqual(3, stringArray.Count());
+            Assert.AreEqual("c", stringArray.Last());
 
             var intArray = doc.RootElement.GetProperty("intArray").GetArray<int>();
-            Assert.Multiple(() =>
-            {
-                Assert.That(intArray.Count(), Is.EqualTo(2));
-                Assert.That(intArray.First(), Is.EqualTo(1));
-            });
+            Assert.AreEqual(2, intArray.Count());
+            Assert.AreEqual(1, intArray.First());
 
             var intArrayNotNull = doc.RootElement.GetProperty("intArray").GetArray<int>(true);
-            Assert.Multiple(() =>
-            {
-                Assert.That(intArrayNotNull.Count(), Is.EqualTo(3));
-                Assert.That(intArrayNotNull.ElementAt(2), Is.EqualTo(3));
-            });
+            Assert.AreEqual(3, intArrayNotNull.Count());
+            Assert.AreEqual(3, intArrayNotNull.ElementAt(2));
 
             var objArray = doc.RootElement.GetProperty("object").GetArray<IdLabelItem>();
-            Assert.Multiple(() =>
-            {
-                Assert.That(objArray.Count(), Is.EqualTo(1));
-                Assert.That(objArray.First()?.Label, Is.EqualTo("Label"));
-            });
+            Assert.AreEqual(1, objArray.Count());
+            Assert.AreEqual("Label", objArray.First()?.Label);
         }
 
-        [Test]
+        [TestMethod]
         public void GetDictionaryJsonTests()
         {
             // Arrange
@@ -313,10 +290,10 @@ namespace Tests.Utils
             var json = JsonSerializer.Serialize(dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
 
             // Assert
-            Assert.That(json, Is.EqualTo("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}"""));
+            Assert.AreEqual("""{"a":1,"a1":999,"b":"2","d":false,"e":"2021-01-01T00:00:00","f":[1,2,3]}""", json);
         }
 
-        [Test]
+        [TestMethod]
         public void ToDictionaryTests()
         {
             // Arrange
@@ -327,17 +304,14 @@ namespace Tests.Utils
             var dic = doc.RootElement.ToDictionary();
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(dic.Count, Is.EqualTo(6));
-                Assert.That(dic.Get<int>("a"), Is.EqualTo(1));
-                Assert.That(dic.Get<bool>("d"), Is.EqualTo(false));
-                Assert.That(dic.Get<DateTime>("e"), Is.EqualTo(DateTime.Parse("2021-01-01")));
-                Assert.That(dic.GetArray<int>("f").Count(), Is.EqualTo(3));
-            });
+            Assert.HasCount(6, dic);
+            Assert.AreEqual(1, dic.Get<int>("a"));
+            Assert.IsFalse(dic.Get<bool>("d"));
+            Assert.AreEqual(DateTime.Parse("2021-01-01"), dic.Get<DateTime>("e"));
+            Assert.AreEqual(3, dic.GetArray<int>("f").Count());
         }
 
-        [Test]
+        [TestMethod]
         public void FormatTemplateWithJsonTests()
         {
             // Arrange
@@ -349,11 +323,8 @@ namespace Tests.Utils
             var result2 = tempalte.FormatTemplateWithJson(json, "(empty)");
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result1, Is.EqualTo("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00"));
-                Assert.That(result2, Is.EqualTo("Hello, 1, your name is (empty), the date is 2021-01-01T00:00:00"));
-            });
+            Assert.AreEqual("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00", result1);
+            Assert.AreEqual("Hello, 1, your name is (empty), the date is 2021-01-01T00:00:00", result2);
         }
     }
 }

@@ -1,30 +1,29 @@
 ﻿using com.etsoo.Utils.String;
-using NUnit.Framework;
 using System.Diagnostics;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class StringUtilTests
     {
-        private static IEnumerable<TestCaseData> TryParseBoolBulkTestData
+        private static IEnumerable<object[]> TryParseBoolBulkTestData
         {
             get
             {
-                yield return new TestCaseData(true, true);
-                yield return new TestCaseData("true", true);
-                yield return new TestCaseData("True", true);
-                yield return new TestCaseData("TrUe", true);
-                yield return new TestCaseData(1, true);
-                yield return new TestCaseData("1", true);
-                yield return new TestCaseData(false, false);
-                yield return new TestCaseData("false", false);
-                yield return new TestCaseData("False", false);
-                yield return new TestCaseData(0, false);
-                yield return new TestCaseData("0", false);
-                yield return new TestCaseData("abc", null);
-                yield return new TestCaseData(-1, null);
-                yield return new TestCaseData(null, null);
+                yield return new object[] { true, true };
+                yield return new object[] { "true", true };
+                yield return new object[] { "True", true };
+                yield return new object[] { "TrUe", true };
+                yield return new object[] { 1, true };
+                yield return new object[] { "1", true };
+                yield return new object[] { false, false };
+                yield return new object[] { "false", false };
+                yield return new object[] { "False", false };
+                yield return new object[] { 0, false };
+                yield return new object[] { "0", false };
+                yield return new object[] { "abc", null };
+                yield return new object[] { -1, null };
+                yield return new object[] { null, null };
             }
         }
 
@@ -44,8 +43,9 @@ namespace Tests.Utils
         /// </summary>
         /// <param name="input">Input data</param>
         /// <param name="expectedResult">Expected result</param>
-        [Test, TestCaseSource(nameof(TryParseBoolBulkTestData))]
-        public void TryParse_Bool_Bulk(dynamic input, bool? expectedResult)
+        [TestMethod]
+        [DynamicData(nameof(TryParseBoolBulkTestData))]
+        public void TryParse_Bool_Bulk(object input, bool? expectedResult)
         {
             // Arange
 
@@ -53,27 +53,28 @@ namespace Tests.Utils
             var result = StringUtils.TryParseObject<bool>(input);
 
             // Assert
-            Assert.That(result, Is.EqualTo(expectedResult));
+            Assert.AreEqual(expectedResult, result);
         }
 
-        private static IEnumerable<TestCaseData> FormatFileSizeTestData
+        private static IEnumerable<object[]> FormatFileSizeTestData
         {
             get
             {
-                yield return new TestCaseData(1551859712, "1.45 GB", 2);
-                yield return new TestCaseData(1551859712, "1.4 GB", 1);
-                yield return new TestCaseData(1125000, "1.07 MB", 2);
+                yield return new object[] { 1551859712L, "1.45 GB", 2 };
+                yield return new object[] { 1551859712L, "1.4 GB", 1 };
+                yield return new object[] { 1125000L, "1.07 MB", 2 };
             }
         }
 
-        [TestCaseSource(nameof(FormatFileSizeTestData))]
+        [TestMethod]
+        [DynamicData(nameof(FormatFileSizeTestData))]
         public void FormatFileSize_Test(long input, string expected, int fractionDigits)
         {
             var result = StringUtils.FormatFileSize(input, fractionDigits);
-            Assert.That(result, Is.EqualTo(expected));
+            Assert.AreEqual(expected, result);
         }
 
-        [Test]
+        [TestMethod]
         public void GetLCSTests()
         {
             // Arrange
@@ -84,10 +85,10 @@ namespace Tests.Utils
             var result = StringUtils.GetLCS(input1, input2);
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("总部基地中区"));
+            Assert.AreEqual("总部基地中区", result.ToString());
         }
 
-        [Test]
+        [TestMethod]
         public void GetSamePartsTest()
         {
             // Arrange
@@ -99,10 +100,10 @@ namespace Tests.Utils
 
             // Assert
             var expected = new[] { "总部基地中区", "中国陶瓷", "E座" };
-            Assert.That(result, Is.EqualTo(expected));
+            CollectionAssert.AreEqual(expected, result.ToArray());
         }
 
-        [Test]
+        [TestMethod]
         public void GetSamePartsMinCharsTest()
         {
             // Arrange
@@ -114,48 +115,48 @@ namespace Tests.Utils
 
             // Assert
             var expected = new[] { "ab", "de" };
-            Assert.That(result, Is.EqualTo(expected));
+            CollectionAssert.AreEqual(expected, result.ToArray());
         }
 
-        [Test]
+        [TestMethod]
         public void HideData_Test()
         {
             // Act 1
             var result = StringUtils.HideData("4000609917");
 
             // Assert 1
-            Assert.That(result, Is.EqualTo("400***917"));
+            Assert.AreEqual("400***917", result);
 
             // Act 2
             result = StringUtils.HideData("+8653255579200");
 
             // Assert 2
-            Assert.That(result, Is.EqualTo("+865***9200"));
+            Assert.AreEqual("+865***9200", result);
         }
 
-        [Test]
+        [TestMethod]
         public void HideEmail_Test()
         {
             // Act 1
             var result = StringUtils.HideEmail("info@etsoo.com");
 
             // Assert 1
-            Assert.That(result, Is.EqualTo("in***@etsoo.com"));
+            Assert.AreEqual("in***@etsoo.com", result);
 
             // Act 2
             result = StringUtils.HideEmail("helloworld@etsoo.com");
 
             // Assert 2
-            Assert.That(result, Is.EqualTo("hel***rld@etsoo.com"));
+            Assert.AreEqual("hel***rld@etsoo.com", result);
 
             // Act 3
             result = StringUtils.HideEmail("xm@etsoo.com");
 
             // Assert 3
-            Assert.That(result, Is.EqualTo("x***@etsoo.com"));
+            Assert.AreEqual("x***@etsoo.com", result);
         }
 
-        [Test]
+        [TestMethod]
         public void IEnumerableToString_Test()
         {
             // Arrange
@@ -165,13 +166,13 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.That(result, Is.EqualTo("1,2,3"));
+            Assert.AreEqual("1,2,3", result);
         }
 
         /// <summary>
         /// Enum parse test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void TryParseEnum()
         {
             // Arrange
@@ -179,23 +180,19 @@ namespace Tests.Utils
             var result1 = StringUtils.TryParse<TestEnum>("Friday");
             var result2 = StringUtils.TryParse<TestEnum>("4");
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result1, Is.EqualTo(TestEnum.Friday));
-                Assert.That(result2, Is.EqualTo(TestEnum.Friday));
-            });
+            Assert.AreEqual(TestEnum.Friday, result1);
+            Assert.AreEqual(TestEnum.Friday, result2);
         }
 
-        private static IEnumerable<TestCaseData> TryParsePerformanceBulkTestData
+        private static IEnumerable<object[]> TryParsePerformanceBulkTestData
         {
             get
             {
-                yield return new TestCaseData(true);
-                yield return new TestCaseData("true");
-                yield return new TestCaseData(1);
-                yield return new TestCaseData("abc");
-                yield return new TestCaseData(-1);
+                yield return new object[] { true };
+                yield return new object[] { "true" };
+                yield return new object[] { 1 };
+                yield return new object[] { "abc" };
+                yield return new object[] { -1 };
             }
         }
 
@@ -203,7 +200,8 @@ namespace Tests.Utils
         /// Performance test to parse bool value, 10K less than 100ms
         /// </summary>
         /// <param name="input">Input data</param>
-        [Test, TestCaseSource(nameof(TryParsePerformanceBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(TryParsePerformanceBulkTestData))]
         public void TryParse_Performance_Bulk(object input)
         {
             var sw = new Stopwatch();
@@ -218,41 +216,43 @@ namespace Tests.Utils
 
             var ms = sw.ElapsedMilliseconds;
 
-            Assert.That(ms, Is.LessThan(100), $"{input}, {ms} is more than 100 ms");
+            Assert.IsLessThan(100, ms, $"{input}, {ms} is more than 100 ms");
         }
 
-        private static IEnumerable<TestCaseData> PascalLinuxBulkTestData
+        private static IEnumerable<object[]> PascalLinuxBulkTestData
         {
             get
             {
-                yield return new TestCaseData("A", "a");
-                yield return new TestCaseData("Name", "name");
-                yield return new TestCaseData("HelloWorld", "hello_world");
-                yield return new TestCaseData("YourCustomerId", "your_customer_id");
+                yield return new object[] { "A", "a" };
+                yield return new object[] { "Name", "name" };
+                yield return new object[] { "HelloWorld", "hello_world" };
+                yield return new object[] { "YourCustomerId", "your_customer_id" };
             }
         }
 
-        [Test, TestCaseSource(nameof(PascalLinuxBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(PascalLinuxBulkTestData))]
         public void PascalCaseToLinuxStyle_All_Test(string pascal, string camel)
         {
             // Arrange & act
             var result = StringUtils.PascalCaseToLinuxStyle(pascal).ToString();
 
             // Assert
-            Assert.That(result, Is.EqualTo(camel));
+            Assert.AreEqual(camel, result);
         }
 
-        [Test, TestCaseSource(nameof(PascalLinuxBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(PascalLinuxBulkTestData))]
         public void LinuxStyleToPascalCase_All_Test(string pascal, string camel)
         {
             // Arrange & act
             var result = StringUtils.LinuxStyleToPascalCase(camel).ToString();
 
             // Assert
-            Assert.That(result, Is.EqualTo(pascal));
+            Assert.AreEqual(pascal, result);
         }
 
-        [Test]
+        [TestMethod]
         public void LinuxStyleToPascalCase_Cameral_Test()
         {
             // Arrange & act
@@ -260,10 +260,10 @@ namespace Tests.Utils
             var result = StringUtils.LinuxStyleToPascalCase(input).ToString();
 
             // Assert
-            Assert.That(result, Is.EqualTo("YourName"));
+            Assert.AreEqual("YourName", result);
         }
 
-        [Test]
+        [TestMethod]
         public void IEnumerableToString_Int_Test()
         {
             // Arrange
@@ -273,10 +273,10 @@ namespace Tests.Utils
             var result = StringUtils.IEnumerableToString(items);
 
             // Assert
-            Assert.That(result, Is.EqualTo("1,2"));
+            Assert.AreEqual("1,2", result);
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryToString_Int_Test()
         {
             // Arrange
@@ -286,10 +286,10 @@ namespace Tests.Utils
             var result = StringUtils.DictionaryToString(items);
 
             // Assert
-            Assert.That(result, Is.EqualTo("1001=True&1002=False"));
+            Assert.AreEqual("1001=True&1002=False", result);
         }
 
-        [Test]
+        [TestMethod]
         public void AsEnumerable_Int_Test()
         {
             // Arrange
@@ -298,15 +298,11 @@ namespace Tests.Utils
             // Act
             var items = StringUtils.AsEnumerable<int>(input);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(items.Count(), Is.EqualTo(2));
-                Assert.That(items, Does.Contain(3));
-            });
+            Assert.AreEqual(2, items.Count());
+            CollectionAssert.Contains(items.ToList(), 3);
         }
 
-        [Test]
+        [TestMethod]
         public void AsEnumerable_String_Test()
         {
             // Arrange
@@ -315,28 +311,21 @@ namespace Tests.Utils
             // Act
             var items = StringUtils.AsEnumerable(input);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(items.Count(), Is.EqualTo(3));
-                Assert.That(items, Does.Contain("3"));
-            });
+            Assert.AreEqual(3, items.Count());
+            CollectionAssert.Contains(items.ToList(), "3");
         }
 
-        [Test]
+        [TestMethod]
         public void IsJsonTests()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That("1".IsJson(), Is.False);
-                Assert.That("false".IsJson(), Is.False);
-                Assert.That("{}".IsJson(), Is.True);
-                Assert.That("{ \"bool\": true }".IsJson(), Is.True);
-                Assert.That("[]".IsJson(), Is.True);
-            });
+            Assert.IsFalse("1".IsJson());
+            Assert.IsFalse("false".IsJson());
+            Assert.IsTrue("{}".IsJson());
+            Assert.IsTrue("{ \"bool\": true }".IsJson());
+            Assert.IsTrue("[]".IsJson());
         }
 
-        [Test]
+        [TestMethod]
         public void ToPascalWord_Test()
         {
             // Arrange
@@ -346,66 +335,54 @@ namespace Tests.Utils
             var result = input.AsSpan().ToPascalWord();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("Hello"));
+            Assert.AreEqual("Hello", result.ToString());
         }
 
-        private static IEnumerable<TestCaseData> RemoveNonLettersTestData
+        private static IEnumerable<object[]> RemoveNonLettersTestData
         {
             get
             {
-                yield return new TestCaseData(" 123 ", "123");
-                yield return new TestCaseData("0532-5557 9200", "053255579200");
-                yield return new TestCaseData("02,s*", "02s");
+                yield return new object[] { " 123 ", "123" };
+                yield return new object[] { "0532-5557 9200", "053255579200" };
+                yield return new object[] { "02,s*", "02s" };
             }
         }
 
-        [Test, TestCaseSource(nameof(RemoveNonLettersTestData))]
+        [TestMethod]
+        [DynamicData(nameof(RemoveNonLettersTestData))]
         public void RemoveNonLetters_Test(string input, string result)
         {
-            Assert.That(result, Is.EqualTo(StringUtils.RemoveNonLetters(input)));
+            Assert.AreEqual(result, StringUtils.RemoveNonLetters(input));
         }
 
-        [Test]
+        [TestMethod]
         public void SplitIntGuid_TestEmptyCase()
         {
             // Arrange & act
             var (id, guid) = StringUtils.SplitIntGuid(null);
-
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(id, Is.Null);
-                Assert.That(guid, Is.Null);
-            });
+            Assert.IsNull(id);
+            Assert.IsNull(guid);
         }
 
-        [Test]
+        [TestMethod]
         public void SplitIntGuid_TestNormalCase()
         {
             // Arrange & act
             var (id, guid) = StringUtils.SplitIntGuid("5|700fc07c-ce7c-4af0-aed3-c83a9d30f23d");
-
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(id, Is.EqualTo(5));
-                Assert.That(Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"), Is.EqualTo(guid));
-            });
+            Assert.AreEqual(5, id);
+            Assert.AreEqual(Guid.Parse("700fc07c-ce7c-4af0-aed3-c83a9d30f23d"), guid);
         }
 
-        [Test]
+        [TestMethod]
         public void NumberToCharsAndCharsToNumberTests()
         {
             var num = 1638777042242;
             var chars = StringUtils.NumberToChars(num);
-            Assert.Multiple(() =>
-            {
-                Assert.That(chars, Is.EqualTo("QmpkdVgv"));
-                Assert.That(StringUtils.CharsToNumber(chars), Is.EqualTo(num));
-            });
+            Assert.AreEqual("QmpkdVgv", chars);
+            Assert.AreEqual(num, StringUtils.CharsToNumber(chars));
         }
 
-        [Test]
+        [TestMethod]
         public void WriteJsonTests()
         {
             var json = StringUtils.WriteJson((writer) =>
@@ -416,24 +393,21 @@ namespace Tests.Utils
                 writer.WriteEndObject();
             });
 
-            Assert.That(json, Is.EqualTo("""{"test":{"Brand":"亿速"}}"""));
+            Assert.AreEqual("""{"test":{"Brand":"亿速"}}""", json);
         }
 
-        [Test]
+        [TestMethod]
         public void GetPrimitiveValueTests()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(StringUtils.GetPrimitiveValue(1.0), Is.EqualTo(1.0));
+            Assert.AreEqual(1.0, StringUtils.GetPrimitiveValue(1.0));
 
-                var guid = Guid.NewGuid();
-                Assert.That(StringUtils.GetPrimitiveValue(guid), Is.EqualTo(guid));
+            var guid = Guid.NewGuid();
+            Assert.AreEqual(guid, StringUtils.GetPrimitiveValue(guid));
 
-                var dt = DateTime.Now;
-                Assert.That(StringUtils.GetPrimitiveValue(dt), Is.EqualTo(dt));
+            var dt = DateTime.Now;
+            Assert.AreEqual(dt, StringUtils.GetPrimitiveValue(dt));
 
-                Assert.That(StringUtils.GetPrimitiveValue(new Uri("https://etsoo.com/")), Is.EqualTo("https://etsoo.com/"));
-            });
+            Assert.AreEqual("https://etsoo.com/", StringUtils.GetPrimitiveValue(new Uri("https://etsoo.com/")));
         }
     }
 }

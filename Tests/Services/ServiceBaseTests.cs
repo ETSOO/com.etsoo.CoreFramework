@@ -11,7 +11,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Moq;
-using NUnit.Framework;
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Runtime.Versioning;
@@ -40,9 +39,9 @@ namespace Tests.Services
         }
     }
 
-    [TestFixture]
+    [TestClass]
     [SupportedOSPlatform("windows")]
-    internal class ServiceBaseTests
+    public class ServiceBaseTests
     {
         readonly SqliteDatabase db;
         readonly ServiceTest service;
@@ -57,10 +56,10 @@ namespace Tests.Services
             service = new ServiceTest(app, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
         }
 
-        [SetUp]
-        public async Task Setup()
+        [TestInitialize]
+        public void Setup()
         {
-            await db.WithConnection((connection) =>
+            db.WithConnection((connection) =>
             {
                 var sql = @"
                     CREATE TABLE IF NOT EXISTS User (id int PRIMARY KEY, name nvarchar(128), status int) WITHOUT ROWID;
@@ -69,10 +68,10 @@ namespace Tests.Services
                     INSERT OR IGNORE INTO User (id, name) VALUES(1001, 'Admin 1');
                 ";
                 return connection.ExecuteAsync(sql);
-            });
+            }).GetAwaiter().GetResult();
         }
 
-        [Test]
+        [TestMethod]
         public async Task SqlModelTests()
         {
             await service.SqlDeleteAsync([1003]);
@@ -80,27 +79,27 @@ namespace Tests.Services
             var user = new SqlUserInsert { Id = 1003, Name = "Admin 3", Status = EntityStatus.Approved };
 
             var id = await service.SqlInsertAsync<SqlUserInsert, int>(user);
-            Assert.That(id, Is.EqualTo(1003));
+            Assert.AreEqual(1003, id);
 
             var update = new SqlUserUpdate { Id = 1003, Name = "Admin 3 Updated", ChangedFields = ["Name"] };
             var updateResult = await service.SqlUpdateAsync(update);
-            Assert.That(updateResult.Ok, Is.True);
+            Assert.IsTrue(updateResult.Ok);
 
             var select = new SqlUserSelect { Id = 1003, QueryPaging = new QueryPagingData { BatchSize = 2 } };
             var selectData = (await service.SqlSelectAsync<SqlUserSelect, UserData>(select)).FirstOrDefault();
-            Assert.That(selectData, Is.Not.Null);
-            Assert.That(selectData.Name, Is.EqualTo("Admin 3 Updated"));
+            Assert.IsNotNull(selectData);
+            Assert.AreEqual("Admin 3 Updated", selectData.Name);
 
             var writer = new ArrayBufferWriter<byte>();
             await service.SqlSelectJsonAsync<SqlUserSelect, UserData>(select, writer);
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
-            Assert.That(json, Is.EqualTo("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]"));
+            Assert.AreEqual("[{\"id\":1003,\"name\":\"Admin 3 Updated\",\"status\":100}]", json);
 
             var deleteResult = await service.SqlDeleteAsync([1003], "User");
-            Assert.That(deleteResult.Ok, Is.True);
+            Assert.IsTrue(deleteResult.Ok);
         }
 
-        [Test]
+        [TestMethod]
         public void EncryptionTests()
         {
             // Arrange
@@ -112,10 +111,10 @@ namespace Tests.Services
             var plainText = service.Decrypt(encrypted, passphrase, 120);
 
             // Assert
-            Assert.That(plainText, Is.EqualTo(input));
+            Assert.AreEqual(input, plainText);
         }
 
-        [Test]
+        [TestMethod]
         public void WebDecryptionTests()
         {
             // Arrange
@@ -127,31 +126,28 @@ namespace Tests.Services
             var plainText = service.Decrypt(encrypted, passphrase, 120, true);
             var plainTextLong = service.Decrypt(encrypted, passphrase, null, true);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(plainText, Is.Null);
-                Assert.That(plainTextLong, Is.EqualTo(input));
-            });
+            // Assert
+            Assert.IsNull(plainText);
+            Assert.AreEqual(input, plainTextLong);
         }
 
-        [Test]
+        [TestMethod]
         public async Task InitCallTests()
         {
             // Arrange
             var rq = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds() };
             var result = await service.InitCallAsync(rq, "My Password");
-            Assert.That(result.Ok, Is.True);
+            Assert.IsTrue(result.Ok);
 
             var deviceId = result.Data.Get("DeviceId");
-            Assert.That(deviceId, Is.Not.Null);
+            Assert.IsNotNull(deviceId);
 
             var rqNew = new InitCallRQ { Timestamp = SharedUtils.UTCToJsMiliseconds(), DeviceId = deviceId };
             var resultNew = await service.InitCallAsync(rqNew, "My Password");
-            Assert.That(resultNew.Ok, Is.True);
+            Assert.IsTrue(resultNew.Ok);
         }
 
-        [Test]
+        [TestMethod]
         public async Task InlineUpdateAsync_Test()
         {
             // Arrange
@@ -169,16 +165,13 @@ namespace Tests.Services
                 TableName = "User"
             });
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result.Ok, Is.True);
-                Assert.That(data, Is.Not.Null);
-                Assert.That(data?.RowsAffected, Is.EqualTo(1));
-            });
+            // Assert
+            Assert.IsTrue(result.Ok);
+            Assert.IsNotNull(data);
+            Assert.AreEqual(1, data?.RowsAffected);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryAs_Test()
         {
             // Arrange
@@ -189,10 +182,10 @@ namespace Tests.Services
             var result = await service.QueryAsAsync<TestUserModule>(command);
 
             // Assert
-            Assert.That(result?.Name, Is.EqualTo("Admin 1"));
+            Assert.AreEqual("Admin 1", result?.Name);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryAsResult_NoActionResult()
         {
             // Arrange
@@ -204,15 +197,12 @@ namespace Tests.Services
 
             // Assert
             var error = ApplicationErrors.NoActionResult;
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.Ok, Is.False);
-                Assert.That(result.Type, Is.EqualTo(error.Type));
-                Assert.That(result.Title, Is.EqualTo(error.Title));
-            });
+            Assert.IsFalse(result.Ok);
+            Assert.AreEqual(error.Type, result.Type);
+            Assert.AreEqual(error.Title, result.Title);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryAsResult_NoData()
         {
             // Arrange
@@ -223,10 +213,10 @@ namespace Tests.Services
             var result = await service.QueryAsResultAsync(command);
 
             // Assert
-            Assert.That(result.Ok, Is.True);
+            Assert.IsTrue(result.Ok);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ReadToStreamAsync_Test()
         {
             // Arrange
@@ -238,15 +228,12 @@ namespace Tests.Services
             var result = await service.ReadToStreamAsync(command, stream);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result, Is.True);
-                Assert.That(json, Does.Contain("Admin 1"));
-            });
+            // Assert
+            Assert.IsTrue(result);
+            Assert.Contains("Admin 1", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ReadToStreamAsync_JoinFields_Test()
         {
             // Arrange
@@ -262,14 +249,11 @@ namespace Tests.Services
             var result = await service.ReadToStreamAsync(command, stream);
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(json, Is.EqualTo("[{\"id\":1001,\"isAdmin2\":false},{\"id\":1002,\"isAdmin2\":true}]"));
-            });
+            // Assert
+            Assert.AreEqual("[{\"id\":1001,\"isAdmin2\":false},{\"id\":1002,\"isAdmin2\":true}]", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ReadToStreamMultipleResultsAsync_Test()
         {
             // Arrange
@@ -281,16 +265,13 @@ namespace Tests.Services
             var result = await service.ReadToStreamAsync(command, stream, DataFormat.Json, new[] { "users" });
             var json = Encoding.UTF8.GetString(stream.ToArray());
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(result, Is.True);
-                Assert.That(json, Does.Contain("\"users\":"));
-                Assert.That(json, Does.Contain("\"data2\":"));
-            });
+            // Assert
+            Assert.IsTrue(result);
+            Assert.Contains("\"users\":", json);
+            Assert.Contains("\"data2\":", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ReadJsonToStreamWithReturnAsync_Test()
         {
             // Arrange
@@ -306,7 +287,7 @@ namespace Tests.Services
             var json = Encoding.UTF8.GetString(result.ToArray());
 
             // Assert
-            Assert.That(json, Does.Contain("id"));
+            Assert.Contains("id", json);
         }
     }
 }

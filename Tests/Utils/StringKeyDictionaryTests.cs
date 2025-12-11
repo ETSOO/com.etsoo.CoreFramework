@@ -1,49 +1,40 @@
 ﻿using com.etsoo.Utils.String;
-using NUnit.Framework;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class StringKeyDictionaryTests
     {
         /// <summary>
         /// String dictionary GetItem test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void GetItem_String_Test()
         {
             // Arrange
             var dic = new StringKeyDictionary<string>(new Dictionary<string, string?>() { { "null", null }, { "ok", "ok" } });
-
-            Assert.Multiple(() =>
-            {
-                // Act & assert
-                Assert.That(dic.GetItem("null"), Is.Null);
-                Assert.That(dic.GetItem("ok"), Is.Not.Null);
-            });
+            // Act & assert
+            Assert.IsNull(dic.GetItem("null"));
+            Assert.IsNotNull(dic.GetItem("ok"));
 
             var key = dic.GetItem("key");
-            Assert.That(key, Is.Null);
+            Assert.IsNull(key);
         }
 
         /// <summary>
         /// Integer dictionary GetItem test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void GetItem_Int_Test()
         {
             // Arrange
             var dic = new StringKeyDictionary<int?>(new Dictionary<string, int?>() { { "null", null }, { "ok", 123 } });
-
-            Assert.Multiple(() =>
-            {
-                // Act & assert
-                Assert.That(dic.GetItem("null"), Is.Null);
-                Assert.That(dic.GetItem("ok"), Is.Not.Null);
-            });
+            // Act & assert
+            Assert.IsNull(dic.GetItem("null"));
+            Assert.IsNotNull(dic.GetItem("ok"));
 
             var key = dic.GetItem("key");
-            Assert.That(key, Is.Null);
+            Assert.IsNull(key);
         }
 
         // Arrange
@@ -58,47 +49,44 @@ namespace Tests.Utils
         /// <summary>
         /// StringKeyDictionaryDynamic null test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void DictionaryDynamic_GetNull_Test()
         {
-            Assert.Multiple(() =>
-            {
-                Assert.That(dic.Get("null"), Is.Null);
-                Assert.That(dic.Get<bool>("null"), Is.Null);
-            });
+            Assert.IsNull(dic.Get("null"));
+            Assert.IsNull(dic.Get<bool>("null"));
         }
 
         /// <summary>
         /// StringKeyDictionaryDynamic bool test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void DictionaryDynamic_GetBool_Test()
         {
-            Assert.That(dic.Get<bool>("bool"), Is.EqualTo(true));
+            Assert.IsTrue(dic.Get<bool>("bool"));
         }
 
         /// <summary>
         /// StringKeyDictionaryDynamic decimal test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void DictionaryDynamic_GetDecimal_Test()
         {
-            Assert.That(dic.Get<decimal>("money"), Is.EqualTo(12.8M));
+            Assert.AreEqual(12.8M, dic.Get<decimal>("money"));
         }
 
         /// <summary>
         /// StringKeyDictionaryDynamic decimal from string test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void DictionaryDynamic_GetDecimalFromString_Test()
         {
-            Assert.That(dic.Get<decimal>("string"), Is.EqualTo(12.8M));
+            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
         }
 
         /// <summary>
         /// StringKeyDictionaryString test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void DictionaryString_Get_Test()
         {
             // Arrange
@@ -108,15 +96,12 @@ namespace Tests.Utils
                 { "string", "12.8" }
             });
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(dic.GetItem("null"), Is.Null);
-                Assert.That(dic.Get<bool>("null"), Is.Null);
-                Assert.That(dic.Get<decimal>("string"), Is.EqualTo(12.8M));
-            });
+            Assert.IsNull(dic.GetItem("null"));
+            Assert.IsNull(dic.Get<bool>("null"));
+            Assert.AreEqual(12.8M, dic.Get<decimal>("string"));
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryString_GetIntArray_Test()
         {
             // Arrange
@@ -129,14 +114,11 @@ namespace Tests.Utils
             var array1 = dic.GetArray<int>("array1");
             var array2 = dic.GetArray<int>("array2");
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(array1.Count, Is.EqualTo(3));
-                Assert.That(array2.Count, Is.EqualTo(3));
-            });
+            Assert.AreEqual(3, array1.Count());
+            Assert.AreEqual(3, array2.Count());
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryString_GetStringArray_Test()
         {
             // Arrange
@@ -149,16 +131,13 @@ namespace Tests.Utils
             var array1 = dic.GetArray("array1");
             var array2 = dic.GetArray("array2");
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(array1, Is.Not.Null);
-                Assert.That(array2, Is.Not.Null);
-                Assert.That(array1!.Count, Is.EqualTo(4));
-                Assert.That(array2!.Count, Is.EqualTo(3));
-            });
+            Assert.IsNotNull(array1);
+            Assert.IsNotNull(array2);
+            Assert.AreEqual(4, array1.Count());
+            Assert.AreEqual(3, array2.Count());
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryObject_GetIntArray_Test()
         {
             // Arrange
@@ -171,14 +150,11 @@ namespace Tests.Utils
             var array1 = dic.GetArray<int>("array1");
             var array2 = dic.GetArray<int>("array2");
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(array1.Count, Is.EqualTo(3));
-                Assert.That(array2.Count, Is.EqualTo(3));
-            });
+            Assert.AreEqual(3, array1.Count());
+            Assert.AreEqual(3, array2.Count());
         }
 
-        [Test]
+        [TestMethod]
         public void DictionaryObject_GetStringArray_Test()
         {
             // Arrange
@@ -191,13 +167,10 @@ namespace Tests.Utils
             var array1 = dic.GetArray("array1");
             var array2 = dic.GetArray("array2");
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(array1, Is.Not.Null);
-                Assert.That(array2, Is.Not.Null);
-                Assert.That(array1!.Count, Is.EqualTo(4));
-                Assert.That(array2!.Count, Is.EqualTo(3));
-            });
+            Assert.IsNotNull(array1);
+            Assert.IsNotNull(array2);
+            Assert.AreEqual(4, array1.Count());
+            Assert.AreEqual(3, array2.Count());
         }
     }
 }

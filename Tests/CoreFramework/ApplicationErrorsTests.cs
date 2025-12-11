@@ -1,16 +1,15 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.Localization;
-using NUnit.Framework;
 
 namespace Tests.CoreFramework
 {
-    [TestFixture]
+    [TestClass]
     public class ApplicationErrorsTests
     {
         /// <summary>
         /// Multiple cultures of the errors
         /// </summary>
-        [Test]
+        [TestMethod]
         public void Errors_MultipleCultures()
         {
             // Arrange
@@ -18,13 +17,13 @@ namespace Tests.CoreFramework
 
             // Action & assert
             // Resources depend on CurrentUICulture, not CurrentCulture
-            Assert.That(ApplicationErrors.NoUserFound.Title, Is.EqualTo("找不到用户"));
+            Assert.AreEqual("找不到用户", ApplicationErrors.NoUserFound.Title);
 
             // Arrange
             LocalizationUtils.SetCulture("en-US");
 
             // Action & assert
-            Assert.That(ApplicationErrors.NoUserFound.Title, Is.EqualTo("No User Found"));
+            Assert.AreEqual("No User Found", ApplicationErrors.NoUserFound.Title);
         }
     }
 }

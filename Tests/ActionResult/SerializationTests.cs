@@ -1,17 +1,16 @@
 ﻿using com.etsoo.Utils;
 using com.etsoo.Utils.Serialization;
 using com.etsoo.Utils.String;
-using NUnit.Framework;
 using System.Buffers;
 using System.Text;
 using System.Text.Json;
 
 namespace Tests.ActionResult
 {
-    [TestFixture]
+    [TestClass]
     public class SerializationTests
     {
-        [Test]
+        [TestMethod]
         public void SeriliazationTest()
         {
             // Arrange
@@ -27,16 +26,13 @@ namespace Tests.ActionResult
             // Act
             var json = JsonSerializer.Serialize(modal, SharedUtils.JsonDefaultSerializerOptions);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(json, Does.Contain("secret"));
-                Assert.That(json, Does.Contain("***"));
-                Assert.That(json, Does.Contain("uShortValue"));
-            });
+            // Assert
+            Assert.Contains("secret", json);
+            Assert.Contains("***", json);
+            Assert.Contains("uShortValue", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ToJsonTest()
         {
             // Arrange
@@ -55,15 +51,12 @@ namespace Tests.ActionResult
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(json, Does.Not.Contain("secret"));
-                Assert.That(json, Does.Contain("uShortValue"));
-            });
+            // Assert
+            Assert.DoesNotContain("secret", json);
+            Assert.Contains("uShortValue", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ToJsonTest2()
         {
             // Arrange
@@ -82,32 +75,29 @@ namespace Tests.ActionResult
 
             // Act
             await using var stream = SharedUtils.GetStream();
-            await result.ToJsonAsync(stream);
+            await result.ToJsonAsync(stream, TestContext.CancellationToken);
             stream.TryGetBuffer(out var bytes);
             var json = Encoding.UTF8.GetString(bytes);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(json, Is.EqualTo("{\"data\":{\"id\":1,\"enabled\":true,\"guid\":\"00000000-0000-0000-0000-000000000000\",\"creation\":\"2024-05-18T00:00:00+00:00\"},\"ok\":true,\"title\":\"Success\"}"));
-            });
+            // Assert
+            Assert.AreEqual("{\"data\":{\"id\":1,\"enabled\":true,\"guid\":\"00000000-0000-0000-0000-000000000000\",\"creation\":\"2024-05-18T00:00:00+00:00\"},\"ok\":true,\"title\":\"Success\"}", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task StringIdDataResultTests()
         {
             var id = "ABC";
             var result = com.etsoo.Utils.Actions.ActionResult.Succeed(id);
 
             await using var stream = SharedUtils.GetStream();
-            await result.ToJsonAsync(stream);
+            await result.ToJsonAsync(stream, TestContext.CancellationToken);
             stream.Position = 0;
 
-            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultStringIdData);
-            Assert.That(dataResult?.Data?.Id, Is.EqualTo(id));
+            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultStringIdData, TestContext.CancellationToken);
+            Assert.AreEqual(id, dataResult?.Data?.Id);
         }
 
-        [Test]
+        [TestMethod]
         public async Task IdMsgDataResultTests()
         {
             var id = 12345;
@@ -115,25 +105,26 @@ namespace Tests.ActionResult
             var result = com.etsoo.Utils.Actions.ActionResult.Succeed(id, msg);
 
             await using var stream = SharedUtils.GetStream();
-            await result.ToJsonAsync(stream);
+            await result.ToJsonAsync(stream, TestContext.CancellationToken);
             stream.Position = 0;
 
-            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData);
-            Assert.Multiple(async () =>
+            var dataResult = await JsonSerializer.DeserializeAsync(stream, CommonJsonSerializerContext.Default.ActionResultIdMsgData, TestContext.CancellationToken);
+
+            // Assert
+            Assert.IsNotNull(dataResult);
+            Assert.IsTrue(dataResult!.Ok);
+
+            if (dataResult.Ok is true)
             {
-                Assert.That(dataResult, Is.Not.Null);
-                Assert.That(dataResult!.Ok, Is.True);
+                Assert.AreEqual(id, dataResult.Data.Id);
+                Assert.AreEqual(msg, dataResult.Data.Msg);
+            }
 
-                if (dataResult.Ok is true)
-                {
-                    Assert.That(dataResult.Data.Id, Is.EqualTo(id));
-                    Assert.That(dataResult.Data.Msg, Is.EqualTo(msg));
-                }
-
-                var newResult = await dataResult.ToActionResultAsync(CommonJsonSerializerContext.Default.IdMsgData);
-                Assert.That(newResult.Data.Get<int>(nameof(id)), Is.EqualTo(id));
-                Assert.That(newResult.Data.Get(nameof(msg)), Is.EqualTo(msg));
-            });
+            var newResult = await dataResult.ToActionResultAsync(CommonJsonSerializerContext.Default.IdMsgData);
+            Assert.AreEqual(id, newResult.Data.Get<int>(nameof(id)));
+            Assert.AreEqual(msg, newResult.Data.Get(nameof(msg)));
         }
+
+        public TestContext TestContext { get; set; }
     }
 }

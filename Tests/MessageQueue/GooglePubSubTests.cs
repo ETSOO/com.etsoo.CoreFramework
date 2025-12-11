@@ -2,14 +2,13 @@
 using com.etsoo.MessageQueue.GooglePubSub;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit.Framework;
 
 namespace Tests.MessageQueue
 {
-    [TestFixture]
-    internal class GooglePubSubTests
+    [TestClass]
+    public class GooglePubSubTests
     {
-        [Test]
+        [TestMethod]
         public async Task ProducerSendAsyncTest()
         {
             var client = await GooglePubSubUtils.CreatePublisherClientAsync(new GooglePubSubProducerOptions
@@ -25,10 +24,10 @@ namespace Tests.MessageQueue
             await producer.DisposeAsync();
             await client.DisposeAsync();
 
-            Assert.That(messageId, Is.Not.Null);
+            Assert.IsNotNull(messageId);
         }
 
-        [Test]
+        [TestMethod]
         public async Task ProducerReceiveAsyncTest()
         {
             var client = await GooglePubSubUtils.CreatePublisherClientAsync(new GooglePubSubProducerOptions
@@ -68,17 +67,16 @@ namespace Tests.MessageQueue
             consumer.StartAsync(source.Token);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-            await Task.Delay(5000);
+            await Task.Delay(5000, TestContext.CancellationToken);
             await consumer.StopAsync(source.Token);
 
             await subscriber.DisposeAsync();
             await client.DisposeAsync();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(messages, Is.Not.Empty);
-                Assert.That(messages.Any(m => messageId.Equals(m.MessageId)), Is.True);
-            });
+            Assert.IsTrue(messages.Any());
+            Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));
         }
+
+        public TestContext TestContext { get; set; }
     }
 }

@@ -1,58 +1,56 @@
 ﻿using com.etsoo.Address;
 using com.etsoo.Utils.String;
-using NUnit.Framework;
 
 namespace Tests.Utils
 {
     /// <summary>
     /// Address region tests
     /// </summary>
-    internal class AddressRegionTests
+    [TestClass]
+    public class AddressRegionTests
     {
-        [Test]
+        [TestMethod]
         public void Countries_GetById_Tests()
         {
             // Arrange & act
             var country = AddressRegion.GetById("CN");
 
             // Assert
-            Assert.That(country?.Currency, Is.EqualTo("CNY"));
+            Assert.AreEqual("CNY", country?.Currency);
         }
 
-        [Test]
+        [TestMethod]
         public void Countries_GetByIdd_Tests()
         {
             // Arrange & act
             var country = AddressRegion.GetByIdd("64");
 
             // Assert
-            Assert.That(country?.Id, Is.EqualTo("NZ"));
+            Assert.AreEqual("NZ", country?.Id);
         }
 
-        private static IEnumerable<TestCaseData> CreatePhoneBulkTestData
+        private static IEnumerable<object[]> CreatePhoneBulkTestData
         {
             get
             {
-                yield return new TestCaseData("+8613832922812", "CN", "13832922812", true);
-                yield return new TestCaseData("+8653255579200", "CN", "053255579200", false);
+                yield return new object[] { "+8613832922812", "CN", "13832922812", true };
+                yield return new object[] { "+8653255579200", "CN", "053255579200", false };
             }
         }
 
-        [Test, TestCaseSource(nameof(CreatePhoneBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(CreatePhoneBulkTestData))]
         public void Countries_CreatePhone_BulkTests(string phoneNumber, string region, string formatedNumber, bool isMobile)
         {
             // Arrange & act
             var phone = AddressRegion.CreatePhone(phoneNumber);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(phone?.Region, Is.EqualTo(region));
-                Assert.That(phone?.PhoneNumber, Is.EqualTo(formatedNumber));
-                Assert.That(phone?.IsMobile, Is.EqualTo(isMobile));
-            });
+            // Assert
+            Assert.AreEqual(region, phone?.Region);
+            Assert.AreEqual(formatedNumber, phone?.PhoneNumber);
+            Assert.AreEqual(isMobile, phone?.IsMobile);
         }
 
-        [Test]
+        [TestMethod]
         public void Countries_CreatePhones_Test()
         {
             // Arrange
@@ -65,10 +63,10 @@ namespace Tests.Utils
             var phones = AddressRegion.CreatePhones(phoneNumbers, "CN");
 
             // Assert
-            Assert.That(phones.Count(), Is.EqualTo(1));
+            Assert.AreEqual(1, phones.Count());
         }
 
-        [Test]
+        [TestMethod]
         public void CountryPhone_ToInternationalFormat_Tests()
         {
             // Arrange
@@ -78,26 +76,26 @@ namespace Tests.Utils
             var result1 = phone?.ToInternationalFormat();
 
             // Assert 1
-            Assert.That(result1, Is.EqualTo("+64210722065"));
+            Assert.AreEqual("+64210722065", result1);
 
             // Act 2
             var result2 = phone?.ToInternationalFormat("00");
 
             // Assert 2
-            Assert.That(result2, Is.EqualTo("0064210722065"));
+            Assert.AreEqual("0064210722065", result2);
         }
 
-        [Test]
+        [TestMethod]
         public void Extensions_UniquePhones_Tests()
         {
             // Arrange
             var phones = AddressRegion.CreatePhones(["13853259135", "+64210722065", "+8613853259135"], "CN");
 
             // Act & assert
-            Assert.That(phones.UniquePhones().Count(), Is.EqualTo(2));
+            Assert.AreEqual(2, phones.UniquePhones().Count());
         }
 
-        [Test]
+        [TestMethod]
         public void Extensions_JoinAsString_Tests()
         {
             // Arrange
@@ -111,10 +109,10 @@ namespace Tests.Utils
             var result = data.JoinAsString(",", ";");
 
             // Assert
-            Assert.That(result, Is.EqualTo("a,1;b,2;"));
+            Assert.AreEqual("a,1;b,2;", result);
         }
 
-        [Test]
+        [TestMethod]
         public void Extensions_JoinAsQuery_Tests()
         {
             // Arrange
@@ -128,7 +126,7 @@ namespace Tests.Utils
             var result = data.JoinAsQuery();
 
             // Assert
-            Assert.That(result, Is.EqualTo("a=1%3d2&b=2%263&"));
+            Assert.AreEqual("a=1%3d2&b=2%263&", result);
         }
     }
 }

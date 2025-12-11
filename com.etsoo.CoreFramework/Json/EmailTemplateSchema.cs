@@ -9,9 +9,15 @@ namespace com.etsoo.CoreFramework.Json
     /// <see cref="Models.EmailTemplateDto"/>
     public static class EmailTemplateSchema
     {
+        static EmailTemplateSchema()
+        {
+            FormatRegistry.Global.Register(new NameEmailFormat());
+        }
+
         /// <summary>
         /// Create the schema
         /// 创建模式
+        /// https://json-schema.org/draft/2020-12/json-schema-validation#name-defined-formats
         /// </summary>
         /// <returns>Schema</returns>
         public static JsonSchema Create()
@@ -33,7 +39,7 @@ namespace com.etsoo.CoreFramework.Json
                         .Items(
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)
-                                .Format("email")
+                                .Format("name-email")
                         )
                         .UniqueItems(true)
                     ),
@@ -42,7 +48,7 @@ namespace com.etsoo.CoreFramework.Json
                         .Items(
                             new JsonSchemaBuilder()
                                 .Type(SchemaValueType.String)
-                                .Format("email")
+                                .Format("name-email")
                         )
                         .UniqueItems(true)
                     ),

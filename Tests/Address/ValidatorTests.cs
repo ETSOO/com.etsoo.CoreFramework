@@ -1,41 +1,38 @@
 ﻿using com.etsoo.Address.Validators;
-using NUnit.Framework;
 
 namespace Tests.Address
 {
-    [TestFixture]
-    internal class ValidatorTests
+    [TestClass]
+    public class ValidatorTests
     {
-        [Test]
+        [TestMethod]
         public void ChinaPinValidatorFalseTests()
         {
             var validator = new ChinaPinValidator("430124198812081876");
-            Assert.Multiple(() =>
-            {
-                Assert.That(validator.Valid, Is.False);
-                Assert.That(validator.IsFemale, Is.False);
-                Assert.That(validator.Birthday?.Month, Is.EqualTo(12));
-                Assert.That(validator.Birthday?.Day, Is.EqualTo(8));
-            });
+
+            // Assert
+            Assert.IsFalse(validator.Valid);
+            Assert.IsFalse(validator.IsFemale);
+            Assert.AreEqual(12, validator.Birthday?.Month);
+            Assert.AreEqual(8, validator.Birthday?.Day);
         }
 
-        [Test]
+        [TestMethod]
         public void ChinaPinValidatorTrueTests()
         {
             var validator = new ChinaPinValidator("53010219200508011x");
-            Assert.Multiple(() =>
-            {
-                Assert.That(validator.Valid, Is.True);
 
-                if (validator.Valid)
-                {
-                    Assert.That(validator.StateNum, Is.EqualTo("53"));
-                    Assert.That(validator.CityNum, Is.EqualTo("5301"));
-                    Assert.That(validator.DistrictNum, Is.EqualTo("530102"));
-                    Assert.That(validator.IsFemale, Is.False);
-                    Assert.That(validator.Birthday?.Month, Is.EqualTo(5));
-                }
-            });
+            // Assert
+            Assert.IsTrue(validator.Valid);
+
+            if (validator.Valid)
+            {
+                Assert.AreEqual("53", validator.StateNum);
+                Assert.AreEqual("5301", validator.CityNum);
+                Assert.AreEqual("530102", validator.DistrictNum);
+                Assert.IsFalse(validator.IsFemale);
+                Assert.AreEqual(5, validator.Birthday?.Month);
+            }
         }
     }
 }

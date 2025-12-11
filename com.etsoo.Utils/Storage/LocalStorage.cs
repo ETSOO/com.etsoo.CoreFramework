@@ -28,7 +28,7 @@ namespace com.etsoo.Utils.Storage
         /// <returns>Result</returns>
         protected SqliteConnection GetConnection()
         {
-            return new SqliteConnection($"Data Source={Root}\\{dbFile};Cache=Shared;Mode=ReadWriteCreate;");
+            return new SqliteConnection($"Data Source={Root}\\{dbFile};Cache=Shared;Pooling=false;Mode=ReadWriteCreate;");
         }
 
         /// <summary>

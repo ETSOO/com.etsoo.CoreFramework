@@ -7,7 +7,6 @@ using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -17,7 +16,7 @@ using System.Text.Json;
 
 namespace Tests.CoreFramework
 {
-    [TestFixture]
+    [TestClass]
     public class JwtServiceTests
     {
         readonly JwtService service;
@@ -51,17 +50,18 @@ namespace Tests.CoreFramework
             service = new JwtService(new ServiceCollection(), section.Get<JwtSettings>(), null);
         }
 
-        [Test]
+        [TestMethod]
         public void SignDataTest()
         {
             var rsa = new RSACrypto(null, "Pkcs8:MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCNgoWeFN2Wi/fELIPZBV2hWPOm0Fb8621ptyBWfNLFlT553ZH6xC3sZxp9btM7JdwfWvs5VRonpBvfdgIBikMMbp1vCZJONjfpTLNcHlHgdF9rwk4MgCadarBKsMQAfwij8f15O9UVXBhvztGf6Ho09DnitJ1YnUk3kt8ClsLWOT0h3QTwnbjyhpg3/JmJw8jIPdzxxhrmYvqq4qvXzj9H5opjWd9oaMFaiGB4zFBsHMJXuH9ACsbbf6qnzj9AEy6V8cM9VZaTID4nFn5C49z3piawV+yM4P4p4a2SJq/d7dwbzSomPzUvLMnktTvk+NJRyNxyspjqOt72Y4j7YNQDAgMBAAECggEAAMtq1KhpVh8TFRbq5p0RGYbWV2l0E5d+1ckhdVreFB3ya9zCpRXU7C7oByxII1zjD4oDPx8rNm3Feku/VyLfnYJBgA4dtDK5vaWgnDPPYeNFZeWBarCNhvTCaKj1cMtF0SXatoOPfr81o+sVYkB77zAv4wYAnC7F6nn4ppsSHQHTG9nuLP4G0y2ULk9/9q2v/GdynH1OD7P1yUzB15if5IF6zvhwaXUM1PineRf4kYmaHtJdShKAWfVSBvC1Vilk+vqLMbwO55eoBTIHYpsZWln/ec6RE7z+Pb7g0rQdVSKr8BgXt5As5Gh/Y1d4SLXLUA0Zr7AhRpFWspWuvdhzAQKBgQDfS/b8h51xOyrMOPXcel0i3ZyKVJs4mBRVrLr0V1HS3yfAnp/kjC+eK2WTHjGGEPwZtcewtIWXXB+Y5GxpTxhx/53EER8vKH5QND6k5jxtdDQIHwUU5zVIxzyhY0Str6cilwKlWGivM8Io7zT3rHn1R87yLNyan2uj3OPztmJRiQKBgQCiPCHXEplzZmHO2xMRzkCe5XV8ZZLZQcVCuZpmj3c2wNWGrDTYJlYnV9dc1W0cyOwG8kyOPcC3ho9iRwth25nxMnw5afMtOYvwI4EvLmd22iiAGEAj9O0dOCB6Yxmis9asdttYhZCkL1G6HUCG4Mn6XSrLHZ2ruEuRae32/TWSKwKBgCaCDTgDky1BzOGnOQ8qswEeQq7AZHxgDbGwthUJMf0xqsNXF6/sVRHr3fp/DH9YUoGEjcl1eExgALr3OZL3pvmR4X08jqotS4s9V0hMxEMD9S0pXFD8hn3kjhou6lshnasja7tkAbmlLWitx+6meenI1nGBNxIbSA7cOxt+anoxAoGAed6wEQ9AxKahTLHXNmX4tyRpyCPJV3kHxOMGMIsPI8th24PbQpAx4eYjuvH8wEXSwDkd9zA+Z98mMM5rp3w+vSiOltaXPV7gV2lkbtvuDyM8j1UoQZqI0I1MIIP3SvjLh8zVYz8ac6u0OholUezk7TU1o1VBDzEnWzn277YwmvcCgYEAsHp6kOcKNxAvfzE8XZ0RfFNlfRREGtmJOsiNWqJzpyKRTSGsxRQUiNnd1rEWXGD0dBI1//d23//9FJA9uS7A4qKjo/EnuH05pjsTaB3zVyirtYcFKJL3DgbMeFoCKGUUbUmAEe7vIxdAKbpjJRL4HHZwwb8BcG7bHLmYFdbya5U=");
             var sourceBytes = Encoding.UTF8.GetBytes("app_id=2021004153681483&charset=UTF-8&format=json&method=alipay.system.oauth.token&sign_type=RSA2&timestamp=2024-07-01 07:25:33&version=1.0");
             var bytes = rsa.SignData(sourceBytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
             var sign = Convert.ToBase64String(bytes);
-            Assert.That(sign, Is.EqualTo("UItF4asgd6OX+6uwjJr33KEA+FnyO00KeFaxNZOlEGE8BTN9nQbG0DJxTnwFonF7qHd9bBVptvTZCsSHrS5aww5n1ofPCuadewVJ14LJyexIURF6Rz8TDadXQlfDsCG7DrfIzs4ixeybwbPpNZMTFn1lpUmqR5jfybcR/aXT1RW9kh8PK6Q6m5Kp2Pl2q13DRGX7hCyJFvkq0ZdwRMtAgQAOCY5U9DYDROKVsAr+A/TyIQTQFIcIFtej+kDHZ5SKFllXgmPQONA3nEDOj/bU758rDnaQ3MKBPXe7FPUJooPtMTvAOD6fgnuOEXh9vStqOQKhuBeWAsnBxOP1L6uSWQ=="));
+
+            Assert.AreEqual("UItF4asgd6OX+6uwjJr33KEA+FnyO00KeFaxNZOlEGE8BTN9nQbG0DJxTnwFonF7qHd9bBVptvTZCsSHrS5aww5n1ofPCuadewVJ14LJyexIURF6Rz8TDadXQlfDsCG7DrfIzs4ixeybwbPpNZMTFn1lpUmqR5jfybcR/aXT1RW9kh8PK6Q6m5Kp2Pl2q13DRGX7hCyJFvkq0ZdwRMtAgQAOCY5U9DYDROKVsAr+A/TyIQTQFIcIFtej+kDHZ5SKFllXgmPQONA3nEDOj/bU758rDnaQ3MKBPXe7FPUJooPtMTvAOD6fgnuOEXh9vStqOQKhuBeWAsnBxOP1L6uSWQ==", sign);
         }
 
-        [Test]
+        [TestMethod]
         public void CreateAccessToken_Tests()
         {
             // Arrange
@@ -93,17 +93,14 @@ namespace Tests.CoreFramework
             // Deserialize
             var user2 = JsonSerializer.Deserialize(userJson, ModelJsonSerializerContext.Default.CurrentUser);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(token, Is.Not.Null);
-                Assert.That(user2, Is.Not.Null);
-                Assert.That(user2!.ClientIp, Is.EqualTo(user.ClientIp));
-                Assert.That(user2.Language, Is.EqualTo(user.Language));
-                Assert.That(user2.AppId, Is.EqualTo(user.AppId));
-                Assert.That(userJson, Does.Contain("customAmount"));
-                Assert.That(user2.JsonData.Get<bool>("CustomFlag"), Is.False);
-            });
+            // Assert
+            Assert.IsNotNull(token);
+            Assert.IsNotNull(user2);
+            Assert.AreEqual(user.ClientIp, user2!.ClientIp);
+            Assert.AreEqual(user.Language, user2.Language);
+            Assert.AreEqual(user.AppId, user2.AppId);
+            Assert.Contains("customAmount", userJson);
+            Assert.IsFalse(user2.JsonData.Get<bool>("CustomFlag"));
 
             // Arrange, public key verification
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
@@ -122,12 +119,9 @@ namespace Tests.CoreFramework
 
             var scopes = claimsPrincipal?.Claims.Where(claim => claim.Type == "scope").Select(claim => claim.Value);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(claimsPrincipal, Is.Not.Null);
-                Assert.That(claimsPrincipal?.Claims.GetValue(UserToken.IPAddressClaim), Is.EqualTo("127.0.0.1"));
-                Assert.That(scopes, Is.EqualTo(userScopes));
-            });
+            Assert.IsNotNull(claimsPrincipal);
+            Assert.AreEqual("127.0.0.1", claimsPrincipal?.Claims.GetValue(UserToken.IPAddressClaim));
+            CollectionAssert.AreEqual(userScopes, scopes?.ToArray());
 
             // Public service should not generate token
             Assert.Throws<InvalidOperationException>(() =>
@@ -136,7 +130,7 @@ namespace Tests.CoreFramework
             });
         }
 
-        [Test]
+        [TestMethod]
         public void CreateIdToken_Tests()
         {
             // Arrange
@@ -180,24 +174,21 @@ namespace Tests.CoreFramework
             var claims = jwt?.Claims;
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(identity.IsAuthenticated, Is.False);
-                Assert.That(cp?.Identity?.IsAuthenticated, Is.True);
-                Assert.That(cp?.IsInRole("Admin"), Is.True);
-                Assert.That(cp?.IsInRole("Manager"), Is.True);
-                Assert.That(cp?.IsInRole("User"), Is.True);
-                Assert.That(identity.Name, Is.EqualTo(user.Id));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value, Is.EqualTo("Etsoo"));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value, Is.EqualTo(userName));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value, Is.EqualTo("1"));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == CurrentUser.AppClaim)?.Value, Is.EqualTo(app));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == UserToken.TimeZoneClaim)?.Value, Is.EqualTo(timezone.Id));
-                Assert.That(claims?.FirstOrDefault(c => c.Type == MinUserToken.JsonDataClaim)?.Value, Is.EqualTo("{\"customAmount\":12}"));
-            });
+            Assert.IsFalse(identity.IsAuthenticated);
+            Assert.IsTrue(cp?.Identity?.IsAuthenticated ?? false);
+            Assert.IsTrue(cp?.IsInRole("Admin") ?? false);
+            Assert.IsTrue(cp?.IsInRole("Manager") ?? false);
+            Assert.IsTrue(cp?.IsInRole("User") ?? false);
+            Assert.AreEqual(user.Id, identity.Name);
+            Assert.AreEqual("Etsoo", claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Iss)?.Value);
+            Assert.AreEqual(userName, claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value);
+            Assert.AreEqual("1", claims?.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.NameId)?.Value);
+            Assert.AreEqual(app, claims?.FirstOrDefault(c => c.Type == CurrentUser.AppClaim)?.Value);
+            Assert.AreEqual(timezone.Id, claims?.FirstOrDefault(c => c.Type == UserToken.TimeZoneClaim)?.Value);
+            Assert.AreEqual("{\"customAmount\":12}", claims?.FirstOrDefault(c => c.Type == MinUserToken.JsonDataClaim)?.Value);
         }
 
-        [Test]
+        [TestMethod]
         public void ValidateIdToken_Tests()
         {
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(JwtText));
@@ -208,17 +199,15 @@ namespace Tests.CoreFramework
 
             var user = CurrentUser.Create(cp, out _);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(user, Is.Not.Null);
-                Assert.That(token, Is.Not.Null);
-                Assert.That(token?.Issuer, Is.EqualTo("SmartERP"));
-                Assert.That(user?.Id, Is.EqualTo("1010"));
-                Assert.That(user?.Organization, Is.EqualTo("0"));
-            });
+            // Assert
+            Assert.IsNotNull(user);
+            Assert.IsNotNull(token);
+            Assert.AreEqual("SmartERP", token?.Issuer);
+            Assert.AreEqual("1010", user?.Id);
+            Assert.AreEqual("0", user?.Organization);
         }
 
-        [Test]
+        [TestMethod]
         public void SignDataAndVerify_Tests()
         {
             // Arrange, public key service
@@ -230,7 +219,8 @@ namespace Tests.CoreFramework
             var rawData = "In this scenario, the external client will give you the structure of JWT, normally with custom claims that they expect and provide you with an RSA private key to sign the token. The token will then be used to construct a Uri that will be sent to users and allowing them to invoke the external client endpoints.";
             var signResult = service.SignData(rawData);
             var result = publicService.VerifyData(Encoding.UTF8.GetBytes(rawData), signResult);
-            Assert.That(result);
+
+            Assert.IsTrue(result);
         }
     }
 }

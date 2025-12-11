@@ -1,13 +1,12 @@
 ﻿using com.etsoo.Utils.SpanMemory;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.Utils
 {
-    [TestFixture]
-    internal class SpanMemoryTests
+    [TestClass]
+    public class SpanMemoryTests
     {
-        [Test]
+        [TestMethod]
         public void ToBase64BytesTests()
         {
             // Arrange
@@ -19,11 +18,11 @@ namespace Tests.Utils
             var bytes2 = base64.AsSpan().ToBase64Bytes().ToArray();
 
             // Assert
-            Assert.That(bytes2, Is.EqualTo(bytes1));
+            CollectionAssert.AreEqual(bytes1, bytes2);
 
             // Invalid Base64 string
             var bytes3 = "Hello, world!".AsSpan().ToBase64Bytes().ToArray();
-            Assert.That(bytes3, Is.Empty);
+            Assert.IsEmpty(bytes3);
         }
     }
 }

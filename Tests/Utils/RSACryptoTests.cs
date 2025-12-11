@@ -1,13 +1,12 @@
 ﻿using com.etsoo.Utils.Crypto;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Tests.Utils
 {
-    [TestFixture]
-    internal class RSACryptoTests
+    [TestClass]
+    public class RSACryptoTests
     {
         readonly string privateKey;
         readonly string publicKey;
@@ -20,7 +19,7 @@ namespace Tests.Utils
             publicKey = Convert.ToBase64String(rsa.ExportRSAPublicKey());
         }
 
-        [Test]
+        [TestMethod]
         public void EncryptDecryptTests()
         {
             // Arrange
@@ -43,7 +42,7 @@ namespace Tests.Utils
             var decryptResult = Encoding.UTF8.GetString(crypto.Decrypt(result));
 
             // Assert
-            Assert.That(decryptResult, Is.EqualTo(input));
+            Assert.AreEqual(input, decryptResult);
         }
     }
 }

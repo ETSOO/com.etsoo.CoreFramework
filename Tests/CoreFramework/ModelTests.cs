@@ -3,7 +3,6 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using System.Buffers;
 using System.Data;
 using System.Net.Http.Json;
@@ -47,7 +46,7 @@ namespace Tests.CoreFramework
         }
     }
 
-    [TestFixture]
+    [TestClass]
     public class ModelTests
     {
         static MyDbContext CreateDbContext()
@@ -59,7 +58,7 @@ namespace Tests.CoreFramework
             return provider.GetRequiredService<MyDbContext>();
         }
 
-        [Test]
+        [TestMethod]
         public void LoginIdRQTest()
         {
             var loginIdRQ = new LoginIdRQ
@@ -70,10 +69,10 @@ namespace Tests.CoreFramework
                 TimeZone = "Asia/Shanghai"
             };
 
-            Assert.That(loginIdRQ.Validate(), Is.Null);
+            Assert.IsNull(loginIdRQ.Validate());
         }
 
-        [Test]
+        [TestMethod]
         public void QueryRQTest()
         {
             var rq = new QueryRQ<int>
@@ -88,10 +87,10 @@ namespace Tests.CoreFramework
             var db = CreateDbContext();
             var sql = db.Users.QueryEtsoo(rq, (u) => u.Id).ToQueryString();
 
-            Assert.That(sql, Does.Contain("ORDER BY \"u\".\"Id\" DESC"));
+            Assert.Contains("ORDER BY \"u\".\"Id\" DESC", sql);
         }
 
-        [Test]
+        [TestMethod]
         public async Task UpdateTestAsync()
         {
             var db = CreateDbContext();
@@ -113,16 +112,14 @@ namespace Tests.CoreFramework
 
             db.ChangeTracker.Clear();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(changedProperties.Count(), Is.EqualTo(2));
-                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Name")?.CurrentValue, Is.EqualTo("Admin Changed"));
-                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.OriginalValue, Is.EqualTo("Normal"));
-                Assert.That(changedProperties.FirstOrDefault(p => p.Name == "Status")?.CurrentValue, Is.EqualTo("Deleted"));
-            });
+            // Assert
+            Assert.HasCount(2, changedProperties);
+            Assert.AreEqual("Admin Changed", changedProperties.FirstOrDefault(p => p.Name == "Name")?.CurrentValue);
+            Assert.AreEqual("Normal", changedProperties.FirstOrDefault(p => p.Name == "Status")?.OriginalValue);
+            Assert.AreEqual("Deleted", changedProperties.FirstOrDefault(p => p.Name == "Status")?.CurrentValue);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonTest()
         {
             var rq = new QueryRQ<int>
@@ -142,15 +139,13 @@ namespace Tests.CoreFramework
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(hasContent, Is.True);
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
-                Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
-            });
+            // Assert
+            Assert.IsTrue(hasContent);
+            Assert.AreEqual("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)", commandText);
+            Assert.Contains("\"newName\":\"Admin 1\"", json);
         }
 
-        [Test]
+        [TestMethod]
         public void SelectRegexAndSplitRegexTests()
         {
             var sql = """
@@ -176,14 +171,11 @@ namespace Tests.CoreFramework
             var columns = DatabaseExtensions.SplitRegex().Split(match.Groups[1].Value);
 
             // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(columns, Has.Length.EqualTo(7));
-                Assert.That(columns.First().Trim(), Is.EqualTo("c.id AS \"Id\""));
-            });
+            Assert.HasCount(7, columns);
+            Assert.AreEqual("c.id AS \"Id\"", columns.First().Trim());
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonSimpleLikeTest()
         {
             var rq = new QueryRQ<int>
@@ -209,13 +201,11 @@ namespace Tests.CoreFramework
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" IN (1001, 1002, 1003) AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" <= 100 AND \"u\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
-            });
+            // Assert
+            Assert.AreEqual("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" IN (1001, 1002, 1003) AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" <= 100 AND \"u\".\"Name\" LIKE '%肖赞%'\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)", commandText);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonLikeTest()
         {
             var rq = new QueryRQ<int>
@@ -241,14 +231,12 @@ namespace Tests.CoreFramework
                 .Select(u => new { u.Id, NewName = u.Name, u.Status })
                 .ToJsonAsync(writer);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(hasContent, Is.True); // Empty array
-                Assert.That(commandText, Is.EqualTo("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" = 1001 AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" > 100 AND ((\"u\".\"Name\" LIKE '%肖%' AND \"u\".\"Name\" NOT LIKE '%赞%') OR \"u\".\"Name\" LIKE '%肖必须%')\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
-            });
+            // Assert
+            Assert.IsTrue(hasContent);
+            Assert.AreEqual("SELECT json_group_array(json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\")) FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" = 1001 AND \"u\".\"Id\" NOT IN (1, 2, 3) AND \"u\".\"Status\" > 100 AND ((\"u\".\"Name\" LIKE '%肖%' AND \"u\".\"Name\" NOT LIKE '%赞%') OR \"u\".\"Name\" LIKE '%肖必须%')\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)", commandText);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonEmptyTest()
         {
             var rq = new QueryRQ<int>
@@ -269,14 +257,12 @@ namespace Tests.CoreFramework
             var (hasContent, _) = await db.Users.QueryEtsoo(rq, (u) => u.Id, (u) => u.Status).Select(u => new { u.Id, NewName = u.Name, u.Status }).ToJsonAsync(writer);
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
-            Assert.Multiple(() =>
-            {
-                Assert.That(hasContent, Is.True);
-                Assert.That(json, Is.EqualTo("[]"));
-            });
+            // Assert
+            Assert.IsTrue(hasContent);
+            Assert.AreEqual("[]", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonObjectTest()
         {
             var rq = new QueryRQ<int>
@@ -296,15 +282,13 @@ namespace Tests.CoreFramework
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(hasContent, Is.True);
-                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
-                Assert.That(json, Does.Contain("\"newName\":\"Admin 1\""));
-            });
+            // Assert
+            Assert.IsTrue(hasContent);
+            Assert.AreEqual("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3)\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)", commandText);
+            Assert.Contains("\"newName\":\"Admin 1\"", json);
         }
 
-        [Test]
+        [TestMethod]
         public async Task QueryJsonObjectWithKeysetsTest()
         {
             var rq = new QueryRQ<int>
@@ -325,14 +309,12 @@ namespace Tests.CoreFramework
 
             var json = Encoding.UTF8.GetString(writer.WrittenSpan);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(hasContent, Is.False);
-                Assert.That(commandText, Is.EqualTo("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3) AND (\"u\".\"Name\" > '肖赞' OR (\"u\".\"Name\" = '肖赞' AND \"u\".\"Id\" < 1))\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)"));
-            });
+            // Assert
+            Assert.IsFalse(hasContent);
+            Assert.AreEqual("SELECT json_object('id', \"Id\", 'newName', \"NewName\", 'status', \"Status\") FROM (SELECT \"u\".\"Id\", \"u\".\"Name\" AS \"NewName\", \"u\".\"Status\"\r\nFROM \"User\" AS \"u\"\r\nWHERE \"u\".\"Id\" NOT IN (1, 2, 3) AND (\"u\".\"Name\" > '肖赞' OR (\"u\".\"Name\" = '肖赞' AND \"u\".\"Id\" < 1))\r\nORDER BY \"u\".\"Name\", \"u\".\"Id\" DESC\r\nLIMIT @p)", commandText);
         }
 
-        [Test]
+        [TestMethod]
         public async Task AuthRefreshTokenRQTest()
         {
             var rq = new AuthRefreshTokenRQ
@@ -347,16 +329,14 @@ namespace Tests.CoreFramework
             using var jsonContent = JsonContent.Create(rq, ModelJsonSerializerContext.Default.AuthRefreshTokenRQ);
             var newRQ = JsonSerializer.Deserialize(await jsonContent.ReadAsStreamAsync(), ModelJsonSerializerContext.Default.AuthRefreshTokenRQ);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(rq.Validate(), Is.Null);
-                Assert.That(rq.Sign, Has.Length.LessThan(128));
-                Assert.That(newRQ?.Sign, Is.EqualTo(rq.Sign));
-                Assert.That(newRQ?.TotalMinutes(), Is.InRange(0.00001, 1));
-            });
+            // Assert
+            Assert.IsNull(rq.Validate());
+            Assert.IsLessThan(128, rq.Sign.Length);
+            Assert.AreEqual(rq.Sign, newRQ?.Sign);
+            Assert.IsTrue(newRQ?.TotalMinutes() >= 0.00001 && newRQ?.TotalMinutes() <= 1);
         }
 
-        [Test]
+        [TestMethod]
         public void ToJsonInternalAsyncLogicTest()
         {
             var commandText = "SELECT c1.id AS \"Id\", COALESCE(c1.local_name, c0.name) AS \"Name\", c0.identity_type AS \"IdentityType\", c0.require_local_url AS \"RequireLocalUrl\", COALESCE(c1.local_url, c0.web_url) AS \"WebUrl\", COALESCE(c1.local_help_url, c0.help_url) AS \"HelpUrl\", c0.logo AS \"Logo\", c1.expiry AS \"Expiry\", CASE\r\n    WHEN c1.expiry IS NULL OR c1.expiry <= now() + INTERVAL '-90 days' THEN NULL\r\n    ELSE CAST(date_part('epoch', c1.expiry - now()) / 86400.0 AS integer)\r\nEND AS \"ExpiryDays\", c1.status AS \"Status\", c1.creation AS \"Creation\", (SELECT name FROM user LIMIT 1) AS \"Test\"\r\nFROM (\r\n    SELECT c.id, c.core_app_id, c.creation, c.expiry, c.local_help_url, c.local_name, c.local_url, c.status\r\n    FROM core_organization_app AS c\r\n    WHERE c.core_organization_id = @__User_OrganizationInt_0\r\n    ORDER BY c.creation DESC, c.id DESC\r\n    LIMIT @__p_1\r\n) AS c1\r\nINNER JOIN core_app AS c0 ON c1.core_app_id = c0.id\r\nORDER BY c1.creation DESC, c1.id DESC";
@@ -393,11 +373,11 @@ namespace Tests.CoreFramework
             });
 
             // Assert
-            Assert.That(fields.Count(), Is.EqualTo(12));
+            Assert.AreEqual(12, fields.Count());
             var nameField = fields.First(f => f.Source == "\"Name\"");
-            Assert.That(nameField.Name, Is.EqualTo("name"));
+            Assert.AreEqual("name", nameField.Name);
             var testField = fields.First(f => f.Source == "\"Test\"");
-            Assert.That(testField.Name, Is.EqualTo("test"));
+            Assert.AreEqual("test", testField.Name);
         }
     }
 }

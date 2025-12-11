@@ -11,7 +11,6 @@ using Npgsql;
 using System.Buffers;
 using System.Data;
 using System.Data.Common;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
@@ -317,8 +316,6 @@ namespace com.etsoo.Database
         /// <param name="source">Source</param>
         /// <param name="data">Paging data</param>
         /// <returns>Result</returns>
-        [RequiresUnreferencedCode("Expression requires unreferenced code")]
-        [RequiresDynamicCode("Expression requires dynamic code")]
         public static IQueryable<TSource> QueryEtsooPaging<TSource>(this IQueryable<TSource> source, QueryPagingData data)
         {
             if (data.OrderBy?.Any() is true)
@@ -474,27 +471,27 @@ namespace com.etsoo.Database
         /// <param name="idSelector">Id selector</param>
         /// <param name="exclude">Exclude instead of contain</param>
         /// <returns>Result</returns>
-        [RequiresDynamicCode("Expression requires dynamic code")]
         public static IQueryable<TSource> QueryEtsooContains<TSource, TKey>(this IQueryable<TSource> source, IEnumerable<TKey> collection, Expression<Func<TSource, TKey>> idSelector, bool exclude = false)
         {
-            // Get the Contains method from the Enumerable type
-#pragma warning disable IL2060 // Call to 'System.Reflection.MethodInfo.MakeGenericMethod' can not be statically analyzed. It's not possible to guarantee the availability of requirements of the generic method.
-            var containsMethod = typeof(Enumerable).GetMethods()
-                .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
-                .MakeGenericMethod(typeof(TKey));
-#pragma warning restore IL2060 // Call to 'System.Reflection.MethodInfo.MakeGenericMethod' can not be statically analyzed. It's not possible to guarantee the availability of requirements of the generic method.
+            // Convert collection to a List<TKey>, so Contains is non-generic
+            var list = collection.ToList();
 
-            // Create a constant expression representing the value to compare against
-            var constant = Expression.Constant(collection);
+            // Expression for the list
+            var listExpr = Expression.Constant(list);
 
-            // Create a method call expression to call the Contains method on the constant expression
-            var containsExpression = Expression.Call(containsMethod, constant, idSelector.Body);
+            // Get List<TKey>.Contains method (non-generic, no MakeGenericMethod)
+            var containsMethod = typeof(List<TKey>).GetMethod(nameof(List<>.Contains));
 
-            // Create a lambda expression representing the predicate
-            Expression predicateExpression = exclude ? Expression.Not(containsExpression) : containsExpression;
-            var predicate = Expression.Lambda<Func<TSource, bool>>(predicateExpression, idSelector.Parameters[0]);
+            // Build: list.Contains(idSelector(x))
+            var containsExpr = Expression.Call(listExpr, containsMethod!, idSelector.Body);
 
-            // Call the Where method with the constructed predicate
+            // Exclude logic
+            Expression predicateExpr = exclude ? Expression.Not(containsExpr) : containsExpr;
+
+            // Build final lambda: x => list.Contains(x.Id)
+            var predicate = Expression.Lambda<Func<TSource, bool>>(predicateExpr, idSelector.Parameters[0]);
+
+            // Apply Where
             return source.Where(predicate);
         }
 
@@ -547,7 +544,6 @@ namespace com.etsoo.Database
         /// <param name="likeMethod">Like type and method name, custom ILike for PostgreSQL</param>
         /// <param name="fields">Fields</param>
         /// <returns>Result</returns>
-        [RequiresDynamicCode("Expression requires dynamic code")]
         public static Expression<Func<TSource, bool>> ToEtsooKeywords<TSource>(this string keywords, (Type type, string method)? likeMethod, params Expression<Func<TSource, string?>>[] fields)
         {
             var parts = keywords.ParseQueryKeywords();

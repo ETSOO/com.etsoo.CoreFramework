@@ -37,7 +37,7 @@ namespace com.etsoo.Web
                 // The device id is the rest of the string
                 deviceId = s[2..];
 
-                return service.CheckDevice(context.UserAgent(), deviceId.Replace(" ", "+"), out _, out parser);
+                return service.CheckDevice(context.UserAgent, deviceId.Replace(" ", "+"), out _, out parser);
             }, null, cancellationToken);
 
             AuthLoginValidateData? data = null;

@@ -2,12 +2,11 @@
 using com.etsoo.Database;
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
-using NUnit.Framework;
 using System.Text;
 
 namespace Tests.CoreFramework
 {
-    [TestFixture]
+    [TestClass]
     public class ApplicationTests
     {
         readonly string configurationText = @"{
@@ -21,15 +20,16 @@ namespace Tests.CoreFramework
         /// <summary>
         /// Mini application test
         /// </summary>
-        [Test]
+        [TestMethod]
         public void MiniApplicationTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
             var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
-            Assert.That(app.Configuration.Cultures.Length, Is.EqualTo(0));
+
+            Assert.IsEmpty(app.Configuration.Cultures);
         }
 
-        [Test]
+        [TestMethod]
         public void ConfigurationTest()
         {
             // Arrange
@@ -37,20 +37,19 @@ namespace Tests.CoreFramework
             var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Configuration");
 
             var privateField = section.GetSection("PrivateKey").Value;
-            Assert.That(privateField, Is.EqualTo("Etsoo"));
+
+            Assert.AreEqual("Etsoo", privateField);
 
             var config = section.Get<AppConfiguration>();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(config, Is.Not.Null);
-                Assert.That(config?.PrivateKey, Is.EqualTo("Etsoo"));
-                Assert.That(config?.Name, Is.EqualTo("TestApp"));
-                Assert.That(config?.Cultures[1], Is.EqualTo("zh-Hans-CN"));
-            });
+            // Assert
+            Assert.IsNotNull(config);
+            Assert.AreEqual("Etsoo", config?.PrivateKey);
+            Assert.AreEqual("TestApp", config?.Name);
+            Assert.AreEqual("zh-Hans-CN", config?.Cultures[1]);
         }
 
-        [Test]
+        [TestMethod]
         public void EncryptionTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
@@ -59,7 +58,7 @@ namespace Tests.CoreFramework
             var encrypted = app.EncriptData(text, "a");
             var decrypted = app.DecriptData(encrypted, "a");
 
-            Assert.That(decrypted, Is.EqualTo(text));
+            Assert.AreEqual(text, decrypted);
         }
     }
 }

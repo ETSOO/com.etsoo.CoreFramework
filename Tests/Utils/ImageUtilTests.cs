@@ -1,23 +1,23 @@
 ﻿using com.etsoo.ImageUtils;
-using NUnit.Framework;
 using System.Runtime.Versioning;
 
 namespace Tests.Utils
 {
-    [TestFixture]
+    [TestClass]
     public class ImageUtilTests
     {
-        private static IEnumerable<TestCaseData> GetCodecInfoBulkTestData
+        private static IEnumerable<object[]> GetCodecInfoBulkTestData
         {
             get
             {
-                yield return new TestCaseData(".jpg", "image/jpeg");
-                yield return new TestCaseData(".tiff", "image/tiff");
-                yield return new TestCaseData(".txt", null);
+                yield return new object[] { ".jpg", "image/jpeg" };
+                yield return new object[] { ".tiff", "image/tiff" };
+                yield return new object[] { ".txt", null };
             }
         }
 
-        [Test, TestCaseSource(nameof(GetCodecInfoBulkTestData))]
+        [TestMethod]
+        [DynamicData(nameof(GetCodecInfoBulkTestData))]
         [SupportedOSPlatform("windows")]
         public void GetCodecInfo_BulkTests(string path, string? mimeType)
         {
@@ -25,10 +25,10 @@ namespace Tests.Utils
             var result = ImageWinUtils.GetCodecInfo(path);
 
             // Assert
-            Assert.That(mimeType, Is.EqualTo(result?.MimeType));
+            Assert.AreEqual(mimeType, result?.MimeType);
         }
 
-        [Test]
+        [TestMethod]
         public async Task CreateFromBase64StringAsyncTests()
         {
             // Arrange
@@ -38,12 +38,9 @@ namespace Tests.Utils
             using var ms = new MemoryStream();
             var ext = await ImageSharpUtils.CreateFromBase64StringAsync(base64, new SixLabors.ImageSharp.Size(900, 900), ms);
 
-            Assert.Multiple(() =>
-            {
-                // Assert
-                Assert.That(ext, Is.EqualTo("png"));
-                Assert.That(ms.Length, Is.EqualTo(1015));
-            });
+            // Assert
+            Assert.AreEqual("png", ext);
+            Assert.AreEqual(1015, ms.Length);
         }
     }
 }
