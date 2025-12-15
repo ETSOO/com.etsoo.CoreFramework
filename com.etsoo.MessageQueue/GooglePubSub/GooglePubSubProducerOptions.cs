@@ -14,14 +14,14 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         /// 项目编号
         /// </summary>
         [Required]
-        public string ProjectId { get; init; } = default!;
+        public string ProjectId { get; set; } = default!;
 
         /// <summary>
         /// Topic id
         /// 主题编号
         /// </summary>
         [Required]
-        public string TopicId { get; init; } = default!;
+        public string TopicId { get; set; } = default!;
     }
 
     [OptionsValidator]

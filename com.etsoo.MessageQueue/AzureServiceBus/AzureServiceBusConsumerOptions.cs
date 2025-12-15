@@ -13,24 +13,24 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         /// Queue name
         /// 队列名称
         /// </summary>
-        public string? QueueName { get; init; }
+        public string? QueueName { get; set; }
 
         /// <summary>
         /// Topic name
         /// 主题名称
         /// </summary>
-        public string? TopicName { get; init; }
+        public string? TopicName { get; set; }
 
         /// <summary>
         /// Subscription name
         /// 订阅名称
         /// </summary>
-        public string? SubscriptionName { get; init; }
+        public string? SubscriptionName { get; set; }
 
         /// <summary>
         /// Processor options
         /// 处理器选项
         /// </summary>
-        public ServiceBusProcessorOptions ProcessorOptions { get; init; } = new();
+        public ServiceBusProcessorOptions ProcessorOptions { get; set; } = new();
     }
 }

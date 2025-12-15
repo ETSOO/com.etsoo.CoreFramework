@@ -15,13 +15,13 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         /// 队列或主题名称
         /// </summary>
         [Required]
-        public string QueueOrTopicName { get; init; } = default!;
+        public string QueueOrTopicName { get; set; } = default!;
 
         /// <summary>
         /// Sender options
         /// 发件人选项
         /// </summary>
-        public ServiceBusSenderOptions SenderOptions { get; init; } = new();
+        public ServiceBusSenderOptions SenderOptions { get; set; } = new();
     }
 
     [OptionsValidator]

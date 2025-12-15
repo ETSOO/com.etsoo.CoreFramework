@@ -10,50 +10,50 @@
         /// Queue name
         /// 队列名称
         /// </summary>
-        public string? QueueName { get; init; }
+        public string? QueueName { get; set; }
 
         /// <summary>
         /// The name of the exchange
         /// The empty string denotes the default or nameless exchange: 
         /// messages are routed to the queue with the name specified by routingKey, if it exists
         /// </summary>
-        public string? Exchange { get; init; }
+        public string? Exchange { get; set; }
 
         /// <summary>
         /// Exchange type includes: direct, topic, headers and fanout
         /// 交换类型
         /// </summary>
-        public string? ExchangeType { get; init; }
+        public string? ExchangeType { get; set; }
 
         /// <summary>
         /// Routing key for routing and topics 
         /// </summary>
-        public string? RoutingKey { get; init; }
+        public string? RoutingKey { get; set; }
 
         /// <summary>
         /// Should this queue will survive a broker restart?
         /// </summary>
-        public bool Durable { get; init; }
+        public bool Durable { get; set; }
 
         /// <summary>
         /// Should this queue use be limited to its declaring connection?
         /// </summary>
-        public bool Exclusive { get; init; }
+        public bool Exclusive { get; set; }
 
         /// <summary>
         /// Should this queue be auto-deleted when its last consumer (if any) unsubscribes?
         /// </summary>
-        public bool AutoDelete { get; init; }
+        public bool AutoDelete { get; set; }
 
         /// <summary>
         /// This flag tells the server how to react if a message cannot be routed to a queue
         /// </summary>
-        public bool Mandatory { get; init; }
+        public bool Mandatory { get; set; }
 
         /// <summary>
         /// Additional queue arguments, e.g. "x-queue-type"
         /// 额外的队列参数，例如 “x-queue-type”
         /// </summary>
-        public IDictionary<string, object?>? QueueArguments { get; init; }
+        public IDictionary<string, object?>? QueueArguments { get; set; }
     }
 }

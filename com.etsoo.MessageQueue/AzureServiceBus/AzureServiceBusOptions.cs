@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.MessageQueue.AzureServiceBus
 {
@@ -12,12 +13,13 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         /// 连接字符串
         /// Connection string
         /// </summary>
-        public required string ConnectionString { get; init; }
+        [Required]
+        public string ConnectionString { get; set; } = default!;
 
         /// <summary>
         /// Client options
         /// 客户端选项
         /// </summary>
-        public ServiceBusClientOptions ClientOptions { get; init; } = new();
+        public ServiceBusClientOptions ClientOptions { get; set; } = new();
     }
 }
