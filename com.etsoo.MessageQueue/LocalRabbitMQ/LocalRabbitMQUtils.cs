@@ -39,7 +39,18 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
             if (options.VirtualHost != null) factory.VirtualHost = options.VirtualHost;
             if (options.HostName != null) factory.HostName = options.HostName;
             if (options.Port.HasValue) factory.Port = options.Port.Value;
-            if (options.Ssl != null) factory.Ssl = options.Ssl;
+            if (options.Ssl != null)
+            {
+                factory.Ssl = new SslOption
+                {
+                    CertPassphrase = options.Ssl.CertPassphrase,
+                    CertPath = options.Ssl.CertPath,
+                    CheckCertificateRevocation = options.Ssl.CheckCertificateRevocation,
+                    Enabled = options.Ssl.Enabled,
+                    ServerName = options.Ssl.ServerName,
+                    Version = options.Ssl.Version
+                };
+            }
 
             // Connection is thread safe
             connection = await factory.CreateConnectionAsync(cancellationToken);

@@ -1,4 +1,7 @@
-﻿namespace com.etsoo.MessageQueue.GooglePubSub
+﻿using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
+
+namespace com.etsoo.MessageQueue.GooglePubSub
 {
     /// <summary>
     /// Google PubSub message consumer options
@@ -10,12 +13,19 @@
         /// Project id
         /// 项目编号
         /// </summary>
-        public required string ProjectId { get; init; }
+        [Required]
+        public string ProjectId { get; init; } = default!;
 
         /// <summary>
         /// Subscription id
         /// 订阅编号
         /// </summary>
-        public required string SubscriptionId { get; init; }
+        [Required]
+        public string SubscriptionId { get; init; } = default!;
+    }
+
+    [OptionsValidator]
+    public partial class ValidateGooglePubSubConsumerOptions : IValidateOptions<GooglePubSubConsumerOptions>
+    {
     }
 }

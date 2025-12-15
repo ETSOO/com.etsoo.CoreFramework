@@ -1,7 +1,19 @@
 ﻿using RabbitMQ.Client;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Authentication;
 
 namespace com.etsoo.MessageQueue.LocalRabbitMQ
 {
+    public record LocalRabbitMQSslOptions
+    {
+        public string? CertPassphrase { get; init; }
+        public string CertPath { get; init; } = default!;
+        public bool CheckCertificateRevocation { get; init; }
+        public bool Enabled { get; init; }
+        public string ServerName { get; init; } = default!;
+        public SslProtocols Version { get; init; }
+    }
+
     /// <summary>
     /// Local RabbitMQ connection options
     /// 本地 RabbitMQ 链接选项
@@ -42,6 +54,6 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
         /// <summary>
         /// TLS options setting.
         /// </summary>
-        public SslOption? Ssl { get; init; }
+        public LocalRabbitMQSslOptions? Ssl { get; init; }
     }
 }

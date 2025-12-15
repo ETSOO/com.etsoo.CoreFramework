@@ -1,4 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 
 namespace com.etsoo.MessageQueue.AzureServiceBus
 {
@@ -12,12 +14,18 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         /// Queue or topic name
         /// 队列或主题名称
         /// </summary>
-        public required string QueueOrTopicName { get; init; }
+        [Required]
+        public string QueueOrTopicName { get; init; } = default!;
 
         /// <summary>
         /// Sender options
         /// 发件人选项
         /// </summary>
         public ServiceBusSenderOptions SenderOptions { get; init; } = new();
+    }
+
+    [OptionsValidator]
+    public partial class ValidateAzureServiceBusProducerOptions : IValidateOptions<AzureServiceBusProducerOptions>
+    {
     }
 }

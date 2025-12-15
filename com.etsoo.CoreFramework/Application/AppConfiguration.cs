@@ -30,54 +30,54 @@ namespace com.etsoo.CoreFramework.Application
         /// Supported cultures, like zh-CN, zh-Hans-CN, en
         /// 支持的文化，比如zh-CN, zh-Hans-CN, en
         /// </summary>
-        public string[] Cultures { get; set; } = [];
+        public string[] Cultures { get; init; } = [];
 
         /// <summary>
         /// Private key for hash or simple encryption/decryption, required
         /// 哈希或简单加密/解密私匙，必填
         /// </summary>
         [Required]
-        public string PrivateKey { get; set; } = string.Empty;
+        public string PrivateKey { get; init; } = string.Empty;
 
         /// <summary>
         /// Unique name
         /// 唯一名称
         /// </summary>
-        public string Name { get; set; } = "SmartERP";
+        public string Name { get; init; } = "SmartERP";
 
         /// <summary>
         /// Web url
         /// 网页地址
         /// </summary>
         [Url]
-        public string WebUrl { get; set; } = "http://localhost";
+        public string WebUrl { get; init; } = "http://localhost";
 
         /// <summary>
         /// Api url
         /// 接口地址
         /// </summary>
         [Url]
-        public string ApiUrl { get; set; } = "http://localhost/api";
+        public string ApiUrl { get; init; } = "http://localhost/api";
 
         /// <summary>
         /// Cache hours
         /// 缓存小时数
         /// </summary>
         [Range(0, 2400)]
-        public double CacheHours { get; set; } = 24D;
+        public double CacheHours { get; init; } = 24D;
 
         /// <summary>
         /// Refresh token valid days
         /// 刷新令牌有效天数
         /// </summary>
         [Range(1, 300)]
-        public int RefreshTokenDays { get; set; } = 30;
+        public int RefreshTokenDays { get; init; } = 30;
 
         /// <summary>
         /// Init call encryption identifier
         /// 初始化调用加密标识
         /// </summary>
-        public string InitCallEncryptionIdentifier { get; set; } = "InitCall";
+        public string InitCallEncryptionIdentifier { get; init; } = "InitCall";
     }
 
     [OptionsValidator]
