@@ -62,7 +62,10 @@ namespace com.etsoo.MessageQueue.QueueProcessors
             var message = await body.ToMessageAsync(typeInfo, cancellationToken);
             if (message == null)
             {
-                logger.LogError("Convert body to {type} failed: {body}", typeof(T), body.ToJsonString());
+                if (logger.IsEnabled(LogLevel.Error))
+                {
+                    logger.LogError("Convert body to {type} failed: {body}", T.Type, body.ToJsonString());
+                }
                 return;
             }
 
