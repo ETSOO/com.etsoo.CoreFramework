@@ -596,6 +596,32 @@ namespace com.etsoo.Utils
         }
 
         /// <summary>
+        /// Remove and return revmoed items from list
+        /// 移除并返回列表中被移除的项
+        /// </summary>
+        /// <typeparam name="T">Generic item type</typeparam>
+        /// <param name="list">List</param>
+        /// <param name="predicate">Predicate to remove</param>
+        /// <returns>Removed items</returns>
+        public static List<T> RemoveAndReturn<T>(
+            this IList<T> list,
+            Predicate<T> predicate)
+        {
+            var removedItems = new List<T>();
+
+            for (var i = list.Count - 1; i >= 0; i--)
+            {
+                if (predicate(list[i]))
+                {
+                    removedItems.Add(list[i]);
+                    list.RemoveAt(i);
+                }
+            }
+
+            return removedItems;
+        }
+
+        /// <summary>
         /// Set datatime's Utc kind
         /// 设置日期时间的类型为Utc
         /// </summary>

@@ -154,5 +154,19 @@ namespace Tests.Utils
             var json = await SharedUtils.JoinAsAuditJsonAsync(oldData, newData, ["Id", "Name"]);
             Assert.AreEqual("{\"oldData\":{\"id\":1001},\"newData\":{\"name\":\"Admin 2\",\"id\":1001}}", json);
         }
+
+        [TestMethod]
+        public void RemoveAndReturnTests()
+        {
+            // Arrange
+            var list = new List<int> { 1, 2, 3, 4, 5, 6 };
+
+            // Act
+            var removed = list.RemoveAndReturn(x => x % 2 == 0);
+
+            // Assert
+            CollectionAssert.AreEquivalent(new List<int> { 2, 4, 6 }, removed);
+            CollectionAssert.AreEquivalent(new List<int> { 1, 3, 5 }, list);
+        }
     }
 }
