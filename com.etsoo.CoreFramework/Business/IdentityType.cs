@@ -27,7 +27,8 @@
 
     /// <summary>
     /// Identity type with flags
-    /// 标识类型带标志
+    /// Remove contact definition, because contact is a relationship, not an identity
+    /// 标识类型带标志，删除联系人定义，因为联系人是一种关系，不是身份
     /// </summary>
     [Flags]
     public enum IdentityTypeFlags : byte
@@ -55,12 +56,6 @@
         /// 供应商
         /// </summary>
         Supplier = 4,
-
-        /// <summary>
-        /// Contact
-        /// 联系人
-        /// </summary>
-        Contact = 8,
 
         /// <summary>
         /// Organization
