@@ -1,4 +1,5 @@
 ﻿using com.etsoo.CoreFramework.Authentication;
+using com.etsoo.CoreFramework.Business;
 
 namespace com.etsoo.CoreFramework.Application
 {
@@ -53,5 +54,18 @@ namespace com.etsoo.CoreFramework.Application
         /// User roles
         /// </summary>
         public const UserRole UserRoles = UserRole.User | UserRole.Leader | ManagerRoles;
+
+        /// <summary>
+        /// Determines whether the specified product unit represents an asset-based unit
+        /// 确定指定的产品单位是否是资产的单位
+        /// </summary>
+        /// <param name="unit">The product unit to evaluate</param>
+        /// <returns>result</returns>
+        public static bool IsAssetUnit(ProductUnit unit)
+        {
+            return unit == ProductUnit.TIME
+                || unit == ProductUnit.MONEY
+                || (unit >= ProductUnit.HOUR && unit <= ProductUnit.HALFYEAR);
+        }
     }
 }

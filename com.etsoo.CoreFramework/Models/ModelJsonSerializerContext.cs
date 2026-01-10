@@ -19,7 +19,6 @@ namespace com.etsoo.CoreFramework.Models
     )]
 
     [JsonSerializable(typeof(AntiforgeryRequestToken))]
-    [JsonSerializable(typeof(AssetUnit))]
     [JsonSerializable(typeof(DataPrivacy))]
     [JsonSerializable(typeof(EntityStatus))]
     [JsonSerializable(typeof(IdentityType))]
