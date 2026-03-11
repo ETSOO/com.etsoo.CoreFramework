@@ -31,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="com.etsoo.ApiModel" Version="1.0.80" />
     <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.14" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.4" />
   </ItemGroup>
 
   <ItemGroup>
