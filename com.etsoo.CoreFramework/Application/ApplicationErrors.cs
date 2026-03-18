@@ -159,6 +159,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError ItemExists => new(nameof(ItemExists), Resources.ItemExists);
 
         /// <summary>
+        /// Item does not exist
+        /// 项目不存在
+        /// </summary>
+        public static ApplicationError ItemNotExists => new(nameof(ItemNotExists), Resources.ItemNotExists);
+
+        /// <summary>
         /// Join Organization Required
         /// 需要加入组织
         /// </summary>
@@ -315,6 +321,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(InvalidMobile) => InvalidMobile,
                 nameof(IPAddressChanged) => IPAddressChanged,
                 nameof(ItemExists) => ItemExists,
+                nameof(ItemNotExists) => ItemNotExists,
                 nameof(JoinOrgRequired) => JoinOrgRequired,
                 nameof(MobileExists) => MobileExists,
                 nameof(NoActionResult) => NoActionResult,

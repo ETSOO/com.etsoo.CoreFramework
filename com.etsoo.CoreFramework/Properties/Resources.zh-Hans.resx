@@ -246,4 +246,7 @@
   <data name="SignExpired" xml:space="preserve">
     <value>签名已过期</value>
   </data>
+  <data name="ItemNotExists" xml:space="preserve">
+    <value>项目不存在</value>
+  </data>
 </root>
