@@ -249,4 +249,13 @@
   <data name="ItemNotExists" xml:space="preserve">
     <value>项目不存在</value>
   </data>
+  <data name="RateLimiting" xml:space="preserve">
+    <value>请求频率限制</value>
+  </data>
+  <data name="TooManyItems" xml:space="preserve">
+    <value>项目过多</value>
+  </data>
+  <data name="DataOutdated" xml:space="preserve">
+    <value>数据已过时</value>
+  </data>
 </root>

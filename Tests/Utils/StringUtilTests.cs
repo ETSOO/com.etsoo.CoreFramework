@@ -75,6 +75,170 @@ namespace Tests.Utils
         }
 
         [TestMethod]
+        public void FormatName_ChineseCase()
+        {
+            // Arrange
+            var name = "青岛亿速思维网络科技有限公司";
+            var maxChars = 6;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars);
+
+            // Assert
+            Assert.AreEqual("青岛亿速思维", result);
+        }
+
+        [TestMethod]
+        public void FormatName_ExceedsMaxParts_ReturnsTruncatedParts()
+        {
+            // Arrange
+            var name = "John Michael David Smith";
+            var maxChars = 100;
+            var maxParts = 2;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John Michael", result);
+        }
+
+        [TestMethod]
+        public void FormatName_ExceedsMaxChars_ReturnsTruncatedString()
+        {
+            // Arrange
+            var name = "JohnSmithWithAVeryLongLastName";
+            var maxChars = 10;
+            var maxParts = 5;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("JohnSmithW", result);
+        }
+
+        [TestMethod]
+        public void FormatName_WithinLimits_ReturnsOriginalName()
+        {
+            // Arrange
+            var name = "John Smith";
+            var maxChars = 20;
+            var maxParts = 5;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John Smith", result);
+        }
+
+        [TestMethod]
+        public void FormatName_ExactlyMaxParts_ReturnsTruncatedParts()
+        {
+            // Arrange
+            var name = "One Two Three Four";
+            var maxChars = 100;
+            var maxParts = 3;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("One Two Three", result);
+        }
+
+        [TestMethod]
+        public void FormatName_SingleWord_ReturnsOriginalIfWithinLimits()
+        {
+            // Arrange
+            var name = "John";
+            var maxChars = 10;
+            var maxParts = 2;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John", result);
+        }
+
+        [TestMethod]
+        public void FormatName_EmptySpaces_IgnoresEmptyEntries()
+        {
+            // Arrange
+            var name = "John  Smith";  // Double space
+            var maxChars = 20;
+            var maxParts = 2;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John Smith", result);
+        }
+
+        [TestMethod]
+        public void FormatName_LeadingTrailingSpaces_RemovesThem()
+        {
+            // Arrange
+            var name = "  John Smith  ";
+            var maxChars = 20;
+            var maxParts = 3;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John Smith", result);
+        }
+
+        [TestMethod]
+        public void FormatName_MaxPartsEqualsOne_ReturnsFirstPart()
+        {
+            // Arrange
+            var name = "John Smith Brown";
+            var maxChars = 100;
+            var maxParts = 1;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("John Smith", result);
+        }
+
+        [TestMethod]
+        public void FormatName_ExceedsMaxCharsWithSingleWord_TruncatesWord()
+        {
+            // Arrange
+            var name = "Extraordinarily";
+            var maxChars = 8;
+            var maxParts = 3;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("Extraord", result);
+        }
+
+        [TestMethod]
+        public void FormatName_ExactlyMaxChars_ReturnsOriginal()
+        {
+            // Arrange
+            var name = "JohnSmith";
+            var maxChars = 9;
+            var maxParts = 5;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars, maxParts);
+
+            // Assert
+            Assert.AreEqual("JohnSmith", result);
+        }
+
+        [TestMethod]
         public void GetLCSTests()
         {
             // Arrange

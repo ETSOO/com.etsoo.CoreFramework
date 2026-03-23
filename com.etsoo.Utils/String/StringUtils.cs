@@ -27,6 +27,36 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Format name
+        /// </summary>
+        /// <param name="name">Input name</param>
+        /// <param name="maxChars">Max chars</param>
+        /// <param name="maxParts">Max parts</param>
+        /// <returns></returns>
+        public static string FormatName(string name, int maxChars, int? maxParts = null)
+        {
+            name = name.Trim();
+
+            var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            var max = maxParts.GetValueOrDefault(maxChars / 3);
+            if (max < 2) max = 2;
+
+            if (parts.Length >= max)
+            {
+                return string.Join(' ', parts.Take(max));
+            }
+            else if(name.Length > maxChars)
+            {
+                return name[..maxChars];
+            }
+            else
+            {
+                return name;
+            }
+        }
+
+        /// <summary>
         /// Get longest common substring (dynamic programming instead of recursion)
         /// 获取最长公共子串 (动态编程而不是递归)
         /// </summary>

@@ -249,4 +249,13 @@
   <data name="ItemNotExists" xml:space="preserve">
     <value>Item does not exist</value>
   </data>
+  <data name="RateLimiting" xml:space="preserve">
+    <value>Rate Limiting</value>
+  </data>
+  <data name="TooManyItems" xml:space="preserve">
+    <value>Too Many Items</value>
+  </data>
+  <data name="DataOutdated" xml:space="preserve">
+    <value>Data Outdated</value>
+  </data>
 </root>

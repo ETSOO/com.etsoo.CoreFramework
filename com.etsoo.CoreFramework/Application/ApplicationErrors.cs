@@ -87,6 +87,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError DataNotReady => new(nameof(DataNotReady), Resources.DataNotReady);
 
         /// <summary>
+        /// Data outdated
+        /// 数据已过时
+        /// </summary>
+        public static ApplicationError DataOutdated => new(nameof(DataOutdated), Resources.DataOutdated);
+
+        /// <summary>
         /// Data Processing Failed
         /// 数据处理失败
         /// </summary>
@@ -261,6 +267,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError OutOfMemory => new(nameof(OutOfMemory), Resources.OutOfMemory);
 
         /// <summary>
+        /// Rate Limiting
+        /// 频率限制
+        /// </summary>
+        public static ApplicationError RateLimiting => new(nameof(RateLimiting), Resources.RateLimiting);
+
+        /// <summary>
         /// Schema validation error
         /// 模式验证错误
         /// </summary>
@@ -277,6 +289,12 @@ namespace com.etsoo.CoreFramework.Application
         /// 您的令牌已过期错误
         /// </summary>
         public static ApplicationError TokenExpired => new(nameof(TokenExpired), Resources.TokenExpired);
+
+        /// <summary>
+        /// Too many items
+        /// 项目过多
+        /// </summary>
+        public static ApplicationError TooManyItems => new(nameof(TooManyItems), Resources.TooManyItems);
 
         /// <summary>
         /// Your account has been temporarily blocked
@@ -309,6 +327,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(CodesNoMatch) => CodesNoMatch,
                 nameof(CodeSendingFailed) => CodeSendingFailed,
                 nameof(DataNotReady) => DataNotReady,
+                nameof(DataOutdated) => DataOutdated,
                 nameof(DataProcessingFailed) => DataProcessingFailed,
                 nameof(DbConnectionFailed) => DbConnectionFailed,
                 nameof(DeleteReferencedData) => DeleteReferencedData,
@@ -338,8 +357,10 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(OrgExists) => OrgExists,
                 nameof(OrgExpired) => OrgExpired,
                 nameof(OutOfMemory) => OutOfMemory,
+                nameof(RateLimiting) => RateLimiting,
                 nameof(SignExpired) => SignExpired,
                 nameof(TokenExpired) => TokenExpired,
+                nameof(TooManyItems) => TooManyItems,
                 nameof(UserFrozen) => UserFrozen,
                 nameof(UserRegistered) => UserRegistered,
                 _ => null

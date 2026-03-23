@@ -142,6 +142,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Data Outdated.
+        /// </summary>
+        public static string DataOutdated {
+            get {
+                return ResourceManager.GetString("DataOutdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data Processing Failed.
         /// </summary>
         public static string DataProcessingFailed {
@@ -412,6 +421,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rate Limiting.
+        /// </summary>
+        public static string RateLimiting {
+            get {
+                return ResourceManager.GetString("RateLimiting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Schema Validation Error.
         /// </summary>
         public static string SchemaValidationError {
@@ -435,6 +453,15 @@ namespace com.etsoo.CoreFramework.Properties {
         public static string TokenExpired {
             get {
                 return ResourceManager.GetString("TokenExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Too Many Items.
+        /// </summary>
+        public static string TooManyItems {
+            get {
+                return ResourceManager.GetString("TooManyItems", resourceCulture);
             }
         }
         
