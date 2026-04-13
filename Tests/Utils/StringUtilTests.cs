@@ -89,6 +89,20 @@ namespace Tests.Utils
         }
 
         [TestMethod]
+        public void FormatName_ChineseWithBracesCase()
+        {
+            // Arrange
+            var name = "中国银行(广州新天地支行)";
+            var maxChars = 6;
+
+            // Act
+            var result = StringUtils.FormatName(name, maxChars);
+
+            // Assert
+            Assert.AreEqual(name, result);
+        }
+
+        [TestMethod]
         public void FormatName_ExceedsMaxParts_ReturnsTruncatedParts()
         {
             // Arrange
@@ -572,6 +586,48 @@ namespace Tests.Utils
             Assert.AreEqual(dt, StringUtils.GetPrimitiveValue(dt));
 
             Assert.AreEqual("https://etsoo.com/", StringUtils.GetPrimitiveValue(new Uri("https://etsoo.com/")));
+        }
+
+        [TestMethod]
+        public void CommonPrefixFrom_BasicCase()
+        {
+            // Arrange
+            var a = "HelloWorld";
+            var b = "HelloThere";
+
+            // Act
+            var result = StringUtils.CommonPrefixFrom(a, b);
+
+            // Assert
+            Assert.AreEqual("Hello", result);
+        }
+
+        [TestMethod]
+        public void CommonPrefixFrom_WithStartIndex()
+        {
+            // Arrange
+            var a = "TestHelloWorld";
+            var b = "DataHelloThere";
+
+            // Act
+            var result = StringUtils.CommonPrefixFrom(a, b, 4);
+
+            // Assert
+            Assert.AreEqual("Hello", result);
+        }
+
+        [TestMethod]
+        public void CommonPrefixFrom_NoCommonPrefix()
+        {
+            // Arrange
+            var a = "Apple";
+            var b = "Banana";
+
+            // Act
+            var result = StringUtils.CommonPrefixFrom(a, b);
+
+            // Assert
+            Assert.AreEqual(string.Empty, result);
         }
     }
 }

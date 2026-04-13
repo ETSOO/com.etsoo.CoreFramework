@@ -14,6 +14,30 @@ namespace com.etsoo.Utils.String
     public static partial class StringUtils
     {
         /// <summary>
+        /// Get common prefix from two strings with start index
+        /// 获取两个字符串从指定起始位置的公共前缀
+        /// </summary>
+        /// <param name="a">First input string</param>
+        /// <param name="b">Second input string</param>
+        /// <param name="start">Start index to begin comparison. Default is 0</param>
+        /// <returns>Result</returns>
+        public static string CommonPrefixFrom(string a, string b, int start = 0)
+        {
+            var minLength = Math.Min(a.Length, b.Length);
+
+            if (start < 0 || start >= minLength)
+                return string.Empty;
+
+            int i = start;
+            while (i < minLength && a[i] == b[i])
+            {
+                i++;
+            }
+
+            return a[start..i];
+        }
+
+        /// <summary>
         /// Format file size
         /// 格式化文件大小
         /// </summary>
@@ -48,7 +72,28 @@ namespace com.etsoo.Utils.String
             }
             else if(name.Length > maxChars)
             {
-                return name[..maxChars];
+                var endIndex = maxChars;
+                var brackets = new Dictionary<char, char> { { '(', ')' }, { '（', '）' }, { '[', ']' } };
+
+                // Count unmatched brackets for each type
+                foreach (var (start, end) in brackets)
+                {
+                    var count = name[..maxChars].Count(c => c == start) - name[..maxChars].Count(c => c == end);
+
+                    if (count > 0)
+                    {
+                        // Find matching end brackets
+                        for (var i = maxChars; i < name.Length && count > 0; i++)
+                        {
+                            if (name[i] == start) count++;
+                            else if (name[i] == end && --count == 0) endIndex = i + 1;
+                        }
+
+                        if (count == 0) return name[..endIndex];
+                    }
+                }
+
+                return name[..endIndex];
             }
             else
             {
