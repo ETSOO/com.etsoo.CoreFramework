@@ -33,12 +33,10 @@ namespace com.etsoo.SMTP
         protected virtual void FormatMessage(MimeMessage message)
         {
             // Set the sender
-            message.Sender ??= MailboxAddress.Parse(Options.Sender ?? Options.UserName);
-
-            if (message.From.Count == 0)
+            var sender = Options.Sender ?? Options.UserName;
+            if (!string.IsNullOrEmpty(sender))
             {
-                // Set one from
-                message.From.Add(message.Sender);
+                message.Sender ??= MailboxAddress.Parse(sender);
             }
 
             // Default recipients
@@ -46,9 +44,17 @@ namespace com.etsoo.SMTP
             message.Cc.AddRange(Options.Cc);
             message.Bcc.AddRange(Options.Bcc);
 
-            if (message.To.Count == 0)
+            if (message.Sender != null)
             {
-                message.From.Add(message.Sender);
+                if (message.From.Count == 0)
+                {
+                    message.From.Add(message.Sender);
+                }
+
+                if (message.To.Count == 0)
+                {
+                    message.To.Add(message.Sender);
+                }
             }
         }
 
