@@ -60,35 +60,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 await channel.ExchangeDeclareAsync(exchange: exchange, type: exchangeType, cancellationToken: cancellationToken);
             }
 
-            var bp = new BasicProperties
-            {
-                Persistent = true
-            };
-
-            var messageId = Guid.NewGuid().ToString();
-            bp.MessageId = messageId;
-
-            if (properties != null)
-            {
-                if (properties.AppId != null) bp.AppId = properties.AppId;
-                if (properties.CorrelationId != null) bp.CorrelationId = properties.CorrelationId;
-                if (properties.Type != null) bp.Type = properties.Type;
-                if (properties.ContentEncoding != null) bp.ContentEncoding = properties.ContentEncoding;
-                if (properties.ContentType != null) bp.ContentType = properties.ContentType;
-                if (properties.Priority.HasValue) bp.Priority = properties.Priority.Value;
-                if (properties.ReplyTo != null) bp.ReplyTo = properties.ReplyTo;
-                if (properties.TimeToLive.HasValue) bp.Expiration = properties.TimeToLive.Value.TotalMilliseconds.ToString();
-
-                if (properties.Headers != null) bp.Headers = properties.Headers!;
-                else bp.Headers ??= new Dictionary<string, object?>();
-
-                if (bp.Headers.TryGetValue(LocalRabbitMQUtils.LoginUserIdField, out var user) && user != null)
-                {
-                    bp.UserId = Convert.ToString(user);
-                }
-
-                if (properties.UserId != null) bp.Headers[nameof(properties.UserId)] = properties.UserId;
-            }
+            var bp = LocalRabbitMQUtils.CreateBasicProperties(properties);
 
             await channel.BasicPublishAsync(exchange: exchange,
                                  routingKey: routingKey,
@@ -97,7 +69,7 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                                  body: body,
                                  cancellationToken: cancellationToken);
 
-            return messageId;
+            return bp.MessageId!;
         }
     }
 }

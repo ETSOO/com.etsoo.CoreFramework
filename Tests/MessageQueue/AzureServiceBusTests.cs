@@ -58,13 +58,13 @@ namespace Tests.MessageQueue
                 messages.Add(properties);
             };
 
-            var subscriber = AzureServiceBusUtils.CreateServiceBusProcessor(new AzureServiceBusConsumerOptions
+            var host = AzureServiceBusUtils.CreateServiceBusProcessor(new AzureServiceBusConsumerOptions
             {
                 ConnectionString = _configuration["AzureServiceBusConnectionString"] ?? string.Empty,
                 QueueName = "smarterpqueue"
             });
             var consumer = new AzureServiceBusConsumer(
-                subscriber,
+                host,
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
@@ -72,7 +72,7 @@ namespace Tests.MessageQueue
             await Task.Delay(1000);
             await consumer.StopAsync(default);
 
-            await subscriber.DisposeAsync();
+            await host.Item1.DisposeAsync();
 
             Assert.IsTrue(messages.Any());
             Assert.IsTrue(messages.Any(m => messageId.Equals(m.MessageId)));

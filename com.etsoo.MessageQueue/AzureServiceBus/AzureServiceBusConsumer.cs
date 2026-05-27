@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
 using com.etsoo.MessageQueue.QueueProcessors;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 
 namespace com.etsoo.MessageQueue.AzureServiceBus
@@ -8,9 +9,12 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
     /// Azure service bus message consumer
     /// Azure 服务总线消息消费者
     /// </summary>
-    public class AzureServiceBusConsumer(ServiceBusProcessor processor, IEnumerable<IMessageQueueProcessor> processors, ILogger logger) : MessageQueueConsumer(processors, logger)
+    public class AzureServiceBusConsumer((ServiceBusProcessor Processor, ServiceBusSender Sender) sb, IEnumerable<IMessageQueueProcessor> processors, ILogger logger) : MessageQueueConsumer(processors, logger)
     {
-        private readonly ServiceBusProcessor _processor = processor;
+        const string RetryCountField = "RetryCount";
+
+        private readonly ServiceBusProcessor _processor = sb.Processor;
+        private readonly ServiceBusSender _sender = sb.Sender;
 
         private async Task MessageHandler(ProcessMessageEventArgs args)
         {
@@ -25,13 +29,21 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
 
                 if (count == 0)
                 {
-                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                    if (Logger.IsEnabled(LogLevel.Error))
+                    {
+                        Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                    }
+
                     await args.DeadLetterMessageAsync(args.Message, "NoProcessor", cancellationToken: args.CancellationToken);
+
                     return;
                 }
                 else if (count > 1)
                 {
-                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                    if (Logger.IsEnabled(LogLevel.Information))
+                    {
+                        Logger.LogInformation("More Than One Processor for Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                    }
                 }
 
                 if (!_processor.AutoCompleteMessages)
@@ -42,14 +54,35 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
                     await args.CompleteMessageAsync(args.Message, args.CancellationToken);
                 }
 
-                // Log success
-                Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                if (Logger.IsEnabled(LogLevel.Information))
+                {
+                    // Log success
+                    Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                if (Logger.IsEnabled(LogLevel.Error))
+                {
+                    Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Body.ToString(), properties);
+                }
 
-                await args.RenewMessageLockAsync(args.Message, args.CancellationToken);
+                // await args.AbandonMessageAsync(args.Message, cancellationToken: args.CancellationToken);
+                // await args.RenewMessageLockAsync(args.Message, args.CancellationToken);
+
+                // Retry later
+                message.ApplicationProperties.TryGetValue(RetryCountField, out var retryCountObj);
+                var retryCount = StringUtils.TryParseObject<int>(retryCountObj).GetValueOrDefault() + 1;
+
+                var retryMessage = new ServiceBusMessage(message);
+                retryMessage.ApplicationProperties[RetryCountField] = retryCount;
+
+                // Send the retry message with a delay
+                var delay = DateTimeOffset.UtcNow.AddSeconds(GetRetryDelay(retryCount));
+                await _sender.ScheduleMessageAsync(retryMessage, delay, args.CancellationToken);
+
+                // Complete the message to remove it from the queue, since we have scheduled a retry message
+                await args.CompleteMessageAsync(args.Message, args.CancellationToken);
 
                 if (_processor.AutoCompleteMessages) throw;
             }
@@ -57,7 +90,11 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
 
         private Task ErrorHandler(ProcessErrorEventArgs args)
         {
-            Logger.LogError("ErrorHandler: {args}", args);
+            if (Logger.IsEnabled(LogLevel.Error))
+            {
+                Logger.LogError("ErrorHandler: {args}", args);
+            }
+
             return Task.CompletedTask;
         }
 

@@ -36,22 +36,40 @@ namespace com.etsoo.MessageQueue.GooglePubSub
 
                     if (count == 0)
                     {
-                        Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
-                        return SubscriberClient.Reply.Nack;
+                        // No processor for the message, log a warning and let them acknowledged
+
+                        if (Logger.IsEnabled(LogLevel.Warning))
+                        {
+                            Logger.LogError("No Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                        }
+                        
+                        // return SubscriberClient.Reply.Nack;
                     }
                     else if (count > 1)
                     {
-                        Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                        if (Logger.IsEnabled(LogLevel.Information))
+                        {
+                            Logger.LogInformation("More Than One Processor for Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                        }
                     }
 
-                    // Log success
-                    Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                    if (Logger.IsEnabled(LogLevel.Information))
+                    {
+                        // Log success
+                        Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                    }
 
                     return SubscriberClient.Reply.Ack;
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                    if (Logger.IsEnabled(LogLevel.Error))
+                    {
+                        Logger.LogError(ex, "Message: {message}, Properties: {properties}", message.Data.ToStringUtf8(), properties);
+                    }
+
+                    // GCP retry is controlled by subscription configuration
+                    // https://docs.cloud.google.com/pubsub/docs/subscription-retry-policy
                     return SubscriberClient.Reply.Nack;
                 }
             });

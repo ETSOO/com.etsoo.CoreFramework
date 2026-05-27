@@ -55,13 +55,16 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
         /// </summary>
         /// <param name="options">Options</param>
         /// <returns>Result</returns>
-        public static ServiceBusProcessor CreateServiceBusProcessor(AzureServiceBusConsumerOptions options)
+        public static (ServiceBusProcessor, ServiceBusSender) CreateServiceBusProcessor(AzureServiceBusConsumerOptions options)
         {
             var client = CreateServiceBusClient(options);
 
+            ServiceBusSender sender;
+
             if (!string.IsNullOrEmpty(options.QueueName))
             {
-                return client.CreateProcessor(options.QueueName, options.ProcessorOptions);
+                sender = client.CreateSender(options.QueueName);
+                return (client.CreateProcessor(options.QueueName, options.ProcessorOptions), sender);
             }
             else if (string.IsNullOrEmpty(options.TopicName))
             {
@@ -73,7 +76,8 @@ namespace com.etsoo.MessageQueue.AzureServiceBus
             }
             else
             {
-                return client.CreateProcessor(options.TopicName, options.SubscriptionName, options.ProcessorOptions);
+                sender = client.CreateSender(options.TopicName);
+                return (client.CreateProcessor(options.TopicName, options.SubscriptionName, options.ProcessorOptions), sender);
             }
         }
 

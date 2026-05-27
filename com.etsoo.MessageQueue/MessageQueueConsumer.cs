@@ -5,8 +5,9 @@ using System.Collections.Concurrent;
 namespace com.etsoo.MessageQueue
 {
     /// <summary>
-    /// Message queue consumer abstract
-    /// 消息队列消费者抽象类
+    /// Message queue consumer abstract. Because a queue can define multiple processors, an exception in one processor should not affect the execution of other processors.
+    /// When possible, one message type should have one processor. If a message type has multiple processors, it is necessary to check whether the message has been processed before processing to avoid duplicate processing.
+    /// 消息队列消费者抽象类，因为队列可以定义多个处理器，一个处理器的异常，不应该影响其他处理器的执行，所以尽可能一个信息类型一个处理器。如果一个信息类型有多个处理器，在处理时需要检查信息是否有过处理记录，避免重复处理。
     /// </summary>
     public abstract class MessageQueueConsumer : IMessageQueueConsumer
     {
@@ -31,6 +32,23 @@ namespace com.etsoo.MessageQueue
         }
 
         /// <summary>
+        /// Get retry delay seconds based on retry count
+        /// 获取重试延迟秒数，基于重试次数
+        /// </summary>
+        /// <param name="retryCount">Retry count</param>
+        /// <returns>Result</returns>
+        protected int GetRetryDelay(int retryCount)
+        {
+            return retryCount switch
+            {
+                1 => 5,
+                2 => 30,
+                3 => 300,
+                _ => 6000
+            };
+        }
+
+        /// <summary>
         /// Process message
         /// 处理消息
         /// </summary>
@@ -52,9 +70,10 @@ namespace com.etsoo.MessageQueue
                     if (!processor.CanDeserialize(properties)) return;
 
                     // Convert, map and process
+                    // Multiple processes for same type messages, please implement the check for whether the message has been processed
                     await processor.ExecuteAsync(body, properties, cancellationToken);
 
-                    // Increase execution count
+                    // Increase execution count if successful
                     Interlocked.Increment(ref count);
                 }
                 catch (Exception ex)

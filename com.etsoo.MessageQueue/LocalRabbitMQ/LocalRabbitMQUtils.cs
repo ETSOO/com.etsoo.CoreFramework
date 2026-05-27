@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Azure.Amqp.Framing;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Concurrent;
 
@@ -105,6 +106,50 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 p.Headers[nameof(bp.Expiration)] = bp.Expiration;
 
             return p;
+        }
+
+        /// <summary>
+        /// Create basic properties for sending message
+        /// 为发送消息创建基本属性
+        /// </summary>
+        /// <param name="properties">Original message properties</param>
+        /// <returns>Result</returns>
+        public static BasicProperties CreateBasicProperties(MessageProperties? properties = null)
+        {
+            var bp = new BasicProperties
+            {
+                Persistent = true,
+                Headers = new Dictionary<string, object?>()
+            };
+
+            var messageId = Guid.NewGuid().ToString();
+            bp.MessageId = messageId;
+
+            if (properties != null)
+            {
+                if (properties.AppId != null) bp.AppId = properties.AppId;
+                if (properties.CorrelationId != null) bp.CorrelationId = properties.CorrelationId;
+                if (properties.Type != null) bp.Type = properties.Type;
+                if (properties.ContentEncoding != null) bp.ContentEncoding = properties.ContentEncoding;
+                if (properties.ContentType != null) bp.ContentType = properties.ContentType;
+                if (properties.Priority.HasValue) bp.Priority = properties.Priority.Value;
+                if (properties.ReplyTo != null) bp.ReplyTo = properties.ReplyTo;
+                if (properties.TimeToLive.HasValue) bp.Expiration = properties.TimeToLive.Value.TotalMilliseconds.ToString();
+
+                if (properties.Headers != null)
+                {
+                    bp.Headers = properties.Headers!;
+
+                    if (properties.Headers.TryGetValue(LoginUserIdField, out var user) && user != null)
+                    {
+                        bp.UserId = Convert.ToString(user);
+                    }
+                }
+
+                if (properties.UserId != null) bp.Headers[nameof(properties.UserId)] = properties.UserId;
+            }
+
+            return bp;
         }
     }
 }

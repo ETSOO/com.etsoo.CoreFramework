@@ -1,4 +1,5 @@
 ﻿using com.etsoo.MessageQueue.QueueProcessors;
+using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -11,9 +12,13 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
     /// </summary>
     public class LocalRabbitMQConsumer : MessageQueueConsumer
     {
+        public const string RetryCountField = "x-retry-count";
+
         readonly LocalRabbitMQConsumerOptions _options;
 
         AsyncEventingBasicConsumer? _consumer;
+
+        QueueDeclareOk[] _delayedQueues = [];
 
         public LocalRabbitMQConsumer(LocalRabbitMQConsumerOptions options, IEnumerable<IMessageQueueProcessor> processors, ILogger logger)
             : base(processors, logger)
@@ -34,28 +39,62 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                 var count = await ProcessAsync(e.Body, properties, e.CancellationToken);
                 if (count == 0)
                 {
-                    await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
-
-                    // Log warning
-                    Logger.LogError("No Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
-
-                    return;
+                    // Get rid of the unknow messages, let them acknowledged
+                    // await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
+                    if (Logger.IsEnabled(LogLevel.Warning))
+                    {
+                        // Log warning
+                        Logger.LogError("No Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
+                    }
                 }
                 else if (count > 1)
                 {
-                    // Log warning
-                    Logger.LogWarning("More Than One Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
+                    if (Logger.IsEnabled(LogLevel.Information))
+                    {
+                        // Log warning
+                        Logger.LogInformation("More Than One Processor for Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
+                    }
                 }
 
                 await channel.BasicAckAsync(e.DeliveryTag, false, e.CancellationToken);
 
-                // Log success
-                Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                if (Logger.IsEnabled(LogLevel.Information))
+                {
+                    // Log success
+                    Logger.LogInformation("Message {id} Processed {count}", properties.MessageId, count);
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
-                await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
+                if (Logger.IsEnabled(LogLevel.Error))
+                {
+                    Logger.LogError(ex, "Message: {message}, Properties: {properties}", e.Body.ToJsonString(), properties);
+                }
+
+                // TTL + DLX
+                object? retryCountObj = null;
+                properties.Headers?.TryGetValue(RetryCountField, out retryCountObj);
+
+                var retryCount = StringUtils.TryParseObject<int>(retryCountObj).GetValueOrDefault() + 1;
+
+                var delayQueue = GetDelayQueue(retryCount);
+
+                var props = new BasicProperties(e.BasicProperties)
+                {
+                    Persistent = true
+                };
+                props.Headers ??= new Dictionary<string, object?>();
+                props.Headers[RetryCountField] = retryCount;
+
+                await channel.BasicPublishAsync(exchange: "",
+                                     routingKey: delayQueue.QueueName,
+                                     mandatory: _options.Mandatory,
+                                     basicProperties: props,
+                                     body: e.Body,
+                                     cancellationToken: e.CancellationToken);
+
+                await channel.BasicAckAsync(e.DeliveryTag, false, e.CancellationToken);
+                // await channel.BasicNackAsync(e.DeliveryTag, false, true, e.CancellationToken);
             }
         }
 
@@ -116,6 +155,12 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                   cancellationToken: cancellationToken);
             }
 
+            var delayQueue1 = await CreateDelayQueue(channel, queue, GetRetryDelay(1), cancellationToken);
+            var delayQueue2 = await CreateDelayQueue(channel, queue, GetRetryDelay(2), cancellationToken);
+            var delayQueue3 = await CreateDelayQueue(channel, queue, GetRetryDelay(3), cancellationToken);
+            var delayQueue4 = await CreateDelayQueue(channel, queue, GetRetryDelay(4), cancellationToken);
+            _delayedQueues = [delayQueue1, delayQueue2, delayQueue3, delayQueue4];
+
             var consumer = new AsyncEventingBasicConsumer(channel);
             consumer.ReceivedAsync += MessageHandler;
 
@@ -125,6 +170,37 @@ namespace com.etsoo.MessageQueue.LocalRabbitMQ
                      cancellationToken: cancellationToken);
 
             _consumer = consumer;
+        }
+
+        private QueueDeclareOk GetDelayQueue(int retryCount)
+        {
+            var index = retryCount - 1;
+            if (index >= _delayedQueues.Length)
+            {
+                return _delayedQueues[^1];
+            }
+            else
+            {
+                return _delayedQueues[index];
+            }
+        }
+
+        private Task<QueueDeclareOk> CreateDelayQueue(IChannel channel, string queue, int seconds, CancellationToken cancellationToken)
+        {
+            // durable, whether the queue is durable, 'true' means it will survive a broker restart
+            // exclusive, whether the queue belongs ONLY to the current connection, 'true' means it's inaccessible from other connections, automatically deleted when the connection closes
+            // autoDelete, whether the queue is automatically deleted when the last consumer unsubscribes
+            return channel.QueueDeclareAsync(queue: queue + $"-DLX-{seconds}",
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: new Dictionary<string, object?>
+                {
+                    { "x-dead-letter-exchange", string.IsNullOrEmpty(_options.Exchange) ? "" : _options.Exchange },
+                    { "x-dead-letter-routing-key", _options.RoutingKey ?? queue },
+                    { "x-message-ttl", seconds * 1000 }
+                },
+                cancellationToken: cancellationToken);
         }
 
         /// <summary>
