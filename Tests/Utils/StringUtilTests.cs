@@ -586,6 +586,12 @@ namespace Tests.Utils
             Assert.AreEqual(dt, StringUtils.GetPrimitiveValue(dt));
 
             Assert.AreEqual("https://etsoo.com/", StringUtils.GetPrimitiveValue(new Uri("https://etsoo.com/")));
+
+            var arr = new[] { 1, 3, 5 };
+            Assert.AreEqual("1, 3, 5", StringUtils.GetPrimitiveValue(arr));
+
+            var objArr = new object?[] { 1, 3.25, "abc", null, true };
+            Assert.AreEqual("1, 3.25, abc, , True", StringUtils.GetPrimitiveValue(objArr));
         }
 
         [TestMethod]

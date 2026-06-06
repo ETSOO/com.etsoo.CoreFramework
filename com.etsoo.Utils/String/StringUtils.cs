@@ -332,8 +332,22 @@ namespace com.etsoo.Utils.String
                 or byte or short or ushort or int or uint or long or ulong
                 or float or double or decimal or DateTime or DateTimeOffset
                 or Guid or char => value,
+                IEnumerable e => JoinEnumerable(e),
                 _ => value.ToString()
             };
+        }
+
+        private static string JoinEnumerable(IEnumerable enumerable)
+        {
+            var sb = new StringBuilder();
+            var enumerator = enumerable.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                sb.Append(enumerator.Current);
+                sb.Append(", ");
+            }
+            if (sb.Length > 0) sb.Length -= 2;
+            return sb.ToString();
         }
 
         /// <summary>
