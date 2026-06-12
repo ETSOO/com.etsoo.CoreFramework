@@ -7,6 +7,7 @@ using System.Buffers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Tests.Utils
 {
@@ -27,6 +28,70 @@ namespace Tests.Utils
             var serviceProvider = services.BuildServiceProvider();
 
             return serviceProvider.GetRequiredService<IDistributedCache>();
+        }
+
+        [TestMethod]
+        public void GetOrCreateTest()
+        {
+            var cache = CreateDistributedCache();
+            var key = "test_key";
+            var dic = new Dictionary<string, object>
+            {
+                { "a", 1 },
+                { "a1", 999L },
+                { "b", "2" },
+                //{ "c", new { id = 3, label = "Label" } },
+                { "d", false },
+                { "e", DateTime.Parse("2021-01-01") },
+                { "f", new int[] { 1, 2, 3 } }
+            };
+
+            // First time, should create and cache the value, so the result should be the same instance
+            var result = cache.GetOrCreate(key, options => dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
+            Assert.AreEqual(dic, result);
+
+            // Second time, should get from cache, so the result should not be the same instance
+            var secondResult = cache.GetOrCreate(key, options => dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
+            Assert.AreNotEqual(dic, secondResult);
+
+            // Remove the cache entry
+            cache.Remove(key);
+        }
+
+        [TestMethod]
+        public async Task GetOrCreateAsyncTest()
+        {
+            var cache = CreateDistributedCache();
+            var key = "test_key_async";
+            var dic = new Dictionary<string, object>
+            {
+                { "a", 1 },
+                { "a1", 999L },
+                { "b", "2" },
+                //{ "c", new { id = 3, label = "Label" } },
+                { "d", false },
+                { "e", DateTime.Parse("2021-01-01") },
+                { "f", new int[] { 1, 2, 3 } }
+            };
+
+            // First time, should create and cache the value, so the result should be the same instance
+            var result = await cache.GetOrCreateAsync(key, async options =>
+            {
+                return dic;
+            }, CommonJsonSerializerContext.Default.DictionaryStringObject, TestContext.CancellationToken);
+
+            Assert.AreEqual(dic, result);
+
+            // Second time, should get from cache, so the result should not be the same instance
+            var secondResult = await cache.GetOrCreateAsync(key, async options =>
+            {
+                return dic;
+            }, CommonJsonSerializerContext.Default.DictionaryStringObject, TestContext.CancellationToken);
+
+            Assert.AreNotEqual(dic, secondResult);
+
+            // Remove the cache entry
+            cache.Remove(key);
         }
 
         [TestMethod]
@@ -192,5 +257,7 @@ namespace Tests.Utils
             Assert.AreEqual("Hello, 1, your name is ?, the date is 2021-01-01T00:00:00", result1);
             Assert.AreEqual("Hello, 1, your name is (empty), the date is 2021-01-01T00:00:00", result2);
         }
+
+        public TestContext TestContext { get; set; }
     }
 }
