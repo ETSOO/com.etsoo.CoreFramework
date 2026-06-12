@@ -1,6 +1,7 @@
 ﻿using com.etsoo.MessageQueue.QueueProcessors;
 using Google.Cloud.PubSub.V1;
 using Microsoft.Extensions.Logging;
+using static Google.Cloud.PubSub.V1.SubscriberClient;
 
 namespace com.etsoo.MessageQueue.GooglePubSub
 {
@@ -82,7 +83,7 @@ namespace com.etsoo.MessageQueue.GooglePubSub
         /// <param name="cancellationToken">Indicates that the shutdown process should no longer be graceful.</param>
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _subscriberClient.StopAsync(cancellationToken);
+            await _subscriberClient.StopAsync(new ShutdownOptions(), cancellationToken);
         }
 
         /// <summary>
