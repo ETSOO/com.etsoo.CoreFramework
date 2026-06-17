@@ -9,14 +9,14 @@
     <RepositoryType></RepositoryType>
     <Company>ETSOO / 亿速思维</Company>
     <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
-    <Authors>ETSOO SmartERP NextGen Team</Authors>
+    <Authors>ETSOO</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>ETSOO Shared Source Generators
 亿速思维共享代码生成器</Description>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageIcon>logo.png</PackageIcon>
     <PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
-    <Version>1.0.95</Version>
+    <Version>1.0.96</Version>
     <AssemblyVersion>1.0.5.0</AssemblyVersion>
     <FileVersion>1.0.5.0</FileVersion>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

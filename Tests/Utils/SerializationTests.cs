@@ -31,6 +31,25 @@ namespace Tests.Utils
         }
 
         [TestMethod]
+        public void GetOrCreateBytesTest()
+        {
+            var cache = CreateDistributedCache();
+            var key = "test_key";
+            var bytes = Encoding.UTF8.GetBytes("Hello, World!");
+
+            // First time, should create and cache the value, so the result should be the same instance
+            var result = cache.GetOrCreate(key, options => bytes);
+            Assert.AreEqual(bytes, result);
+
+            // Second time, still the same
+            var secondResult = cache.GetOrCreate(key, options => bytes);
+            Assert.AreEqual(bytes, secondResult);
+
+            // Remove the cache entry
+            cache.Remove(key);
+        }
+
+        [TestMethod]
         public void GetOrCreateTest()
         {
             var cache = CreateDistributedCache();
@@ -53,6 +72,25 @@ namespace Tests.Utils
             // Second time, should get from cache, so the result should not be the same instance
             var secondResult = cache.GetOrCreate(key, options => dic, CommonJsonSerializerContext.Default.DictionaryStringObject);
             Assert.AreNotEqual(dic, secondResult);
+
+            // Remove the cache entry
+            cache.Remove(key);
+        }
+
+        [TestMethod]
+        public async Task GetOrCreateAsyncBytesTest()
+        {
+            var cache = CreateDistributedCache();
+            var key = "test_key";
+            var bytes = Encoding.UTF8.GetBytes("Hello, World!");
+
+            // First time, should create and cache the value, so the result should be the same instance
+            var result = await cache.GetOrCreateAsync(key, async options => bytes, TestContext.CancellationToken);
+            Assert.AreEqual(bytes, result);
+
+            // Second time, still the same
+            var secondResult = await cache.GetOrCreateAsync(key, async options => bytes, TestContext.CancellationToken);
+            Assert.AreEqual(bytes, secondResult);
 
             // Remove the cache entry
             cache.Remove(key);

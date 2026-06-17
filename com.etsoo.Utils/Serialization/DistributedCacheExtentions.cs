@@ -11,6 +11,32 @@ namespace com.etsoo.Utils.Serialization
     public static class DistributedCacheExtentions
     {
         /// <summary>
+        /// Gets the value associated with this key if it exists, or generates a new entry using the provided key and a value from the given factory if the key is not found.
+        /// </summary>
+        /// <param name="cache">The <see cref="IDistributedCache"/> instance this method extends.</param>
+        /// <param name="key">A string identifying the requested value.</param>
+        /// <param name="factory">The factory task that creates the value associated with this key if the key does not exist in the cache.</param>
+        /// <returns>Result</returns>
+        public static byte[]? GetOrCreate(this IDistributedCache cache, string key, Func<DistributedCacheEntryOptions, byte[]?> factory)
+        {
+            var bytes = cache.Get(key);
+            if (bytes != null)
+            {
+                return bytes;
+            }
+
+            var options = new DistributedCacheEntryOptions();
+            bytes = factory(options);
+
+            if (bytes == null)
+                return default;
+
+            cache.Set(key, bytes, options);
+
+            return bytes;
+        }
+
+        /// <summary>
         /// Synchronously gets the value associated with this key if it exists, or generates a new entry using the provided key and a value from the given factory if the key is not found.
         /// </summary>
         /// <typeparam name="T">The type of the object to get.</typeparam>
@@ -38,6 +64,33 @@ namespace com.etsoo.Utils.Serialization
             cache.Set(key, newBytes, options);
 
             return item;
+        }
+
+        /// <summary>
+        /// Asynchronously gets the value associated with this key if it exists, or generates a new entry using the provided key and a value from the given factory if the key is not found.
+        /// </summary>
+        /// <param name="cache">The <see cref="IDistributedCache"/> instance this method extends.</param>
+        /// <param name="key">A string identifying the requested value.</param>
+        /// <param name="factory">The factory task that creates the value associated with this key if the key does not exist in the cache.</param>
+        /// <returns>Result</returns>
+        public static async Task<byte[]?> GetOrCreateAsync(this IDistributedCache cache, string key, Func<DistributedCacheEntryOptions, Task<byte[]?>> factory, CancellationToken cancellationToken = default)
+        {
+            // 避免 await 之后回到原上下文，从而减少线程切换和调度开销
+            var bytes = await cache.GetAsync(key, cancellationToken).ConfigureAwait(false);
+            if (bytes != null)
+            {
+                return bytes;
+            }
+
+            var options = new DistributedCacheEntryOptions();
+            bytes = await factory(options).ConfigureAwait(false);
+            if (bytes == null)
+                return default;
+
+            await cache.SetAsync(key, bytes, options, cancellationToken)
+                .ConfigureAwait(false);
+
+            return bytes;
         }
 
         /// <summary>
