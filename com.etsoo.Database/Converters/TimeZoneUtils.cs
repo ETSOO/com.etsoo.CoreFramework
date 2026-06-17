@@ -1,4 +1,5 @@
-﻿using TimeZoneConverter;
+﻿using com.etsoo.Utils.Serialization.Country;
+using TimeZoneConverter;
 
 namespace com.etsoo.Database.Converters
 {
@@ -8,6 +9,44 @@ namespace com.etsoo.Database.Converters
     /// </summary>
     public static class TimeZoneUtils
     {
+        /// <summary>
+        /// Create a new instance of <see cref="TimeZoneItem"/> from time zone info
+        /// 从时区信息创建一个新的<see cref="TimeZoneItem"/>实例
+        /// </summary>
+        /// <param name="tz">Time zone info</param>
+        /// <returns>Result</returns>
+        public static TimeZoneItem CreateFrom(TimeZoneInfo tz)
+        {
+            var id = tz.Id;
+
+            if (!TZConvert.KnownIanaTimeZoneNames.Contains(id, StringComparer.OrdinalIgnoreCase))
+            {
+                id = TZConvert.WindowsToIana(id) ?? id;
+            }
+
+            return new TimeZoneItem
+            {
+                Id = id,
+                DisplayName = tz.DisplayName,
+                StandardName = tz.StandardName,
+                UtcOffset = tz.BaseUtcOffset
+            };
+        }
+
+        /// <summary>
+        /// Create a new instance of <see cref="TimeZoneItem"/> from time zone id
+        /// 通过时区ID创建一个新的<see cref="TimeZoneItem"/>实例
+        /// </summary>
+        /// <param name="id">Time zone ID</param>
+        /// <returns>Result</returns>
+        public static TimeZoneItem? CreateFrom(string id)
+        {
+            var tz = GetTimeZoneBase(id);
+            if (tz == null) return null;
+
+            return CreateFrom(tz);
+        }
+
         /// <summary>
         /// Get time zone
         /// 获取时区

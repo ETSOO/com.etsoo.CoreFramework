@@ -15,6 +15,14 @@
     }
 
     /// <summary>
+    /// Item with long id and label
+    /// 带长编号和标签的项目
+    /// </summary>
+    public record IdLabelLongItem : IdLabelItem<long>
+    {
+    }
+
+    /// <summary>
     /// Item with id and label
     /// 带编号和标签的项目
     /// </summary>

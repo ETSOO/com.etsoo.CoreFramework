@@ -138,6 +138,20 @@ namespace Tests.Utils
         }
 
         [TestMethod]
+        public void CreateFrom_Test()
+        {
+            // Arrange set culture for test
+            CultureInfo.CurrentCulture = new CultureInfo("zh-CN");
+            CultureInfo.CurrentUICulture = new CultureInfo("zh-CN");
+
+            // Convert
+            var item = TimeZoneUtils.CreateFrom("Tokyo Standard Time");
+            Assert.IsNotNull(item);
+
+            Assert.AreEqual("Asia/Tokyo", item.Id);
+        }
+
+        [TestMethod]
         public void GetTimeZone_Test()
         {
             // Arrange set culture for test

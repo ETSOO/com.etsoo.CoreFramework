@@ -9,14 +9,14 @@
 		<PackageProjectUrl>https://www.etsoo.com/SmartERP/</PackageProjectUrl>
 		<RepositoryType></RepositoryType>
 		<RepositoryUrl>https://github.com/ETSOO/com.etsoo.CoreFramework/tree/master/com.etsoo.HTTP</RepositoryUrl>
-		<Authors>ETSOO SmartERP NextGen Team</Authors>
+		<Authors>ETSOO</Authors>
 		<Company>ETSOO / 亿速思维</Company>
 		<Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Description>ETSOO HTTP Utilities
 亿速思维 HTTP 工具</Description>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		<Version>1.0.90</Version>
+		<Version>1.0.91</Version>
 		<AssemblyVersion>1.0.1.0</AssemblyVersion>
 		<FileVersion>1.0.1.0</FileVersion>
 		<PackageIcon>logo.png</PackageIcon>

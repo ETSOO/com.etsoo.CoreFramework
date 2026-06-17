@@ -1,5 +1,6 @@
 ﻿using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
+using com.etsoo.Utils.Serialization.Country;
 using com.etsoo.Utils.Storage;
 using com.etsoo.Utils.String;
 using System.Text.Json;
@@ -25,6 +26,8 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<GuidItem>))]
     [JsonSerializable(typeof(IEnumerable<IdItem>))]
     [JsonSerializable(typeof(IEnumerable<IdLabelItem>))]
+    [JsonSerializable(typeof(IEnumerable<IdLabelLongItem>))]
+    [JsonSerializable(typeof(IEnumerable<TimeZoneItem>))]
     [JsonSerializable(typeof(IEnumerable<long>))]
     [JsonSerializable(typeof(IEnumerable<ulong>))]
     [JsonSerializable(typeof(IEnumerable<int>))]

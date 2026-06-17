@@ -131,6 +131,50 @@ namespace Tests.CoreFramework
         }
 
         [TestMethod]
+        public void CreateSmartERPAccessToken_Tests()
+        {
+            string smartERP = @"{
+                ""Jwt"": {
+                    ""DefaultIssuer"": ""SmartERP"",
+                    ""Audience"": ""EtsooRereshToken"",
+                    ""EncryptionKey"": ""#G6~iD-o>sb=Kr&U>!gNvbTO8j*Xk4IO"",
+                    ""PrivateKey"": ""MIIEpQIBAAKCAQEA4f7rPmRqDsLc2efxNJA/+jtPC3JcQ/JMeiszovOcni4ndqiOd5XSMKxUPHDgkIXV1GtWqD+1er5hxf9ApJq30rfIuIr5CtkmvppYEsmAI4s9hf7NTmmj6GmIJV4c/tG1NXEF8eFJluxvwfzxPH3AC2KbAEQr1sJkfr/qezyuwzKDgTVhuF2GrYrWk2tIcv7t6Wqkvg7OuhYUYEdDpglhQL1YA98m8HC2bN0aYr1x7LudbSiekzHAZQHMecs+39fH4iQ2JR766qCEP2TlrkHED+DwX4OI+AarEdQL6rzOfkMqxdvZ6F2HSw7ymZAX87VM6YssCtsaOgVomC8QQhEWWQIDAQABAoIBAQC4DMCOzn5lSSNNv4x772J7KuQEAX3MxD6uXBKwic+qLxJqm3lzQKuughoUIyVv7d8oIMaxPTlSHkxIUMnXhD1iudQZHu0VfaYFInPJ0RqvV82iG9IeIwCe3ZtIO25HxIfcXxClXYFuDV4y0Qmx5wOJAiQTwnEldKkdZLTU6qW1Rx1NcpPuTMboa4Hri3ZTb8EHQcRpcytda6Aq/GEL+oXBUIJocvjbUySS4PSOm8OFg2yZAO9sD/um3XFm5Ro8VX7/zf/bgjOTY+gmfQLyAqy/N4ZvVa6knDUJTt7vfJ2UNqH5QB5Rt6jhNeDzhosF+0osCXUN8XpOSLPjtthTnKblAoGBAPdWSIm1m7m9HTFLk9OXBqiiQpLBUdsmnHANsFqTWqj0gWaku75HjjCJ4i1XyrOjr3vwohZ+g1jDg12EokauFHU4bQI5eemG5avqjEtkfO6N2Mm8VEAbyvvtok3VdwI/tIBD1frITvnJNJtjYzmfQuaGkm1UDRrCNYeUkF7byZwfAoGBAOnpSCHqL7IGg43ZjPV7Gv/VzHISuhk1+nT0dPYM56UvTjulBAY4mbHHWGu0Sh6J8EcC/HRhwNHWxuk6CM3TTaaCCOWz3yDa8CZmrHWDiL2c1T+AuMZC+TPWRtYHrA/v7uLqHVtjHuQvJ2ns5JuKtRkw9gZj2kVTDB3UtklTB/6HAoGBAKBO91LyN42qSjqCHr0cfP9ds8KEtDZTjz99T9lU+oTZfOl3SgwpOrqxE7yJ02KdbAbrz1K/CwjEJ+e8KKWg/LeBK/4uHJtEiKXlrqrK5cKEg4c1nnGy0dx5iCHkgm8dtTMRRKZ3n+B8DbHNOCnH1MevX0anHJtEVweaPfyNfd3HAoGAMm6boMRPOEDzSDgpjhvWvGYqSEYFXb4nm+PA+/PYVeMXKQDxFy5I5O2oAMDEYkU3Svg32hfhbNyz0kEy+L2gNlA+/teDOiA6Ou1ULZoId2lDCQgFzqlN9YEzkJ3i2STQCpiTb8q1NFl+U/ZBa8/CMAZAZSxOOTgomp3sF28RgC0CgYEAkELEVa5TvvNMrJTIH/zsZEujgb6ZPehfD8OQf7T6QafetC9RjywbjftTuDDNQTQDjCi8N/UVLU9/Se3PNMRx4aB9JZzPHfXrwt7Bobb5TEuANRcbrc4TkAaTXeCVMcrlVNbHgtrktT2jyTwXceMW08LPvcXQG8313pJEJs17Vxs="",
+                    ""PublicKey"": ""MIIBCgKCAQEA4f7rPmRqDsLc2efxNJA/+jtPC3JcQ/JMeiszovOcni4ndqiOd5XSMKxUPHDgkIXV1GtWqD+1er5hxf9ApJq30rfIuIr5CtkmvppYEsmAI4s9hf7NTmmj6GmIJV4c/tG1NXEF8eFJluxvwfzxPH3AC2KbAEQr1sJkfr/qezyuwzKDgTVhuF2GrYrWk2tIcv7t6Wqkvg7OuhYUYEdDpglhQL1YA98m8HC2bN0aYr1x7LudbSiekzHAZQHMecs+39fH4iQ2JR766qCEP2TlrkHED+DwX4OI+AarEdQL6rzOfkMqxdvZ6F2HSw7ymZAX87VM6YssCtsaOgVomC8QQhEWWQIDAQAB""
+                }
+            }";
+
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(smartERP));
+            var section = new ConfigurationBuilder().AddJsonStream(stream).Build().GetSection("Jwt");
+
+            var service = new JwtService(new ServiceCollection(), section.Get<JwtSettings>(), null);
+
+            // Arrange
+            string[] userScopes = ["core", "crm"];
+            var user = new CurrentUser
+            {
+                Id = "1002",
+                Scopes = userScopes,
+                Name = "Garry Xiao",
+                RoleValue = (int)UserRole.Admin,
+                ClientIp = IPAddress.Parse("127.0.0.1"),
+                Region = "CN",
+                Organization = "1099",
+                OrganizationName = "青岛亿速思维网络科技有限公司",
+                DeviceId = "1",
+                Oid = 1006,
+                Pid = 1017,
+                App = "1",
+                Language = CultureInfo.CurrentCulture
+            };
+
+            // Act
+            var token = service.CreateAccessToken(user, liveMinutes: 600000);
+
+            // Assert
+            Assert.IsNotNull(token);
+        }
+
+        [TestMethod]
         public void CreateIdToken_Tests()
         {
             // Arrange
