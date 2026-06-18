@@ -13,7 +13,7 @@ namespace Tests.MessageQueue
         [TestMethod]
         public async Task ProducerSendAsyncTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test", Exclusive = true, AutoDelete = true });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
             Assert.IsNotNull(messageId);
@@ -22,7 +22,7 @@ namespace Tests.MessageQueue
         [TestMethod]
         public async Task ProducerReceiveAsyncTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test", Exclusive = true, AutoDelete = true });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
 
@@ -33,7 +33,7 @@ namespace Tests.MessageQueue
             };
 
             var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Test" },
+                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Test", Exclusive = true, AutoDelete = true },
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
@@ -49,7 +49,7 @@ namespace Tests.MessageQueue
         [TestMethod]
         public async Task ProducerReceiveWithDLXAsyncTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Test", Exclusive = true, AutoDelete = true });
             var messageId = await producer.SendJsonAsync(new SimpleData { Num = 1, Bool = true }, new MessageProperties { AppId = "SmartERPTest", UserId = "GUID" });
             await producer.DisposeAsync();
 
@@ -68,7 +68,7 @@ namespace Tests.MessageQueue
             };
 
             var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Test" },
+                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Test", Exclusive = true, AutoDelete = true },
                 new[] { new SimpleProcessor(action) },
                 Mock.Of<ILogger>()
                );
@@ -84,7 +84,7 @@ namespace Tests.MessageQueue
         [TestMethod]
         public async Task ProducerReceiveAsyncStringTest()
         {
-            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Hub-Test" });
+            var producer = new LocalRabbitMQProducer(new LocalRabbitMQProducerOptions { QueueName = "Etsoo-Hub-Test", Exclusive = true, AutoDelete = true });
             var messageId = await producer.SendAsync(Encoding.UTF8.GetBytes("Hello"), new MessageProperties { AppId = "SmartERPTest" });
             await producer.DisposeAsync();
 
@@ -97,7 +97,7 @@ namespace Tests.MessageQueue
             };
 
             var consumer = new LocalRabbitMQConsumer(
-                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Hub-Test" },
+                new LocalRabbitMQConsumerOptions { QueueName = "Etsoo-Hub-Test", Exclusive = true, AutoDelete = true },
                 new[] { new StringProcessor(action) },
                 Mock.Of<ILogger>()
                );
