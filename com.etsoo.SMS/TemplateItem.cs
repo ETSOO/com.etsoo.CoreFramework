@@ -34,7 +34,7 @@
         string TemplateId,
         string? EndPoint = null,
         string? Region = null,
-        string? Language = null,
+        string[]? Languages = null,
         string? Signature = null,
         bool Default = false
     );

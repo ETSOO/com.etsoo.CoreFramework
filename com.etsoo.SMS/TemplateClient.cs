@@ -8,7 +8,7 @@ namespace com.etsoo.SMS
     /// </summary>
     public abstract class TemplateClient : HttpClientService, ITemplateClient
     {
-        private readonly List<TemplateItem> allTemplates = new();
+        private readonly List<TemplateItem> allTemplates = [];
 
         /// <summary>
         /// Constructor
@@ -59,7 +59,7 @@ namespace com.etsoo.SMS
             if (string.IsNullOrEmpty(region) && string.IsNullOrEmpty(language))
             {
                 // Return first default item
-                return allTemplates.FirstOrDefault(t => t.Kind == kind && t.Default && t.Region == null && t.Language == null);
+                return allTemplates.FirstOrDefault(t => t.Kind == kind && t.Default && t.Region == null && t.Languages == null);
             }
 
             var subTemplates = allTemplates.Where(t => t.Kind == kind);
@@ -73,7 +73,7 @@ namespace com.etsoo.SMS
             if (!string.IsNullOrEmpty(language))
             {
                 // All languages or the specific language
-                subTemplates = subTemplates.Where(r => r.Language == null || r.Language == language).OrderByDescending(r => r.Language == language).ThenByDescending(r => r.Default);
+                subTemplates = subTemplates.Where(r => r.Languages == null || r.Languages.Contains(language)).OrderByDescending(r => r.Languages?.Contains(language)).ThenByDescending(r => r.Default);
             }
 
             return subTemplates.FirstOrDefault();
