@@ -75,7 +75,6 @@ namespace com.etsoo.Utils
             return claims.FirstOrDefault(c => c.Type.Equals(type, comparisonType))?.Value;
         }
 
-        private static readonly DateTime JsBaseDateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         private static readonly RecyclableMemoryStreamManager manager = new();
         private const int defaultBufferSize = 1024;
 
@@ -627,6 +626,7 @@ namespace com.etsoo.Utils
         /// </summary>
         /// <param name="input">Input datetime</param>
         /// <returns>Utc datetime</returns>
+        [return: NotNullIfNotNull(nameof(input))]
         public static DateTime? SetUtcKind(DateTime? input)
         {
             if (input == null)
@@ -715,7 +715,7 @@ namespace com.etsoo.Utils
         /// <returns>DateTime UTC</returns>
         public static DateTime JsMilisecondsToUTC(long miliseconds)
         {
-            return JsBaseDateTime.AddMilliseconds(miliseconds);
+            return DateTimeOffset.FromUnixTimeMilliseconds(miliseconds).UtcDateTime;
         }
 
         /// <summary>
@@ -737,7 +737,7 @@ namespace com.etsoo.Utils
         /// <returns>UTC datetime</returns>
         public static DateTime UnixSecondsToUTC(long seconds)
         {
-            return JsBaseDateTime.AddSeconds(seconds);
+            return DateTimeOffset.FromUnixTimeSeconds(seconds).UtcDateTime;
         }
 
         /// <summary>
@@ -748,7 +748,14 @@ namespace com.etsoo.Utils
         /// <returns>Miliseconds</returns>
         public static long UTCToJsMiliseconds(DateTime? dt = null)
         {
-            return (long)(SetUtcKind(dt).GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalMilliseconds;
+            if (dt == null)
+            {
+                return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            }
+            else
+            {
+                return new DateTimeOffset(SetUtcKind(dt.Value)).ToUnixTimeMilliseconds();
+            }
         }
 
         /// <summary>
@@ -759,7 +766,14 @@ namespace com.etsoo.Utils
         /// <returns>Seconds</returns>
         public static long UTCToUnixSeconds(DateTime? dt = null)
         {
-            return (long)(SetUtcKind(dt).GetValueOrDefault(DateTime.UtcNow) - JsBaseDateTime).TotalSeconds;
+            if (dt == null)
+            {
+                return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            }
+            else
+            {
+                return new DateTimeOffset(SetUtcKind(dt.Value)).ToUnixTimeSeconds();
+            }
         }
     }
 }

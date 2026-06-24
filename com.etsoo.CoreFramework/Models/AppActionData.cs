@@ -5,8 +5,8 @@ using System.Text.Json.Serialization;
 namespace com.etsoo.CoreFramework.Models
 {
     /// <summary>
-    /// Application action data
-    /// 程序动作数据
+    /// Application action data, implement your own logic to handle the expiry like 'TotalMinutes() > 30'
+    /// 程序动作数据，实现您自己的逻辑来处理过期，例如 'TotalMinutes() > 30'
     /// </summary>
     public record AppActionData : SignModel
     {

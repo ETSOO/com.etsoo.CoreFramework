@@ -16,9 +16,10 @@ namespace Tests.Utils
                     tcs.TrySetResult(key);
                     return Task.CompletedTask;
                 },
+                TimeSpan.FromMilliseconds(100),
                 scanInterval: 50);
 
-            debouncer.Debounce("A", TimeSpan.FromMilliseconds(100));
+            debouncer.Debounce("A");
 
             var completed = await Task.WhenAny(
                 tcs.Task,
