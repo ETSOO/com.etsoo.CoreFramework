@@ -38,6 +38,95 @@ namespace com.etsoo.Utils.String
         }
 
         /// <summary>
+        /// Convert amount to Chinese number
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns>Result</returns>
+        public static string ConvertToChineseNumber(decimal amount)
+        {
+            return ConvertToChineseNumber(Convert.ToInt64(amount * 1000));
+        }
+
+        private static string RemoveTrailingZero(string text)
+        {
+            return text.TrimEnd('零');
+        }
+
+        /// <summary>
+        /// Convert value to Chinese number
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <returns>Result</returns>
+        public static string ConvertToChineseNumber(long value)
+        {
+            if (value == 0)
+                return "零";
+
+            var result = new StringBuilder();
+
+            if (value < 0)
+            {
+                result.Append('负');
+                value = -value;
+            }
+
+            const string digits = "零壹贰叁肆伍陆柒捌玖";
+            const string units = "厘分角元拾佰仟万拾佰仟亿拾佰仟万";
+
+            string number = value.ToString();
+
+            for (int i = 0; i < number.Length; i++)
+            {
+                int digit = number[i] - '0';
+                var digitText = digits[digit];
+                var unit = units[number.Length - i - 1];
+
+                if (digit != 0)
+                {
+                    result.Append(digitText);
+                    result.Append(unit);
+                    continue;
+                }
+
+                string current = result.ToString();
+
+                if (unit is '亿' or '万' or '元' or '零')
+                {
+                    current = RemoveTrailingZero(current);
+                    result.Clear();
+                    result.Append(current);
+                }
+
+                if (unit == '亿' || (unit == '万' && !current.EndsWith('亿')) || unit == '元')
+                {
+                    result.Append(unit);
+                    continue;
+                }
+
+                bool endsWithYi = current.EndsWith('亿');
+                bool endsWithZero = current.EndsWith('零');
+
+                bool previousIsZero =
+                    current.Length >= 2 &&
+                    current[^2] == '零';
+
+                if (!endsWithZero && (previousIsZero || !endsWithYi))
+                {
+                    result.Append('零');
+                }
+            }
+
+            string output = RemoveTrailingZero(result.ToString());
+
+            if (output.EndsWith('元'))
+            {
+                output += "整";
+            }
+
+            return output;
+        }
+
+        /// <summary>
         /// Format file size
         /// 格式化文件大小
         /// </summary>

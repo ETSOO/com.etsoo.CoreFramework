@@ -56,6 +56,24 @@ namespace Tests.Utils
             Assert.AreEqual(expectedResult, result);
         }
 
+        private static IEnumerable<object[]> ConvertToChineseNumberTestData
+        {
+            get
+            {
+                yield return new object[] { 0M, "零" };
+                yield return new object[] { 100012M, "壹拾万零壹拾贰元整" };
+                yield return new object[] { -10022.25M, "负壹万零贰拾贰元贰角伍分" };
+            }
+        }
+
+        [TestMethod]
+        [DynamicData(nameof(ConvertToChineseNumberTestData))]
+        public void ConvertToChineseNumber_Test(decimal input, string expected)
+        {
+            var result = StringUtils.ConvertToChineseNumber(input);
+            Assert.AreEqual(expected, result);
+        }
+
         private static IEnumerable<object[]> FormatFileSizeTestData
         {
             get
