@@ -14,7 +14,14 @@
         /// <summary>
         /// Label
         /// </summary>
-        public string? Label { get; init; }
+        public string? Label
+        {
+            get
+            {
+                return field ?? Title ?? Name;
+            }
+            set;
+        }
 
         /// <summary>
         /// Name

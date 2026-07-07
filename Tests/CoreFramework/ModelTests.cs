@@ -59,6 +59,31 @@ namespace Tests.CoreFramework
         }
 
         [TestMethod]
+        public void ListType2Test()
+        {
+            var listType2 = new ListType2
+            {
+                Id = 1,
+                Name = "Name",
+                Title = "Title"
+            };
+            Assert.AreEqual(listType2.Title, listType2.Label);
+
+            listType2 = new ListType2
+            {
+                Id = 1,
+                Label = "Label"
+            };
+            Assert.AreEqual("Label", listType2.Label);
+
+            listType2 = new ListType2
+            {
+                Id = 1
+            };
+            Assert.IsNull(listType2.Label);
+        }
+
+        [TestMethod]
         public void LoginIdRQTest()
         {
             var loginIdRQ = new LoginIdRQ
