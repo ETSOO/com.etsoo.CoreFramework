@@ -5,6 +5,7 @@ namespace com.etsoo.CoreFramework.Json
     /// <summary>
     /// Custom field schema
     /// @see @etsoo/appscript 'CustomFieldData' for more details
+    /// @see com.etsoo.CoreFramework.Models.CustomFieldData
     /// 自定义字段模式
     /// </summary>
     public static class CustomFieldSchema
