@@ -36,6 +36,12 @@ namespace com.etsoo.CoreFramework.Models
         public required string Name { get; init; }
 
         /// <summary>
+        /// Label
+        /// 标签
+        /// </summary>
+        public string? Label { get; init; }
+
+        /// <summary>
         /// Value
         /// 值
         /// </summary>
