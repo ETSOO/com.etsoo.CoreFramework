@@ -1,6 +1,5 @@
 ﻿using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Models;
-using com.etsoo.Utils.Serialization.Country;
 using com.etsoo.Utils.Storage;
 using com.etsoo.Utils.String;
 using System.Text.Json;
@@ -27,7 +26,6 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<IdItem>))]
     [JsonSerializable(typeof(IEnumerable<IdLabelItem>))]
     [JsonSerializable(typeof(IEnumerable<IdLabelLongItem>))]
-    [JsonSerializable(typeof(IEnumerable<TimeZoneItem>))]
     [JsonSerializable(typeof(IEnumerable<long>))]
     [JsonSerializable(typeof(IEnumerable<ulong>))]
     [JsonSerializable(typeof(IEnumerable<int>))]
@@ -40,6 +38,8 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<double>))]
     [JsonSerializable(typeof(IEnumerable<decimal>))]
     [JsonSerializable(typeof(IEnumerable<float>))]
+    [JsonSerializable(typeof(IEnumerable<DateOnly>))]
+    [JsonSerializable(typeof(IEnumerable<TimeOnly>))]
     [JsonSerializable(typeof(IActionResult))]
     [JsonSerializable(typeof(ActionResultAbstract))]
     [JsonSerializable(typeof(JsonElement))]
@@ -54,6 +54,7 @@ namespace com.etsoo.Utils.Serialization
     [JsonSerializable(typeof(IEnumerable<Country.CurrencyData>))]
     [JsonSerializable(typeof(IEnumerable<Country.CurrencyItem>))]
     [JsonSerializable(typeof(IEnumerable<Country.RegionItem>))]
+    [JsonSerializable(typeof(IEnumerable<Country.TimeZoneItem>))]
 
     public partial class CommonJsonSerializerContext : JsonSerializerContext
     {
