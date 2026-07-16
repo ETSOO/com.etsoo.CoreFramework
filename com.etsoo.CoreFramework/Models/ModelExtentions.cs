@@ -1,5 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Business;
 using com.etsoo.Database;
+using com.etsoo.Utils.Models;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 

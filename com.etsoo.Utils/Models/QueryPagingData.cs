@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace com.etsoo.Database
+namespace com.etsoo.Utils.Models
 {
     /// <summary>
     /// Query paging order
@@ -30,7 +30,7 @@ namespace com.etsoo.Database
     /// https://learn.microsoft.com/en-us/ef/core/querying/pagination
     /// 查询分页数据，偏移分页与键集分页
     /// </summary>
-    public partial record QueryPagingData
+    public record QueryPagingData
     {
         /// <summary>
         /// Current page

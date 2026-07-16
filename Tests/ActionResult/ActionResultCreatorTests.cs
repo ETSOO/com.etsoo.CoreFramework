@@ -15,7 +15,7 @@ namespace Tests.ActionResult
         {
             // Arrange
             // Create the dabase
-            db = new SqlServerDatabase("Server=(local);User ID=smarterp;Password=smarterp;Enlist=false;TrustServerCertificate=true");
+            db = new SqlServerDatabase("Server=localhost,1433;User ID=sa;Password=Etsoo@2026;Enlist=false;TrustServerCertificate=true");
         }
 
         /// <summary>

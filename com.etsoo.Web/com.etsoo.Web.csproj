@@ -7,7 +7,7 @@
     <Authors>ETSOO</Authors>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Company>ETSOO / 亿速思维</Company>
-    <Version>1.3.95</Version>
+    <Version>1.3.96</Version>
     <Description>ETSOO Shared Web Components
 亿速思维共享 Web 组件</Description>
     <Copyright>Copyright © ETSOO 2004 - 2026</Copyright>
@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.etsoo.ApiModel" Version="1.0.82" />
-    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.14" />
+    <PackageReference Include="com.etsoo.ApiModel" Version="1.0.83" />
+    <PackageReference Include="com.etsoo.UserAgentParser" Version="1.0.15" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
   </ItemGroup>
 

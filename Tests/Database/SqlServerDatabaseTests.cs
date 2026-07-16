@@ -14,7 +14,45 @@ namespace Tests.Database
         {
             // Arrange
             // Create the dabase
-            db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
+            db = new SqlServerDatabase("Server=localhost,1433;User ID=sa;Password=Etsoo@2026;Database=tempdb;Enlist=false;TrustServerCertificate=true");
+
+            using var conn = db.NewConnection();
+            conn.Execute("""
+                IF OBJECT_ID('dbo.[User]', 'U') IS NULL
+                BEGIN
+                    CREATE TABLE dbo.[User]
+                    (
+                        Id INT PRIMARY KEY,
+                        Name NVARCHAR(128) NOT NULL
+                    );
+                END
+
+                IF NOT EXISTS (SELECT * FROM [User] WHERE Id = 1001)
+                BEGIN
+                    INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1')
+                END
+
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_return'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_return
+                            @Value SMALLINT,
+                            @OutputValue INT OUTPUT
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+
+                            SET @OutputValue = @Value * 2;
+                            RETURN @Value;
+                        END
+                    ');
+                END
+                """, commandType: CommandType.Text);
         }
 
         /// <summary>

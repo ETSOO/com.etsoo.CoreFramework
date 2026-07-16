@@ -291,6 +291,7 @@ namespace com.etsoo.SourceGenerators
             // Source code
             var source = $@"#nullable enable
                 using com.etsoo.Database;
+                using com.etsoo.Utils.Models;
                 using System;
                 using System.Data;
                 using System.Text;

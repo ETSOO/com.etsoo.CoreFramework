@@ -1,4 +1,6 @@
-﻿namespace com.etsoo.Database
+﻿using com.etsoo.Utils.Models;
+
+namespace com.etsoo.Database
 {
     /// <summary>
     /// SQL select interface

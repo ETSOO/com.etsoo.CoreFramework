@@ -199,7 +199,7 @@ namespace com.etsoo.SourceGenerators
                             valuePart = $"SqlServerUtils.DictionaryToRecords({fieldName}, {keyDbType}, {itemDbType}).AsTableValuedParameter(\"{typeName}\")";
                         }
                     }
-                    else if (typeSymbol is INamedTypeSymbol nSymbol && nSymbol.GetFullName() == "com.etsoo.Database.QueryPagingData")
+                    else if (typeSymbol is INamedTypeSymbol nSymbol && nSymbol.GetFullName() == "com.etsoo.Utils.Models.QueryPagingData")
                     {
                         // Query paging data
                         var qmembers = nSymbol.ParseMembers(true, new List<string>(), out _);

@@ -79,9 +79,11 @@ namespace com.etsoo.CoreFramework.Models
     /// 查询请求数据
     /// </summary>
     /// <typeparam name="T">Generic id type</typeparam>
-    public record QueryRQ<T> : QueryRQBase, IQueryRQ where T : struct
+    public record QueryRQ<T> : QueryRQBase, IQueryRQ, IQueryRQBase<T> where T : struct
     {
         object? IQueryRQ.Id => Id;
+
+        T IQueryRQBase<T>.Id { get => throw new NotImplementedException(); set => Id = value; }
 
         /// <summary>
         /// Id
@@ -100,7 +102,7 @@ namespace com.etsoo.CoreFramework.Models
         /// 排除的编号
         /// </summary>
         public virtual IEnumerable<T>? ExcludedIds { get; set; }
-
+        
         /// <summary>
         /// Validate the model
         /// 验证模块
@@ -126,7 +128,7 @@ namespace com.etsoo.CoreFramework.Models
     /// Search request data with string id
     /// 查询请求数据
     /// </summary>
-    public record QueryRQ : QueryRQBase, IQueryRQ
+    public record QueryRQ : QueryRQBase, IQueryRQ, IQueryRQBase<string>
     {
         object? IQueryRQ.Id => Id;
 

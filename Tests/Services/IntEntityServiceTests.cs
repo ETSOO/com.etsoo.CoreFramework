@@ -4,6 +4,7 @@ using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
 using com.etsoo.Utils;
+using com.etsoo.Utils.Models;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -67,7 +68,7 @@ namespace Tests.Services
 
         public IntEntityServiceTests()
         {
-            var db = new SqlServerDatabase("Server=(local);User ID=test;Password=test;Enlist=false;TrustServerCertificate=true");
+            var db = new SqlServerDatabase("Server=localhost,1433;User ID=sa;Password=Etsoo@2026;Database=tempdb;Enlist=false;TrustServerCertificate=true");
 
             var config = new AppConfiguration { Name = "test", PrivateKey = "@s$a!" };
             app = new CoreApplication<AppConfiguration, SqlConnection>(config, db);
@@ -75,7 +76,180 @@ namespace Tests.Services
             service = new IntEntityService(app, "user", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
 
             using var conn = db.NewConnection();
-            conn.Execute("IF NOT EXISTS (SELECT * FROM [User] WHERE Id = 1001) BEGIN INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1') END", commandType: CommandType.Text);
+            conn.Execute("""
+                IF OBJECT_ID('dbo.[User]', 'U') IS NULL
+                BEGIN
+                    CREATE TABLE dbo.[User]
+                    (
+                        Id INT PRIMARY KEY,
+                        Name NVARCHAR(128) NOT NULL,
+                        Status TINYINT NOT NULL DEFAULT 0
+                    );
+                END
+
+                IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name ='et_int_ids')
+                BEGIN
+                    CREATE TYPE [dbo].[et_int_ids] AS TABLE (
+                    [Id] INT NOT NULL,
+                    PRIMARY KEY CLUSTERED ([Id] ASC));
+                END
+
+                IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name ='et_int_smallint_items')
+                BEGIN
+                    CREATE TYPE [dbo].[et_int_smallint_items] AS TABLE(
+                	    [Key] INT NOT NULL,
+                	    [Item] SMALLINT NOT NULL,
+                	    PRIMARY KEY CLUSTERED ([Key] ASC)
+                    )
+                END
+
+                IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name ='et_nvarchar_ids')
+                BEGIN
+                    CREATE TYPE [dbo].[et_nvarchar_ids] AS TABLE (
+                    [Id] NVARCHAR (50) NOT NULL,
+                    PRIMARY KEY CLUSTERED ([Id] ASC));
+                END
+
+                IF NOT EXISTS (SELECT * FROM [User] WHERE Id = 1001)
+                BEGIN
+                    INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1')
+                END
+
+                -- EXEC('DROP PROCEDURE ep_user_create');
+
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_create'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_create
+                            @Id INT,
+                            @Name VARCHAR(128)
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+
+                            IF EXISTS (
+                                SELECT 1
+                                FROM dbo.[User]
+                                WHERE Id = @Id
+                            )
+                            BEGIN
+                                SELECT 0 AS ok, ''id_have'' AS [type], ''id'' AS [field];
+                                RETURN;
+                            END
+
+                            INSERT INTO dbo.[User] (Id, Name)
+                            VALUES (@Id, @Name);
+
+                            -- 返回操作结果
+                            SELECT 1 AS ok, @Id AS id;
+                        END
+                    ');
+                END
+
+                -- EXEC('DROP PROCEDURE ep_user_delete');
+
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_delete'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_delete
+                            @Ids AS et_int_ids READONLY
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+
+                            DELETE FROM dbo.[User]
+                            WHERE Id IN (SELECT Id FROM @Ids);
+                
+                            -- 返回操作结果
+                            SELECT 1 AS ok;
+                        END
+                    ');
+                END
+
+                -- EXEC('DROP PROCEDURE ep_user_sort');
+
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_sort'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_sort
+                            @Category INT = NULL,
+                            @Items AS et_int_smallint_items READONLY
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+                
+                            -- 返回操作结果
+                            SELECT 1 AS ok;
+                        END
+                    ');
+                END
+
+                -- EXEC('DROP PROCEDURE ep_user_list_as_json');
+                
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_list_as_json'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_list_as_json
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+               
+                            SELECT
+                                Id,
+                                Name,
+                                Status
+                            FROM dbo.[User]
+                            FOR JSON PATH;
+                        END
+                    ');
+                END
+
+                -- EXEC('DROP PROCEDURE ep_user_read_for_default');
+                
+                IF NOT EXISTS (
+                    SELECT *
+                    FROM sys.objects
+                    WHERE type = 'P'
+                      AND name = 'ep_user_read_for_default'
+                )
+                BEGIN
+                    EXEC('
+                        CREATE PROCEDURE ep_user_read_for_default
+                            @Id INT
+                        AS
+                        BEGIN
+                            SET NOCOUNT ON;
+                
+                            SELECT
+                                Id,
+                                Name,
+                                Status
+                            FROM dbo.[User]
+                            WHERE Id = @Id;
+                        END
+                    ');
+                END
+                """, commandType: CommandType.Text);
         }
 
         [TestInitialize]
@@ -232,9 +406,9 @@ namespace Tests.Services
             };
 
             var parameters = service.QueryStudentParameters(student);
-            Assert.IsTrue(parameters.ParameterNames.Contains("Name"));
-            Assert.IsTrue(parameters.ParameterNames.Contains("BatchSize"));
-            Assert.IsTrue(parameters.ParameterNames.Contains("CurrentPage"));
+            Assert.Contains("Name", parameters.ParameterNames);
+            Assert.Contains("BatchSize", parameters.ParameterNames);
+            Assert.Contains("CurrentPage", parameters.ParameterNames);
         }
 
         [TestMethod]
