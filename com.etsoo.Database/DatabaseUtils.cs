@@ -16,18 +16,6 @@ namespace com.etsoo.Database
     public static partial class DatabaseUtils
     {
         /// <summary>
-        /// Is the order by fields valid
-        /// 排序字段是否有效
-        /// </summary>
-        /// <param name="data">Pagination data</param>
-        /// <returns>Result</returns>
-        public static bool IsOrderByValid(this QueryPagingData? data)
-        {
-            if (data == null || data.OrderBy == null) return true;
-            return !data.OrderBy.Any(o => !IsValidField(o.Field));
-        }
-
-        /// <summary>
         /// Get order command
         /// 获取排序命令
         /// </summary>
@@ -39,7 +27,7 @@ namespace com.etsoo.Database
             var orderBy = data?.OrderBy;
             if (orderBy?.Any() is null or false) return null;
 
-            var result = string.Join(", ", orderBy.Select(o => IsValidField(o.Field) ? $"{(db == null ? o.Field : db.EscapePart(o.Field))} {(o.Desc ? "DESC" : "ASC")}" : null).Where(o => o != null));
+            var result = string.Join(", ", orderBy.Select(o => Extensions.IsValidField(o.Field) ? $"{(db == null ? o.Field : db.EscapePart(o.Field))} {(o.Desc ? "DESC" : "ASC")}" : null).Where(o => o != null));
 
             return $"ORDER BY {result}";
         }
@@ -107,17 +95,6 @@ namespace com.etsoo.Database
         public static bool IsAnsi(this string input)
         {
             return !input.Any(c => c > 127);
-        }
-
-        /// <summary>
-        /// Is the field valid
-        /// 字段是否有效
-        /// </summary>
-        /// <param name="field">Field</param>
-        /// <returns>Result</returns>
-        public static bool IsValidField(string field)
-        {
-            return OrderFieldRegex().IsMatch(field);
         }
 
         /// <summary>
@@ -455,8 +432,5 @@ namespace com.etsoo.Database
 
         [GeneratedRegex("(^|\\s+)(exec|execute|select|insert|update|delete|union|join|create|alter|drop|rename|truncate|backup|restore)\\s", RegexOptions.IgnoreCase)]
         private static partial Regex MyRegex1();
-
-        [GeneratedRegex("^[0-9a-zA-Z_\\.]+$")]
-        private static partial Regex OrderFieldRegex();
     }
 }

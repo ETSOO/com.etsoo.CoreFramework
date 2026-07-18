@@ -32,9 +32,9 @@ namespace com.etsoo.CoreFramework.Models
             Expression<Func<TSource, EntityStatus>>? statusSelector = null,
             Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null) where TKey : struct
         {
-            if (rq.Id.HasValue)
+            if (rq.Id is { } id)
             {
-                source = source.QueryEtsooEqual(rq.Id.Value, idSelector.Body, idSelector.Parameters[0]);
+                source = source.QueryEtsooEqual(id, idSelector.Body, idSelector.Parameters[0]);
             }
 
             if (rq.Ids?.Count() > 0)

@@ -1,11 +1,36 @@
-﻿namespace com.etsoo.Utils.Models
+﻿using System.Text.RegularExpressions;
+
+namespace com.etsoo.Utils.Models
 {
     /// <summary>
     /// Extensions
     /// 扩展
     /// </summary>
-    public static class Extensions
+    public static partial class Extensions
     {
+        /// <summary>
+        /// Is the order by fields valid
+        /// 排序字段是否有效
+        /// </summary>
+        /// <param name="data">Pagination data</param>
+        /// <returns>Result</returns>
+        public static bool IsOrderByValid(this QueryPagingData? data)
+        {
+            if (data == null || data.OrderBy == null) return true;
+            return !data.OrderBy.Any(o => !IsValidField(o.Field));
+        }
+
+        /// <summary>
+        /// Is the field valid
+        /// 字段是否有效
+        /// </summary>
+        /// <param name="field">Field</param>
+        /// <returns>Result</returns>
+        public static bool IsValidField(string field)
+        {
+            return OrderFieldRegex().IsMatch(field);
+        }
+
         /// <summary>
         /// Get all none null items
         /// 获取所有非空项目
@@ -23,5 +48,8 @@
                 }
             }
         }
+
+        [GeneratedRegex("^[0-9a-zA-Z_\\.]+$")]
+        private static partial Regex OrderFieldRegex();
     }
 }

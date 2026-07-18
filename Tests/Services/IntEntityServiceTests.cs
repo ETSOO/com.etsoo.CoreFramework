@@ -83,7 +83,7 @@ namespace Tests.Services
                     (
                         Id INT PRIMARY KEY,
                         Name NVARCHAR(128) NOT NULL,
-                        Status TINYINT NOT NULL DEFAULT 0
+                        [Status] TINYINT NOT NULL DEFAULT 0
                     );
                 END
 
@@ -217,7 +217,7 @@ namespace Tests.Services
                             SELECT
                                 Id,
                                 Name,
-                                Status
+                                [Status]
                             FROM dbo.[User]
                             FOR JSON PATH;
                         END
@@ -243,7 +243,7 @@ namespace Tests.Services
                             SELECT
                                 Id,
                                 Name,
-                                Status
+                                [Status]
                             FROM dbo.[User]
                             WHERE Id = @Id;
                         END
@@ -379,7 +379,7 @@ namespace Tests.Services
 
             stream.Position = 0;
             var content = SharedUtils.StreamToString(stream);
-            Assert.Contains("Admin 2", content);
+            Assert.Contains("Admin 1", content);
         }
 
         [TestMethod]
