@@ -32,9 +32,43 @@ namespace com.etsoo.CoreFramework.Models
             Expression<Func<TSource, EntityStatus>>? statusSelector = null,
             Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null) where TKey : struct
         {
-            if (rq.Id is { } id)
+            return source.QueryEtsooBase(rq, idSelector, (source) =>
             {
-                source = source.QueryEtsooEqual(id, idSelector.Body, idSelector.Parameters[0]);
+                if (statusSelector != null)
+                {
+                    source = source.QueryEtsooStatus(rq, statusSelector);
+                }
+
+                if (otherFilters != null)
+                {
+                    source = otherFilters(source);
+                }
+
+                return source;
+            });
+        }
+
+        /// <summary>
+        /// Etsoo query base
+        /// 亿速思维查询基础
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <typeparam name="TKey">Generic key type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="rq">Query request data</param>
+        /// <param name="idSelector">Id field selector</param>
+        /// <param name="otherFilters">Other filters</param>
+        /// <returns>Result</returns>
+        [RequiresDynamicCode("Expression requires dynamic code")]
+        [RequiresUnreferencedCode("Expression requires unreferenced code")]
+        public static IQueryable<TSource> QueryEtsooBase<TSource, TKey>(
+            this IQueryable<TSource> source, QueryRQBase<TKey> rq,
+            Expression<Func<TSource, TKey>> idSelector,
+            Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null) where TKey : struct
+        {
+            if (rq.Id.HasValue)
+            {
+                source = source.QueryEtsooEqual(rq.Id.Value, idSelector.Body, idSelector.Parameters[0]);
             }
 
             if (rq.Ids?.Count() > 0)
@@ -45,11 +79,6 @@ namespace com.etsoo.CoreFramework.Models
             if (rq.ExcludedIds?.Count() > 0)
             {
                 source = source.QueryEtsooContains(rq.ExcludedIds, idSelector, true);
-            }
-
-            if (statusSelector != null)
-            {
-                source = source.QueryEtsooStatus(rq, statusSelector);
             }
 
             if (otherFilters != null)
@@ -109,6 +138,40 @@ namespace com.etsoo.CoreFramework.Models
             Expression<Func<TSource, EntityStatus>>? statusSelector = null,
             Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null)
         {
+            return source.QueryEtsooBase(rq, idSelector, (source) =>
+            {
+                if (statusSelector != null)
+                {
+                    source = source.QueryEtsooStatus(rq, statusSelector);
+                }
+
+                if (otherFilters != null)
+                {
+                    source = otherFilters(source);
+                }
+
+                return source;
+            });
+        }
+
+        /// <summary>
+        /// Etsoo query base
+        /// 亿速思维查询基础
+        /// </summary>
+        /// <typeparam name="TSource">Generic source type</typeparam>
+        /// <param name="source">Source</param>
+        /// <param name="rq">Query request data</param>
+        /// <param name="idSelector">Id field selector</param>
+        /// <param name="otherFilters">Other filters</param>
+        /// <returns>Result</returns>
+        [RequiresDynamicCode("Expression requires dynamic code")]
+        [RequiresUnreferencedCode("Expression requires unreferenced code")]
+        public static IQueryable<TSource> QueryEtsooBase<TSource>(
+            this IQueryable<TSource> source,
+            QueryRQBase rq,
+            Expression<Func<TSource, string>> idSelector,
+            Func<IQueryable<TSource>, IQueryable<TSource>>? otherFilters = null)
+        {
             if (!string.IsNullOrEmpty(rq.Id))
             {
                 source = source.QueryEtsooEqual(rq.Id, idSelector.Body, idSelector.Parameters[0]);
@@ -122,11 +185,6 @@ namespace com.etsoo.CoreFramework.Models
             if (rq.ExcludedIds?.Count() > 0)
             {
                 source = source.QueryEtsooContains(rq.ExcludedIds, idSelector, true);
-            }
-
-            if (statusSelector != null)
-            {
-                source = source.QueryEtsooStatus(rq, statusSelector);
             }
 
             if (otherFilters != null)

@@ -105,6 +105,8 @@ namespace com.etsoo.Utils.Models
     /// <typeparam name="T">Generic id type</typeparam>
     public abstract record QueryRQBase<T> : QueryRQBaseCommon where T : struct
     {
+        protected override object? GetId() => Id;
+
         /// <summary>
         /// Id
         /// 编号
@@ -131,6 +133,8 @@ namespace com.etsoo.Utils.Models
     /// <typeparam name="T">Generic id type</typeparam>
     public abstract record QueryRQBase : QueryRQBaseCommon
     {
+        protected override object? GetId() => Id;
+
         /// <summary>
         /// Id
         /// 编号
