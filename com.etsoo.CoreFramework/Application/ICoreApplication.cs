@@ -9,7 +9,7 @@ namespace com.etsoo.CoreFramework.Application
     /// </summary>
     /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic database connection type</typeparam>
-    public interface ICoreApplication<S, C> : ICoreApplicationBase
+    public interface ICoreApplication<out S, out C> : ICoreApplicationBase
         where S : AppConfiguration
         where C : DbConnection
     {
