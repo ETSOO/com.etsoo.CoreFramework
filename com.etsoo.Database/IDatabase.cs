@@ -370,7 +370,7 @@ namespace com.etsoo.Database
     /// 通用数据库接口
     /// </summary>
     /// <typeparam name="C">Generic connection type</typeparam>
-    public interface IDatabase<C> : IDatabase where C : DbConnection
+    public interface IDatabase<out C> : IDatabase where C : DbConnection
     {
         /// <summary>
         /// New database connection

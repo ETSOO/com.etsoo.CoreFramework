@@ -19,7 +19,7 @@ namespace Tests.Services
     /// <summary>
     /// Int id entity service
     /// </summary>
-    internal class IntEntityService : EntityServiceBase<AppConfiguration, SqlConnection, ICoreApplication<AppConfiguration, SqlConnection>, ICurrentUser, int>
+    internal class IntEntityService : EntityServiceBase<ICoreApplication<AppConfiguration, SqlConnection>, ICurrentUser, int>
     {
         public IntEntityService(ICoreApplication<AppConfiguration, SqlConnection> app, string flag, ILogger logger) : base(app, null!, flag, logger)
         {

@@ -7,7 +7,6 @@ using com.etsoo.Utils.Actions;
 using com.etsoo.Utils.Crypto;
 using com.etsoo.Utils.String;
 using Microsoft.Extensions.Logging;
-using System.Data.Common;
 using System.Text;
 
 namespace com.etsoo.CoreFramework.Services
@@ -17,14 +16,10 @@ namespace com.etsoo.CoreFramework.Services
     /// User is not null (default) when setting the userRequired = true
     /// 业务逻辑的基础服务
     /// </summary>
-    /// <typeparam name="S">Generic configuration type</typeparam>
-    /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="A">Generic application type</typeparam>
     /// <typeparam name="U">Generic current user type</typeparam>
-    public abstract partial class ServiceBase<S, C, A, U> : IServiceBase
-        where S : AppConfiguration
-        where C : DbConnection
-        where A : ICoreApplication<S, C>
+    public abstract partial class ServiceBase<A, U> : IServiceBase
+        where A : ICoreApplicationBase
         where U : IUserToken
     {
         private static readonly char[] separators = [' ', '_'];

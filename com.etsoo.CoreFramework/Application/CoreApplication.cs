@@ -62,7 +62,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <summary>
         /// ICoreApplicationBase.DB implementation
         /// </summary>
-        IDatabase ICoreApplicationBase.DB => DB;
+        IDatabase<DbConnection> ICoreApplicationBase.DB => DB;
 
         /// <summary>
         /// Model DataAnnotations are validated, true under Web API to avoid double validation

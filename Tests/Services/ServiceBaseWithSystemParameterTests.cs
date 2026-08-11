@@ -15,7 +15,7 @@ using System.Text;
 
 namespace Tests.Services
 {
-    internal class ServiceWithParameterTest : ServiceBase<AppConfiguration, SqliteConnection, ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
+    internal class ServiceWithParameterTest : ServiceBase<ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
     {
         public ServiceWithParameterTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger)
             : base(app, new CurrentUser

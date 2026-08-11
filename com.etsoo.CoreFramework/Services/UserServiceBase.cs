@@ -1,7 +1,6 @@
 ﻿using com.etsoo.CoreFramework.Application;
 using com.etsoo.CoreFramework.User;
 using Microsoft.Extensions.Logging;
-using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -9,8 +8,6 @@ namespace com.etsoo.CoreFramework.Services
     /// User authorized service base for business logic
     /// 已授权用户业务逻辑服务基类
     /// </summary>
-    /// <typeparam name="S">Generic configuration type</typeparam>
-    /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="A">Generic application type</typeparam>
     /// <typeparam name="U">Generic current user type</typeparam>
     /// <remarks>
@@ -21,11 +18,10 @@ namespace com.etsoo.CoreFramework.Services
     /// <param name="user">Current user</param>
     /// <param name="flag">Flag</param>
     /// <param name="logger">Logger</param>
-    public abstract class UserServiceBase<S, C, A, U>(A app, U user, string flag, ILogger logger)
-        : ServiceBase<S, C, A, U>(app, user, flag, logger), IServiceBase
-        where S : AppConfiguration
-        where C : DbConnection
-        where A : ICoreApplication<S, C>
+    public abstract class UserServiceBase<A, U>(A app, U user, string flag, ILogger logger)
+        : ServiceBase<A, U>(app, user, flag, logger), IServiceBase
+        where A : ICoreApplicationBase
+
         where U : IUserToken
     {
         /// <summary>

@@ -8,7 +8,6 @@ using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Buffers;
-using System.Data.Common;
 
 namespace com.etsoo.CoreFramework.Services
 {
@@ -16,8 +15,6 @@ namespace com.etsoo.CoreFramework.Services
     /// User authorized entity service
     /// 已授权用户实体服务
     /// </summary>
-    /// <typeparam name="S">Generic configuration type</typeparam>
-    /// <typeparam name="C">Generic connection type</typeparam>
     /// <typeparam name="A">Generic application type</typeparam>
     /// <typeparam name="U">Generic current user type</typeparam>
     /// <typeparam name="T">Generic id type</typeparam>
@@ -37,11 +34,9 @@ namespace com.etsoo.CoreFramework.Services
     /// <param name="user">Current user</param>
     /// <param name="flag">Flag</param>
     /// <param name="logger">Logger</param>
-    public abstract class EntityServiceBase<S, C, A, U, T>(A app, U user, string flag, ILogger logger)
-        : UserServiceBase<S, C, A, U>(app, user, flag, logger), IEntityServiceBase<T>
-        where S : AppConfiguration
-        where C : DbConnection
-        where A : ICoreApplication<S, C>
+    public abstract class EntityServiceBase<A, U, T>(A app, U user, string flag, ILogger logger)
+        : UserServiceBase<A, U>(app, user, flag, logger), IEntityServiceBase<T>
+        where A : ICoreApplicationBase
         where U : IUserToken
         where T : struct
     {

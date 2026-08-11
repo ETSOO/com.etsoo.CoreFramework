@@ -19,7 +19,7 @@ using System.Text;
 
 namespace Tests.Services
 {
-    internal class ServiceTest : ServiceBase<AppConfiguration, SqliteConnection, ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
+    internal class ServiceTest : ServiceBase<ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
     {
         public ServiceTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger) : base(app, null, flag, logger)
         {

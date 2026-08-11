@@ -13,16 +13,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Buffers;
 using System.Data;
-using System.Data.Common;
 using System.Net;
 using System.Text.RegularExpressions;
 
 namespace com.etsoo.CoreFramework.Services
 {
-    public abstract partial class ServiceBase<S, C, A, U> : IServiceBase
-        where S : AppConfiguration
-        where C : DbConnection
-        where A : ICoreApplication<S, C>
+    public abstract partial class ServiceBase<A, U> : IServiceBase
+        where A : ICoreApplicationBase
         where U : IUserToken
     {
         /// <summary>
