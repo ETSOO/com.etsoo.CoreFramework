@@ -18,12 +18,6 @@ namespace com.etsoo.CoreFramework.Application
         int AppId { get; }
 
         /// <summary>
-        /// Application configuration
-        /// 程序配置
-        /// </summary>
-        AppConfiguration Configuration { get; }
-
-        /// <summary>
         /// Database
         /// 数据库
         /// </summary>

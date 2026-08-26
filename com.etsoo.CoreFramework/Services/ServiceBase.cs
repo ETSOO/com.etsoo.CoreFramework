@@ -27,6 +27,8 @@ namespace com.etsoo.CoreFramework.Services
         // Duration seconds for time span of the server side and browser/client side
         private const int DurationSeconds = 120;
 
+        private readonly AppConfiguration _configuration;
+
         /// <summary>
         /// Application
         /// 程序对象
@@ -56,12 +58,14 @@ namespace com.etsoo.CoreFramework.Services
         /// 构造函数
         /// </remarks>
         /// <param name="app">Application</param>
+        /// <param name="configuration">Configuration</param>
         /// <param name="user">Current user</param>
         /// <param name="flag">Flag</param>
         /// <param name="logger">Logger</param>
-        public ServiceBase(A app, U? user, string flag, ILogger logger)
+        public ServiceBase(A app, AppConfiguration configuration, U? user, string flag, ILogger logger)
         {
             App = app;
+            _configuration = configuration;
             User = user;
             Flag = flag;
             Logger = logger;
@@ -266,7 +270,7 @@ namespace com.etsoo.CoreFramework.Services
                     // Repo update
                     if (!string.IsNullOrEmpty(rq.Identifier))
                     {
-                        var source = await HashDecryptAsync(rq.Identifier, App.Configuration.InitCallEncryptionIdentifier);
+                        var source = await HashDecryptAsync(rq.Identifier, _configuration.InitCallEncryptionIdentifier);
                         if (source != null && int.TryParse(source, out var deviceId))
                         {
                             await InitCallUpdateAsync(rq.DeviceId, newDeviceId, deviceId, cancellationToken);

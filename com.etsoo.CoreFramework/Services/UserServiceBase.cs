@@ -15,11 +15,12 @@ namespace com.etsoo.CoreFramework.Services
     /// 构造函数
     /// </remarks>
     /// <param name="app">Application</param>
+    /// <param name="configuration">Configuration</param>
     /// <param name="user">Current user</param>
     /// <param name="flag">Flag</param>
     /// <param name="logger">Logger</param>
-    public abstract class UserServiceBase<A, U>(A app, U user, string flag, ILogger logger)
-        : ServiceBase<A, U>(app, user, flag, logger), IServiceBase
+    public abstract class UserServiceBase<A, U>(A app, AppConfiguration configuration, U user, string flag, ILogger logger)
+        : ServiceBase<A, U>(app, configuration, user, flag, logger), IServiceBase
         where A : ICoreApplicationBase
 
         where U : IUserToken

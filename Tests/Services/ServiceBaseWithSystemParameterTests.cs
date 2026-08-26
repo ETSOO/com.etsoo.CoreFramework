@@ -15,10 +15,10 @@ using System.Text;
 
 namespace Tests.Services
 {
-    internal class ServiceWithParameterTest : ServiceBase<ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
+    internal class ServiceWithParameterTest : ServiceBase<ICoreApplication<SqliteConnection>, ICurrentUser>
     {
-        public ServiceWithParameterTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger)
-            : base(app, new CurrentUser
+        public ServiceWithParameterTest(ICoreApplication<SqliteConnection> app, AppConfiguration configuration, string flag, ILogger logger)
+            : base(app, configuration, new CurrentUser
             {
                 Id = "1",
                 Scopes = [],
@@ -52,9 +52,9 @@ namespace Tests.Services
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
             var config = AppConfiguration.Create();
-            var app = new CoreApplication<AppConfiguration, SqliteConnection>(config, db);
+            var app = new CoreApplication<SqliteConnection>(db, config.PrivateKey);
 
-            service = new ServiceWithParameterTest(app, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+            service = new ServiceWithParameterTest(app, config, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
         }
 
         [TestInitialize]

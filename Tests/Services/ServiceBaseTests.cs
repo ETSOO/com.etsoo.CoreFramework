@@ -19,9 +19,10 @@ using System.Text;
 
 namespace Tests.Services
 {
-    internal class ServiceTest : ServiceBase<ICoreApplication<AppConfiguration, SqliteConnection>, ICurrentUser>
+    internal class ServiceTest : ServiceBase<ICoreApplication<SqliteConnection>, ICurrentUser>
     {
-        public ServiceTest(ICoreApplication<AppConfiguration, SqliteConnection> app, string flag, ILogger logger) : base(app, null, flag, logger)
+        public ServiceTest(ICoreApplication<SqliteConnection> app, AppConfiguration configuration, string flag, ILogger logger)
+            : base(app, configuration, null, flag, logger)
         {
         }
 
@@ -52,9 +53,9 @@ namespace Tests.Services
             db = new SqliteDatabase("Data Source = etsoo.db;");
 
             var config = AppConfiguration.Create();
-            var app = new CoreApplication<AppConfiguration, SqliteConnection>(config, db);
+            var app = new CoreApplication<SqliteConnection>(db, config.PrivateKey);
 
-            service = new ServiceTest(app, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+            service = new ServiceTest(app, config, "User", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
         }
 
         [TestInitialize]

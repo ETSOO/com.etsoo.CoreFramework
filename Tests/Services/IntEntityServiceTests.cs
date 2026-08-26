@@ -19,9 +19,9 @@ namespace Tests.Services
     /// <summary>
     /// Int id entity service
     /// </summary>
-    internal class IntEntityService : EntityServiceBase<ICoreApplication<AppConfiguration, SqlConnection>, ICurrentUser, int>
+    internal class IntEntityService : EntityServiceBase<ICoreApplication<SqlConnection>, ICurrentUser, int>
     {
-        public IntEntityService(ICoreApplication<AppConfiguration, SqlConnection> app, string flag, ILogger logger) : base(app, null!, flag, logger)
+        public IntEntityService(ICoreApplication<SqlConnection> app, AppConfiguration configuration, string flag, ILogger logger) : base(app, configuration, null!, flag, logger)
         {
         }
 
@@ -63,7 +63,7 @@ namespace Tests.Services
     [SupportedOSPlatform("windows")]
     public class IntEntityServiceTests
     {
-        readonly CoreApplication<AppConfiguration, SqlConnection> app;
+        readonly CoreApplication<SqlConnection> app;
         readonly IntEntityService service;
 
         public IntEntityServiceTests()
@@ -71,9 +71,9 @@ namespace Tests.Services
             var db = new SqlServerDatabase("Server=localhost,1433;User ID=sa;Password=Etsoo@2026;Database=tempdb;Enlist=false;TrustServerCertificate=true");
 
             var config = new AppConfiguration { Name = "test", PrivateKey = "@s$a!" };
-            app = new CoreApplication<AppConfiguration, SqlConnection>(config, db);
+            app = new CoreApplication<SqlConnection>(db, config.PrivateKey);
 
-            service = new IntEntityService(app, "user", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
+            service = new IntEntityService(app, config, "user", new EventLogLoggerProvider().CreateLogger("SmartERPTests"));
 
             using var conn = db.NewConnection();
             conn.Execute("""

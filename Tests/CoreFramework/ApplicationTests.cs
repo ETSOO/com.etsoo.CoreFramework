@@ -24,9 +24,9 @@ namespace Tests.CoreFramework
         public void MiniApplicationTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
-            var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
+            var app = new CoreApplication<SqliteConnection>(db, AppConfiguration.Create().PrivateKey);
 
-            Assert.IsEmpty(app.Configuration.Cultures);
+            Assert.IsNotNull(app.DB);
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace Tests.CoreFramework
         public void EncryptionTest()
         {
             var db = new SqliteDatabase("Data Source = etsoo.db;");
-            var app = new CoreApplication<AppConfiguration, SqliteConnection>(AppConfiguration.Create(), db);
+            var app = new CoreApplication<SqliteConnection>(db, AppConfiguration.Create().PrivateKey);
             var text = "Hello, world!";
             var encrypted = app.EncriptData(text, "a");
             var decrypted = app.DecriptData(encrypted, "a");

@@ -12,10 +12,8 @@ namespace com.etsoo.CoreFramework.Application
     /// Core application
     /// 核心程序
     /// </summary>
-    /// <typeparam name="S">Generic configuration type</typeparam>
     /// <typeparam name="C">Generic database connection type</typeparam>
-    public class CoreApplication<S, C> : ICoreApplication<S, C>
-        where S : AppConfiguration
+    public class CoreApplication<C> : ICoreApplication<C>
         where C : DbConnection
     {
         private JsonSerializerOptions? _defaultJsonSerializerOptions;
@@ -40,18 +38,13 @@ namespace com.etsoo.CoreFramework.Application
             }
         }
 
+        private readonly string _privateKey;
+
         /// <summary>
         /// Application id
         /// 应用编号
         /// </summary>
         public int AppId { get; protected init; }
-
-        /// <summary>
-        /// Application configuration
-        /// 程序配置
-        /// </summary>
-        public S Configuration { get; }
-        AppConfiguration ICoreApplicationBase.Configuration => Configuration;
 
         /// <summary>
         /// Database
@@ -74,23 +67,23 @@ namespace com.etsoo.CoreFramework.Application
         /// Constructor
         /// 构造函数
         /// </summary>
-        /// <param name="configuration">Configuration</param>
         /// <param name="db">Database</param>
+        /// <param name="privateKey">Private key</param>
         /// <param name="modelValidated">Model validated or not</param>
         public CoreApplication(
-            S configuration,
             IDatabase<C> db,
+            string privateKey,
             bool modelValidated = false
         )
         {
             // Update
             (
-                Configuration,
                 DB,
+                _privateKey,
                 ModelValidated
             ) = (
-                configuration,
                 db,
+                privateKey,
                 modelValidated
             );
         }
@@ -101,8 +94,8 @@ namespace com.etsoo.CoreFramework.Application
         /// </summary>
         /// <param name="init">Init tuple</param>
         /// <param name="modelValidated">Model validated or not</param>
-        public CoreApplication((S configuration,
-            IDatabase<C> db) init, bool modelValidated = false) : this(init.configuration, init.db, modelValidated)
+        public CoreApplication((IDatabase<C> db, string privateKey) init, bool modelValidated = false)
+            : this(init.db, init.privateKey, modelValidated)
         {
         }
 
@@ -140,7 +133,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Result</returns>
         public string DecriptData(string cipherText, string key = "")
         {
-            var bytes = CryptographyUtils.AESDecrypt(cipherText, key + Configuration.PrivateKey) ?? throw new ApplicationException("Decript Data Failed");
+            var bytes = CryptographyUtils.AESDecrypt(cipherText, key + _privateKey) ?? throw new ApplicationException("Decript Data Failed");
             return Encoding.UTF8.GetString(bytes);
         }
 
@@ -153,7 +146,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Result</returns>
         public string EncriptData(string plainText, string key = "")
         {
-            return CryptographyUtils.AESEncrypt(plainText, key + Configuration.PrivateKey);
+            return CryptographyUtils.AESEncrypt(plainText, key + _privateKey);
         }
 
         /// <summary>
@@ -175,7 +168,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Hashed bytes</returns>
         public byte[] HashPasswordBytes(ReadOnlySpan<char> password)
         {
-            return CryptographyUtils.HMACSHA512(password, Configuration.PrivateKey);
+            return CryptographyUtils.HMACSHA512(password, _privateKey);
         }
 
         /// <summary>
@@ -186,7 +179,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>Hashed bytes</returns>
         public async Task<byte[]> HashPasswordBytesAsync(string password)
         {
-            return await CryptographyUtils.HMACSHA512Async(password, Configuration.PrivateKey);
+            return await CryptographyUtils.HMACSHA512Async(password, _privateKey);
         }
 
         /// <summary>
