@@ -8,7 +8,7 @@ namespace com.etsoo.CoreFramework.Application
     /// </summary>
     public record OtlpExporterService
     {
-        public OtlpExportProtocol Protocol { get; set; } = OtlpExportProtocol.HttpProtobuf;
+        public OtlpExportProtocol? Protocol { get; set; }
         public Uri Endpoint { get; set; } = default!;
         public string? Headers { get; set; }
     }
