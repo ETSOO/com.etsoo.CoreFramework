@@ -26,14 +26,14 @@ namespace com.etsoo.Utils.Crypto
                 return null;
             }
 
-            var salt = cipherText[2..34];
-            var iv = cipherText[34..66];
-            var encrypted = cipherText[66..];
-            var key = PBKDF2(Encoding.UTF8.GetBytes(passphrase), Convert.FromHexString(salt), 32, iterations * 1000);
+            var salt = Convert.FromHexString(cipherText[2..34]);
+            var iv = Convert.FromHexString(cipherText[34..66]);
+            var encrypted = Convert.FromBase64String(cipherText[66..]);
+            var key = PBKDF2(Encoding.UTF8.GetBytes(passphrase), salt, 32, iterations * 1000);
 
             using var aes = Aes.Create();
             aes.Key = key;
-            return aes.DecryptCbc(Convert.FromBase64String(encrypted), Convert.FromHexString(iv), PaddingMode.PKCS7);
+            return aes.DecryptCbc(encrypted, iv, PaddingMode.PKCS7);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace com.etsoo.Utils.Crypto
         public static string AESEncrypt(string plainText, string passphrase, int iterations = 10)
         {
             var salt = CreateRandBytes(16).ToArray();
-            var iv = CreateRandBytes(16);
+            var iv = CreateRandBytes(16).ToArray();
             var key = PBKDF2(Encoding.UTF8.GetBytes(passphrase), salt, 32, iterations * 1000);
 
             using var aes = Aes.Create();
@@ -74,7 +74,7 @@ namespace com.etsoo.Utils.Crypto
             sb.Append(iterations.ToString().PadLeft(2, '0'));
             sb.Append(Convert.ToHexString(salt));
             sb.Append(Convert.ToHexString(iv));
-            sb.Append(Convert.ToBase64String(aes.EncryptCbc(Encoding.UTF8.GetBytes(plainText), iv)));
+            sb.Append(Convert.ToBase64String(aes.EncryptCbc(Encoding.UTF8.GetBytes(plainText), iv, PaddingMode.PKCS7)));
             return sb.ToString();
         }
 

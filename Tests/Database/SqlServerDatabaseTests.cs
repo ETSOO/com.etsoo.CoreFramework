@@ -5,6 +5,8 @@ using System.Data;
 
 namespace Tests.Database
 {
+    // SQL Server docker setup
+    // docker run -n sqlserver -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Etsoo@2026" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2025-latest
     [TestClass]
     public class SqlServerDatabaseTests
     {

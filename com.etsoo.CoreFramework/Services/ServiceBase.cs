@@ -309,13 +309,12 @@ namespace com.etsoo.CoreFramework.Services
         /// 登记异常结果日志，并返回简介的用户结果
         /// </summary>
         /// <param name="ex">Exception</param>
+        /// <param name="data">State data</param>
         /// <returns>Result</returns>
-        public ActionResult LogException(Exception ex)
+        public ActionResult LogException(Exception ex, Dictionary<string, object?>? data = null)
         {
-            // Get the Db connection failure result
             var exResult = App.DB.GetExceptionResult(ex);
 
-            // Transform
             var result = exResult.Type switch
             {
                 DbExceptionType.OutOfMemory => ApplicationErrors.OutOfMemory.AsResult(),
@@ -323,7 +322,10 @@ namespace com.etsoo.CoreFramework.Services
                 _ => ApplicationErrors.DataProcessingFailed.AsResult()
             };
 
-            // Log the exception
+            using var scope = data != null
+                ? Logger.BeginScope(data)
+                : null;
+
             if (exResult.Critical)
             {
                 Logger.LogError(ex, "Critical error: {title}", result.Title);
@@ -333,7 +335,8 @@ namespace com.etsoo.CoreFramework.Services
                 Logger.LogWarning(ex, "Error: {title}", result.Title);
             }
 
-            // Return
+            scope?.Dispose();
+
             return result;
         }
     }

@@ -76,8 +76,9 @@ namespace com.etsoo.CoreFramework.Services
         /// 登记异常结果日志，并返回简介的用户结果
         /// </summary>
         /// <param name="ex">Exception</param>
+        /// <param name="data">State data</param>
         /// <returns>Result</returns>
-        ActionResult LogException(Exception ex);
+        ActionResult LogException(Exception ex, Dictionary<string, object?>? data = null);
 
         /// <summary>
         /// Async query command as object

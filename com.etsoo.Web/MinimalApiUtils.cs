@@ -77,7 +77,7 @@ namespace com.etsoo.Web
         /// <param name="result">Action result</param>
         /// <param name="parser">Parser</param>
         /// <returns>Valid or not</returns>
-        public static bool CheckDevice(string? userAgent, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out UAParser? parser)
+        public static bool CheckDevice([NotNullWhen(true)] string? userAgent, [NotNullWhen(false)] out IActionResult? result, [NotNullWhen(true)] out UAParser? parser)
         {
             // User-Agent validatation
             parser = new UAParser(userAgent);
@@ -161,7 +161,7 @@ namespace com.etsoo.Web
             {
                 // Exception happened when device upgraded or changed view model (windows to mobile)
                 // Client should response to it to clear cached device id
-                result = service.LogException(ex);
+                result = service.LogException(ex, new() { { "DeviceId", deviceId }, { "UserAgent", userAgent }, { "ShortName", parser.ToShortName() } });
                 return false;
             }
         }

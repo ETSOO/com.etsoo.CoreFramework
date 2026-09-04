@@ -4,6 +4,7 @@ using com.etsoo.CoreFramework.Models;
 using com.etsoo.CoreFramework.Services;
 using com.etsoo.CoreFramework.User;
 using com.etsoo.Database;
+using com.etsoo.UserAgentParser;
 using com.etsoo.Utils;
 using com.etsoo.Utils.Models;
 using Dapper;
@@ -112,7 +113,10 @@ namespace Tests.Services
             var encrypted = service.Encrypt(input, passphrase, 1);
             var plainText = service.Decrypt(encrypted, passphrase, 120);
 
+            var encryptedEnhanced = service.Encrypt(input, passphrase, 1, false);
+
             // Assert
+            Assert.AreNotEqual(encryptedEnhanced, encrypted);
             Assert.AreEqual(input, plainText);
         }
 
