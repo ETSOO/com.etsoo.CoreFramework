@@ -52,7 +52,7 @@ namespace Tests.Utils
         public async Task<(string?, long)> DownloadImageAsync()
         {
             await using var stream = new MemoryStream();
-            var filename = await DownloadAsync("https://www.etsoo.com/images/logo.png", stream);
+            var filename = await DownloadAsync("https://platform.etsoo.cn/resources/etsoo.png", stream);
             return (filename, stream.Length);
         }
 

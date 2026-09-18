@@ -63,9 +63,7 @@ namespace com.etsoo.CoreFramework.Application
         /// <returns>result</returns>
         public static bool IsAssetUnit(ProductUnit unit)
         {
-            return unit == ProductUnit.TIME
-                || unit == ProductUnit.MONEY
-                || (unit >= ProductUnit.HOUR && unit <= ProductUnit.HALFYEAR);
+            return unit >= ProductUnit.HOUR && unit <= ProductUnit.HALFYEAR;
         }
     }
 }

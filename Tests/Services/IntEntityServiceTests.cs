@@ -77,7 +77,6 @@ namespace Tests.Services
 
             using var conn = db.NewConnection();
             conn.Execute("""
-
                 IF OBJECT_ID('dbo.[User]', 'U') IS NULL
                 BEGIN
                     CREATE TABLE dbo.[User]
