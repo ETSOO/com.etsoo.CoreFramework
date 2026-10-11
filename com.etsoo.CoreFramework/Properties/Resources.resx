@@ -258,4 +258,7 @@
   <data name="DataOutdated" xml:space="preserve">
     <value>Data Outdated</value>
   </data>
+  <data name="InsufficientBalance" xml:space="preserve">
+    <value>Insufficient Account Balance</value>
+  </data>
 </root>

@@ -149,7 +149,7 @@ namespace Tests.Utils
         public async Task DownloadImageAsyncTests()
         {
             var (filename, length) = await service.DownloadImageAsync();
-            Assert.AreEqual("logo.png", filename);
+            Assert.AreEqual("etsoo.png", filename);
             Assert.IsGreaterThanOrEqualTo(1000, length);
         }
 

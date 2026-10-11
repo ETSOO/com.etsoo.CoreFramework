@@ -258,4 +258,7 @@
   <data name="DataOutdated" xml:space="preserve">
     <value>数据已过时</value>
   </data>
+  <data name="InsufficientBalance" xml:space="preserve">
+    <value>账户余额不足</value>
+  </data>
 </root>

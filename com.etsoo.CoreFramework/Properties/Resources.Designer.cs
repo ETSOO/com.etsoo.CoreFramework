@@ -214,6 +214,15 @@ namespace com.etsoo.CoreFramework.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Insufficient Account Balance.
+        /// </summary>
+        public static string InsufficientBalance {
+            get {
+                return ResourceManager.GetString("InsufficientBalance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Action.
         /// </summary>
         public static string InvalidAction {

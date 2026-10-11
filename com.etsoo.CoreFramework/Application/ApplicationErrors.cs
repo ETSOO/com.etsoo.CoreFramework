@@ -135,6 +135,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError HighRequestRrequency => new(nameof(HighRequestRrequency), Resources.HighRequestRrequency);
 
         /// <summary>
+        /// Insufficient Balance
+        /// 余额不足
+        /// </summary>
+        public static ApplicationError InsufficientBalance => new(nameof(InsufficientBalance), Resources.InsufficientBalance);
+
+        /// <summary>
         /// Invalid Action
         /// 无效的操作
         /// </summary>
@@ -335,6 +341,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(DeviceFrozen) => DeviceFrozen,
                 nameof(EmailExists) => EmailExists,
                 nameof(HighRequestRrequency) => HighRequestRrequency,
+                nameof(InsufficientBalance) => InsufficientBalance,
                 nameof(InvalidAction) => InvalidAction,
                 nameof(InvalidEmail) => InvalidEmail,
                 nameof(InvalidMobile) => InvalidMobile,
