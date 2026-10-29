@@ -1,4 +1,5 @@
 ﻿using com.etsoo.ImageUtils;
+using com.etsoo.ImageUtils.Barcode;
 using System.Runtime.Versioning;
 
 namespace Tests.Utils
@@ -42,5 +43,25 @@ namespace Tests.Utils
             Assert.AreEqual("png", ext);
             Assert.AreEqual(1015, ms.Length);
         }
+
+        [TestMethod]
+        public async Task CreateCreateQRCodeAsync()
+        {
+            var options = new BarcodeOptions
+            {
+                Type = "QRCode",
+                Content = "https://cn.etsoo.com/",
+                ForegroundText = "#3f51b5",
+                Width = 600,
+                Height = 600
+            };
+
+            await using var stream = new MemoryStream();
+            await BarcodeUtils.CreateAsync(stream, options, TestContext.CancellationToken);
+
+            Assert.IsGreaterThan(100, stream.Length);
+        }
+
+        public TestContext TestContext { get; set; }
     }
 }

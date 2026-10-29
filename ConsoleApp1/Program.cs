@@ -1,8 +1,6 @@
-﻿using com.etsoo.ImageUtils.Barcode;
-using com.etsoo.MessageQueue;
+﻿using com.etsoo.MessageQueue;
 using com.etsoo.MessageQueue.QueueProcessors;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -182,23 +180,6 @@ namespace ConsoleApp1
             chars.Slice(index, len).CopyTo(newChars.Slice(newIndex, len));
 
             return newChars.Trim('\0').ToString();
-        }
-
-        static async Task CreateQRCode()
-        {
-            var options = new BarcodeOptions
-            {
-                Type="QRCode",
-                Content="https://cn.etsoo.com/",
-                ForegroundText="#3f51b5",
-                Width = 600,
-                Height = 600
-            };
-
-            using var stream = File.Create("D:\\test.png");
-            await BarcodeUtils.CreateAsync(stream, options);
-
-            Console.Write("QRCode created");
         }
 
         static void TestTask()
