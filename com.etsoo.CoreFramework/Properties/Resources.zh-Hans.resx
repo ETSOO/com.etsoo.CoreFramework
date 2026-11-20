@@ -261,4 +261,7 @@
   <data name="InsufficientBalance" xml:space="preserve">
     <value>账户余额不足</value>
   </data>
+  <data name="ValueOutOfRange" xml:space="preserve">
+    <value>值超出有效范围</value>
+  </data>
 </root>

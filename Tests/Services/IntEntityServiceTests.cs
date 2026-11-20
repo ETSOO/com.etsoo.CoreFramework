@@ -77,15 +77,15 @@ namespace Tests.Services
 
             using var conn = db.NewConnection();
             conn.Execute("""
-                IF OBJECT_ID('dbo.[User]', 'U') IS NULL
-                BEGIN
-                    CREATE TABLE dbo.[User]
-                    (
-                        Id INT PRIMARY KEY,
-                        Name NVARCHAR(128) NOT NULL,
-                        [Status] TINYINT NOT NULL DEFAULT 0
-                    );
-                END
+                IF OBJECT_ID('dbo.[User]', 'U') IS NOT NULL
+                    EXEC('DROP TABLE dbo.[User]');
+
+                CREATE TABLE dbo.[User]
+                (
+                    Id INT PRIMARY KEY,
+                    Name NVARCHAR(128) NOT NULL,
+                    [Status] TINYINT NOT NULL DEFAULT 0
+                );
 
                 IF NOT EXISTS (SELECT * FROM sys.types WHERE is_table_type = 1 AND name ='et_int_ids')
                 BEGIN
@@ -115,7 +115,8 @@ namespace Tests.Services
                     INSERT INTO [User] (Id, Name) VALUES (1001, 'Admin 1')
                 END
 
-                -- EXEC('DROP PROCEDURE ep_user_create');
+                IF OBJECT_ID('dbo.ep_user_create', 'P') IS NOT NULL
+                    EXEC('DROP PROCEDURE ep_user_create');
 
                 IF NOT EXISTS (
                     SELECT *
@@ -151,7 +152,8 @@ namespace Tests.Services
                     ');
                 END
 
-                -- EXEC('DROP PROCEDURE ep_user_delete');
+                IF OBJECT_ID('dbo.ep_user_delete', 'P') IS NOT NULL
+                    EXEC('DROP PROCEDURE ep_user_delete');
 
                 IF NOT EXISTS (
                     SELECT *
@@ -176,7 +178,8 @@ namespace Tests.Services
                     ');
                 END
 
-                -- EXEC('DROP PROCEDURE ep_user_sort');
+                IF OBJECT_ID('dbo.ep_user_sort', 'P') IS NOT NULL
+                    EXEC('DROP PROCEDURE ep_user_sort');
 
                 IF NOT EXISTS (
                     SELECT *
@@ -199,7 +202,8 @@ namespace Tests.Services
                     ');
                 END
 
-                -- EXEC('DROP PROCEDURE ep_user_list_as_json');
+                IF OBJECT_ID('dbo.ep_user_list_as_json', 'P') IS NOT NULL
+                    EXEC('DROP PROCEDURE ep_user_list_as_json');
                 
                 IF NOT EXISTS (
                     SELECT *
@@ -224,7 +228,8 @@ namespace Tests.Services
                     ');
                 END
 
-                -- EXEC('DROP PROCEDURE ep_user_read_for_default');
+                IF OBJECT_ID('dbo.ep_user_read_for_default', 'P') IS NOT NULL
+                    EXEC('DROP PROCEDURE ep_user_read_for_default');
                 
                 IF NOT EXISTS (
                     SELECT *
@@ -316,8 +321,8 @@ namespace Tests.Services
             // Arrange
             var user = new UserUpdateModule
             {
-                Id = 1021,
-                Name = "Admin 21",
+                Id = 1001,
+                Name = "Admin New Name",
                 ChangedFields = ["Name"]
             };
 

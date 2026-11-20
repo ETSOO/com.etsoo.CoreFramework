@@ -261,4 +261,7 @@
   <data name="InsufficientBalance" xml:space="preserve">
     <value>Insufficient Account Balance</value>
   </data>
+  <data name="ValueOutOfRange" xml:space="preserve">
+    <value>The value is outside the valid range</value>
+  </data>
 </root>

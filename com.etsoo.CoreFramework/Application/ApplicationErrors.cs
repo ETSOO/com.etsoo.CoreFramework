@@ -195,8 +195,8 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError NoActionResult => new(nameof(NoActionResult), Resources.NoActionResult);
 
         /// <summary>
-        /// No action result error
-        /// 没有操作结果错误
+        /// No data returned error
+        /// 没有返回数据错误
         /// </summary>
         public static ApplicationError NoDataReturned => new(nameof(NoDataReturned), Resources.NoDataReturned);
 
@@ -315,6 +315,12 @@ namespace com.etsoo.CoreFramework.Application
         public static ApplicationError UserRegistered => new(nameof(UserRegistered), Resources.UserRegistered);
 
         /// <summary>
+        /// The value is outside the valid range.
+        /// 值超出有效范围
+        /// </summary>
+        public static ApplicationError ValueOutOfRange => new(nameof(ValueOutOfRange), Resources.ValueOutOfRange);
+
+        /// <summary>
         /// Get error with name
         /// 从名称获取错误
         /// </summary>
@@ -370,6 +376,7 @@ namespace com.etsoo.CoreFramework.Application
                 nameof(TooManyItems) => TooManyItems,
                 nameof(UserFrozen) => UserFrozen,
                 nameof(UserRegistered) => UserRegistered,
+                nameof(ValueOutOfRange) => ValueOutOfRange,
                 _ => null
             };
         }

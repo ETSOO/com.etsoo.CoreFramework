@@ -71,7 +71,7 @@ namespace com.etsoo.SMTP
             FormatMessage(message);
 
             // Client
-            using var client = new SmtpClient();
+            await using var client = new SmtpClient();
 
             // Connection
             await client.ConnectAsync(Options.Host, Options.Port, Options.UseSsl, token);
@@ -83,7 +83,7 @@ namespace com.etsoo.SMTP
             }
 
             // Send
-            await client.SendAsync(message, token);
+            //await client.SendAsync(message, token);
 
             // Disconnect
             await client.DisconnectAsync(true, token);

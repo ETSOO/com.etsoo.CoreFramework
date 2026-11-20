@@ -491,5 +491,14 @@ namespace com.etsoo.CoreFramework.Properties {
                 return ResourceManager.GetString("UserRegistered", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value is outside the valid range.
+        /// </summary>
+        public static string ValueOutOfRange {
+            get {
+                return ResourceManager.GetString("ValueOutOfRange", resourceCulture);
+            }
+        }
     }
 }
